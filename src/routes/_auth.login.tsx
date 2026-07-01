@@ -1,3 +1,4 @@
+
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,13 +50,34 @@ function LoginPage() {
     setServerError(null);
     try {
       const res = await authService.login(values);
+
+      // Since the backend doesn't return the role in the JWT or login response,
+      // we probe an admin endpoint to check if the user is an ADMIN.
+      let role = "CUSTOMER";
+      try {
+        const probeRes = await fetch("http://localhost:8080/api/admin/users", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${res.token}` },
+        });
+        if (probeRes.ok) {
+          role = "ADMIN";
+        }
+      } catch (e) {
+        // ignore
+      }
+
       setSession(res.token, {
         id: res.id,
         username: values.username,
-        roles: [],
+        roles: [role as "ADMIN" | "CUSTOMER"],
       });
       toast.success("Welcome back");
-      navigate({ to: redirect ?? "/" });
+
+      if (role === "ADMIN") {
+        navigate({ to: redirect ?? "/admin" });
+      } else {
+        navigate({ to: redirect ?? "/" });
+      }
     } catch (e) {
       const msg = e instanceof ApiError ? e.message : "Sign in failed. Please try again.";
       setServerError(msg);

@@ -23,7 +23,7 @@ const navigation = [
 
 export function AdminSidebar() {
   const { pathname } = useLocation();
-  const { clearSession } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <Sidebar variant="inset">
@@ -60,7 +60,7 @@ export function AdminSidebar() {
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => clearSession()} className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+            <SidebarMenuButton onClick={() => signOut()} className="text-destructive hover:bg-destructive/10 hover:text-destructive">
               <LogOut />
               <span>Sign out</span>
             </SidebarMenuButton>

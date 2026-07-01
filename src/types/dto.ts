@@ -7,7 +7,11 @@ export type UUID = string;
 
 /* ---------- Auth ---------- */
 export type LoginRequest = { username: string; password: string };
-export type LoginResponse = { token: string; id: UUID };
+export type LoginResponse = { 
+  token: string; 
+  id: UUID;
+  role: string;
+};
 
 export type RegisterRole = "ADMIN" | "CUSTOMER";
 export type RegisterRequest = {
@@ -188,4 +192,21 @@ export type UpdateProductRequest = Partial<CreateProductRequest>;
 
 export type OrderStatusUpdateRequest = {
   orderStatus: OrderStatus;
+};
+
+/* ---------- Addresses ---------- */
+export type AddressRequest = {
+  fullName: string;
+  phoneNumber: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+};
+
+export type AddressResponse = AddressRequest & {
+  addressId: UUID;
 };

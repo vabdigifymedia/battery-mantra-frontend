@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Layers } from "lucide-react";
-import { categoriesQuery } from "@/queries";
+import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
 export function CategoryGrid() {
-  const { data, isLoading, isError } = useQuery(categoriesQuery());
+  const { data, isLoading, isError } = useQuery(rootCategoriesQuery());
 
   if (isLoading) {
     return (
@@ -29,11 +29,11 @@ export function CategoryGrid() {
           search={{ categoryId: c.categoryId }}
           className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+          <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
             {c.iconUrl ? (
-              <img src={c.iconUrl} alt="" className="h-6 w-6" />
+              <img src={c.iconUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
             ) : (
-              <Layers className="h-5 w-5" />
+              <Layers className="h-8 w-8" />
             )}
           </span>
           <span className="text-sm font-medium text-foreground line-clamp-2">

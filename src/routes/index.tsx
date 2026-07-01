@@ -12,7 +12,7 @@ import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { FaqAccordion } from "@/components/home/FaqAccordion";
 import {
   productListQuery,
-  categoriesQuery,
+  rootCategoriesQuery,
   featuredBrandsQuery,
   vehiclesListQuery,
 } from "@/queries";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
   }),
   loader: ({ context }) => {
     void context.queryClient.prefetchQuery(productListQuery());
-    void context.queryClient.prefetchQuery(categoriesQuery());
+    void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(featuredBrandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
   },

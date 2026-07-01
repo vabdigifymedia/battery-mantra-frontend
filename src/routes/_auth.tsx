@@ -8,9 +8,12 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AuthLayout() {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
   if (status === "loading") return <FullPageLoader />;
-  if (status === "authenticated") return <Navigate to="/" />;
+  if (status === "authenticated") {
+    const isAdmin = user?.roles.includes("ADMIN");
+    return <Navigate to={isAdmin ? "/admin" : "/"} />;
+  }
   return (
     <Container size="sm" className="py-12 sm:py-16">
       <Outlet />
