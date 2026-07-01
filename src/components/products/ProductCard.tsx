@@ -1,0 +1,50 @@
+import { Link } from "@tanstack/react-router";
+import { Image } from "@/components/common/Image";
+import { Price } from "@/components/common/Price";
+import { cn } from "@/lib/utils";
+import type { ProductListResponse } from "@/types/dto";
+
+export function ProductCard({
+  product,
+  className,
+}: {
+  product: ProductListResponse;
+  className?: string;
+}) {
+  return (
+    <Link
+      to="/products/$id"
+      params={{ id: product.productId }}
+      className={cn(
+        "group block overflow-hidden rounded-2xl border border-border bg-card shadow-product transition-all hover:-translate-y-0.5 hover:shadow-floating focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        className,
+      )}
+    >
+      <div className="relative">
+        <Image
+          src={product.productImage}
+          alt={product.productName}
+          aspect="square"
+          rounded={false}
+          className="rounded-none"
+        />
+      </div>
+      <div className="space-y-1.5 p-4">
+        {product.brandName ? (
+          <p className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {product.brandName}
+          </p>
+        ) : null}
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-foreground group-hover:text-primary">
+          {product.productName}
+        </h3>
+        {product.productCategory ? (
+          <p className="truncate text-xs text-muted-foreground">{product.productCategory}</p>
+        ) : null}
+        <div className="flex items-center justify-between pt-1">
+          <Price value={product.productPrice} size="md" />
+        </div>
+      </div>
+    </Link>
+  );
+}

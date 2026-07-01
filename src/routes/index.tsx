@@ -1,0 +1,144 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, BatteryCharging, Zap } from "lucide-react";
+import { HeroSection } from "@/components/layout/HeroSection";
+import { Container } from "@/components/layout/Container";
+import { SectionHeading } from "@/components/layout/SectionHeading";
+import { Button } from "@/components/ui/button";
+import { VehicleFinderWidget } from "@/components/home/VehicleFinderWidget";
+import { CategoryGrid } from "@/components/home/CategoryGrid";
+import { BrandStrip } from "@/components/home/BrandStrip";
+import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { FaqAccordion } from "@/components/home/FaqAccordion";
+import {
+  productListQuery,
+  categoriesQuery,
+  featuredBrandsQuery,
+  vehiclesListQuery,
+} from "@/queries";
+import { APP } from "@/constants/app";
+
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: `${APP.name} — ${APP.tagline}` },
+      {
+        name: "description",
+        content:
+          "Shop premium automotive, inverter and industrial batteries with free installation, exchange offers and India-wide delivery.",
+      },
+      { property: "og:title", content: APP.name },
+      {
+        property: "og:description",
+        content:
+          "Premium batteries with free installation, exchange offers and India-wide delivery.",
+      },
+    ],
+  }),
+  loader: ({ context }) => {
+    void context.queryClient.prefetchQuery(productListQuery());
+    void context.queryClient.prefetchQuery(categoriesQuery());
+    void context.queryClient.prefetchQuery(featuredBrandsQuery());
+    void context.queryClient.prefetchQuery(vehiclesListQuery());
+  },
+  component: HomePage,
+});
+
+function HomePage() {
+  return (
+    <div>
+      <HeroSection
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5">
+            <Zap className="h-3 w-3" /> Genuine batteries · Free fitment
+          </span>
+        }
+        title={
+          <>
+            India&apos;s most trusted
+            <br />
+            <span className="text-primary">battery store</span>
+          </>
+        }
+        description="Find the right battery for any car, bike, inverter or commercial vehicle — delivered and installed at your doorstep."
+        primaryAction={
+          <Button asChild variant="brand" size="lg">
+            <Link to="/products">
+              Shop batteries <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        }
+        secondaryAction={
+          <Button asChild variant="brand-outline" size="lg">
+            <Link to="/vehicle-finder">
+              <BatteryCharging className="h-4 w-4" /> Find by vehicle
+            </Link>
+          </Button>
+        }
+        media={<VehicleFinderWidget />}
+      />
+
+      <Container size="xl" className="space-y-16 py-12 sm:py-16">
+        <section aria-labelledby="categories">
+          <SectionHeading
+            eyebrow="Browse"
+            title={<span id="categories">Shop by category</span>}
+            description="Pick from a curated catalogue of leading battery categories."
+          />
+          <div className="mt-6">
+            <CategoryGrid />
+          </div>
+        </section>
+
+        <section aria-labelledby="brands">
+          <SectionHeading
+            eyebrow="Trusted brands"
+            title={<span id="brands">Top battery brands</span>}
+          />
+          <div className="mt-6">
+            <BrandStrip />
+          </div>
+        </section>
+
+        <section aria-labelledby="featured">
+          <SectionHeading
+            eyebrow="Best of"
+            title={<span id="featured">Featured batteries</span>}
+            action={
+              <Button asChild variant="ghost-brand">
+                <Link to="/products">
+                  View all <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            }
+          />
+          <div className="mt-6">
+            <FeaturedProducts limit={8} />
+          </div>
+        </section>
+
+        <section aria-labelledby="why">
+          <SectionHeading
+            eyebrow="Why BatteryMantra"
+            title={<span id="why">Built for confidence</span>}
+            align="center"
+          />
+          <div className="mt-8">
+            <WhyChooseUs />
+          </div>
+        </section>
+
+        <section aria-labelledby="faq" className="mx-auto max-w-3xl">
+          <SectionHeading
+            eyebrow="FAQ"
+            title={<span id="faq">Questions, answered</span>}
+            align="center"
+          />
+          <div className="mt-6">
+            <FaqAccordion />
+          </div>
+        </section>
+      </Container>
+    </div>
+  );
+}
