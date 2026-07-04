@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Check, Clock, Package, Truck, Wrench } from "lucide-react";
 import { Image } from "@/components/common/Image";
 import { Price } from "@/components/common/Price";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -63,7 +64,29 @@ function OrderDetailPage() {
     );
 
   const o = order.data;
-  const canCancel = ["PENDING", "PROCESSING"].includes(o.orderStatus);
+  const canCancel = ["PENDING", "PROCESSING", "CONFIRMED"].includes(o.orderStatus);
+
+  const getStatusIndex = (status: string) => {
+    switch (status) {
+      case "PENDING": return 0;
+      case "CONFIRMED":
+      case "PROCESSING": return 1;
+      case "OUT_FOR_DELIVERY":
+      case "SHIPPED": return 2;
+      case "DELIVERED": return 3;
+      case "INSTALLED": return 4;
+      default: return -1;
+    }
+  };
+  
+  const statusIndex = getStatusIndex(o.orderStatus);
+  const isCancelled = o.orderStatus === "CANCELLED" || o.orderStatus === "RETURNED";
+
+  const getDeliveryLabel = (method?: string) => {
+    if (method === "HOME_INSTALLATION") return "Home Installation";
+    if (method === "STORE_PICKUP") return "Store Pickup";
+    return "Standard Delivery";
+  };
 
   return (
     <div>
@@ -86,6 +109,43 @@ function OrderDetailPage() {
               </Button>
             ) : null}
           </div>
+
+          {!isCancelled && statusIndex >= 0 && (
+            <div className="py-6 mb-6">
+              <h3 className="font-display text-sm font-semibold mb-4">Tracking Status</h3>
+              <div className="relative flex justify-between">
+                <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 bg-border z-0">
+                  <div 
+                    className="h-full bg-primary transition-all duration-500 ease-in-out" 
+                    style={{ width: `${(Math.min(statusIndex, (o.deliveryMethod === 'HOME_INSTALLATION' ? 4 : 3)) / (o.deliveryMethod === 'HOME_INSTALLATION' ? 4 : 3)) * 100}%` }}
+                  />
+                </div>
+                
+                {[
+                  { label: "Pending", icon: Clock },
+                  { label: "Confirmed", icon: Package },
+                  { label: "Out for Delivery", icon: Truck },
+                  { label: "Delivered", icon: Check },
+                  ...(o.deliveryMethod === "HOME_INSTALLATION" ? [{ label: "Installed", icon: Wrench }] : []),
+                ].map((step, idx) => {
+                  const Icon = step.icon;
+                  const isActive = statusIndex >= idx;
+                  const isCurrent = statusIndex === idx;
+                  
+                  return (
+                    <div key={idx} className="relative z-10 flex flex-col items-center gap-2">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center border-2 ${isActive ? 'bg-primary border-primary text-primary-foreground' : 'bg-card border-border text-muted-foreground'}`}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <span className={`text-xs font-semibold ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <ul className="space-y-3">
             {o.orderItems.map((it) => (
@@ -127,6 +187,22 @@ function OrderDetailPage() {
                 <dt className="text-muted-foreground">Items</dt>
                 <dd>{o.orderItems.length}</dd>
               </div>
+              {(o.exchangeDiscount ?? 0) > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Scrap Discount</dt>
+                  <dd>-<Price value={o.exchangeDiscount!} size="sm" /></dd>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Delivery Method</dt>
+                <dd className="font-medium text-right">{getDeliveryLabel(o.deliveryMethod)}</dd>
+              </div>
+              {o.deliveryMethod === "HOME_INSTALLATION" && o.installationDate && (
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Installation Date</dt>
+                  <dd className="font-medium text-right text-primary">{formatDate(o.installationDate)}</dd>
+                </div>
+              )}
               <div className="mt-2 flex justify-between border-t border-border pt-2 text-base">
                 <dt className="font-semibold">Total</dt>
                 <dd>

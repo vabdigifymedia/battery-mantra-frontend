@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
@@ -19,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/admin/products")({
+export const Route = createFileRoute("/admin/products/")({
   component: AdminProducts,
 });
 
@@ -43,8 +43,10 @@ function AdminProducts() {
           <h2 className="font-display text-3xl font-bold tracking-tight">Products</h2>
           <p className="text-muted-foreground">Manage your product catalog.</p>
         </div>
-        <Button onClick={() => toast.info("Add Product form coming soon!")}>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
+        <Button asChild>
+          <Link to="/admin/products/new">
+            <Plus className="mr-2 h-4 w-4" /> Add Product
+          </Link>
         </Button>
       </div>
 
@@ -88,8 +90,10 @@ function AdminProducts() {
                   <TableCell>{product.brandName || "N/A"}</TableCell>
                   <TableCell>₹{product.productPrice.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => toast.info("Edit Product form coming soon!")}>
-                      <Edit className="h-4 w-4" />
+                    <Button asChild variant="ghost" size="icon">
+                      <Link to={`/admin/products/${product.productId}/edit`}>
+                        <Edit className="h-4 w-4" />
+                      </Link>
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

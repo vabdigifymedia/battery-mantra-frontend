@@ -94,6 +94,16 @@ export const orderDetailQuery = (orderId: string) =>
     staleTime: 30_000,
   });
 
+import { addressesService } from "@/services/addresses.service";
+
+export const addressesQuery = (enabled: boolean) =>
+  queryOptions({
+    queryKey: queryKeys.addresses.list(),
+    queryFn: ({ signal }) => addressesService.list(signal),
+    enabled,
+    staleTime: 5 * 60_000,
+  });
+
 import { adminService } from "@/services/admin.service";
 
 export const adminUsersQuery = () =>

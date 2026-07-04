@@ -58,7 +58,9 @@ function CartPage() {
     return <Navigate to="/login" search={{ redirect: "/cart" }} />;
 
   const items = data?.cartItems ?? [];
-  const subtotal = items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
+  const subtotal = data?.subTotal ?? items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
+  const exchangeDiscount = data?.exchangeDiscount ?? 0;
+  const totalAmount = data?.totalAmount ?? subtotal;
 
   return (
     <div>
@@ -118,6 +120,13 @@ function CartPage() {
                         >
                           {it.product.productName}
                         </Link>
+                        {it.exchangeOldBattery && (
+                          <div className="mt-1">
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-success bg-success/10 px-1.5 py-0.5 rounded-sm">
+                              Exchange old battery (-₹1,000)
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <Button
                         variant="ghost"
@@ -163,6 +172,14 @@ function CartPage() {
                   <Price value={subtotal} size="sm" />
                 </dd>
               </div>
+              {exchangeDiscount > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Scrap Discount</dt>
+                  <dd className="font-medium">
+                    -<Price value={exchangeDiscount} size="sm" />
+                  </dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Shipping</dt>
                 <dd className="font-medium">Calculated at checkout</dd>
@@ -170,7 +187,7 @@ function CartPage() {
               <div className="mt-3 flex justify-between border-t border-border pt-3 text-base">
                 <dt className="font-semibold">Total</dt>
                 <dd>
-                  <Price value={subtotal} size="md" />
+                  <Price value={totalAmount} size="md" />
                 </dd>
               </div>
             </dl>

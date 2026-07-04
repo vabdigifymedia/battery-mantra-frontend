@@ -40,6 +40,10 @@ export const queryKeys = {
     list: () => [...queryKeys.orders.all, "list"] as const,
     detail: (id: string) => [...queryKeys.orders.all, "detail", id] as const,
   },
+  addresses: {
+    all: ["addresses"] as const,
+    list: () => [...queryKeys.addresses.all, "list"] as const,
+  },
   admin: {
     all: ["admin"] as const,
     users: () => [...queryKeys.admin.all, "users"] as const,

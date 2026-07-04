@@ -44,6 +44,12 @@ export const endpoints = {
     cancel: (orderId: string) => `/api/orders/${encodeURIComponent(orderId)}/cancel`,
     checkout: "/api/orders/checkout",
   },
+  addresses: {
+    list: "/api/addresses",
+    add: "/api/addresses",
+    update: (id: string) => `/api/addresses/${encodeURIComponent(id)}`,
+    delete: (id: string) => `/api/addresses/${encodeURIComponent(id)}`,
+  },
   admin: {
     users: "/api/admin/users",
     orders: "/api/admin/orders",

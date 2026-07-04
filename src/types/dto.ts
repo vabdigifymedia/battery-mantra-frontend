@@ -67,11 +67,21 @@ export type CategoryListResponse = {
   categoryDescription?: string;
   iconUrl?: string;
   displayOrder?: number;
+  parentId?: UUID | null;
+  subCategories?: CategoryListResponse[];
 };
 export type CategoryDetailResponse = CategoryListResponse & {
   parentId?: UUID;
   children?: CategoryListResponse[];
 };
+export type CreateCategoryRequest = {
+  categoryName: string;
+  categoryDescription?: string;
+  iconUrl?: string;
+  displayOrder?: number;
+  parentId?: UUID;
+};
+export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;
 
 /* ---------- Products ---------- */
 export type ProductListResponse = {
@@ -126,17 +136,28 @@ export type ProductFilterParams = {
 };
 
 /* ---------- Cart ---------- */
-export type AddToCartRequest = { productId: UUID; quantity: number };
+export type AddToCartRequest = { 
+  productId: UUID; 
+  quantity: number;
+  exchangeOldBattery?: boolean;
+};
 export type UpdateCartItemRequest = { quantity: number };
+
 export type CartItemResponse = {
   cartItemId: UUID;
   product: ProductListResponse;
   quantity: number;
+  subtotal: number;
+  exchangeOldBattery?: boolean;
 };
+
 export type CartResponse = {
   cartId: UUID;
   userId: UUID;
   cartItems: CartItemResponse[];
+  subTotal: number;
+  exchangeDiscount: number;
+  totalAmount: number;
 };
 
 /* ---------- Orders ---------- */
@@ -147,7 +168,11 @@ export type OrderStatus =
   | "DELIVERED"
   | "CANCELLED"
   | "RETURNED";
-export type CheckoutRequest = { addressId: UUID };
+export type CheckoutRequest = {
+  addressId: UUID;
+  deliveryMethod: string;
+  installationDate?: string;
+};
 export type OrderItemResponse = {
   productId: UUID;
   productName: string;
@@ -162,6 +187,9 @@ export type OrderResponse = {
   shippingAddress?: string;
   placedAt: string;
   totalAmount: number;
+  deliveryMethod?: string;
+  installationDate?: string;
+  exchangeDiscount?: number;
   orderItems: OrderItemResponse[];
 };
 

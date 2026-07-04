@@ -1,21 +1,21 @@
-import { api } from "@/lib/api/client";
-import { endpoints } from "@/constants/endpoints";
+import { apiFetch } from "@/lib/api/client";
+import { endpoints } from "@/lib/api/endpoints";
 import type { AddressRequest, AddressResponse } from "@/types/dto";
 
 export const addressesService = {
   list: async (signal?: AbortSignal) => {
-    return api.get<AddressResponse[]>(endpoints.addresses.list, { signal });
+    return apiFetch<AddressResponse[]>(endpoints.addresses.list, { signal });
   },
 
   add: async (data: AddressRequest) => {
-    return api.post<AddressResponse>(endpoints.addresses.add, data);
+    return apiFetch<AddressResponse>(endpoints.addresses.add, { method: "POST", body: data });
   },
 
   update: async (addressId: string, data: AddressRequest) => {
-    return api.put<AddressResponse>(endpoints.addresses.update(addressId), data);
+    return apiFetch<AddressResponse>(endpoints.addresses.update(addressId), { method: "PUT", body: data });
   },
 
   delete: async (addressId: string) => {
-    return api.delete<void>(endpoints.addresses.delete(addressId));
+    return apiFetch<void>(endpoints.addresses.delete(addressId), { method: "DELETE" });
   },
 };

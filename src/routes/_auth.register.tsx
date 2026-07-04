@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,6 +22,10 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
+const searchSchema = z.object({
+  redirect: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_auth/register")({
   head: () => ({
     meta: [
@@ -29,11 +33,13 @@ export const Route = createFileRoute("/_auth/register")({
       { name: "description", content: "Create your BatteryMantra account." },
     ],
   }),
+  validateSearch: searchSchema,
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { redirect } = useSearch({ from: "/_auth/register" });
   const { setSession } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -59,7 +65,17 @@ function RegisterPage() {
         roles: ["CUSTOMER"],
       });
       toast.success("Account created");
-      navigate({ to: "/" });
+      if (redirect) {
+        const [path, query] = redirect.split("?");
+        if (query) {
+          const params = Object.fromEntries(new URLSearchParams(query));
+          router.navigate({ to: path as any, search: params });
+        } else {
+          router.navigate({ to: path as any });
+        }
+      } else {
+        router.navigate({ to: "/" as any });
+      }
     } catch (e) {
       const msg = e instanceof ApiError ? e.message : "Sign up failed. Please try again.";
       setServerError(msg);
@@ -134,7 +150,7 @@ function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link to="/login" className="font-semibold text-primary hover:underline">
+        <Link to="/login" search={{ redirect }} className="font-semibold text-primary hover:underline">
           Sign in
         </Link>
       </p>

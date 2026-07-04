@@ -7,7 +7,9 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FormField } from "@/components/forms/FormField";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AddressSelector } from "@/components/checkout/AddressSelector";
 import { Price } from "@/components/common/Price";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { Spinner } from "@/components/feedback/Spinner";
@@ -42,10 +44,16 @@ function CheckoutPage() {
   const qc = useQueryClient();
   const cart = useQuery(cartQuery(status === "authenticated"));
   const [addressId, setAddressId] = useState<string>(search.addressId ?? "");
+  const [deliveryMethod, setDeliveryMethod] = useState<string>("STANDARD_DELIVERY");
+  const [installationDate, setInstallationDate] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
 
   const checkout = useMutation({
-    mutationFn: () => ordersService.checkout({ addressId }),
+    mutationFn: () => ordersService.checkout({ 
+      addressId, 
+      deliveryMethod, 
+      installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined 
+    }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
       qc.invalidateQueries({ queryKey: queryKeys.orders.all });
@@ -61,7 +69,9 @@ function CheckoutPage() {
     return <Navigate to="/login" search={{ redirect: "/checkout" }} />;
 
   const items = cart.data?.cartItems ?? [];
-  const subtotal = items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
+  const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
+  const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
+  const totalAmount = cart.data?.totalAmount ?? subtotal;
 
   if (!cart.isLoading && items.length === 0) {
     return (
@@ -80,7 +90,10 @@ function CheckoutPage() {
   }
 
   const canPlace =
-    /^[0-9a-fA-F-]{36}$/.test(addressId) && items.length > 0 && !checkout.isPending;
+    /^[0-9a-fA-F-]{36}$/.test(addressId) && 
+    items.length > 0 && 
+    !checkout.isPending && 
+    (deliveryMethod !== "HOME_INSTALLATION" || installationDate !== "");
 
   return (
     <div>
@@ -89,19 +102,7 @@ function CheckoutPage() {
         <div className="space-y-6">
           <section className="rounded-2xl border border-border bg-card p-5">
             <h2 className="mb-4 font-display text-lg font-semibold">Delivery address</h2>
-            <FormField
-              label="Address ID"
-              htmlFor="addressId"
-              required
-              hint="Paste the ID of a saved address from your account. Address management UI is coming soon."
-            >
-              <Input
-                id="addressId"
-                value={addressId}
-                onChange={(e) => setAddressId(e.target.value)}
-                placeholder="00000000-0000-0000-0000-000000000000"
-              />
-            </FormField>
+            <AddressSelector value={addressId} onChange={setAddressId} />
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-5">
@@ -128,6 +129,48 @@ function CheckoutPage() {
               </p>
             ) : null}
           </section>
+
+          <section className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="mb-4 font-display text-lg font-semibold">Delivery Method</h2>
+            <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod} className="space-y-4">
+              <div className="flex items-start space-x-3 rounded-xl border border-border p-4 hover:border-primary/50">
+                <RadioGroupItem value="STANDARD_DELIVERY" id="delivery-standard" className="mt-1" />
+                <Label htmlFor="delivery-standard" className="cursor-pointer font-medium flex-1">
+                  <div>Standard Delivery</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-1">Free delivery within 3-5 business days.</div>
+                </Label>
+              </div>
+              <div className="flex items-start space-x-3 rounded-xl border border-border p-4 hover:border-primary/50">
+                <RadioGroupItem value="STORE_PICKUP" id="delivery-pickup" className="mt-1" />
+                <Label htmlFor="delivery-pickup" className="cursor-pointer font-medium flex-1">
+                  <div>Store Pickup</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-1">Pick up your battery from our nearest partner garage.</div>
+                </Label>
+              </div>
+              <div className="flex items-start space-x-3 rounded-xl border border-border p-4 hover:border-primary/50">
+                <RadioGroupItem value="HOME_INSTALLATION" id="delivery-install" className="mt-1" />
+                <Label htmlFor="delivery-install" className="cursor-pointer font-medium flex-1">
+                  <div>Home Installation</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-1">A technician will arrive at your location to install the battery.</div>
+                  
+                  {deliveryMethod === "HOME_INSTALLATION" && (
+                    <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                      <Label htmlFor="install-date" className="mb-1.5 block text-xs">Select Installation Date</Label>
+                      <Input 
+                        id="install-date" 
+                        type="date" 
+                        className="bg-background max-w-[200px]"
+                        min={new Date().toISOString().split('T')[0]}
+                        value={installationDate}
+                        onChange={(e) => setInstallationDate(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+                </Label>
+              </div>
+            </RadioGroup>
+          </section>
         </div>
 
         <aside className="h-fit rounded-2xl border border-border bg-card p-5 shadow-product">
@@ -149,10 +192,18 @@ function CheckoutPage() {
                 <Price value={subtotal} size="sm" />
               </dd>
             </div>
+            {exchangeDiscount > 0 && (
+              <div className="flex justify-between text-success">
+                <dt>Scrap Discount</dt>
+                <dd className="font-medium">
+                  -<Price value={exchangeDiscount} size="sm" />
+                </dd>
+              </div>
+            )}
             <div className="mt-2 flex justify-between border-t border-border pt-2 text-base">
               <dt className="font-semibold">Total</dt>
               <dd>
-                <Price value={subtotal} size="md" />
+                <Price value={totalAmount} size="md" />
               </dd>
             </div>
           </dl>

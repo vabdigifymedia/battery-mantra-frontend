@@ -1,5 +1,5 @@
 
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_auth/login")({
 });
 
 function LoginPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { setSession } = useAuth();
   const { redirect } = useSearch({ from: "/_auth/login" });
   const [serverError, setServerError] = useState<string | null>(null);
@@ -73,10 +73,18 @@ function LoginPage() {
       });
       toast.success("Welcome back");
 
-      if (role === "ADMIN") {
-        navigate({ to: redirect ?? "/admin" });
+      if (redirect) {
+        const [path, query] = redirect.split("?");
+        if (query) {
+          const params = Object.fromEntries(new URLSearchParams(query));
+          router.navigate({ to: path as any, search: params });
+        } else {
+          router.navigate({ to: path as any });
+        }
+      } else if (role === "ADMIN") {
+        router.navigate({ to: "/admin" as any });
       } else {
-        navigate({ to: redirect ?? "/" });
+        router.navigate({ to: "/" as any });
       }
     } catch (e) {
       const msg = e instanceof ApiError ? e.message : "Sign in failed. Please try again.";
@@ -133,7 +141,7 @@ function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New to BatteryMantra?{" "}
-        <Link to="/register" className="font-semibold text-primary hover:underline">
+        <Link to="/register" search={{ redirect }} className="font-semibold text-primary hover:underline">
           Create an account
         </Link>
       </p>
