@@ -3,9 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { APP } from "@/constants/app";
 import { cn } from "@/lib/utils";
 
-/**
- * Logo slot. Replace with official BatteryMantra SVG when provided.
- */
+
 export function Logo({ className, withWordmark = true }: { className?: string; withWordmark?: boolean }) {
   return (
     <Link
