@@ -7,6 +7,10 @@ export const endpoints = {
     login: "/api/auth/login",
     register: "/api/auth/register",
   },
+  user: {
+    profile: "/api/user/profile",
+    password: "/api/user/password",
+  },
   products: {
     list: "/api/products",
     filter: "/api/products/filter",

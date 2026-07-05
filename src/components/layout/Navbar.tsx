@@ -128,6 +128,11 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/account">
+                    <User className="mr-2 h-4 w-4" /> Account Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/cart">
                     <ShoppingCart className="mr-2 h-4 w-4" /> My cart
                   </Link>

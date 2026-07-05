@@ -111,7 +111,7 @@ function LoginPage() {
           <Input
             id="username"
             autoComplete="username"
-            placeholder="johndoe or johndoe@example.com"
+            placeholder="your username or yourmail@example.com"
             autoFocus
             {...form.register("username")}
           />

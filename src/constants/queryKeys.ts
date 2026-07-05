@@ -5,6 +5,10 @@ export const queryKeys = {
     all: ["auth"] as const,
     me: () => [...queryKeys.auth.all, "me"] as const,
   },
+  user: {
+    all: ["user"] as const,
+    profile: () => [...queryKeys.user.all, "profile"] as const,
+  },
   products: {
     all: ["products"] as const,
     list: () => [...queryKeys.products.all, "list"] as const,

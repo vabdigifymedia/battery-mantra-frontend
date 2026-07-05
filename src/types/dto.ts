@@ -241,3 +241,20 @@ export type AddressRequest = {
 export type AddressResponse = AddressRequest & {
   addressId: UUID;
 };
+
+/* ---------- User Profile ---------- */
+export type UserProfileResponse = {
+  username: string;
+  email: string;
+  phoneNumber: string;
+};
+
+export type UpdateProfileRequest = {
+  email: string;
+  phoneNumber: string;
+};
+
+export type UpdatePasswordRequest = {
+  currentPassword?: string;
+  newPassword?: string;
+};

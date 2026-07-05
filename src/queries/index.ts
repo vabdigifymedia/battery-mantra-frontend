@@ -94,6 +94,16 @@ export const orderDetailQuery = (orderId: string) =>
     staleTime: 30_000,
   });
 
+import { userService } from "@/services/user.service";
+
+export const userProfileQuery = (enabled: boolean) =>
+  queryOptions({
+    queryKey: queryKeys.user.profile(),
+    queryFn: ({ signal }) => userService.getProfile(signal),
+    enabled,
+    staleTime: 60_000,
+  });
+
 import { addressesService } from "@/services/addresses.service";
 
 export const addressesQuery = (enabled: boolean) =>
