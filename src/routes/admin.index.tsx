@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { adminOrdersQuery, adminUsersQuery } from "@/queries";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, ShoppingCart, Activity, Clock, Plus, Package, UsersRound, ArrowRight } from "lucide-react";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Button } from "@/components/ui/button";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -14,6 +17,9 @@ export const Route = createFileRoute("/admin/")({
 function AdminDashboard() {
   const usersQuery = useQuery(adminUsersQuery());
   const ordersQuery = useQuery(adminOrdersQuery());
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const isLoading = usersQuery.isLoading || ordersQuery.isLoading;
 
@@ -29,7 +35,42 @@ function AdminDashboard() {
   const orders = ordersQuery.data || [];
   const ordersCount = orders.length;
   const pendingOrders = orders.filter(o => o.orderStatus === "PENDING").length;
-  const totalRevenue = orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0) || 0;
+  
+  // Logic: Do not count cancelled/returned orders.
+  // For COD (currently all online orders), only count profit when DELIVERED or INSTALLED.
+  const validRevenueOrders = orders.filter(o => 
+    o.orderStatus === "DELIVERED" || o.orderStatus === "INSTALLED"
+  );
+  const totalRevenue = validRevenueOrders.reduce((acc, order) => acc + (order.totalAmount || 0), 0) || 0;
+
+  // Group orders by date for the chart (last 7 days)
+  const chartData = useMemo(() => {
+    const dataMap = new Map();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      dataMap.set(label, { name: label, Revenue: 0, Orders: 0 });
+    }
+
+    orders.forEach(order => {
+      if (!order.placedAt) return;
+      const d = new Date(order.placedAt);
+      if (isNaN(d.getTime())) return;
+      
+      const label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      if (dataMap.has(label)) {
+        const item = dataMap.get(label);
+        item.Orders += 1;
+        if (order.orderStatus === "DELIVERED" || order.orderStatus === "INSTALLED") {
+          item.Revenue += (order.totalAmount || 0);
+        }
+      }
+    });
+    return Array.from(dataMap.values());
+  }, [orders]);
 
   // Sort orders descending by date
   const recentOrders = [...orders].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()).slice(0, 5);
@@ -102,6 +143,70 @@ function AdminDashboard() {
           <CardContent>
             <div className={`text-2xl font-bold ${pendingOrders > 0 ? 'text-red-600' : ''}`}>{pendingOrders}</div>
             <p className="text-xs text-muted-foreground mt-1">Require immediate action</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
+        <Card className="col-span-1 lg:col-span-7 shadow-sm border-border overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-lg">Revenue Overview</CardTitle>
+            <CardDescription>
+              Showing revenue for the last 7 days. Only delivered/installed orders are counted.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <div className="h-[300px] w-full mt-4">
+              {mounted ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#888888" 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <YAxis 
+                      stroke="#888888" 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tickFormatter={(value) => `₹${value}`} 
+                    />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
+                    <RechartsTooltip 
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      formatter={(value: number, name: string) => [
+                        name === 'Revenue' ? `₹${value.toLocaleString()}` : value, 
+                        name
+                      ]}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="Revenue" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      fillOpacity={1} 
+                      fill="url(#colorRevenue)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Spinner />
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

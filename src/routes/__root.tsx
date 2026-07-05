@@ -23,44 +23,51 @@ const THEME_INIT_SCRIPT = `
 `.trim();
 
 function NotFoundComponent() {
+  const router = useRouter();
+  const queryClient = router.options.context.queryClient as QueryClient;
   return (
-    <AppProviders>
-      <AppShell>
-        <div className="container-app py-24">
-          <EmptyState
-            title="404 — Page not found"
-            description="The page you're looking for doesn't exist or has been moved."
-            action={
-              <Button asChild variant="brand">
-                <Link to="/">Go home</Link>
-              </Button>
-            }
-          />
-        </div>
-      </AppShell>
-    </AppProviders>
+    <QueryClientProvider client={queryClient}>
+      <AppProviders>
+        <AppShell>
+          <div className="container-app py-24">
+            <EmptyState
+              title="404 — Page not found"
+              description="The page you're looking for doesn't exist or has been moved."
+              action={
+                <Button asChild variant="brand">
+                  <Link to="/">Go home</Link>
+                </Button>
+              }
+            />
+          </div>
+        </AppShell>
+      </AppProviders>
+    </QueryClientProvider>
   );
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const queryClient = router.options.context.queryClient as QueryClient;
 
   return (
-    <AppProviders>
-      <AppShell>
-        <div className="container-app py-24">
-          <ErrorState
-            title="This page didn't load"
-            description="Something went wrong on our end. You can try refreshing or head back home."
-            onRetry={() => {
-              router.invalidate();
-              reset();
-            }}
-          />
-        </div>
-      </AppShell>
-    </AppProviders>
+    <QueryClientProvider client={queryClient}>
+      <AppProviders>
+        <AppShell>
+          <div className="container-app py-24">
+            <ErrorState
+              title="This page didn't load"
+              description="Something went wrong on our end. You can try refreshing or head back home."
+              onRetry={() => {
+                router.invalidate();
+                reset();
+              }}
+            />
+          </div>
+        </AppShell>
+      </AppProviders>
+    </QueryClientProvider>
   );
 }
 

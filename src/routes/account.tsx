@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Navigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -21,16 +21,6 @@ import { PasswordInput } from "@/components/forms/PasswordInput";
 import { Spinner } from "@/components/feedback/Spinner";
 
 export const Route = createFileRoute("/account")({
-  beforeLoad: ({ context }) => {
-    if (!context.auth.isAuthenticated) {
-      throw redirect({
-        to: "/login",
-        search: {
-          redirect: "/account",
-        },
-      });
-    }
-  },
   component: AccountPage,
 });
 
@@ -49,8 +39,12 @@ const passwordSchema = z.object({
 });
 
 function AccountPage() {
-  const { logout } = useAuth();
+  const { status, logout } = useAuth();
   const queryClient = useQueryClient();
+
+  if (status === "unauthenticated") {
+    return <Navigate to="/login" search={{ redirect: "/account" }} />;
+  }
 
   // Queries
   const { data: profile, isLoading: isLoadingProfile } = useQuery(userProfileQuery(true));
