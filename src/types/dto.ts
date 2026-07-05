@@ -191,6 +191,7 @@ export type OrderResponse = {
   placedAt: string;
   totalAmount: number;
   deliveryMethod?: string;
+  paymentMethod?: string;
   installationDate?: string;
   exchangeDiscount?: number;
   orderItems: OrderItemResponse[];

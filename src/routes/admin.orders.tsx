@@ -101,6 +101,7 @@ function AdminOrders() {
           <TableRow>
             <TableHead className="w-[250px]">Order Details</TableHead>
             <TableHead className="w-[200px]">Customer</TableHead>
+            <TableHead>Payment</TableHead>
             <TableHead>Fulfillment</TableHead>
             <TableHead>Date & Time</TableHead>
             <TableHead className="w-[180px]">Status Update</TableHead>
@@ -110,13 +111,13 @@ function AdminOrders() {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-32 text-center">
+              <TableCell colSpan={7} className="h-32 text-center">
                 <Spinner size="md" className="inline-block" />
               </TableCell>
             </TableRow>
           ) : !data.length ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-32 text-center text-muted-foreground font-medium">
+              <TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-medium">
                 No orders found in this category.
               </TableCell>
             </TableRow>
@@ -143,6 +144,13 @@ function AdminOrders() {
                       </p>
                     </div>
                   </div>
+                </TableCell>
+                <TableCell>
+                  {order.paymentMethod === "ONLINE" ? (
+                    <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700">COD</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1.5 text-sm">

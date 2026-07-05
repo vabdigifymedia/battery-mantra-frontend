@@ -54,6 +54,7 @@ function CheckoutPage() {
     mutationFn: () => ordersService.checkout({ 
       addressId, 
       deliveryMethod, 
+      paymentMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined 
     }),
     onSuccess: (order) => {

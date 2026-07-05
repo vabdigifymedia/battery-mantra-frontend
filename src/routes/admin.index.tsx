@@ -250,13 +250,14 @@ function AdminDashboard() {
                 <TableHead className="w-[120px] pl-6">Order ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Amount</TableHead>
+                <TableHead>Payment</TableHead>
                 <TableHead className="pr-6 text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentOrders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                     No orders found.
                   </TableCell>
                 </TableRow>
@@ -271,6 +272,13 @@ function AdminDashboard() {
                     </TableCell>
                     <TableCell className="text-sm font-medium">
                       ₹{order.totalAmount.toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {order.paymentMethod === "ONLINE" ? (
+                        <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-700">COD</span>
+                      )}
                     </TableCell>
                     <TableCell className="pr-6 text-right">
                       <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${getStatusColor(order.orderStatus)}`}>
