@@ -356,9 +356,10 @@ function PdpPage() {
           
           <TabsContent value="desc" className="p-2 sm:p-4 outline-none">
             {data.productDescription ? (
-              <div className="prose prose-sm sm:prose-base max-w-none text-muted-foreground">
-                <p className="whitespace-pre-line leading-relaxed">{data.productDescription}</p>
-              </div>
+              <div 
+                className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: data.productDescription }}
+              />
             ) : (
               <EmptyState title="No Description" description="Description is not available for this product yet." />
             )}
