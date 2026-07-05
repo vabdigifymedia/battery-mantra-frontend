@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { adminOrdersQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,23 +9,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
-import { Copy, Truck, Wrench, Search, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/admin/orders")({
   component: AdminOrders,
 });
 
-const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "INSTALLED", "CANCELLED", "RETURNED"];
+const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"];
 
-const ACTION_REQUIRED_STATUSES = ["PENDING", "PROCESSING", "CONFIRMED"];
-const IN_TRANSIT_STATUSES = ["SHIPPED", "OUT_FOR_DELIVERY"];
-const PAST_STATUSES = ["DELIVERED", "INSTALLED", "CANCELLED", "RETURNED"];
+const ACTION_REQUIRED_STATUSES = ["PENDING", "PROCESSING"];
+const IN_TRANSIT_STATUSES = ["SHIPPED"];
+const PAST_STATUSES = ["DELIVERED", "CANCELLED", "RETURNED"];
 
 function AdminOrders() {
   const queryClient = useQueryClient();
   const { data: orders = [], isLoading } = useQuery(adminOrdersQuery());
   const [search, setSearch] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
+  const prevOrdersCountRef = useRef(orders.length);
+
+  useEffect(() => {
+    if (orders.length > prevOrdersCountRef.current && prevOrdersCountRef.current !== 0) {
+      toast.success("🚨 New Order Received!", {
+        description: "A new order has been placed by a customer.",
+        duration: 8000,
+      });
+    }
+    prevOrdersCountRef.current = orders.length;
+  }, [orders.length]);
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
@@ -56,12 +70,9 @@ function AdminOrders() {
   const getStatusColor = (status: string) => {
     switch(status) {
       case "PENDING": return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
-      case "PROCESSING":
-      case "CONFIRMED": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
-      case "SHIPPED":
-      case "OUT_FOR_DELIVERY": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
-      case "DELIVERED":
-      case "INSTALLED": return "bg-green-500/10 text-green-600 border-green-500/20";
+      case "PROCESSING": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+      case "SHIPPED": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
+      case "DELIVERED": return "bg-green-500/10 text-green-600 border-green-500/20";
       case "CANCELLED":
       case "RETURNED": return "bg-red-500/10 text-red-600 border-red-500/20";
       default: return "bg-gray-500/10 text-gray-600 border-gray-500/20";
@@ -89,21 +100,23 @@ function AdminOrders() {
         <TableHeader className="bg-muted/50">
           <TableRow>
             <TableHead className="w-[250px]">Order Details</TableHead>
+            <TableHead className="w-[200px]">Customer</TableHead>
             <TableHead>Fulfillment</TableHead>
             <TableHead>Date & Time</TableHead>
             <TableHead className="w-[180px]">Status Update</TableHead>
+            <TableHead className="w-[80px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={4} className="h-32 text-center">
+              <TableCell colSpan={6} className="h-32 text-center">
                 <Spinner size="md" className="inline-block" />
               </TableCell>
             </TableRow>
           ) : !data.length ? (
             <TableRow>
-              <TableCell colSpan={4} className="h-32 text-center text-muted-foreground font-medium">
+              <TableCell colSpan={6} className="h-32 text-center text-muted-foreground font-medium">
                 No orders found in this category.
               </TableCell>
             </TableRow>
@@ -132,6 +145,31 @@ function AdminOrders() {
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="flex flex-col gap-1.5 text-sm">
+                    {order.customerName && (
+                      <div className="flex items-center gap-1.5 font-medium text-foreground">
+                        <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span className="truncate max-w-[150px]">{order.customerName}</span>
+                      </div>
+                    )}
+                    {order.customerPhone && (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Phone className="h-3.5 w-3.5 shrink-0" />
+                        <span>{order.customerPhone}</span>
+                      </div>
+                    )}
+                    {order.customerEmail && (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate max-w-[150px]" title={order.customerEmail}>{order.customerEmail}</span>
+                      </div>
+                    )}
+                    {!order.customerName && !order.customerPhone && !order.customerEmail && (
+                      <span className="text-muted-foreground text-xs italic">No details available</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
                   <div className="flex items-start gap-2 text-sm">
                     {order.deliveryMethod === "HOME_INSTALLATION" ? (
                       <Wrench className="h-4 w-4 mt-0.5 text-primary shrink-0" />
@@ -143,9 +181,17 @@ function AdminOrders() {
                         {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
                          order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
                       </p>
-                      <div className="flex items-center text-xs text-muted-foreground mt-0.5 truncate max-w-[200px]">
-                        <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                        <span className="truncate">{order.shippingAddress?.split(',').pop()?.trim() || "No Address"}</span>
+                      <div className="flex flex-col gap-1 mt-0.5">
+                        {order.deliveryMethod === "HOME_INSTALLATION" && order.installationDate && (
+                          <div className="flex items-center text-xs text-primary font-medium truncate">
+                            <Calendar className="h-3 w-3 mr-1 shrink-0" />
+                            <span>{new Date(order.installationDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center text-xs text-muted-foreground truncate max-w-[200px]">
+                          <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                          <span className="truncate">{order.shippingAddress?.split(',').pop()?.trim() || "No Address"}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -175,6 +221,11 @@ function AdminOrders() {
                       ))}
                     </SelectContent>
                   </Select>
+                </TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details">
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -235,6 +286,111 @@ function AdminOrders() {
           <OrderTable data={pastOrders} />
         </TabsContent>
       </Tabs>
+      
+      {selectedOrder && (
+        <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold flex items-center justify-between pr-8">
+                <span>Order #{selectedOrder.orderId.slice(0, 8)}</span>
+                <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getStatusColor(selectedOrder.orderStatus)}`}>
+                  {selectedOrder.orderStatus.replace(/_/g, ' ')}
+                </span>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Customer Details</h3>
+                  <div className="rounded-xl border bg-card p-4 space-y-3 text-sm h-full">
+                    {selectedOrder.customerName && (
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="font-medium">{selectedOrder.customerName}</span>
+                      </div>
+                    )}
+                    {selectedOrder.customerPhone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span>{selectedOrder.customerPhone}</span>
+                      </div>
+                    )}
+                    {selectedOrder.customerEmail && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="truncate">{selectedOrder.customerEmail}</span>
+                      </div>
+                    )}
+                    {!selectedOrder.customerName && !selectedOrder.customerPhone && !selectedOrder.customerEmail && (
+                      <span className="text-muted-foreground italic">No details available</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Fulfillment</h3>
+                  <div className="rounded-xl border bg-card p-4 space-y-3 text-sm h-full">
+                    <div className="flex items-center gap-2 font-medium">
+                      {selectedOrder.deliveryMethod === "HOME_INSTALLATION" ? <Wrench className="h-4 w-4 text-primary shrink-0" /> : <Truck className="h-4 w-4 text-blue-500 shrink-0" />}
+                      {selectedOrder.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : selectedOrder.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
+                    </div>
+                    {selectedOrder.installationDate && (
+                      <div className="flex items-center gap-2 text-primary font-medium">
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        {new Date(selectedOrder.installationDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </div>
+                    )}
+                    <div className="flex items-start gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span className="leading-relaxed">{selectedOrder.shippingAddress || "No Address Provided"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Order Items</h3>
+                <div className="rounded-xl border bg-card divide-y">
+                  {selectedOrder.orderItems.map((item, idx) => (
+                    <div key={idx} className="p-4 flex items-center gap-4">
+                      {item.productImage ? (
+                        <img src={item.productImage} alt={item.productName} className="h-12 w-12 rounded object-cover border" />
+                      ) : (
+                        <div className="h-12 w-12 rounded bg-muted border flex items-center justify-center shrink-0">
+                          <MapPin className="h-4 w-4 text-muted-foreground/50" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm truncate">{item.productName}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity} × ₹{item.priceAtPurchase.toLocaleString()}</p>
+                      </div>
+                      <div className="font-semibold text-sm">
+                        ₹{item.subtotal.toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="p-4 bg-muted/30">
+                    <div className="flex justify-between items-center text-sm mb-1">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span>₹{(selectedOrder.totalAmount + (selectedOrder.exchangeDiscount || 0)).toLocaleString()}</span>
+                    </div>
+                    {selectedOrder.exchangeDiscount && selectedOrder.exchangeDiscount > 0 ? (
+                      <div className="flex justify-between items-center text-sm text-green-600 mb-2">
+                        <span>Exchange Discount</span>
+                        <span>- ₹{selectedOrder.exchangeDiscount.toLocaleString()}</span>
+                      </div>
+                    ) : null}
+                    <div className="flex justify-between items-center font-bold text-lg pt-2 border-t mt-2">
+                      <span>Total</span>
+                      <span>₹{selectedOrder.totalAmount.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -15,7 +15,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
 
 const schema = z.object({
-  username: z.string().trim().min(1, "Username is required"),
+  username: z.string().trim().min(1, "Username, email, or phone is required"),
   password: z.string().min(1, "Password is required"),
 });
 type Values = z.infer<typeof schema>;
@@ -103,7 +103,7 @@ function LoginPage() {
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
         <FormField
-          label="Username"
+          label="Username, Email or Phone"
           htmlFor="username"
           required
           error={form.formState.errors.username?.message}
@@ -111,6 +111,7 @@ function LoginPage() {
           <Input
             id="username"
             autoComplete="username"
+            placeholder="johndoe or johndoe@example.com"
             autoFocus
             {...form.register("username")}
           />

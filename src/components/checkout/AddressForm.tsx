@@ -1,8 +1,10 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormField } from "@/components/forms/FormField";
 import { Spinner } from "@/components/feedback/Spinner";
 import type { AddressRequest, AddressResponse } from "@/types/dto";
@@ -28,6 +30,16 @@ interface AddressFormProps {
   isSubmitting?: boolean;
 }
 
+const INDIAN_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
+  "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", 
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", 
+  "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", 
+  "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", 
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", 
+  "Uttarakhand", "West Bengal"
+];
+
 export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: AddressFormProps) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -40,7 +52,7 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
       state: initialData?.state ?? "",
       postalCode: initialData?.postalCode ?? "",
       country: initialData?.country ?? "India",
-      isDefault: initialData?.isDefault ?? false,
+      isDefault: (initialData as any)?.default ?? initialData?.isDefault ?? false,
     },
   });
 
@@ -72,7 +84,24 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
           <Input id="city" {...form.register("city")} />
         </FormField>
         <FormField label="State" htmlFor="state" required error={form.formState.errors.state?.message}>
-          <Input id="state" {...form.register("state")} />
+          <Controller
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                <SelectTrigger id="state">
+                  <SelectValue placeholder="Select a state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INDIAN_STATES.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </FormField>
       </div>
 
@@ -81,13 +110,37 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
           <Input id="postalCode" {...form.register("postalCode")} />
         </FormField>
         <FormField label="Country" htmlFor="country" required error={form.formState.errors.country?.message}>
-          <Input id="country" {...form.register("country")} />
+          <Controller
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                <SelectTrigger id="country">
+                  <SelectValue placeholder="Select a country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="India">India</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </FormField>
       </div>
 
       <div className="flex items-center gap-2 pt-2">
-        <input type="checkbox" id="isDefault" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isDefault")} />
-        <label htmlFor="isDefault" className="text-sm font-medium text-foreground">Make this my default address</label>
+        <Controller
+          control={form.control}
+          name="isDefault"
+          render={({ field }) => (
+            <Checkbox 
+              id="isDefault" 
+              checked={field.value} 
+              onCheckedChange={field.onChange}
+              className="text-primary focus:ring-primary"
+            />
+          )}
+        />
+        <label htmlFor="isDefault" className="text-sm font-medium text-foreground cursor-pointer">Make this my default address</label>
       </div>
 
       <div className="flex justify-end gap-3 pt-4">

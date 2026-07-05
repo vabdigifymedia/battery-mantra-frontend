@@ -117,5 +117,6 @@ export const adminOrdersQuery = () =>
   queryOptions({
     queryKey: queryKeys.admin.orders(),
     queryFn: () => adminService.getAllOrders(),
-    staleTime: 30_000,
+    staleTime: 10_000,
+    refetchInterval: 15_000, // Poll every 15 seconds
   });

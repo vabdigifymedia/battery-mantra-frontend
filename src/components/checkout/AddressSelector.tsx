@@ -107,17 +107,11 @@ export function AddressSelector({ value, onChange }: AddressSelectorProps) {
             return (
               <div
                 key={addr.addressId}
-                className={`relative flex flex-col gap-2 rounded-xl border p-4 transition-colors ${
+                className={`relative flex flex-col gap-2 rounded-xl border p-4 transition-colors cursor-pointer ${
                   isSelected ? "border-primary bg-primary-soft/50 ring-1 ring-primary" : "border-border bg-card hover:border-primary/40"
                 }`}
+                onClick={() => onChange(addr.addressId)}
               >
-                <button
-                  type="button"
-                  className="absolute inset-0 z-0 h-full w-full cursor-pointer rounded-xl focus:outline-none"
-                  onClick={() => onChange(addr.addressId)}
-                  aria-label={`Select address ${addr.addressId}`}
-                />
-                
                 <div className="relative z-10 flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

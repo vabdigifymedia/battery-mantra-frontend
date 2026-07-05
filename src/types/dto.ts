@@ -185,6 +185,9 @@ export type OrderResponse = {
   orderId: UUID;
   orderStatus: OrderStatus | string;
   shippingAddress?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
   placedAt: string;
   totalAmount: number;
   deliveryMethod?: string;
