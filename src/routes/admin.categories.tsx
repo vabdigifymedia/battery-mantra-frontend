@@ -42,7 +42,7 @@ const categorySchema = z.object({
   categoryDescription: z.string().trim().optional(),
   iconUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
-  parentId: z.string().uuid().optional().nullable(),
+  parentId: z.string().uuid().optional().nullable().or(z.literal("")),
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
