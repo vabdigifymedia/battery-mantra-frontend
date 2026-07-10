@@ -30,6 +30,7 @@ export function SpecificationsTable({ specs }: { specs?: Record<string, unknown>
 
   if (isGrouped) {
     for (const [key, value] of entries) {
+      if (key === "originalPrice") continue; // Skip originalPrice
       if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         const groupEntries = Object.entries(value as Record<string, unknown>).filter(
           ([, v]) => v !== null && v !== undefined && v !== ""
@@ -42,7 +43,7 @@ export function SpecificationsTable({ specs }: { specs?: Record<string, unknown>
       }
     }
   } else {
-    flatEntries.push(...entries);
+    flatEntries.push(...entries.filter(([k]) => k !== "originalPrice"));
   }
 
   const renderTable = (rows: [string, unknown][], startIdx = 0) => (
@@ -106,6 +107,7 @@ export function flattenSpecs(specs?: Record<string, unknown>): [string, unknown]
   const result: [string, unknown][] = [];
 
   for (const [key, value] of Object.entries(specs)) {
+    if (key === "originalPrice") continue; // Skip originalPrice
     if (value === null || value === undefined || value === "") continue;
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       // Nested group — flatten its entries

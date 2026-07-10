@@ -136,6 +136,12 @@ function PdpPage() {
   const allFlatSpecs = flattenSpecs(data.specs);
   const topSpecs = allFlatSpecs.slice(0, 4);
 
+  const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
+  const hasDiscount = originalPrice && originalPrice > data.productPrice;
+  const discountPercent = hasDiscount 
+    ? Math.round(((originalPrice - data.productPrice) / originalPrice) * 100)
+    : 0;
+
   return (
     <div className="bg-muted/30 min-h-screen pb-16">
       {/* Breadcrumb Header */}
@@ -215,8 +221,18 @@ function PdpPage() {
                 </h1>
               </div>
 
-              <div className="flex items-end gap-3 pt-2">
+              <div className="flex items-center gap-3 pt-2">
                 <Price value={data.productPrice} size="xl" className="text-4xl tracking-tight" />
+                {hasDiscount && (
+                  <>
+                    <span className="text-2xl text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
+                      ₹{originalPrice.toLocaleString()}
+                    </span>
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
+                      {discountPercent}% OFF
+                    </Badge>
+                  </>
+                )}
               </div>
               
               <div>

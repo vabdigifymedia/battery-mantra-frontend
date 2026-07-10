@@ -21,6 +21,7 @@ const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
   productDescription: z.string().optional(),
   productPrice: z.coerce.number().min(0, "Price must be positive"),
+  originalPrice: z.coerce.number().min(0).optional(),
   exchangeDiscount: z.coerce.number().min(0).optional().default(0),
   productStock: z.coerce.number().min(0).optional(),
   productImage: z.string().url("Must be a valid URL").optional().or(z.literal("")),
@@ -67,6 +68,7 @@ function EditProductPage() {
     productName: product.productName,
     productDescription: product.productDescription || "",
     productPrice: product.productPrice,
+    originalPrice: Number(product.specs?.originalPrice || 0),
     exchangeDiscount: product.exchangeDiscount || 0,
     productStock: product.productStock || 0,
     productImage: product.productImage || "",
@@ -167,6 +169,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         specsRecord[group.groupName.trim()] = groupSpecs;
       }
     });
+
+    if (data.originalPrice && data.originalPrice > 0) {
+      specsRecord["originalPrice"] = data.originalPrice.toString() as any;
+    }
 
     const payload = {
       productName: data.productName,
@@ -302,9 +308,14 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="productPrice">Price (₹) <span className="text-red-500">*</span></Label>
+                <Label htmlFor="productPrice">Selling Price (₹) <span className="text-red-500">*</span></Label>
                 <Input id="productPrice" type="number" min="0" step="1" {...form.register("productPrice")} />
                 {form.formState.errors.productPrice && <p className="text-xs text-red-500">{form.formState.errors.productPrice.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="originalPrice">Original Price / MRP (₹)</Label>
+                <Input id="originalPrice" type="number" min="0" step="1" {...form.register("originalPrice")} />
+                <p className="text-xs text-muted-foreground">Strikethrough price. Leave 0 if none.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exchangeDiscount">Exchange Discount (₹)</Label>
