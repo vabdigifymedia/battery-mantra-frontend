@@ -21,6 +21,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -56,8 +63,11 @@ function AdminVehicles() {
   
   const [activeTab, setActiveTab] = useState("ALL");
   const [activeMake, setActiveMake] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleResponse | null>(null);
+
+  const PAGE_SIZE = 15;
 
   const typeFilteredVehicles = activeTab === "ALL" 
     ? vehicles 
@@ -68,6 +78,9 @@ function AdminVehicles() {
   const filteredVehicles = activeMake === "ALL"
     ? typeFilteredVehicles
     : typeFilteredVehicles?.filter(v => v.make === activeMake);
+
+  const totalPages = Math.ceil((filteredVehicles?.length || 0) / PAGE_SIZE);
+  const paginatedVehicles = filteredVehicles?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
@@ -172,7 +185,7 @@ function AdminVehicles() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); }} className="w-full">
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); setCurrentPage(1); }} className="w-full">
         <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="ALL" className="rounded-md">All Vehicles</TabsTrigger>
           <TabsTrigger value="CAR" className="rounded-md">Cars</TabsTrigger>
@@ -187,7 +200,7 @@ function AdminVehicles() {
             <Button 
               variant={activeMake === "ALL" ? "default" : "outline"} 
               size="sm" 
-              onClick={() => setActiveMake("ALL")}
+              onClick={() => { setActiveMake("ALL"); setCurrentPage(1); }}
               className="h-7 text-xs rounded-full px-4"
             >
               All Brands
@@ -197,7 +210,7 @@ function AdminVehicles() {
                 key={make}
                 variant={activeMake === make ? "default" : "outline"} 
                 size="sm" 
-                onClick={() => setActiveMake(make)}
+                onClick={() => { setActiveMake(make); setCurrentPage(1); }}
                 className="h-7 text-xs rounded-full px-4"
               >
                 {make}
@@ -233,7 +246,7 @@ function AdminVehicles() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredVehicles.map((vehicle) => (
+              paginatedVehicles?.map((vehicle) => (
                 <TableRow key={vehicle.vehicleId}>
                   <TableCell>
                     {vehicle.imageUrl ? (
@@ -295,6 +308,36 @@ function AdminVehicles() {
           </TableBody>
         </Table>
       </div>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
+            <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredVehicles?.length || 0)}</span> of{" "}
+            <span className="font-medium">{filteredVehicles?.length}</span> results
+          </p>
+          <Pagination className="w-auto mx-0">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                />
+              </PaginationItem>
+              <PaginationItem className="hidden sm:inline-flex px-4 text-sm font-medium">
+                Page {currentPage} of {totalPages}
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
       </Tabs>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

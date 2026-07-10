@@ -18,6 +18,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export const Route = createFileRoute("/admin/products/")({
   component: AdminProducts,
@@ -26,6 +34,11 @@ export const Route = createFileRoute("/admin/products/")({
 function AdminProducts() {
   const queryClient = useQueryClient();
   const { data: products, isLoading } = useQuery(productListQuery());
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 15;
+
+  const totalPages = Math.ceil((products?.length || 0) / PAGE_SIZE);
+  const paginatedProducts = products?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteProduct(id),
@@ -76,7 +89,7 @@ function AdminProducts() {
                 </TableCell>
               </TableRow>
             ) : (
-              products.map((product) => (
+              paginatedProducts?.map((product) => (
                 <TableRow key={product.productId}>
                   <TableCell>
                     {product.productImage ? (
@@ -127,6 +140,36 @@ function AdminProducts() {
           </TableBody>
         </Table>
       </div>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
+            <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, products?.length || 0)}</span> of{" "}
+            <span className="font-medium">{products?.length}</span> results
+          </p>
+          <Pagination className="w-auto mx-0">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                />
+              </PaginationItem>
+              <PaginationItem className="hidden sm:inline-flex px-4 text-sm font-medium">
+                Page {currentPage} of {totalPages}
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }
