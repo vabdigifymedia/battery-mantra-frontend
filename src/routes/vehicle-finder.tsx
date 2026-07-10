@@ -45,8 +45,8 @@ function VehicleFinderPage() {
     if (!search.vehicleId) return emptyVehicleSelection;
     const found = (vehicles.data ?? []).find((v) => v.vehicleId === search.vehicleId);
     return found
-      ? { make: found.make, vehicleId: found.vehicleId }
-      : { make: null, vehicleId: search.vehicleId ?? null };
+      ? { vehicleType: found.vehicleType || "CAR", make: found.make, vehicleId: found.vehicleId }
+      : { vehicleType: null, make: null, vehicleId: search.vehicleId ?? null };
   };
   const [selection, setSelection] = useState<VehicleSelection>(initialFromSearch);
 
@@ -54,7 +54,7 @@ function VehicleFinderPage() {
     if (search.vehicleId && vehicles.data) {
       const found = vehicles.data.find((v) => v.vehicleId === search.vehicleId);
       if (found && found.vehicleId !== selection.vehicleId) {
-        setSelection({ make: found.make, vehicleId: found.vehicleId });
+        setSelection({ vehicleType: found.vehicleType || "CAR", make: found.make, vehicleId: found.vehicleId });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

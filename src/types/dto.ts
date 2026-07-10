@@ -31,8 +31,11 @@ export type RegisterResponse = {
 
 /* ---------- Vehicles ---------- */
 export type FuelType = "PETROL" | "DIESEL" | "ELECTRIC" | "CNG";
+export type VehicleType = "CAR" | "BIKE" | "COMMERCIAL" | "E_RICKSHAW" | "INVERTER";
+
 export type VehicleResponse = {
   vehicleId: UUID;
+  vehicleType: VehicleType;
   make: string;
   model: string;
   yearFrom?: number;
@@ -41,6 +44,7 @@ export type VehicleResponse = {
   imageUrl?: string | null;
 };
 export type CreateVehicleRequest = {
+  vehicleType: VehicleType;
   make: string;
   model: string;
   yearFrom?: number;

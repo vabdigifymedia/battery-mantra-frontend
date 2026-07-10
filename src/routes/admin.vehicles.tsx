@@ -38,6 +38,7 @@ export const Route = createFileRoute("/admin/vehicles")({
 });
 
 const vehicleSchema = z.object({
+  vehicleType: z.enum(["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
   make: z.string().trim().min(1, "Make is required"),
   model: z.string().trim().min(1, "Model is required"),
   yearFrom: z.coerce.number().min(1900).optional().or(z.literal(0)),
@@ -58,6 +59,7 @@ function AdminVehicles() {
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
+      vehicleType: "CAR",
       make: "",
       model: "",
     },
@@ -66,6 +68,7 @@ function AdminVehicles() {
   const openAddModal = () => {
     setEditingVehicle(null);
     form.reset({
+      vehicleType: "CAR",
       make: "",
       model: "",
       yearFrom: undefined,
@@ -79,6 +82,7 @@ function AdminVehicles() {
   const openEditModal = (vehicle: VehicleResponse) => {
     setEditingVehicle(vehicle);
     form.reset({
+      vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make,
       model: vehicle.model,
       yearFrom: vehicle.yearFrom,
@@ -127,6 +131,7 @@ function AdminVehicles() {
   const onSubmit = form.handleSubmit((values) => {
     // Clean up empty years
     const data: CreateVehicleRequest = {
+      vehicleType: values.vehicleType,
       make: values.make,
       model: values.model,
       yearFrom: values.yearFrom ? values.yearFrom : undefined,
@@ -159,6 +164,7 @@ function AdminVehicles() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">Image</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Make</TableHead>
               <TableHead>Model</TableHead>
               <TableHead>Years</TableHead>
@@ -169,13 +175,13 @@ function AdminVehicles() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   <Spinner size="sm" className="inline-block mr-2" /> Loading vehicles...
                 </TableCell>
               </TableRow>
             ) : !vehicles?.length ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   No vehicles found.
                 </TableCell>
               </TableRow>
@@ -192,6 +198,11 @@ function AdminVehicles() {
                         <Car className="h-5 w-5" />
                       </div>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium ring-1 ring-inset ring-muted-foreground/20">
+                      {vehicle.vehicleType}
+                    </span>
                   </TableCell>
                   <TableCell className="font-medium">{vehicle.make}</TableCell>
                   <TableCell>{vehicle.model}</TableCell>
@@ -244,6 +255,20 @@ function AdminVehicles() {
             <DialogTitle>{editingVehicle ? "Edit Vehicle" : "Add Vehicle"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
+            <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
+              <select
+                id="vehicleType"
+                {...form.register("vehicleType")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="CAR">Car</option>
+                <option value="BIKE">Bike</option>
+                <option value="COMMERCIAL">Commercial</option>
+                <option value="E_RICKSHAW">E-Rickshaw</option>
+                <option value="INVERTER">Inverter</option>
+              </select>
+            </FormField>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
                 <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki" />

@@ -8,11 +8,13 @@ import { cn } from "@/lib/utils";
 import type { VehicleResponse } from "@/types/dto";
 
 export type VehicleSelection = {
+  vehicleType: string | null;
   make: string | null;
   vehicleId: string | null;
 };
 
 export const emptyVehicleSelection: VehicleSelection = {
+  vehicleType: null,
   make: null,
   vehicleId: null,
 };
@@ -26,31 +28,59 @@ type Props = {
 export function VehicleStepper({ value, onChange, compact }: Props) {
   const vehicles = useQuery(vehiclesListQuery());
 
-  const makes = Array.from(new Set((vehicles.data ?? []).map((v) => v.make))).sort();
-  const modelsForMake: VehicleResponse[] = value.make
-    ? (vehicles.data ?? []).filter((v) => v.make === value.make)
+  const types = Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).sort();
+  const makesForType = value.vehicleType
+    ? Array.from(new Set((vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType).map((v) => v.make))).sort()
     : [];
+  const modelsForMake = value.vehicleType && value.make
+    ? (vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType && v.make === value.make)
+    : [];
+
+  const formatType = (type: string) => {
+    switch (type) {
+      case "CAR": return "Car";
+      case "BIKE": return "Bike";
+      case "COMMERCIAL": return "Commercial";
+      case "E_RICKSHAW": return "E-Rickshaw";
+      case "INVERTER": return "Inverter";
+      default: return type;
+    }
+  };
 
   return (
     <div className={cn("space-y-3", compact && "space-y-2")}>
-      <StepRow label="Make" stepIndex={1} done={value.make != null}>
+      <StepRow label="Vehicle Type" stepIndex={1} done={value.vehicleType != null}>
         {vehicles.isLoading ? (
           <Loading />
         ) : vehicles.isError ? (
           <ErrorState title="Failed to load vehicles" />
-        ) : makes.length === 0 ? (
+        ) : types.length === 0 ? (
           <Empty />
         ) : (
           <Chips
-            items={makes.map((m) => ({ id: m, label: m }))}
-            activeId={value.make}
-            onSelect={(id) => onChange({ make: String(id), vehicleId: null })}
+            items={types.map((t) => ({ id: t, label: formatType(t) }))}
+            activeId={value.vehicleType}
+            onSelect={(id) => onChange({ vehicleType: id, make: null, vehicleId: null })}
           />
         )}
       </StepRow>
 
+      {value.vehicleType ? (
+        <StepRow label="Make" stepIndex={2} done={value.make != null}>
+          {makesForType.length === 0 ? (
+            <Empty />
+          ) : (
+            <Chips
+              items={makesForType.map((m) => ({ id: m, label: m }))}
+              activeId={value.make}
+              onSelect={(id) => onChange({ ...value, make: String(id), vehicleId: null })}
+            />
+          )}
+        </StepRow>
+      ) : null}
+
       {value.make ? (
-        <StepRow label="Model" stepIndex={2} done={value.vehicleId != null}>
+        <StepRow label="Model" stepIndex={3} done={value.vehicleId != null}>
           {modelsForMake.length === 0 ? (
             <Empty />
           ) : (
