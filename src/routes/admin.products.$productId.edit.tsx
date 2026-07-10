@@ -395,16 +395,32 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
             </CardHeader>
             <CardContent>
               <div className="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                {vehicles.map((v) => (
-                  <div key={v.vehicleId} className="flex items-center space-x-2">
-                    <Checkbox 
-                      id={`vehicle-${v.vehicleId}`} 
-                      checked={(watchVehicles || []).includes(v.vehicleId)}
-                      onCheckedChange={() => toggleVehicle(v.vehicleId)}
-                    />
-                    <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {v.make} {v.model} {v.yearFrom ? `(${v.yearFrom})` : ''}
-                    </label>
+                {Object.entries(
+                  vehicles.reduce((acc, v) => {
+                    const type = v.vehicleType || "CAR";
+                    if (!acc[type]) acc[type] = [];
+                    acc[type].push(v);
+                    return acc;
+                  }, {} as Record<string, typeof vehicles>)
+                ).map(([type, typeVehicles]) => (
+                  <div key={type} className="mb-5 last:mb-0">
+                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 pb-1 border-b">
+                      {type}
+                    </h4>
+                    <div className="space-y-3">
+                      {typeVehicles.map((v) => (
+                        <div key={v.vehicleId} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`vehicle-${v.vehicleId}`} 
+                            checked={(watchVehicles || []).includes(v.vehicleId)}
+                            onCheckedChange={() => toggleVehicle(v.vehicleId)}
+                          />
+                          <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            {v.make} {v.model} {v.yearFrom ? `(${v.yearFrom})` : ''}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
                 {vehicles.length === 0 && (

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Car } from "lucide-react";
 import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
 import {
   Dialog,
@@ -53,8 +54,13 @@ function AdminVehicles() {
   const queryClient = useQueryClient();
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
   
+  const [activeTab, setActiveTab] = useState("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleResponse | null>(null);
+
+  const filteredVehicles = activeTab === "ALL" 
+    ? vehicles 
+    : vehicles?.filter(v => v.vehicleType === activeTab);
 
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
@@ -159,7 +165,17 @@ function AdminVehicles() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
+          <TabsTrigger value="ALL" className="rounded-md">All Vehicles</TabsTrigger>
+          <TabsTrigger value="CAR" className="rounded-md">Cars</TabsTrigger>
+          <TabsTrigger value="BIKE" className="rounded-md">Bikes</TabsTrigger>
+          <TabsTrigger value="COMMERCIAL" className="rounded-md">Commercial</TabsTrigger>
+          <TabsTrigger value="E_RICKSHAW" className="rounded-md">E-Rickshaws</TabsTrigger>
+          <TabsTrigger value="INVERTER" className="rounded-md">Inverters</TabsTrigger>
+        </TabsList>
+        
+        <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -179,14 +195,14 @@ function AdminVehicles() {
                   <Spinner size="sm" className="inline-block mr-2" /> Loading vehicles...
                 </TableCell>
               </TableRow>
-            ) : !vehicles?.length ? (
+            ) : !filteredVehicles?.length ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  No vehicles found.
+                  No vehicles found in this category.
                 </TableCell>
               </TableRow>
             ) : (
-              vehicles.map((vehicle) => (
+              filteredVehicles.map((vehicle) => (
                 <TableRow key={vehicle.vehicleId}>
                   <TableCell>
                     {vehicle.imageUrl ? (
@@ -248,6 +264,7 @@ function AdminVehicles() {
           </TableBody>
         </Table>
       </div>
+      </Tabs>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="sm:max-w-[425px]">
