@@ -55,12 +55,19 @@ function AdminVehicles() {
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
   
   const [activeTab, setActiveTab] = useState("ALL");
+  const [activeMake, setActiveMake] = useState("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleResponse | null>(null);
 
-  const filteredVehicles = activeTab === "ALL" 
+  const typeFilteredVehicles = activeTab === "ALL" 
     ? vehicles 
     : vehicles?.filter(v => v.vehicleType === activeTab);
+
+  const availableMakes = Array.from(new Set(typeFilteredVehicles?.map(v => v.make) ?? [])).sort();
+
+  const filteredVehicles = activeMake === "ALL"
+    ? typeFilteredVehicles
+    : typeFilteredVehicles?.filter(v => v.make === activeMake);
 
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
@@ -165,7 +172,7 @@ function AdminVehicles() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); }} className="w-full">
         <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="ALL" className="rounded-md">All Vehicles</TabsTrigger>
           <TabsTrigger value="CAR" className="rounded-md">Cars</TabsTrigger>
@@ -175,6 +182,30 @@ function AdminVehicles() {
           <TabsTrigger value="INVERTER" className="rounded-md">Inverters</TabsTrigger>
         </TabsList>
         
+        {activeTab !== "ALL" && availableMakes.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Button 
+              variant={activeMake === "ALL" ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setActiveMake("ALL")}
+              className="h-7 text-xs rounded-full px-4"
+            >
+              All Brands
+            </Button>
+            {availableMakes.map(make => (
+              <Button 
+                key={make}
+                variant={activeMake === make ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setActiveMake(make)}
+                className="h-7 text-xs rounded-full px-4"
+              >
+                {make}
+              </Button>
+            ))}
+          </div>
+        )}
+
         <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
