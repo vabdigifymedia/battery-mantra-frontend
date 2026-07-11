@@ -39,7 +39,7 @@ export function CallbackBanner() {
       <Container size="xl" className="relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           {/* Graphic Side */}
-          <div className="hidden lg:flex justify-center relative">
+          <div className="hidden lg:flex justify-center relative order-1 lg:order-2">
             <img 
               src="/images/requestCallback Section image.png" 
               alt="Request Callback"
@@ -48,13 +48,13 @@ export function CallbackBanner() {
           </div>
 
           {/* Form Side */}
-          <div className="flex flex-col space-y-6 text-center lg:text-left">
+          <div className="flex flex-col space-y-6 text-center lg:text-left order-2 lg:order-1">
             <div className="space-y-3">
               <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4">
                 <img 
                   src="/images/requestCallback Section image.png" 
                   alt=""
-                  className="w-40 h-40 sm:w-48 sm:h-48 object-contain lg:hidden mb-2 lg:mb-0 scale-110"
+                  className="w-56 h-56 sm:w-64 sm:h-64 object-contain lg:hidden mb-2 lg:mb-0 scale-110"
                 />
                 Request a CallBack
               </h2>

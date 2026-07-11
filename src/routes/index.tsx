@@ -143,14 +143,26 @@ function HomePage() {
           </div>
         </section>
 
-        <section aria-labelledby="faq" className="mx-auto max-w-3xl">
-          <SectionHeading
-            eyebrow="FAQ"
-            title={<span id="faq">Questions, answered</span>}
-            align="center"
-          />
-          <div className="mt-6">
-            <FaqAccordion />
+        <section aria-labelledby="faq" className="w-full">
+          <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-center">
+            {/* FAQ Accordion side */}
+            <div className="space-y-6 order-2">
+              <SectionHeading
+                eyebrow="FAQ"
+                title={<span id="faq">Questions, answered</span>}
+                align="left"
+              />
+              <FaqAccordion />
+            </div>
+
+            {/* Image side */}
+            <div className="hidden lg:flex justify-center order-1">
+              <img 
+                src="/images/FAQ%20Side%20Image.png" 
+                alt="FAQ" 
+                className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105" 
+              />
+            </div>
           </div>
         </section>
         </Container>
