@@ -10,6 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
+import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
+import { Route as ShippingAndReplacementRouteImport } from './routes/shipping-and-replacement'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -37,6 +40,21 @@ import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.p
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
   id: '/vehicle-finder',
   path: '/vehicle-finder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
+  id: '/terms-and-conditions',
+  path: '/terms-and-conditions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingAndReplacementRoute = ShippingAndReplacementRouteImport.update({
+  id: '/shipping-and-replacement',
+  path: '/shipping-and-replacement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -162,6 +180,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -186,6 +207,9 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -213,6 +237,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -240,6 +267,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/privacy-policy'
+    | '/shipping-and-replacement'
+    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -264,6 +294,9 @@ export interface FileRouteTypes {
     | '/account'
     | '/cart'
     | '/checkout'
+    | '/privacy-policy'
+    | '/shipping-and-replacement'
+    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -290,6 +323,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/privacy-policy'
+    | '/shipping-and-replacement'
+    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/_auth/login'
     | '/_auth/register'
@@ -317,6 +353,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ShippingAndReplacementRoute: typeof ShippingAndReplacementRoute
+  TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductsIdRoute: typeof ProductsIdRoute
@@ -331,6 +370,27 @@ declare module '@tanstack/react-router' {
       path: '/vehicle-finder'
       fullPath: '/vehicle-finder'
       preLoaderRoute: typeof VehicleFinderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-and-conditions': {
+      id: '/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof TermsAndConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping-and-replacement': {
+      id: '/shipping-and-replacement'
+      path: '/shipping-and-replacement'
+      fullPath: '/shipping-and-replacement'
+      preLoaderRoute: typeof ShippingAndReplacementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -545,6 +605,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ShippingAndReplacementRoute: ShippingAndReplacementRoute,
+  TermsAndConditionsRoute: TermsAndConditionsRoute,
   VehicleFinderRoute: VehicleFinderRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductsIdRoute: ProductsIdRoute,

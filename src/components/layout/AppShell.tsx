@@ -24,6 +24,14 @@ const FOOTER_GROUPS: FooterGroup[] = [
       { label: "Home", to: "/" },
     ],
   },
+  {
+    title: "Policies",
+    links: [
+      { label: "Shipping & Replacement", to: "/shipping-and-replacement" },
+      { label: "Privacy Policy", to: "/privacy-policy" },
+      { label: "Terms & Conditions", to: "/terms-and-conditions" },
+    ],
+  },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
