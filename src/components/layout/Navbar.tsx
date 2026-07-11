@@ -101,6 +101,21 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
             <Heart className="h-5 w-5" />
           </Button>
 
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
+            className="relative"
+            onClick={() => navigate({ to: "/cart" })}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 ? (
+              <span className="absolute -right-1 -top-1 grid h-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            ) : null}
+          </Button>
+
           {status === "authenticated" && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -139,29 +154,14 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
             </DropdownMenu>
           ) : (
             <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Sign in"
+              variant="brand"
+              size="sm"
+              className="px-4 text-xs font-semibold"
               onClick={() => navigate({ to: "/login" })}
             >
-              <User className="h-5 w-5" />
+              Login
             </Button>
           )}
-
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
-            className="relative"
-            onClick={() => navigate({ to: "/cart" })}
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 ? (
-              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            ) : null}
-          </Button>
         </nav>
       </Container>
 
