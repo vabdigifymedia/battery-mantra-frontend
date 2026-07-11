@@ -1,3 +1,4 @@
+import { useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer, type FooterGroup } from "./Footer";
@@ -35,6 +36,19 @@ const FOOTER_GROUPS: FooterGroup[] = [
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  const isAdminPage = pathname.startsWith("/admin");
+
+  if (isAdminPage) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <main id="main" className="flex-1 flex flex-col">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <a
