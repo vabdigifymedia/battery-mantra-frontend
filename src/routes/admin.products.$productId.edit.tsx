@@ -416,7 +416,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                             onCheckedChange={() => toggleVehicle(v.vehicleId)}
                           />
                           <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            {v.make} {v.model} {v.yearFrom ? `(${v.yearFrom})` : ''}
+                            {v.make} {v.model}
                           </label>
                         </div>
                       ))}

@@ -90,7 +90,6 @@ export function VehicleStepper({ value, onChange, compact }: Props) {
                 label: v.model,
                 meta: [
                   v.fuelType,
-                  v.yearFrom && v.yearTo ? `${v.yearFrom}–${v.yearTo}` : v.yearFrom || v.yearTo,
                 ]
                   .filter(Boolean)
                   .join(" · "),

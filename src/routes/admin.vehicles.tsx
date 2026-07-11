@@ -49,8 +49,6 @@ const vehicleSchema = z.object({
   vehicleType: z.enum(["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
   make: z.string().trim().min(1, "Make is required"),
   model: z.string().trim().min(1, "Model is required"),
-  yearFrom: z.coerce.number().min(1900).optional().or(z.literal(0)),
-  yearTo: z.coerce.number().min(1900).optional().or(z.literal(0)),
   fuelType: z.enum(["PETROL", "DIESEL", "ELECTRIC", "CNG"]).optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
@@ -97,8 +95,6 @@ function AdminVehicles() {
       vehicleType: "CAR",
       make: "",
       model: "",
-      yearFrom: undefined,
-      yearTo: undefined,
       fuelType: undefined,
       imageUrl: "",
     });
@@ -111,8 +107,6 @@ function AdminVehicles() {
       vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make,
       model: vehicle.model,
-      yearFrom: vehicle.yearFrom,
-      yearTo: vehicle.yearTo,
       fuelType: vehicle.fuelType,
       imageUrl: vehicle.imageUrl || "",
     });
@@ -160,8 +154,6 @@ function AdminVehicles() {
       vehicleType: values.vehicleType,
       make: values.make,
       model: values.model,
-      yearFrom: values.yearFrom ? values.yearFrom : undefined,
-      yearTo: values.yearTo ? values.yearTo : undefined,
       fuelType: values.fuelType,
       imageUrl: values.imageUrl || undefined,
     };
@@ -227,7 +219,6 @@ function AdminVehicles() {
               <TableHead>Type</TableHead>
               <TableHead>Make</TableHead>
               <TableHead>Model</TableHead>
-              <TableHead>Years</TableHead>
               <TableHead>Fuel Type</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -266,11 +257,6 @@ function AdminVehicles() {
                   </TableCell>
                   <TableCell className="font-medium">{vehicle.make}</TableCell>
                   <TableCell>{vehicle.model}</TableCell>
-                  <TableCell>
-                    {vehicle.yearFrom || vehicle.yearTo
-                      ? `${vehicle.yearFrom || "..."} - ${vehicle.yearTo || "..."}`
-                      : "All Years"}
-                  </TableCell>
                   <TableCell>{vehicle.fuelType || "Any"}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEditModal(vehicle)}>
@@ -367,16 +353,6 @@ function AdminVehicles() {
 
               <FormField label="Model" htmlFor="model" required error={form.formState.errors.model?.message}>
                 <Input id="model" {...form.register("model")} placeholder="e.g. Swift" />
-              </FormField>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Year From" htmlFor="yearFrom" error={form.formState.errors.yearFrom?.message}>
-                <Input id="yearFrom" type="number" {...form.register("yearFrom")} placeholder="e.g. 2015" />
-              </FormField>
-
-              <FormField label="Year To" htmlFor="yearTo" error={form.formState.errors.yearTo?.message}>
-                <Input id="yearTo" type="number" {...form.register("yearTo")} placeholder="e.g. 2023" />
               </FormField>
             </div>
 

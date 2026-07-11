@@ -400,7 +400,7 @@ function PdpPage() {
                         {v.make} {v.model}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 font-medium">
-                        {[v.fuelType, v.yearFrom && v.yearTo ? `${v.yearFrom}–${v.yearTo}` : v.yearFrom || v.yearTo].filter(Boolean).join(" • ")}
+                        {[v.fuelType].filter(Boolean).join(" • ")}
                       </div>
                     </div>
                   </li>
