@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, Search } from "lucide-react";
+import Fuse from "fuse.js";
 import { vehiclesListQuery } from "@/queries";
 import { Spinner } from "@/components/feedback/Spinner";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -23,9 +24,10 @@ type Props = {
   value: VehicleSelection;
   onChange: (next: VehicleSelection) => void;
   compact?: boolean;
+  showSearch?: boolean;
 };
 
-export function VehicleStepper({ value, onChange, compact }: Props) {
+export function VehicleStepper({ value, onChange, compact, showSearch = false }: Props) {
   const vehicles = useQuery(vehiclesListQuery());
 
   const types = Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).sort();
@@ -74,6 +76,8 @@ export function VehicleStepper({ value, onChange, compact }: Props) {
               items={makesForType.map((m) => ({ id: m, label: m }))}
               activeId={value.make}
               onSelect={(id) => onChange({ ...value, make: String(id), vehicleId: null })}
+              showSearch={showSearch}
+              searchPlaceholder="Search make..."
             />
           )}
         </StepRow>
@@ -97,6 +101,8 @@ export function VehicleStepper({ value, onChange, compact }: Props) {
               }))}
               activeId={value.vehicleId}
               onSelect={(id) => onChange({ ...value, vehicleId: String(id) })}
+              showSearch={showSearch}
+              searchPlaceholder="Search model..."
             />
           )}
         </StepRow>
@@ -152,41 +158,75 @@ function Chips({
   items,
   activeId,
   onSelect,
+  showSearch = false,
+  searchPlaceholder = "Search...",
 }: {
   items: ChipItem[];
   activeId: string | null;
   onSelect: (id: string) => void;
+  showSearch?: boolean;
+  searchPlaceholder?: string;
 }) {
+  const [query, setQuery] = useState("");
+
+  const filteredItems = useMemo(() => {
+    if (!query || !showSearch) return items;
+    const fuse = new Fuse(items, {
+      keys: ["label"],
+      threshold: 0.3, // 0.3 handles slight typos well
+      ignoreLocation: true,
+    });
+    return fuse.search(query).map((res) => res.item);
+  }, [items, query, showSearch]);
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => {
-        const active = activeId === item.id;
-        return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onSelect(item.id)}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors",
-              active
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-surface hover:border-primary/40 hover:bg-primary-soft",
-            )}
-          >
-            {item.imageUrl && (
-              <img src={item.imageUrl} alt={item.label} className="w-8 h-8 object-contain bg-white rounded flex-shrink-0" />
-            )}
-            <div className="flex flex-col items-start text-left">
-              <span className="font-medium leading-tight">{item.label}</span>
-              {item.meta ? (
-                <span className={cn("text-[10px]", active ? "opacity-90" : "text-muted-foreground")}>
-                  {item.meta}
-                </span>
-              ) : null}
-            </div>
-          </button>
-        );
-      })}
+    <div className="flex flex-col gap-3">
+      {showSearch && items.length > 5 && (
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="h-9 w-full sm:w-64 rounded-md border border-input bg-background pl-9 pr-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+          />
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 max-h-[180px] overflow-y-auto pr-1 pb-1 custom-scrollbar">
+        {filteredItems.length === 0 ? (
+          <p className="py-2 text-sm text-muted-foreground">No matches found.</p>
+        ) : (
+          filteredItems.map((item) => {
+            const active = activeId === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelect(item.id)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-surface hover:border-primary/40 hover:bg-primary-soft",
+                )}
+              >
+                {item.imageUrl && (
+                  <img src={item.imageUrl} alt={item.label} className="w-8 h-8 object-contain bg-white rounded flex-shrink-0" />
+                )}
+                <div className="flex flex-col items-start text-left">
+                  <span className="font-medium leading-tight">{item.label}</span>
+                  {item.meta ? (
+                    <span className={cn("text-[10px]", active ? "opacity-90" : "text-muted-foreground")}>
+                      {item.meta}
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

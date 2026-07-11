@@ -26,7 +26,7 @@ export function VehicleFinderWidget() {
           </p>
         </div>
       </div>
-      <VehicleStepper value={selection} onChange={setSelection} compact />
+      <VehicleStepper value={selection} onChange={setSelection} compact showSearch />
       <Button
         variant="brand"
         className="mt-4 w-full"
