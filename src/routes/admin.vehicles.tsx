@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Car } from "lucide-react";
+import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
@@ -38,7 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { VehicleResponse, CreateVehicleRequest, FuelType } from "@/types/dto";
+import type { VehicleResponse, CreateVehicleRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
 export const Route = createFileRoute("/admin/vehicles")({
@@ -55,6 +55,39 @@ const vehicleSchema = z.object({
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
+const parseCSV = (text: string) => {
+  const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length < 2) return [];
+
+  // Parse headers
+  const headers = lines[0].split(",").map((h) => h.trim().replace(/^["']|["']$/g, ""));
+  
+  const results: any[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",").map((v) => v.trim().replace(/^["']|["']$/g, ""));
+    if (values.length < headers.length) continue;
+
+    const row: any = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index];
+    });
+
+    if (!row.make || !row.model) continue;
+
+    const vehicleType = row.vehicleType?.toUpperCase();
+    const fuelType = row.fuelType?.toUpperCase();
+
+    results.push({
+      vehicleType: ["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"].includes(vehicleType) ? vehicleType : "CAR",
+      make: row.make,
+      model: row.model,
+      fuelType: ["PETROL", "DIESEL", "ELECTRIC", "CNG"].includes(fuelType) ? fuelType : undefined,
+      imageUrl: row.imageUrl || undefined,
+    });
+  }
+  return results;
+};
+
 function AdminVehicles() {
   const queryClient = useQueryClient();
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
@@ -64,6 +97,11 @@ function AdminVehicles() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<VehicleResponse | null>(null);
+
+  // Import states
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importProgress, setImportProgress] = useState<{ current: number; total: number } | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const PAGE_SIZE = 15;
 
@@ -149,7 +187,6 @@ function AdminVehicles() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    // Clean up empty years
     const data: CreateVehicleRequest = {
       vehicleType: values.vehicleType,
       make: values.make,
@@ -165,6 +202,51 @@ function AdminVehicles() {
     }
   });
 
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const parsed = parseCSV(text);
+        
+        if (parsed.length === 0) {
+          toast.error("No valid vehicle rows found in the CSV. Please check formatting.");
+          return;
+        }
+
+        setImporting(true);
+        setImportProgress({ current: 0, total: parsed.length });
+
+        let successCount = 0;
+        
+        for (let i = 0; i < parsed.length; i++) {
+          const vehicle = parsed[i];
+          try {
+            await adminService.createVehicle(vehicle);
+            successCount++;
+          } catch (err) {
+            console.error(`Failed to import vehicle at row ${i + 1}:`, err);
+          }
+          setImportProgress({ current: i + 1, total: parsed.length });
+        }
+
+        queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+        toast.success(`Successfully imported ${successCount} out of ${parsed.length} vehicles!`);
+        setIsImportOpen(false);
+      } catch (err) {
+        toast.error("An error occurred while reading the CSV file.");
+      } finally {
+        setImporting(false);
+        setImportProgress(null);
+        e.target.value = "";
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -172,9 +254,14 @@ function AdminVehicles() {
           <h2 className="font-display text-3xl font-bold tracking-tight">Vehicles</h2>
           <p className="text-muted-foreground">Manage compatible vehicles for batteries.</p>
         </div>
-        <Button onClick={openAddModal}>
-          <Plus className="mr-2 h-4 w-4" /> Add Vehicle
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" /> Import CSV
+          </Button>
+          <Button onClick={openAddModal}>
+            <Plus className="mr-2 h-4 w-4" /> Add Vehicle
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); setCurrentPage(1); }} className="w-full">
@@ -212,120 +299,121 @@ function AdminVehicles() {
         )}
 
         <div className="rounded-md border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">Image</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Make</TableHead>
-              <TableHead>Model</TableHead>
-              <TableHead>Fuel Type</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  <Spinner size="sm" className="inline-block mr-2" /> Loading vehicles...
-                </TableCell>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Make</TableHead>
+                <TableHead>Model</TableHead>
+                <TableHead>Fuel Type</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : !filteredVehicles?.length ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  No vehicles found in this category.
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginatedVehicles?.map((vehicle) => (
-                <TableRow key={vehicle.vehicleId}>
-                  <TableCell>
-                    {vehicle.imageUrl ? (
-                      <div className="h-10 w-10 rounded-md border bg-muted/30 overflow-hidden flex items-center justify-center">
-                        <img src={vehicle.imageUrl} alt={vehicle.make} className="w-full h-full object-contain p-1" />
-                      </div>
-                    ) : (
-                      <div className="h-10 w-10 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
-                        <Car className="h-5 w-5" />
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium ring-1 ring-inset ring-muted-foreground/20">
-                      {vehicle.vehicleType}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-medium">{vehicle.make}</TableCell>
-                  <TableCell>{vehicle.model}</TableCell>
-                  <TableCell>{vehicle.fuelType || "Any"}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal(vehicle)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will permanently delete the vehicle "{vehicle.make} {vehicle.model}".
-                            This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction 
-                            onClick={() => deleteMutation.mutate(vehicle.vehicleId)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center">
+                    <Spinner size="sm" className="inline-block mr-2" /> Loading vehicles...
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* PAGINATION */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
-            <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredVehicles?.length || 0)}</span> of{" "}
-            <span className="font-medium">{filteredVehicles?.length}</span> results
-          </p>
-          <Pagination className="w-auto mx-0">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} 
-                />
-              </PaginationItem>
-              <PaginationItem className="hidden sm:inline-flex px-4 text-sm font-medium">
-                Page {currentPage} of {totalPages}
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} 
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+              ) : !filteredVehicles?.length ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    No vehicles found in this category.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedVehicles?.map((vehicle) => (
+                  <TableRow key={vehicle.vehicleId}>
+                    <TableCell>
+                      {vehicle.imageUrl ? (
+                        <div className="h-10 w-10 rounded-md border bg-muted/30 overflow-hidden flex items-center justify-center">
+                          <img src={vehicle.imageUrl} alt={vehicle.make} className="w-full h-full object-contain p-1" />
+                        </div>
+                      ) : (
+                        <div className="h-10 w-10 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                          <Car className="h-5 w-5" />
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium ring-1 ring-inset ring-muted-foreground/20">
+                        {vehicle.vehicleType}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-medium">{vehicle.make}</TableCell>
+                    <TableCell>{vehicle.model}</TableCell>
+                    <TableCell>{vehicle.fuelType || "Any"}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => openEditModal(vehicle)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the vehicle "{vehicle.make} {vehicle.model}".
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteMutation.mutate(vehicle.vehicleId)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
-      )}
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
+              <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredVehicles?.length || 0)}</span> of{" "}
+              <span className="font-medium">{filteredVehicles?.length}</span> results
+            </p>
+            <Pagination className="w-auto mx-0">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                  />
+                </PaginationItem>
+                <PaginationItem className="hidden sm:inline-flex px-4 text-sm font-medium">
+                  Page {currentPage} of {totalPages}
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Tabs>
 
+      {/* SINGLE ADD / EDIT MODAL */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -384,6 +472,78 @@ function AdminVehicles() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* CSV IMPORT DIALOG */}
+      <Dialog open={isImportOpen} onOpenChange={(open) => !open && !importing && setIsImportOpen(false)}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>Import Vehicles from CSV</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs space-y-2">
+              <p className="font-semibold text-foreground">CSV Format Guidelines:</p>
+              <p className="text-muted-foreground leading-relaxed">
+                The CSV file must contain a header row with the following column names (exact case):
+                <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground">
+                  vehicleType,make,model,fuelType,imageUrl
+                </code>
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                <li><strong className="text-foreground">vehicleType:</strong> CAR, BIKE, COMMERCIAL, E_RICKSHAW, INVERTER</li>
+                <li><strong className="text-foreground">fuelType:</strong> PETROL, DIESEL, ELECTRIC, CNG (or leave blank)</li>
+                <li><strong className="text-foreground">imageUrl:</strong> Valid image URL (or leave blank)</li>
+              </ul>
+            </div>
+
+            {importing ? (
+              <div className="space-y-3 py-4 text-center">
+                <Spinner className="mx-auto" />
+                <p className="text-sm font-semibold text-foreground animate-pulse">
+                  Importing vehicles...
+                </p>
+                {importProgress && (
+                  <p className="text-xs text-muted-foreground">
+                    Progress: {importProgress.current} / {importProgress.total} vehicles (
+                    {Math.round((importProgress.current / importProgress.total) * 100)}%)
+                  </p>
+                )}
+                {importProgress && (
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-primary h-full transition-all duration-200" 
+                      style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 hover:bg-muted/30 transition-colors relative cursor-pointer group">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCSVImport}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="flex flex-col items-center space-y-2 text-center pointer-events-none">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                      <Upload className="h-5 w-5" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Select CSV File</div>
+                    <div className="text-xs text-muted-foreground">Click to browse your files</div>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end pt-2">
+                  <Button variant="ghost" onClick={() => setIsImportOpen(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
