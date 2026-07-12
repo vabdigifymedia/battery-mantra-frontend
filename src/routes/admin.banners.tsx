@@ -56,6 +56,7 @@ function AdminBanners() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<BannerResponse | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const form = useForm<BannerFormValues>({
     resolver: zodResolver(bannerSchema),
@@ -70,6 +71,7 @@ function AdminBanners() {
 
   const openAddModal = () => {
     setEditingBanner(null);
+    setShowAdvanced(false);
     form.reset({
       title: "",
       imageUrl: "",
@@ -82,6 +84,7 @@ function AdminBanners() {
 
   const openEditModal = (banner: BannerResponse) => {
     setEditingBanner(banner);
+    setShowAdvanced(false);
     form.reset({
       title: banner.title ?? "",
       imageUrl: banner.imageUrl,
@@ -95,6 +98,7 @@ function AdminBanners() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingBanner(null);
+    setShowAdvanced(false);
     form.reset();
   };
 
@@ -248,26 +252,38 @@ function AdminBanners() {
             <DialogTitle>{editingBanner ? "Edit Banner" : "Add Banner"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
-            <FormField label="Title" htmlFor="title" hint="Optional description" error={form.formState.errors.title?.message}>
-              <Input id="title" {...form.register("title")} placeholder="e.g. Diwali Sale" />
-            </FormField>
-
             <FormField label="Image URL" htmlFor="imageUrl" required hint="URL of the banner image" error={form.formState.errors.imageUrl?.message}>
               <Input id="imageUrl" {...form.register("imageUrl")} placeholder="https://..." />
             </FormField>
 
-            <FormField label="Link URL" htmlFor="linkUrl" hint="Where the banner links to on click (optional)" error={form.formState.errors.linkUrl?.message}>
-              <Input id="linkUrl" {...form.register("linkUrl")} placeholder="https://... or /products?..." />
-            </FormField>
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 focus:outline-none cursor-pointer"
+            >
+              {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+            </button>
 
-            <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers show first" error={form.formState.errors.displayOrder?.message}>
-              <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
-            </FormField>
+            {showAdvanced && (
+              <div className="space-y-4 border-t border-border pt-4 animate-in fade-in duration-200">
+                <FormField label="Title" htmlFor="title" hint="Optional description (optional)" error={form.formState.errors.title?.message}>
+                  <Input id="title" {...form.register("title")} placeholder="e.g. Diwali Sale" />
+                </FormField>
 
-            <div className="flex items-center gap-2 pt-2">
-              <input type="checkbox" id="isActive" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isActive")} />
-              <label htmlFor="isActive" className="text-sm font-medium text-foreground">Active (Visible on Homepage)</label>
-            </div>
+                <FormField label="Link URL" htmlFor="linkUrl" hint="Where the banner links to on click (optional)" error={form.formState.errors.linkUrl?.message}>
+                  <Input id="linkUrl" {...form.register("linkUrl")} placeholder="https://... or /products?..." />
+                </FormField>
+
+                <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers show first" error={form.formState.errors.displayOrder?.message}>
+                  <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
+                </FormField>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <input type="checkbox" id="isActive" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isActive")} />
+                  <label htmlFor="isActive" className="text-sm font-medium text-foreground">Active (Visible on Homepage)</label>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="ghost" onClick={closeModal}>

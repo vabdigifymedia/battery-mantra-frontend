@@ -51,7 +51,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <div className="flex flex-col">
-      <div className="order-2 lg:order-1">
+      <div className="order-3 lg:order-1">
         <HeroSection
           eyebrow={
             <span className="inline-flex items-center gap-1.5">
@@ -84,11 +84,11 @@ function HomePage() {
         />
       </div>
 
-      <div className="order-3 lg:order-2">
+      <div className="order-1 lg:order-2">
         <BannerCarousel />
       </div>
 
-      <div className="order-1 lg:order-3 w-full bg-background pt-6 lg:pt-12">
+      <div className="order-2 lg:order-3 w-full bg-background pt-6 lg:pt-12">
         <Container size="xl">
           <section aria-labelledby="categories">
             <SectionHeading
