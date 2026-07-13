@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
 import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
@@ -325,7 +326,20 @@ function AddProductPage() {
               <CardDescription>Select vehicles this battery fits.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+              <Tabs defaultValue="CAR" className="w-full">
+                <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1 w-full justify-start">
+                  {Object.keys(
+                    vehicles.reduce((acc, v) => {
+                      const type = v.vehicleType || "CAR";
+                      if (!acc[type]) acc[type] = [];
+                      acc[type].push(v);
+                      return acc;
+                    }, {} as Record<string, typeof vehicles>)
+                  ).map(type => (
+                    <TabsTrigger key={type} value={type} className="rounded-md text-xs px-3">{type}</TabsTrigger>
+                  ))}
+                </TabsList>
+
                 {Object.entries(
                   vehicles.reduce((acc, v) => {
                     const type = v.vehicleType || "CAR";
@@ -334,11 +348,8 @@ function AddProductPage() {
                     return acc;
                   }, {} as Record<string, typeof vehicles>)
                 ).map(([type, typeVehicles]) => (
-                  <div key={type} className="mb-5 last:mb-0">
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 pb-1 border-b">
-                      {type}
-                    </h4>
-                    <div className="space-y-3">
+                  <TabsContent key={type} value={type} className="mt-0">
+                    <div className="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                       {typeVehicles.map((v) => (
                         <div key={v.vehicleId} className="flex items-center space-x-2">
                           <Checkbox 
@@ -346,18 +357,18 @@ function AddProductPage() {
                             checked={(watchVehicles || []).includes(v.vehicleId)}
                             onCheckedChange={() => toggleVehicle(v.vehicleId)}
                           />
-                          <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
                             {v.make} {v.model}
                           </label>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </TabsContent>
                 ))}
                 {vehicles.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-4">No vehicles available.</p>
                 )}
-              </div>
+              </Tabs>
             </CardContent>
           </Card>
         </div>

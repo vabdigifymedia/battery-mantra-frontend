@@ -182,11 +182,11 @@ function CategoryNode({ c, depth = 0 }: { c: CategoryListResponse; depth?: numbe
 
   return (
     <div>
-      <label 
+      <label
         className={cn(
           "flex items-center justify-between text-sm cursor-pointer hover:text-primary transition-colors py-0.5",
           depth > 0 && "text-muted-foreground"
-        )} 
+        )}
         style={{ paddingLeft: `${depth * 16}px` }}
         onClick={(e) => {
           if ((e.target as HTMLElement).tagName.toLowerCase() === 'button') return;
@@ -194,11 +194,11 @@ function CategoryNode({ c, depth = 0 }: { c: CategoryListResponse; depth?: numbe
         }}
       >
         <div className="flex items-center gap-3 flex-1">
-          <RadioGroupItem 
-            value={c.categoryId} 
-            id={`cat-${c.categoryId}`} 
+          <RadioGroupItem
+            value={c.categoryId}
+            id={`cat-${c.categoryId}`}
             className="scale-110"
-            onClick={(e) => e.stopPropagation()} 
+            onClick={(e) => e.stopPropagation()}
           />
           <span>{c.categoryName}</span>
         </div>
@@ -227,7 +227,7 @@ function CategoryNode({ c, depth = 0 }: { c: CategoryListResponse; depth?: numbe
 
 function CategoryRadioTree({ categories, depth = 0 }: { categories: CategoryListResponse[]; depth?: number }) {
   const sorted = [...categories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-  
+
   return (
     <>
       {sorted.map((c) => (
