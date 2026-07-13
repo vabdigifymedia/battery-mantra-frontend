@@ -1,0 +1,28 @@
+vehicleType,make,model,fuelType,imageUrl
+CAR,Mercedes Benz,A Class A180 C..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_A_Class_A180_CDI_rstsfc.jpg
+CAR,Mercedes Benz,A Class A180 S..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_A_Class_A180_CDI_rstsfc.jpg
+CAR,Mercedes Benz,B Class B180 C..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700922/Mercedes_Benz_B_Class_B180_CDI_ipgyce.jpg
+CAR,Mercedes Benz,C Class C230 P..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C Class C250 C..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C Class Petrol,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C200 CDi Petro..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C200 Petrol 20..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C220 CDi Diese..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C220 CDi Petro..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,E Class E200 P..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_E_Class_E200_Petrol_ebbe6u.jpg
+CAR,Mercedes Benz,E Class E250 D..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_E_Class_E200_Petrol_ebbe6u.jpg
+CAR,Mercedes Benz,E Class E250 P..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_E_Class_E200_Petrol_ebbe6u.jpg
+CAR,Mercedes Benz,E Class E280,ANY,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_E_Class_E200_Petrol_ebbe6u.jpg
+CAR,Mercedes Benz,E220 CDi,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_E_Class_E200_Petrol_ebbe6u.jpg
+CAR,Mercedes Benz,E350 Cabriolet,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_E350_Cabriolet_2016_Onwards_ioo62l.jpg
+CAR,Mercedes Benz,E350 Cabriolet..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_E350_Cabriolet_2016_Onwards_ioo62l.jpg
+CAR,Mercedes Benz,GL Class 350 D..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_GL_Class_350_Diesel_fztzuy.jpg
+CAR,Mercedes Benz,M Class ML320 ..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_M_Class_ML320_Diesel_ba9rqi.jpg
+CAR,Mercedes Benz,New M Class ML..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700926/Mercedes_Benz_M_Class_ML320_Diesel_ba9rqi.jpg
+CAR,Mercedes Benz,S Class 350 Di..,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_S_Class_S350_L_Petrol_uhf0iv.jpg
+CAR,Mercedes Benz,S Class S350 L..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_S_Class_S350_L_Petrol_uhf0iv.jpg
+CAR,Mercedes Benz,S Class S500,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700931/Mercedes_Benz_S_Class_S350_L_Petrol_uhf0iv.jpg
+CAR,Mercedes Benz,C Class C 200 CDI,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/Mercedes_Benz_C200_Petrol_2015_eouuy5.jpg
+CAR,Mercedes Benz,C-Class Kompre..,PETROL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700922/Mercedes-Benz_C-Class_Kompressor_f2y8xf.jpg
+CAR,Mercedes Benz,GLA 200d,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700932/Mercedes-Benz_GLA_Class_200_o5vrmb.jpg
+CAR,Mercedes Benz,GLA 220d,DIESEL,https://res.cloudinary.com/xtijkslp/image/upload/v1783700927/GLA_220D_wa6k0x.jpg
