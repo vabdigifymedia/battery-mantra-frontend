@@ -215,7 +215,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         </div>
       </div>
 
-      <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any)} className="flex flex-col lg:flex-row gap-6">
+      <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any, (errs) => {
+        console.error("Validation Errors:", errs);
+        toast.error("Please check the form for errors.");
+      })} className="flex flex-col lg:flex-row gap-6">
         
         {/* LEFT COLUMN - MAIN DETAILS (70%) */}
         <div className="flex-1 space-y-6">
@@ -448,7 +451,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         <Button variant="outline" type="button" onClick={() => navigate({ to: "/admin/products" as any })}>
           Cancel
         </Button>
-        <Button type="submit" form="product-form" disabled={updateMutation.isPending || !form.formState.isDirty} className="min-w-[140px]">
+        <Button type="submit" form="product-form" disabled={updateMutation.isPending} className="min-w-[140px]">
           {updateMutation.isPending ? <Spinner size="sm" className="mr-2" /> : <Save className="mr-2 h-4 w-4" />}
           Save Changes
         </Button>
