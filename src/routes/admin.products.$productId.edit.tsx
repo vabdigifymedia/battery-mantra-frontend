@@ -3,8 +3,8 @@ import { useForm, useFieldArray, Controller, UseFormReturn } from "react-hook-fo
 import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery } from "@/queries";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,6 +113,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: brands = [] } = useQuery(brandsQuery());
   const { data: vehicles = [] } = useQuery(vehiclesListQuery());
+  const queryClient = useQueryClient();
 
   const initialRootId = useMemo(() => {
     if (!rootCategories.length || !defaultValues.categoryId) return "";
@@ -155,7 +156,23 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     }
   });
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
+    // Duplicate Product Check
+    try {
+      const allProducts = await queryClient.fetchQuery(productListQuery());
+      if (allProducts) {
+        const isDuplicate = allProducts.some(
+          p => p.productId !== productId && p.productName.toLowerCase().trim() === data.productName.toLowerCase().trim()
+        );
+        if (isDuplicate) {
+          toast.error(`A product named "${data.productName}" already exists!`);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch products for duplicate check", e);
+    }
+
     // Transform grouped specs into nested Record
     const specsRecord: Record<string, Record<string, string>> = {};
     data.specs.forEach(group => {
