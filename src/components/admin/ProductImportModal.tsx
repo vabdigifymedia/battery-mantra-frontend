@@ -114,12 +114,21 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             const parsedOriginalPrice = parseInt(row["OriginalPrice"]);
             const parsedExchangeDiscount = parseInt(row["ExchangeDiscount"]);
             const parsedStock = parseInt(row["ProductStock"]);
+            
+            if (!isNaN(parsedOriginalPrice)) {
+              specs["Technical Details"]["originalPrice"] = parsedOriginalPrice.toString();
+              hasSpecs = true;
+            }
+
+            let pDesc = row["ProductDescription"] || "";
+            if (pDesc.length > 2000) {
+              pDesc = pDesc.substring(0, 1997) + "..."; // truncate to prevent DB constraint errors
+            }
 
             const payload: CreateProductRequest = {
               productName: row["ProductName"] || "Unknown Product",
-              productDescription: row["ProductDescription"],
+              productDescription: pDesc,
               productPrice: isNaN(parsedPrice) ? 0 : parsedPrice,
-              originalPrice: isNaN(parsedOriginalPrice) ? undefined : parsedOriginalPrice,
               exchangeDiscount: isNaN(parsedExchangeDiscount) ? 0 : parsedExchangeDiscount,
               productStock: isNaN(parsedStock) ? 0 : parsedStock,
               productImage: row["ProductImage"],

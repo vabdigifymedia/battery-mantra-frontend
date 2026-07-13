@@ -28,7 +28,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { ProductImportModal } from "@/components/admin/ProductImportModal";
 
 export const Route = createFileRoute("/admin/products/")({
   component: AdminProducts,
@@ -40,7 +39,6 @@ function AdminProducts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeBrand, setActiveBrand] = useState("ALL");
-  const [isImportOpen, setIsImportOpen] = useState(false);
   const PAGE_SIZE = 15;
 
   const categoryFilteredProducts = activeCategory === "ALL"
@@ -73,9 +71,6 @@ function AdminProducts() {
           <p className="text-muted-foreground">Manage your product catalog.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setIsImportOpen(true)}>
-            Import CSV
-          </Button>
           <Button asChild>
             <Link to="/admin/products/new">
               <Plus className="mr-2 h-4 w-4" /> Add Product
@@ -226,8 +221,6 @@ function AdminProducts() {
           </Pagination>
         </div>
       )}
-
-      <ProductImportModal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} />
     </div>
   );
 }
