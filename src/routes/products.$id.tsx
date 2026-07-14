@@ -358,10 +358,11 @@ function PdpPage() {
       {/* TABS SECTION */}
       <Container size="xl" className="mt-12">
         <Tabs defaultValue="specs" className="w-full bg-background rounded-xl border shadow-sm p-2 sm:p-6">
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1">
-            <TabsTrigger value="specs" className="text-sm sm:text-base data-[state=active]:shadow-sm">Specifications</TabsTrigger>
-            <TabsTrigger value="desc" className="text-sm sm:text-base data-[state=active]:shadow-sm">Description</TabsTrigger>
-            <TabsTrigger value="vehicles" className="text-sm sm:text-base data-[state=active]:shadow-sm">Compatible Vehicles</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6 bg-muted/50 p-1 h-auto">
+            <TabsTrigger value="specs" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm">Specifications</TabsTrigger>
+            <TabsTrigger value="desc" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm">Description</TabsTrigger>
+            <TabsTrigger value="vehicles" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm">Compatible Vehicles</TabsTrigger>
+            <TabsTrigger value="policy" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm whitespace-normal text-center h-auto">Replacement Policy</TabsTrigger>
           </TabsList>
           
           <TabsContent value="specs" className="p-2 sm:p-4 outline-none">
@@ -409,6 +410,32 @@ function PdpPage() {
             ) : (
               <EmptyState title="No Compatibility Data" description="Vehicle compatibility is not available for this product yet." />
             )}
+          </TabsContent>
+
+          <TabsContent value="policy" className="p-2 sm:p-4 outline-none">
+            <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-muted-foreground">
+              <h4 className="text-lg font-bold text-foreground mb-4">Replacement Policy</h4>
+              <p className="mb-2"><strong>a)</strong> You may initiate the request for replacement of the Product within two days from the time the Product (s) is delivered to you ("Replacement Period") if:</p>
+              <ul className="list-disc pl-6 space-y-1 mb-4">
+                <li><strong>(i)</strong> the Product is received in a physically damaged condition and reported to us within 24 hours of delivery.</li>
+                <li><strong>(ii)</strong> Product is faulty or is not in a working situation, to be reported to us within 24 hours of delivery;</li>
+                <li><strong>(iii)</strong> Product or parts of the Product or accessory are missing, reported to us within 24 hours of delivery.</li>
+              </ul>
+              <p className="mb-4 text-sm text-foreground/80 bg-muted/50 p-4 rounded-lg border">
+                All our packages come with <strong>"Tamper Evident Void Seals."</strong> Please ensure that you do not accept packages where the seal has been tampered with. Approval of a tampered "Void Seal" or a harmed box will automatically disqualify you from any replacement declarations for physically damaged/faulty products, wrong Products, or missing accessories.
+              </p>
+              
+              <p className="mb-4"><strong>b)</strong> You shall keep the Products in their unused, original condition, along with the original invoice/ sale receipt, brand outer box, MRP tags attached, user manual, warranty cards, and original supplements in manufacturer packaging for a victorious replacement pick-up. We would accept the request for the replacement of such Product subject to the terms of this policy.</p>
+              
+              <p className="mb-4"><strong>c)</strong> Your replacement will be processed only when the conditions as may be stipulated by us are fulfilled at the time of replacement of such Products, such as the Product to be replaced being provided to us in the original condition along with the price tag intact including original packaging of the Product, the serial number/ bar code of the Product matches our records, if Product(s) bought as a combo then Product(s) sent for a replacement to be as a complete combo, the brand outer packaging of the Product and all accessories therein shall be intact, no damage has occurred post-delivery of the Product while in your possession, etc.</p>
+
+              <p className="mb-6"><strong>d)</strong> You agree that we will not replace any Product: (i) if you have placed the order for a wrong Product model, color, or incorrect Product, (ii) if the Product belongs to the non-replacement Product category (iii) if you fail to request replacement/register a complaint about a damaged, defective or inaccurate Product within the Replacement Period. Any damage to the Product caused by your improper use of the Product, any modification or change to the Product by you, the User, or a third party, or any depreciation in the value for other reasons will not be deemed such Product a damaged defective or inaccurate Product. It will not be considered a quality problem. Any judgment by us in this respect shall be final and binding.</p>
+
+              <div className="border-l-4 border-brand pl-4 bg-brand/5 py-4 pr-4 rounded-r-lg">
+                <p className="font-semibold text-foreground m-0">Note: we only give a product replacement; no return is applicable.</p>
+                <p className="mt-1 text-sm text-foreground/80">For more details about replacement policy, Call us at <a href="tel:+919200920051" className="text-brand hover:underline font-medium">+91-9200920051</a></p>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </Container>
