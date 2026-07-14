@@ -25,7 +25,10 @@ const formSchema = z.object({
   originalPrice: z.coerce.number().min(0).optional(),
   exchangeDiscount: z.coerce.number().min(0).optional().default(0),
   productStock: z.coerce.number().min(0).optional(),
-  productImage: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  productImage: z.string().min(1, "Primary image URL is required"),
+  additionalImages: z.array(z.object({
+    url: z.string().url("Must be a valid URL")
+  })).default([]),
   categoryId: z.string().uuid("Category is required"),
   brandId: z.string().uuid("Brand is required"),
   compatibleVehicleIds: z.array(z.string().uuid()).default([]),
@@ -66,6 +69,7 @@ function AddProductPage() {
       exchangeDiscount: 0,
       productStock: 0,
       productImage: "",
+      additionalImages: [],
       compatibleVehicleIds: [],
       specs: [],
     }
@@ -74,6 +78,11 @@ function AddProductPage() {
   const { fields: specGroups, append: appendGroup, remove: removeGroup } = useFieldArray({
     control: form.control,
     name: "specs"
+  });
+
+  const { fields: additionalImageFields, append: appendImage, remove: removeImage } = useFieldArray({
+    control: form.control,
+    name: "additionalImages"
   });
 
   const createMutation = useMutation({
@@ -133,6 +142,7 @@ function AddProductPage() {
       exchangeDiscount: data.exchangeDiscount,
       productStock: data.productStock,
       productImage: data.productImage || undefined,
+      additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
       categoryId: data.categoryId,
       brandId: data.brandId,
       compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
@@ -206,28 +216,61 @@ function AddProductPage() {
           </Card>
 
           <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle>Media</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Media</CardTitle>
+                <CardDescription>Main image and additional gallery images.</CardDescription>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendImage({ url: "" })}>
+                <Plus className="h-4 w-4 mr-2" /> Add Image
+              </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="flex-1 w-full space-y-2">
-                  <Label htmlFor="productImage">Image URL</Label>
+                  <Label htmlFor="productImage">Primary Image URL <span className="text-red-500">*</span></Label>
                   <Input id="productImage" placeholder="https://example.com/image.jpg" {...form.register("productImage")} />
                   {form.formState.errors.productImage && <p className="text-xs text-red-500">{form.formState.errors.productImage.message}</p>}
-                  <p className="text-xs text-muted-foreground mt-2">Paste a valid URL to show a live preview.</p>
                 </div>
-                <div className="w-full sm:w-40 h-40 border rounded-xl overflow-hidden bg-muted/50 flex items-center justify-center shrink-0">
+                <div className="w-full sm:w-32 h-32 border rounded-xl overflow-hidden bg-muted/50 flex items-center justify-center shrink-0">
                   {watchImageUrl ? (
                     <img src={watchImageUrl} alt="Preview" className="w-full h-full object-contain p-2" onError={(e) => { e.currentTarget.src = ""; e.currentTarget.className = "hidden"; }} />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <ImageIcon className="h-8 w-8 mb-2 opacity-50" />
-                      <span className="text-xs font-medium">No Image</span>
                     </div>
                   )}
                 </div>
               </div>
+
+              {additionalImageFields.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <Label>Additional Images</Label>
+                  {additionalImageFields.map((field, idx) => {
+                    const imgUrl = form.watch(`additionalImages.${idx}.url`);
+                    return (
+                      <div key={field.id} className="flex gap-4 items-start">
+                        <div className="flex-1 space-y-2">
+                          <Input placeholder="https://example.com/gallery.jpg" {...form.register(`additionalImages.${idx}.url` as const)} />
+                          {form.formState.errors.additionalImages?.[idx]?.url && (
+                            <p className="text-xs text-red-500">{form.formState.errors.additionalImages[idx].url?.message}</p>
+                          )}
+                        </div>
+                        <div className="w-10 h-10 border rounded bg-muted/50 flex items-center justify-center shrink-0">
+                           {imgUrl ? (
+                             <img src={imgUrl} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                           ) : (
+                             <ImageIcon className="h-4 w-4 opacity-50" />
+                           )}
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeImage(idx)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 
