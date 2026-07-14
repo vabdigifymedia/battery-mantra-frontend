@@ -193,40 +193,50 @@ function PdpPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT COLUMN: Gallery */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
-            <Card className="overflow-hidden border-border/50 shadow-sm">
-              <div className="p-4 bg-white flex justify-center items-center aspect-square">
-                {activeImage ? (
-                  <img 
-                    src={activeImage} 
-                    alt={data.productName} 
-                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-500 cursor-crosshair mix-blend-multiply" 
-                  />
-                ) : (
-                  <div className="text-muted-foreground flex flex-col items-center">
-                    <Battery className="h-16 w-16 mb-2 opacity-20" />
-                    <span>No image available</span>
-                  </div>
-                )}
-              </div>
-            </Card>
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <div className="flex flex-col-reverse lg:flex-row gap-4 items-start">
+              
+              {/* THUMBNAILS: horizontal on mobile (below image), vertical on desktop (left of image) */}
+              {galleryImages.length > 1 && (
+                <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto pb-2 lg:pb-0 w-full lg:w-24 shrink-0 scrollbar-hide lg:max-h-[500px] scroll-smooth">
+                  {galleryImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImage(img)}
+                      className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${
+                        activeImage === img 
+                          ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white" 
+                          : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
+                      }`}
+                    >
+                      <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-2 mix-blend-multiply" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* MAIN IMAGE */}
+              <Card className="flex-1 overflow-hidden border-border/40 shadow-sm rounded-2xl w-full relative bg-gradient-to-br from-white to-muted/20 transition-all hover:shadow-md">
+                <div className="p-6 flex justify-center items-center aspect-[4/3] lg:aspect-square relative">
+                  {activeImage ? (
+                    <img 
+                      src={activeImage} 
+                      alt={data.productName} 
+                      className="w-full h-full object-contain hover:scale-110 transition-transform duration-700 cursor-crosshair mix-blend-multiply drop-shadow-xl" 
+                    />
+                  ) : (
+                    <div className="text-muted-foreground flex flex-col items-center">
+                      <Battery className="h-16 w-16 mb-2 opacity-20" />
+                      <span>No image available</span>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </div>
             
-            {galleryImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {galleryImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImage(img)}
-                    className={`shrink-0 w-20 h-20 border rounded-lg overflow-hidden bg-white ${activeImage === img ? "ring-2 ring-brand border-transparent" : "hover:border-brand/50"} transition-all`}
-                  >
-                    <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-1 mix-blend-multiply" />
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-4 justify-center py-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-green-600" /> Genuine Product</div>
-              <div className="flex items-center gap-1.5"><RefreshCw className="h-4 w-4 text-blue-600" /> Easy Replacement</div>
+            <div className="flex gap-6 justify-center mt-6 text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-1.5"><ShieldCheck className="h-5 w-5 text-green-600" /> Genuine Product</div>
+              <div className="flex items-center gap-1.5"><RefreshCw className="h-5 w-5 text-blue-600" /> Easy Replacement</div>
             </div>
           </div>
 
