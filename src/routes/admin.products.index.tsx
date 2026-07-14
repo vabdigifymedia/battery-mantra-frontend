@@ -81,7 +81,7 @@ function AdminProducts() {
 
       {products && products.length > 0 && (
         <Tabs value={activeCategory} onValueChange={(val) => { setActiveCategory(val); setActiveBrand("ALL"); setCurrentPage(1); }} className="w-full">
-          <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
+          <TabsList className="mb-4 flex-wrap justify-start h-auto gap-1 bg-muted/50 p-1">
             <TabsTrigger value="ALL" className="rounded-md">All Categories</TabsTrigger>
             {Array.from(new Set(products.map(p => p.productCategory).filter(Boolean) as string[])).sort().map(cat => (
               <TabsTrigger key={cat} value={cat} className="rounded-md">{cat}</TabsTrigger>
