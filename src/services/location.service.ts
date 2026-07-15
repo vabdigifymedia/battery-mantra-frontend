@@ -6,6 +6,7 @@ import {
   UpdateCityRequest,
   PincodeDto,
   AddPincodeRequest,
+  PincodeCheckResponse,
 } from "@/types/dto";
 
 export const locationService = {
@@ -31,4 +32,11 @@ export const locationService = {
     
   deletePincode: (pincodeId: string) =>
     apiFetch<void>(endpoints.admin.locations.pincodes.delete(pincodeId), { method: "DELETE" }),
+
+  // Public
+  getPublicCities: () =>
+    apiFetch<CityDto[]>(endpoints.locations.cities),
+
+  checkPincode: (code: string) =>
+    apiFetch<PincodeCheckResponse>(endpoints.locations.checkPincode(code)),
 };

@@ -109,4 +109,8 @@ export const endpoints = {
       }
     }
   },
+  locations: {
+    cities: "/api/locations/cities",
+    checkPincode: (code: string) => `/api/locations/check-pincode?code=${encodeURIComponent(code)}`,
+  },
 } as const;

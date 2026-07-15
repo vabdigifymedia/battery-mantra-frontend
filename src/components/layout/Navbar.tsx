@@ -7,6 +7,7 @@ import { Container } from "./Container";
 import { Button } from "@/components/ui/button";
 import { SearchBox } from "@/components/forms/SearchBox";
 import { MobileNav } from "./MobileNav";
+import { LocationSelector } from "@/components/location/LocationSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +73,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
             <Menu className="h-5 w-5" />
           </Button>
           <Logo />
+          <LocationSelector />
           <nav aria-label="Primary" className="ml-4 hidden items-center gap-1 lg:flex">
             {links.map((l) => (
               <Link

@@ -345,3 +345,8 @@ export interface PincodeDto {
 export interface AddPincodeRequest {
   codes: string[];
 }
+
+export interface PincodeCheckResponse {
+  isServiceable: boolean;
+  city: CityDto | null;
+}
