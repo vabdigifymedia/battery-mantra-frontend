@@ -313,3 +313,35 @@ export interface CreateCallbackRequest {
 export interface UpdateCallbackStatusRequest {
   status: CallbackStatus;
 }
+
+/* ---------- Locations ---------- */
+export interface CityDto {
+  cityId: UUID;
+  cityName: string;
+  stateName: string;
+  cityImage?: string;
+  isPopular: boolean;
+  isCodAvailable: boolean;
+  isExchangeAvailable: boolean;
+  pincodeCount: number;
+}
+
+export interface CreateCityRequest {
+  cityName: string;
+  stateName: string;
+  cityImage?: string;
+  isPopular?: boolean;
+  isCodAvailable?: boolean;
+  isExchangeAvailable?: boolean;
+}
+
+export type UpdateCityRequest = Partial<CreateCityRequest>;
+
+export interface PincodeDto {
+  pincodeId: UUID;
+  code: string;
+}
+
+export interface AddPincodeRequest {
+  codes: string[];
+}

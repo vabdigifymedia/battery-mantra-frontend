@@ -94,6 +94,19 @@ export const endpoints = {
     callbacks: {
       list: "/api/admin/callbacks",
       updateStatus: (id: string) => `/api/admin/callbacks/${encodeURIComponent(id)}/status`,
+    },
+    locations: {
+      cities: {
+        list: "/api/admin/cities",
+        create: "/api/admin/cities",
+        update: (id: string) => `/api/admin/cities/${encodeURIComponent(id)}`,
+        delete: (id: string) => `/api/admin/cities/${encodeURIComponent(id)}`,
+      },
+      pincodes: {
+        list: (cityId: string) => `/api/admin/cities/${encodeURIComponent(cityId)}/pincodes`,
+        add: (cityId: string) => `/api/admin/cities/${encodeURIComponent(cityId)}/pincodes`,
+        delete: (pincodeId: string) => `/api/admin/pincodes/${encodeURIComponent(pincodeId)}`,
+      }
     }
   },
 } as const;
