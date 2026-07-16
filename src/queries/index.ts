@@ -7,26 +7,34 @@ import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
 import type { ProductFilterParams } from "@/types/dto";
 
-export const productListQuery = () =>
-  queryOptions({
-    queryKey: queryKeys.products.list(),
-    queryFn: ({ signal }) => productsService.list(signal),
+import { useLocationStore } from "@/store/useLocationStore";
+
+export const productListQuery = () => {
+  const cityId = useLocationStore.getState().city?.cityId;
+  return queryOptions({
+    queryKey: queryKeys.products.list(cityId),
+    queryFn: ({ signal }) => productsService.list(cityId, signal),
     staleTime: 60_000,
   });
+};
 
-export const productFilterQuery = (params: ProductFilterParams) =>
-  queryOptions({
-    queryKey: queryKeys.products.filter(params),
-    queryFn: ({ signal }) => productsService.filter(params, signal),
+export const productFilterQuery = (params: ProductFilterParams) => {
+  const cityId = useLocationStore.getState().city?.cityId;
+  return queryOptions({
+    queryKey: queryKeys.products.filter({ ...params, cityId }),
+    queryFn: ({ signal }) => productsService.filter({ ...params, cityId }, signal),
     staleTime: 30_000,
   });
+};
 
-export const productDetailQuery = (id: string) =>
-  queryOptions({
-    queryKey: queryKeys.products.detail(id),
-    queryFn: ({ signal }) => productsService.byId(id, signal),
+export const productDetailQuery = (id: string) => {
+  const cityId = useLocationStore.getState().city?.cityId;
+  return queryOptions({
+    queryKey: queryKeys.products.detail(id, cityId),
+    queryFn: ({ signal }) => productsService.byId(id, cityId, signal),
     staleTime: 60_000,
   });
+};
 
 export const categoriesQuery = () =>
   queryOptions({

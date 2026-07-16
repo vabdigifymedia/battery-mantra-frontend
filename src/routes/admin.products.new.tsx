@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
+import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,12 @@ const formSchema = z.object({
       key: z.string().min(1, "Key is required"),
       value: z.string().min(1, "Value is required")
     })).default([])
+  })).default([]),
+  cityPrices: z.array(z.object({
+    cityId: z.string().uuid("City is required"),
+    price: z.coerce.number().min(0, "Price must be positive"),
+    exchangeDiscount: z.coerce.number().min(0).optional().default(0),
+    stock: z.coerce.number().min(0).optional().default(0),
   })).default([])
 });
 
@@ -52,6 +59,7 @@ function AddProductPage() {
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: brands = [] } = useQuery(brandsQuery());
   const { data: vehicles = [] } = useQuery(vehiclesListQuery());
+  const { data: cities = [] } = useQuery({ queryKey: ["admin", "cities"], queryFn: () => locationService.getAllCities() });
   const queryClient = useQueryClient();
 
   const [selectedRootId, setSelectedRootId] = useState<string>("");
@@ -72,6 +80,7 @@ function AddProductPage() {
       additionalImages: [],
       compatibleVehicleIds: [],
       specs: [],
+      cityPrices: [],
     }
   });
 
@@ -83,6 +92,11 @@ function AddProductPage() {
   const { fields: additionalImageFields, append: appendImage, remove: removeImage } = useFieldArray({
     control: form.control,
     name: "additionalImages"
+  });
+
+  const { fields: cityPricingFields, append: appendCityPricing, remove: removeCityPricing } = useFieldArray({
+    control: form.control,
+    name: "cityPrices"
   });
 
   const createMutation = useMutation({
@@ -146,7 +160,8 @@ function AddProductPage() {
       categoryId: data.categoryId,
       brandId: data.brandId,
       compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
-      specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined
+      specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
+      cityPrices: data.cityPrices.length > 0 ? data.cityPrices : undefined
     };
 
     createMutation.mutate(payload);
@@ -298,6 +313,70 @@ function AddProductPage() {
                     onRemoveGroup={() => removeGroup(groupIndex)}
                   />
                 ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* AREA-WISE PRICING */}
+          <Card className="shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Area-Wise Pricing (Optional)</CardTitle>
+                <CardDescription>Override global price and stock for specific cities.</CardDescription>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendCityPricing({ cityId: "", price: 0, exchangeDiscount: 0, stock: 0 })}>
+                <Plus className="h-4 w-4 mr-2" /> Add Override
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {cityPricingFields.length === 0 ? (
+                <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
+                  No area-wise overrides. Default global pricing will be used everywhere.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {cityPricingFields.map((field, idx) => (
+                    <div key={field.id} className="grid grid-cols-1 sm:grid-cols-5 gap-4 items-start border p-4 rounded-xl bg-muted/10 relative">
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-2 top-2 h-8 w-8 text-destructive hover:bg-destructive/10"
+                        onClick={() => removeCityPricing(idx)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <div className="sm:col-span-2 space-y-2 mt-2 sm:mt-0">
+                        <Label>City <span className="text-red-500">*</span></Label>
+                        <Select onValueChange={(val) => form.setValue(`cityPrices.${idx}.cityId` as const, val)}>
+                          <SelectTrigger className={form.formState.errors.cityPrices?.[idx]?.cityId ? "border-red-500" : ""}>
+                            <SelectValue placeholder="Select City" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cities.map((city) => (
+                              <SelectItem key={city.cityId} value={city.cityId}>{city.cityName}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {form.formState.errors.cityPrices?.[idx]?.cityId && (
+                          <p className="text-[10px] text-red-500">{form.formState.errors.cityPrices[idx].cityId?.message}</p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Price (₹) <span className="text-red-500">*</span></Label>
+                        <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.price` as const)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Discount (₹)</Label>
+                        <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.exchangeDiscount` as const)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Stock</Label>
+                        <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.stock` as const)} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>

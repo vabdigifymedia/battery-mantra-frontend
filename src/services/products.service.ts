@@ -8,16 +8,28 @@ import type {
 } from "@/types/dto";
 
 export const productsService = {
-  list: (signal?: AbortSignal) =>
-    apiFetch<ProductListResponse[]>(endpoints.products.list, { signal, auth: false }),
-  filter: (params: ProductFilterParams, signal?: AbortSignal) =>
+  list: (cityId?: string, signal?: AbortSignal) =>
+    apiFetch<ProductListResponse[]>(endpoints.products.list, { 
+      query: cityId ? { cityId } : undefined,
+      signal, 
+      auth: false 
+    }),
+  filter: (params: ProductFilterParams & { cityId?: string }, signal?: AbortSignal) =>
     apiFetch<PageProductListResponse>(endpoints.products.filter, {
       query: params as Record<string, string | number | undefined>,
       signal,
       auth: false,
     }),
-  byId: (id: string, signal?: AbortSignal) =>
-    apiFetch<ProductDetailResponse>(endpoints.products.byId(id), { signal, auth: false }),
-  byName: (name: string, signal?: AbortSignal) =>
-    apiFetch<ProductDetailResponse>(endpoints.products.byName(name), { signal, auth: false }),
+  byId: (id: string, cityId?: string, signal?: AbortSignal) =>
+    apiFetch<ProductDetailResponse>(endpoints.products.byId(id), { 
+      query: cityId ? { cityId } : undefined,
+      signal, 
+      auth: false 
+    }),
+  byName: (name: string, cityId?: string, signal?: AbortSignal) =>
+    apiFetch<ProductDetailResponse>(endpoints.products.byName(name), { 
+      query: cityId ? { cityId } : undefined,
+      signal, 
+      auth: false 
+    }),
 };

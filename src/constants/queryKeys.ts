@@ -11,11 +11,11 @@ export const queryKeys = {
   },
   products: {
     all: ["products"] as const,
-    list: () => [...queryKeys.products.all, "list"] as const,
-    filter: (params: ProductFilterParams) =>
+    list: (cityId?: string) => [...queryKeys.products.all, "list", cityId] as const,
+    filter: (params: ProductFilterParams & { cityId?: string }) =>
       [...queryKeys.products.all, "filter", params] as const,
-    detail: (id: string) => [...queryKeys.products.all, "detail", id] as const,
-    byName: (name: string) => [...queryKeys.products.all, "name", name] as const,
+    detail: (id: string, cityId?: string) => [...queryKeys.products.all, "detail", id, cityId] as const,
+    byName: (name: string, cityId?: string) => [...queryKeys.products.all, "name", name, cityId] as const,
   },
   categories: {
     all: ["categories"] as const,

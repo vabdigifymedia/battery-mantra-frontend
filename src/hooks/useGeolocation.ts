@@ -3,10 +3,12 @@ import { geocodingService } from "@/services/geocoding.service";
 import { useLocationStore } from "@/store/useLocationStore";
 import { locationService } from "@/services/location.service";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useGeolocation = () => {
   const [isLocating, setIsLocating] = useState(false);
   const { setLocation, setPermission } = useLocationStore();
+  const qc = useQueryClient();
 
   const detectLocation = async () => {
     setIsLocating(true);
@@ -34,6 +36,7 @@ export const useGeolocation = () => {
           const result = await locationService.checkPincode(postcode);
           
           setLocation(postcode, result.serviceable, result.city);
+          qc.invalidateQueries({ queryKey: ["products"] });
           
           if (result.serviceable) {
             toast.success(`Location set to ${result.city?.cityName}, ${postcode}`);

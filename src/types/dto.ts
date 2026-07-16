@@ -244,6 +244,13 @@ export type UserResponse = {
   createdAt?: string;
 };
 
+export type CityPricingDto = {
+  cityId: UUID;
+  price: number;
+  exchangeDiscount?: number;
+  stock: number;
+};
+
 export type CreateProductRequest = {
   productName: string;
   productDescription?: string;
@@ -255,6 +262,7 @@ export type CreateProductRequest = {
   brandId?: UUID;
   specs?: Record<string, unknown>;
   compatibleVehicleIds?: UUID[];
+  cityPrices?: CityPricingDto[];
 };
 
 export type UpdateProductRequest = Partial<CreateProductRequest>;

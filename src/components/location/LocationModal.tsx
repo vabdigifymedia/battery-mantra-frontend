@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { MapPin, Navigation, MapPinOff, Loader2 } from "lucide-react";
 import { useLocationStore } from "@/store/useLocationStore";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 import { toast } from "sonner";
 
@@ -19,6 +19,8 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [isChecking, setIsChecking] = useState(false);
   const { detectLocation, isLocating } = useGeolocation();
   const { setLocation, pincode: currentPincode, isServiceable } = useLocationStore();
+
+  const qc = useQueryClient();
 
   const { data: popularCities, isLoading: isLoadingCities } = useQuery({
     queryKey: ["locations", "public-cities"],
@@ -36,6 +38,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
     try {
       const result = await locationService.checkPincode(code);
       setLocation(code, result.serviceable, result.city);
+      qc.invalidateQueries({ queryKey: ["products"] });
       
       if (result.serviceable) {
         toast.success(`Delivery available in ${result.city?.cityName}!`);
@@ -54,6 +57,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
     // If they click a popular city, we set it as their location without a specific pincode.
     // Since it's a registered city, we know delivery is available there.
     setLocation("", true, city);
+    qc.invalidateQueries({ queryKey: ["products"] });
     toast.success(`Location set to ${city.cityName}!`);
     onClose();
   };
