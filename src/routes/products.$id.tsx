@@ -514,22 +514,42 @@ function PdpPage() {
         </Tabs>
       </Container>
       
-      <RelatedProducts currentProductId={id} />
+      <RelatedProducts currentProductId={id} currentProduct={data} />
     </div>
   );
 }
 
-function RelatedProducts({ currentProductId }: { currentProductId: string }) {
+function RelatedProducts({ currentProductId, currentProduct }: { currentProductId: string; currentProduct?: any }) {
   const { data: allProducts } = useQuery(productListQuery());
   const [related, setRelated] = useState<any[]>([]);
 
   useEffect(() => {
     if (allProducts && allProducts.length > 0) {
       const filtered = allProducts.filter((p: any) => p.productId !== currentProductId);
-      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-      setRelated(shuffled.slice(0, 4));
+      
+      let matched = [...filtered];
+      
+      if (currentProduct) {
+        const strictMatch = filtered.filter((p: any) => 
+          p.productCategory === currentProduct.categoryName && 
+          p.brandName === currentProduct.brandName
+        );
+        
+        const categoryMatch = filtered.filter((p: any) => 
+          p.productCategory === currentProduct.categoryName && 
+          p.brandName !== currentProduct.brandName
+        );
+        
+        const others = filtered.filter((p: any) => p.productCategory !== currentProduct.categoryName);
+        
+        matched = [...strictMatch, ...categoryMatch, ...others];
+      } else {
+        matched.sort(() => 0.5 - Math.random());
+      }
+      
+      setRelated(matched.slice(0, 4));
     }
-  }, [allProducts, currentProductId]);
+  }, [allProducts, currentProductId, currentProduct]);
 
   if (!related.length) return null;
 
