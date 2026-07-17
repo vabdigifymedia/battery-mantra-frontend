@@ -31,8 +31,8 @@ const formSchema = z.object({
   additionalImages: z.array(z.object({
     url: z.string().url("Must be a valid URL")
   })).default([]),
-  categoryId: z.string().uuid("Category is required"),
-  brandId: z.string().uuid("Brand is required"),
+  categoryId: z.string().min(1, "Category is required"),
+  brandId: z.string().min(1, "Brand is required"),
   capacity: z.string().optional(),
   specs: z.array(z.object({
     groupName: z.string().min(1, "Group name is required"),
