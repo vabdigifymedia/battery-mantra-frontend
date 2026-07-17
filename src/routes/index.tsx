@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { VehicleFinderWidget } from "@/components/home/VehicleFinderWidget";
 import { BannerCarousel } from "@/components/home/BannerCarousel";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
+import { ManufacturerGrid } from "@/components/home/ManufacturerGrid";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
@@ -98,6 +99,17 @@ function HomePage() {
             />
             <div className="mt-6">
               <CategoryGrid />
+            </div>
+          </section>
+
+          <section aria-labelledby="manufacturers" className="mt-12">
+            <SectionHeading
+              eyebrow="Find by Make"
+              title={<span id="manufacturers">Shop by manufacturer</span>}
+              description="Select your car manufacturer to find the perfect battery match."
+            />
+            <div className="mt-6">
+              <ManufacturerGrid />
             </div>
           </section>
         </Container>

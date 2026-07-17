@@ -28,6 +28,7 @@ import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
@@ -36,6 +37,7 @@ import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
+import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
 
@@ -133,6 +135,11 @@ const AdminOrdersRoute = AdminOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminManufacturersRoute = AdminManufacturersRouteImport.update({
+  id: '/manufacturers',
+  path: '/manufacturers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLocationsRoute = AdminLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -173,6 +180,12 @@ const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ManufacturersCategorySlugMakeSlugRoute =
+  ManufacturersCategorySlugMakeSlugRouteImport.update({
+    id: '/manufacturers/$categorySlug/$makeSlug',
+    path: '/manufacturers/$categorySlug/$makeSlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   id: '/products/new',
   path: '/products/new',
@@ -203,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -212,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
 }
@@ -232,6 +247,7 @@ export interface FileRoutesByTo {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -241,6 +257,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
 }
@@ -264,6 +281,7 @@ export interface FileRoutesById {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -273,6 +291,7 @@ export interface FileRoutesById {
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
 }
@@ -296,6 +315,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/locations'
+    | '/admin/manufacturers'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -305,6 +325,7 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/products/'
     | '/admin/products/new'
+    | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -325,6 +346,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/locations'
+    | '/admin/manufacturers'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -334,6 +356,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/products'
     | '/admin/products/new'
+    | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products'
     | '/admin/products/$productId/edit'
   id:
@@ -356,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/locations'
+    | '/admin/manufacturers'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -365,6 +389,7 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/products/'
     | '/admin/products/new'
+    | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
   fileRoutesById: FileRoutesById
@@ -385,6 +410,7 @@ export interface RootRouteChildren {
   ProductsIdRoute: typeof ProductsIdRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  ManufacturersCategorySlugMakeSlugRoute: typeof ManufacturersCategorySlugMakeSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -522,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/manufacturers': {
+      id: '/admin/manufacturers'
+      path: '/manufacturers'
+      fullPath: '/admin/manufacturers'
+      preLoaderRoute: typeof AdminManufacturersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/locations': {
       id: '/admin/locations'
       path: '/locations'
@@ -578,6 +611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/manufacturers/$categorySlug/$makeSlug': {
+      id: '/manufacturers/$categorySlug/$makeSlug'
+      path: '/manufacturers/$categorySlug/$makeSlug'
+      fullPath: '/manufacturers/$categorySlug/$makeSlug'
+      preLoaderRoute: typeof ManufacturersCategorySlugMakeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/products/new': {
       id: '/admin/products/new'
       path: '/products/new'
@@ -613,6 +653,7 @@ interface AdminRouteChildren {
   AdminCallbacksRoute: typeof AdminCallbacksRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
+  AdminManufacturersRoute: typeof AdminManufacturersRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
@@ -628,6 +669,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCallbacksRoute: AdminCallbacksRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminLocationsRoute: AdminLocationsRoute,
+  AdminManufacturersRoute: AdminManufacturersRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,
@@ -655,6 +697,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIdRoute: ProductsIdRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  ManufacturersCategorySlugMakeSlugRoute:
+    ManufacturersCategorySlugMakeSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

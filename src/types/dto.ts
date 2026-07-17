@@ -39,6 +39,20 @@ export type RegisterResponse = {
   role: RegisterRole;
 };
 
+/* ---------- Manufacturers ---------- */
+export type ManufacturerResponse = {
+  id: UUID;
+  name: string;
+  logoUrl?: string;
+  displayOrder?: number;
+};
+export type CreateManufacturerRequest = {
+  name: string;
+  logoUrl?: string;
+  displayOrder?: number;
+};
+export type UpdateManufacturerRequest = Partial<CreateManufacturerRequest>;
+
 /* ---------- Vehicles ---------- */
 export type FuelType = "PETROL" | "DIESEL" | "ELECTRIC" | "CNG";
 export type VehicleType = "CAR" | "BIKE" | "COMMERCIAL" | "E_RICKSHAW" | "INVERTER";

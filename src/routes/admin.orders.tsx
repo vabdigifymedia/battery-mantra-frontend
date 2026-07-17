@@ -68,7 +68,7 @@ function AdminOrders() {
   };
 
   const getStatusColor = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "PENDING": return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
       case "PROCESSING": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
       case "SHIPPED": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
@@ -114,7 +114,8 @@ function AdminOrders() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center">
-                  <Spinner size="md" className="inline-block" />
+                  <Spinner
+                    size="md" className="inline-block" />
                 </TableCell>
               </TableRow>
             ) : !data.length ? (
@@ -188,8 +189,8 @@ function AdminOrders() {
                       )}
                       <div className="min-w-0">
                         <p className="font-medium">
-                          {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
-                           order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
+                          {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" :
+                            order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
                         </p>
                         <div className="flex flex-col gap-1 mt-0.5">
                           {order.deliveryMethod === "HOME_INSTALLATION" && order.installationDate && (
@@ -215,7 +216,7 @@ function AdminOrders() {
                   <TableCell>
                     <Select
                       defaultValue={order.orderStatus}
-                      onValueChange={(val) => 
+                      onValueChange={(val) =>
                         updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
                       }
                       disabled={updateStatusMutation.isPending}
@@ -260,7 +261,7 @@ function AdminOrders() {
               {order.orderStatus === "PENDING" && (
                 <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
               )}
-              
+
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -276,7 +277,7 @@ function AdminOrders() {
                   <p className="text-[10px] text-muted-foreground mt-0.5">{order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''}</p>
                 </div>
               </div>
-              
+
               <div className="space-y-3 mb-4">
                 <div className="flex items-center gap-2 bg-muted/30 p-2 rounded-lg">
                   <User className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -290,7 +291,7 @@ function AdminOrders() {
                     <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 shrink-0">COD</span>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-2 px-1">
                   {order.deliveryMethod === "HOME_INSTALLATION" ? (
                     <Wrench className="h-4 w-4 text-primary shrink-0" />
@@ -299,8 +300,8 @@ function AdminOrders() {
                   )}
                   <div className="min-w-0">
                     <p className="text-sm">
-                      {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
-                       order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
+                      {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" :
+                        order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {order.shippingAddress?.split(',').pop()?.trim() || "No Address"}
@@ -308,11 +309,11 @@ function AdminOrders() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 pt-3 border-t">
                 <Select
                   defaultValue={order.orderStatus}
-                  onValueChange={(val) => 
+                  onValueChange={(val) =>
                     updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
                   }
                   disabled={updateStatusMutation.isPending}
@@ -348,8 +349,8 @@ function AdminOrders() {
         </div>
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search Order ID or City..." 
+          <Input
+            placeholder="Search Order ID or City..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 bg-card"
@@ -381,16 +382,16 @@ function AdminOrders() {
         <TabsContent value="action" className="mt-0 outline-none">
           <OrderTable data={actionRequiredOrders} />
         </TabsContent>
-        
+
         <TabsContent value="transit" className="mt-0 outline-none">
           <OrderTable data={inTransitOrders} />
         </TabsContent>
-        
+
         <TabsContent value="past" className="mt-0 outline-none">
           <OrderTable data={pastOrders} />
         </TabsContent>
       </Tabs>
-      
+
       {selectedOrder && (
         <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -430,7 +431,7 @@ function AdminOrders() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Fulfillment</h3>
                   <div className="rounded-xl border bg-card p-4 space-y-3 text-sm h-full">
@@ -451,7 +452,7 @@ function AdminOrders() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Order Items</h3>
                 <div className="rounded-xl border bg-card divide-y">

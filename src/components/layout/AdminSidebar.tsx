@@ -21,6 +21,7 @@ const navigation = [
   { name: "Categories", href: "/admin/categories", icon: Layers },
   { name: "Brands", href: "/admin/brands", icon: Tag },
   { name: "Vehicles", href: "/admin/vehicles", icon: Car },
+  { name: "Manufacturers", href: "/admin/manufacturers", icon: Layers },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },

@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/queryKeys";
 import { productsService } from "@/services/products.service";
 import { categoriesService, brandsService, bannersService } from "@/services/catalog.service";
+import { manufacturersService } from "@/services/manufacturers.service";
 import { vehiclesService } from "@/services/vehicles.service";
 import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
@@ -55,6 +56,13 @@ export const brandsQuery = () =>
     queryKey: queryKeys.brands.list(),
     queryFn: ({ signal }) => brandsService.list(signal),
     staleTime: 5 * 60_000,
+  });
+
+export const manufacturersListQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.manufacturers.list(),
+    queryFn: ({ signal }) => manufacturersService.list(signal),
+    staleTime: 10 * 60_000,
   });
 
 export const featuredBrandsQuery = () =>

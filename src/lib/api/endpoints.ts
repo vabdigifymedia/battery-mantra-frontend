@@ -35,6 +35,9 @@ export const endpoints = {
   callbacks: {
     create: "/api/callbacks",
   },
+  manufacturers: {
+    list: "/api/manufacturers",
+  },
   vehicles: {
     list: "/api/vehicles",
     search: "/api/vehicles/search",
@@ -90,6 +93,11 @@ export const endpoints = {
       create: "/api/admin/vehicles",
       update: (id: string) => `/api/admin/vehicles/${encodeURIComponent(id)}`,
       delete: (id: string) => `/api/admin/vehicles/${encodeURIComponent(id)}`,
+    },
+    manufacturers: {
+      create: "/api/manufacturers",
+      update: (id: string) => `/api/manufacturers/${encodeURIComponent(id)}`,
+      delete: (id: string) => `/api/manufacturers/${encodeURIComponent(id)}`,
     },
     callbacks: {
       list: "/api/admin/callbacks",
