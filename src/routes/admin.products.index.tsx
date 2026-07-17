@@ -122,6 +122,7 @@ function AdminProducts() {
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Brand</TableHead>
+              <TableHead>Capacity (RL)</TableHead>
               <TableHead>Price</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -152,6 +153,15 @@ function AdminProducts() {
                   <TableCell className="font-medium">{product.productName}</TableCell>
                   <TableCell>{product.productCategory || "N/A"}</TableCell>
                   <TableCell>{product.brandName || "N/A"}</TableCell>
+                  <TableCell>
+                    {product.capacity ? (
+                      <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                        {product.capacity}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
                   <TableCell>₹{product.productPrice.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="ghost" size="icon">

@@ -126,6 +126,7 @@ export type ProductListResponse = {
   exchangeDiscount?: number;
   productImage?: string;
   productCategory?: string;
+  capacity?: string;
 };
 
 export type ProductDetailResponse = {
