@@ -86,7 +86,8 @@ function PdpPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [qty, setQty] = useState(1);
-  const [exchange, setExchange] = useState<"no" | "yes">("no");
+  const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
+  const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
@@ -284,7 +285,11 @@ function PdpPage() {
               </div>
 
               <div className="flex items-center gap-3 pt-2">
-                <Price value={data.productPrice} size="xl" className="text-4xl tracking-tight" />
+                <Price 
+                  value={exchange === "yes" && hasExchangeOffer ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) : data.productPrice} 
+                  size="xl" 
+                  className="text-4xl tracking-tight" 
+                />
                 {hasDiscount && (
                   <>
                     <span className="text-2xl text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
