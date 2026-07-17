@@ -142,7 +142,9 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const [selectedRootId, setSelectedRootId] = useState<string>("");
   
   useEffect(() => {
-    if (initialRootId && !selectedRootId) setSelectedRootId(initialRootId);
+    if (initialRootId && !selectedRootId) {
+      setSelectedRootId(initialRootId);
+    }
   }, [initialRootId, selectedRootId]);
 
   const selectedRootCategory = rootCategories.find(c => c.categoryId === selectedRootId);
@@ -152,6 +154,19 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
     defaultValues,
+  });
+
+  // Ensure categoryId and brandId stay synced — fixes race condition where
+  // controlled Select value transitions (empty → valid) can wipe form values
+  useEffect(() => {
+    const syncField = (field: "categoryId" | "brandId") => {
+      const current = form.getValues(field);
+      if (!current && defaultValues[field]) {
+        form.setValue(field, defaultValues[field], { shouldValidate: false });
+      }
+    };
+    syncField("categoryId");
+    syncField("brandId");
   });
 
   const { fields: specGroups, append: appendGroup, remove: removeGroup } = useFieldArray({
@@ -249,6 +264,21 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       </div>
 
       <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any, (errs) => {
+        // Auto-recover from categoryId/brandId race condition
+        let recovered = false;
+        if (errs.categoryId && defaultValues.categoryId) {
+          form.setValue("categoryId", defaultValues.categoryId, { shouldValidate: true });
+          recovered = true;
+        }
+        if (errs.brandId && defaultValues.brandId) {
+          form.setValue("brandId", defaultValues.brandId, { shouldValidate: true });
+          recovered = true;
+        }
+        if (recovered) {
+          // Re-trigger submit after recovery
+          setTimeout(() => form.handleSubmit(onSubmit as any)(), 100);
+          return;
+        }
         console.error("Validation Errors:", errs);
         toast.error("Please check the form for errors.");
       })} className="flex flex-col lg:flex-row gap-6">
