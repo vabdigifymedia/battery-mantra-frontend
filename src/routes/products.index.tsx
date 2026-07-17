@@ -23,6 +23,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { productFilterQuery } from "@/queries";
 import type { ProductFilterParams } from "@/types/dto";
+import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -120,6 +121,7 @@ function ProductsPage() {
         </aside>
 
         <div className="min-w-0">
+          <DynamicSearchBanner search={search} />
           <div className="mb-4 flex items-center justify-between gap-3">
             <Sheet>
               <SheetTrigger asChild>

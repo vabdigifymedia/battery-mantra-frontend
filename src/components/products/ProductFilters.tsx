@@ -218,7 +218,7 @@ function CategoryNode({ c, depth = 0 }: { c: CategoryListResponse; depth?: numbe
       </label>
       {hasChildren && isExpanded && (
         <div className="mt-2 space-y-2">
-          <CategoryRadioTree categories={c.subCategories} depth={depth + 1} />
+          <CategoryRadioTree categories={c.subCategories || []} depth={depth + 1} />
         </div>
       )}
     </div>
