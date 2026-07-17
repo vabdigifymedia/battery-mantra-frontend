@@ -8,13 +8,13 @@ export const manufacturersService = {
   create: (data: CreateManufacturerRequest, signal?: AbortSignal) =>
     apiFetch<ManufacturerResponse>(endpoints.admin.manufacturers.create, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
       signal,
     }),
   update: (id: string, data: UpdateManufacturerRequest, signal?: AbortSignal) =>
     apiFetch<ManufacturerResponse>(endpoints.admin.manufacturers.update(id), {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
       signal,
     }),
   delete: (id: string, signal?: AbortSignal) =>
