@@ -125,8 +125,20 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                     <p className="text-sm font-medium truncate text-foreground">{product.productName}</p>
                     <p className="text-xs text-muted-foreground truncate">{product.brandName || "Unknown Brand"}</p>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <Price value={product.productPrice} size="sm" className="font-semibold" />
+                  <div className="shrink-0 text-right flex flex-col items-end">
+                    {(product.exchangeDiscount ?? 0) > 0 ? (
+                      <>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <Price value={Math.max(0, product.productPrice - (product.exchangeDiscount || 0))} size="sm" className="font-semibold" />
+                          <span className="text-[9px] bg-success/10 text-success px-1 py-0.5 rounded border border-success/20">Exch</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/50">
+                          ₹{product.productPrice.toLocaleString()}
+                        </span>
+                      </>
+                    ) : (
+                      <Price value={product.productPrice} size="sm" className="font-semibold" />
+                    )}
                   </div>
                 </Link>
               ))}

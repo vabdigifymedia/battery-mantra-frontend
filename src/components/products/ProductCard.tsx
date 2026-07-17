@@ -41,8 +41,20 @@ export function ProductCard({
         {product.productCategory ? (
           <p className="truncate text-xs text-muted-foreground">{product.productCategory}</p>
         ) : null}
-        <div className="flex items-center justify-between pt-1">
-          <Price value={product.productPrice} size="md" />
+        <div className="flex flex-col pt-1">
+          {(product.exchangeDiscount ?? 0) > 0 ? (
+            <>
+              <div className="flex items-center gap-1.5">
+                <Price value={Math.max(0, product.productPrice - (product.exchangeDiscount || 0))} size="md" />
+                <span className="text-[10px] bg-success/10 text-success px-1.5 py-0.5 rounded font-medium border border-success/20">With Exchange</span>
+              </div>
+              <span className="text-[11px] text-muted-foreground mt-0.5 font-medium line-through decoration-muted-foreground/50">
+                ₹{product.productPrice.toLocaleString()}
+              </span>
+            </>
+          ) : (
+            <Price value={product.productPrice} size="md" />
+          )}
         </div>
       </div>
     </Link>
