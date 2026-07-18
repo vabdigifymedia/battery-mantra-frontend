@@ -20,6 +20,8 @@ import type {
   CreateVehicleRequest,
   CallbackResponse,
   UpdateCallbackStatusRequest,
+  CapacityResponse,
+  CreateCapacityRequest,
   UUID
 } from "@/types/dto";
 
@@ -35,6 +37,16 @@ export const adminService = {
       multipart: true,
     });
   },
+
+  // Capacities
+  getAllCapacities: (categoryId?: string) => 
+    apiFetch<CapacityResponse[]>(categoryId ? `${endpoints.vehicles.capacities}?categoryId=${categoryId}` : endpoints.vehicles.capacities, { method: "GET" }),
+  createCapacity: (body: CreateCapacityRequest) => 
+    apiFetch<CapacityResponse>(endpoints.admin.capacities, { method: "POST", body: JSON.stringify(body) }),
+  updateCapacity: (id: UUID, body: CreateCapacityRequest) => 
+    apiFetch<CapacityResponse>(`${endpoints.admin.capacities}/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+  deleteCapacity: (id: UUID) => 
+    apiFetch<void>(`${endpoints.admin.capacities}/${id}`, { method: "DELETE" }),
 
   // Users
   getAllUsers: () => apiFetch<UserResponse[]>(endpoints.admin.users, { method: "GET" }),

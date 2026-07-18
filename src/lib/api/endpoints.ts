@@ -41,6 +41,8 @@ export const endpoints = {
   vehicles: {
     list: "/api/vehicles",
     search: "/api/vehicles/search",
+    makes: "/api/vehicles/makes",
+    capacities: "/api/capacities",
     byId: (id: string) => `/api/vehicles/${encodeURIComponent(id)}`,
   },
   cart: {
@@ -66,6 +68,7 @@ export const endpoints = {
   },
   admin: {
     users: "/api/admin/users",
+    capacities: "/api/admin/capacities",
     orders: "/api/admin/orders",
     upload: "/api/admin/upload",
     updateOrderStatus: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/status`,

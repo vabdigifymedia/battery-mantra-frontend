@@ -14,7 +14,7 @@ import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
-import { ALL_CAPACITIES, CAR_CAPACITIES, TWO_WHEELER_CAPACITIES, GENERATOR_CAPACITIES } from "@/constants/capacities";
+import { rootCategoriesQuery, capacitiesQuery } from "@/queries";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
@@ -98,6 +98,8 @@ const parseCSV = (text: string) => {
 function AdminVehicles() {
   const queryClient = useQueryClient();
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
+  const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
+  const { data: dbCapacities = [] } = useQuery(capacitiesQuery());
   
   const [activeTab, setActiveTab] = useState("ALL");
   const [activeMake, setActiveMake] = useState("ALL");
@@ -595,13 +597,21 @@ function AdminVehicles() {
                   <SelectContent>
                     {(() => {
                       const vType = form.watch("vehicleType");
-                      let options = ALL_CAPACITIES;
-                      if (vType === "CAR") options = CAR_CAPACITIES;
-                      else if (vType === "BIKE") options = TWO_WHEELER_CAPACITIES;
-                      else if (vType === "GENERATOR") options = GENERATOR_CAPACITIES;
+                      let catName = "";
+                      if (vType === "CAR") catName = "Four Wheeler";
+                      else if (vType === "BIKE") catName = "Two Wheeler";
+                      else if (vType === "GENERATOR") catName = "Generator";
+
+                      let options = dbCapacities;
+                      if (catName) {
+                        const cat = rootCategories.find(c => c.categoryName.toLowerCase().includes(catName.toLowerCase()));
+                        if (cat) {
+                          options = dbCapacities.filter(c => c.categoryId === cat.categoryId);
+                        }
+                      }
                       
                       return options.map((cap) => (
-                        <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                        <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
                       ));
                     })()}
                   </SelectContent>

@@ -6,6 +6,7 @@ import { manufacturersService } from "@/services/manufacturers.service";
 import { vehiclesService } from "@/services/vehicles.service";
 import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
+import { adminService } from "@/services/admin.service";
 import type { ProductFilterParams } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
@@ -55,6 +56,13 @@ export const brandsQuery = () =>
   queryOptions({
     queryKey: queryKeys.brands.list(),
     queryFn: ({ signal }) => brandsService.list(signal),
+    staleTime: 5 * 60_000,
+  });
+
+export const capacitiesQuery = (categoryId?: string) =>
+  queryOptions({
+    queryKey: ["capacities", categoryId],
+    queryFn: () => adminService.getAllCapacities(categoryId),
     staleTime: 5 * 60_000,
   });
 

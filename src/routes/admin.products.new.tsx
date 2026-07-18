@@ -4,10 +4,9 @@ import { useForm, useFieldArray, Controller, UseFormReturn } from "react-hook-fo
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery } from "@/queries";
+import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery, capacitiesQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
-import { ALL_CAPACITIES } from "@/constants/capacities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,6 +63,7 @@ function AddProductPage() {
   const queryClient = useQueryClient();
 
   const [selectedRootId, setSelectedRootId] = useState<string>("");
+  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(selectedRootId || undefined));
 
   const selectedRootCat = rootCategories.find(c => c.categoryId === selectedRootId);
   const subCategories = selectedRootCat?.subCategories || [];
@@ -299,8 +299,8 @@ function AddProductPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None (Leave Blank)</SelectItem>
-                    {ALL_CAPACITIES.map((cap) => (
-                      <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                    {dbCapacities.map((cap) => (
+                      <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

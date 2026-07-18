@@ -250,6 +250,18 @@ export type OrderResponse = {
   orderItems: OrderItemResponse[];
 };
 
+/* ---------- Capacities (Battery RL) ---------- */
+export type CapacityResponse = {
+  capacityId: UUID;
+  categoryId: UUID;
+  capacityName: string;
+};
+
+export type CreateCapacityRequest = {
+  categoryId: UUID;
+  capacityName: string;
+};
+
 /* ---------- Admin ---------- */
 export type UserResponse = {
   userId: UUID;

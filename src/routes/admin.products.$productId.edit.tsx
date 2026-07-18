@@ -4,10 +4,9 @@ import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery } from "@/queries";
+import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery, capacitiesQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
-import { ALL_CAPACITIES } from "@/constants/capacities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,6 +131,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const { data: cities = [] } = useQuery({ queryKey: ["admin", "cities"], queryFn: () => locationService.getAllCities() });
   const queryClient = useQueryClient();
 
+
   const initialRootId = useMemo(() => {
     if (!rootCategories.length || !defaultValues.categoryId) return "";
     for (const root of rootCategories) {
@@ -144,6 +144,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   }, [rootCategories, defaultValues.categoryId]);
   
   const [selectedRootId, setSelectedRootId] = useState<string>("");
+  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(selectedRootId || undefined));
   
   useEffect(() => {
     if (initialRootId && !selectedRootId) {
@@ -311,9 +312,9 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                     <SelectValue placeholder="Select a capacity (Optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None (Clear)</SelectItem>
-                    {ALL_CAPACITIES.map((cap) => (
-                      <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                    <SelectItem value="none">None (Leave Blank)</SelectItem>
+                    {dbCapacities.map((cap) => (
+                      <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
