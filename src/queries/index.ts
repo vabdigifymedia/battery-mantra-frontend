@@ -138,7 +138,6 @@ export const addressesQuery = (enabled: boolean) =>
     staleTime: 5 * 60_000,
   });
 
-import { adminService } from "@/services/admin.service";
 
 export const adminUsersQuery = () =>
   queryOptions({
