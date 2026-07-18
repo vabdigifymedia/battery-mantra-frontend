@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { adminService } from "@/services/admin.service";
@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import type { BannerResponse, CreateBannerRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 import { queryKeys } from "@/constants/queryKeys";
@@ -332,9 +333,19 @@ function AdminBanners() {
             <DialogTitle>{editingBanner ? "Edit Banner" : "Add Banner"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
-            <FormField label="Image URL" htmlFor="imageUrl" required hint="URL of the banner image" error={form.formState.errors.imageUrl?.message}>
-              <Input id="imageUrl" {...form.register("imageUrl")} placeholder="https://..." />
-            </FormField>
+            <Controller
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  folder="battery-mantra/banners"
+                  label="Image URL *"
+                  error={form.formState.errors.imageUrl?.message}
+                />
+              )}
+            />
 
             <button
               type="button"

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { rootCategoriesQuery } from "@/queries";
@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import type { CategoryListResponse, CreateCategoryRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
@@ -402,9 +403,19 @@ function AdminCategories() {
               <Input id="categoryDescription" {...form.register("categoryDescription")} />
             </FormField>
 
-            <FormField label="Icon URL" htmlFor="iconUrl" hint="URL to an image icon" error={form.formState.errors.iconUrl?.message}>
-              <Input id="iconUrl" {...form.register("iconUrl")} placeholder="https://..." />
-            </FormField>
+            <Controller
+              control={form.control}
+              name="iconUrl"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  folder="battery-mantra/categories"
+                  label="Icon URL (Optional)"
+                  error={form.formState.errors.iconUrl?.message}
+                />
+              )}
+            />
 
             <FormField label="Display Order" htmlFor="displayOrder" error={form.formState.errors.displayOrder?.message}>
               <Input id="displayOrder" type="number" {...form.register("displayOrder")} />

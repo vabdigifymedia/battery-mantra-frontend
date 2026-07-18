@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { vehiclesListQuery } from "@/queries";
@@ -17,6 +17,7 @@ import { FormField } from "@/components/forms/FormField";
 import { ALL_CAPACITIES, CAR_CAPACITIES, TWO_WHEELER_CAPACITIES, GENERATOR_CAPACITIES } from "@/constants/capacities";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -609,9 +610,19 @@ function AdminVehicles() {
               <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">Add one or more capacity codes for this vehicle to automatically match compatible batteries.</p>
             </FormField>
 
-            <FormField label="Image URL" htmlFor="imageUrl" error={form.formState.errors.imageUrl?.message}>
-              <Input id="imageUrl" type="url" {...form.register("imageUrl")} placeholder="https://example.com/car.png" />
-            </FormField>
+            <Controller
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  folder="battery-mantra/vehicles"
+                  label="Vehicle Image URL (Optional)"
+                  error={form.formState.errors.imageUrl?.message}
+                />
+              )}
+            />
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="ghost" onClick={closeModal}>

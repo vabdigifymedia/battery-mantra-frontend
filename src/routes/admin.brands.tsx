@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { brandsQuery } from "@/queries";
@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import type { BrandResponse, BrandRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
@@ -287,9 +288,19 @@ function AdminBrands() {
               <Input id="brandName" {...form.register("brandName")} placeholder="e.g. Exide" />
             </FormField>
 
-            <FormField label="Logo URL" htmlFor="brandLogo" hint="URL to a brand logo image" error={form.formState.errors.brandLogo?.message}>
-              <Input id="brandLogo" {...form.register("brandLogo")} placeholder="https://..." />
-            </FormField>
+            <Controller
+              control={form.control}
+              name="brandLogo"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  folder="battery-mantra/brands"
+                  label="Logo URL (Optional)"
+                  error={form.formState.errors.brandLogo?.message}
+                />
+              )}
+            />
 
             <div className="flex items-center gap-2 pt-2">
               <input type="checkbox" id="featured" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("featured")} />

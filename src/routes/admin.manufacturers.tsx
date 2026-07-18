@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { manufacturersListQuery } from "@/queries";
@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import type { ManufacturerResponse, CreateManufacturerRequest, UpdateManufacturerRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 import { queryKeys } from "@/constants/queryKeys";
@@ -231,9 +232,19 @@ function AdminManufacturers() {
             <FormField label="Manufacturer Name" error={form.formState.errors.name?.message}>
               <Input {...form.register("name")} placeholder="e.g. Maruti Suzuki" />
             </FormField>
-            <FormField label="Logo URL (Cloudinary)" error={form.formState.errors.logoUrl?.message}>
-              <Input {...form.register("logoUrl")} placeholder="https://res.cloudinary.com/..." />
-            </FormField>
+            <Controller
+              control={form.control}
+              name="logoUrl"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  folder="battery-mantra/manufacturers"
+                  label="Logo URL (Cloudinary)"
+                  error={form.formState.errors.logoUrl?.message}
+                />
+              )}
+            />
             <FormField label="Display Order" error={form.formState.errors.displayOrder?.message}>
               <Input type="number" {...form.register("displayOrder")} placeholder="e.g. 1" />
             </FormField>

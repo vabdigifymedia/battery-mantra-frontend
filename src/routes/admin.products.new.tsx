@@ -19,6 +19,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
@@ -228,18 +229,19 @@ function AddProductPage() {
             <CardContent className="space-y-6">
               <div className="flex flex-col sm:flex-row gap-6 items-start">
                 <div className="flex-1 w-full space-y-2">
-                  <Label htmlFor="productImage">Primary Image URL <span className="text-red-500">*</span></Label>
-                  <Input id="productImage" placeholder="https://example.com/image.jpg" {...form.register("productImage")} />
-                  {form.formState.errors.productImage && <p className="text-xs text-red-500">{form.formState.errors.productImage.message}</p>}
-                </div>
-                <div className="w-full sm:w-32 h-32 border rounded-xl overflow-hidden bg-muted/50 flex items-center justify-center shrink-0">
-                  {watchImageUrl ? (
-                    <img src={watchImageUrl} alt="Preview" className="w-full h-full object-contain p-2" onError={(e) => { e.currentTarget.src = ""; e.currentTarget.className = "hidden"; }} />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <ImageIcon className="h-8 w-8 mb-2 opacity-50" />
-                    </div>
-                  )}
+                  <Controller
+                    control={form.control}
+                    name="productImage"
+                    render={({ field }) => (
+                      <CloudinaryUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        folder="battery-mantra/products"
+                        label="Primary Image *"
+                        error={form.formState.errors.productImage?.message}
+                      />
+                    )}
+                  />
                 </div>
               </div>
 
@@ -251,19 +253,21 @@ function AddProductPage() {
                     return (
                       <div key={field.id} className="flex gap-4 items-start">
                         <div className="flex-1 space-y-2">
-                          <Input placeholder="https://example.com/gallery.jpg" {...form.register(`additionalImages.${idx}.url` as const)} />
-                          {form.formState.errors.additionalImages?.[idx]?.url && (
-                            <p className="text-xs text-red-500">{form.formState.errors.additionalImages[idx].url?.message}</p>
-                          )}
+                          <Controller
+                            control={form.control}
+                            name={`additionalImages.${idx}.url` as const}
+                            render={({ field }) => (
+                              <CloudinaryUpload
+                                value={field.value}
+                                onChange={field.onChange}
+                                folder="battery-mantra/products"
+                                label={`Additional Image ${idx + 1}`}
+                                error={form.formState.errors.additionalImages?.[idx]?.url?.message}
+                              />
+                            )}
+                          />
                         </div>
-                        <div className="w-10 h-10 border rounded bg-muted/50 flex items-center justify-center shrink-0">
-                           {imgUrl ? (
-                             <img src={imgUrl} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                           ) : (
-                             <ImageIcon className="h-4 w-4 opacity-50" />
-                           )}
-                        </div>
-                        <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeImage(idx)}>
+                        <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50 mt-8" onClick={() => removeImage(idx)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

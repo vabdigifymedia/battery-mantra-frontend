@@ -24,6 +24,18 @@ import type {
 } from "@/types/dto";
 
 export const adminService = {
+  // Upload
+  uploadImage: (file: File, folder: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiFetch<{ url: string; publicId: string }>(endpoints.admin.upload, {
+      method: "POST",
+      query: { folder },
+      body: formData,
+      multipart: true,
+    });
+  },
+
   // Users
   getAllUsers: () => apiFetch<UserResponse[]>(endpoints.admin.users, { method: "GET" }),
 
