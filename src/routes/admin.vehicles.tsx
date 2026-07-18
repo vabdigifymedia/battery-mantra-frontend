@@ -550,75 +550,79 @@ function AdminVehicles() {
               </select>
             </FormField>
 
-            <FormField label="Capacity (RL)" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2 min-h-[28px] p-2 border rounded-md bg-muted/20">
-                  {(() => {
-                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
-                    return (
-                      <>
-                        {currentCapacities.map((cap: string) => (
-                          <Badge key={cap} variant="secondary" className="px-2 py-1 flex items-center gap-1 font-normal bg-background border shadow-sm">
-                            {cap}
-                            <X 
-                              className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const newCaps = currentCapacities.filter((c: string) => c !== cap);
-                                form.setValue("capacity", newCaps.join(","), { shouldDirty: true });
-                              }} 
-                            />
-                          </Badge>
-                        ))}
-                        {currentCapacities.length === 0 && (
-                          <span className="text-xs text-muted-foreground my-auto ml-1">No capacities added</span>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-                
-                <Select 
-                  key={(() => {
-                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
-                    return currentCapacities.length;
-                  })()}
-                  onValueChange={(val) => {
-                    if (!val) return;
-                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
-                    if (!currentCapacities.includes(val)) {
-                      form.setValue("capacity", [...currentCapacities, val].join(","), { shouldDirty: true });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Add a capacity..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(() => {
-                      const vType = form.watch("vehicleType");
-                      let catName = "";
-                      if (vType === "CAR") catName = "Four Wheeler";
-                      else if (vType === "BIKE") catName = "Two Wheeler";
-                      else if (vType === "GENERATOR") catName = "Generator";
+            {(() => {
+              const vType = form.watch("vehicleType");
+              let catName = "";
+              if (vType === "CAR") catName = "Four Wheeler";
+              else if (vType === "BIKE") catName = "Two Wheeler";
+              else if (vType === "GENERATOR") catName = "Generator";
 
-                      let options = dbCapacities;
-                      if (catName) {
-                        const cat = rootCategories.find(c => c.categoryName.toLowerCase().includes(catName.toLowerCase()));
-                        if (cat) {
-                          options = dbCapacities.filter(c => c.categoryId === cat.categoryId);
+              let options = dbCapacities;
+              if (catName) {
+                const cat = rootCategories.find(c => c.categoryName.toLowerCase().includes(catName.toLowerCase()));
+                if (cat) {
+                  options = dbCapacities.filter(c => c.categoryId === cat.categoryId);
+                }
+              }
+
+              if (options.length === 0) return null;
+
+              return (
+                <FormField label="Capacity (RL)" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2 min-h-[28px] p-2 border rounded-md bg-muted/20">
+                      {(() => {
+                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        return (
+                          <>
+                            {currentCapacities.map((cap: string) => (
+                              <Badge key={cap} variant="secondary" className="px-2 py-1 flex items-center gap-1 font-normal bg-background border shadow-sm">
+                                {cap}
+                                <X 
+                                  className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const newCaps = currentCapacities.filter((c: string) => c !== cap);
+                                    form.setValue("capacity", newCaps.join(","), { shouldDirty: true });
+                                  }} 
+                                />
+                              </Badge>
+                            ))}
+                            {currentCapacities.length === 0 && (
+                              <span className="text-xs text-muted-foreground my-auto ml-1">No capacities added</span>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                    
+                    <Select 
+                      key={(() => {
+                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        return currentCapacities.length;
+                      })()}
+                      onValueChange={(val) => {
+                        if (!val) return;
+                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        if (!currentCapacities.includes(val)) {
+                          form.setValue("capacity", [...currentCapacities, val].join(","), { shouldDirty: true });
                         }
-                      }
-                      
-                      return options.map((cap) => (
-                        <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
-                      ));
-                    })()}
-                  </SelectContent>
-                </Select>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">Add one or more capacity codes for this vehicle to automatically match compatible batteries.</p>
-            </FormField>
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Add a capacity..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.map((cap) => (
+                          <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">Add one or more capacity codes for this vehicle to automatically match compatible batteries.</p>
+                </FormField>
+              );
+            })()}
 
             <Controller
               control={form.control}

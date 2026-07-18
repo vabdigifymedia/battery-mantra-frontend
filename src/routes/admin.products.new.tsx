@@ -283,32 +283,33 @@ function AddProductPage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Capacity (RL)</CardTitle>
-                <CardDescription>Enter the capacity to automatically match vehicles.</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="capacity">Capacity Code</Label>
-                <Select onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldValidate: true })}>
-                  <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select a capacity (Optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None (Leave Blank)</SelectItem>
-                    {dbCapacities.map((cap) => (
-                      <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
-              </div>
-            </CardContent>
-          </Card>
-
+          {dbCapacities.length > 0 && (
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Capacity (RL)</CardTitle>
+                  <CardDescription>Enter the capacity to automatically match vehicles.</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">Capacity Code</Label>
+                  <Select onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldValidate: true })}>
+                    <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select a capacity (Optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None (Leave Blank)</SelectItem>
+                      {dbCapacities.map((cap) => (
+                        <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
           <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>

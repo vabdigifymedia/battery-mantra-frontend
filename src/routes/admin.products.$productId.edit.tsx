@@ -305,20 +305,23 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                 <Input id="productName" placeholder="e.g. Amaron Pro 12V 45Ah" {...form.register("productName")} />
                 {form.formState.errors.productName && <p className="text-xs text-red-500">{form.formState.errors.productName.message}</p>}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="capacity">Capacity</Label>
-                <Select value={form.watch("capacity") || "none"} onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldDirty: true, shouldValidate: true })}>
-                  <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select a capacity (Optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None (Leave Blank)</SelectItem>
-                    {dbCapacities.map((cap) => (
-                      <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {dbCapacities.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">Capacity</Label>
+                  <Select value={form.watch("capacity") || "none"} onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldDirty: true, shouldValidate: true })}>
+                    <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select a capacity (Optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None (Leave Blank)</SelectItem>
+                      {dbCapacities.map((cap) => (
+                        <SelectItem key={cap.capacityId} value={cap.capacityName}>{cap.capacityName}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="productDescription">Description</Label>
                 <Controller
