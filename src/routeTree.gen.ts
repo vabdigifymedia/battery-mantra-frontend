@@ -31,6 +31,7 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminCapacitiesRouteImport } from './routes/admin.capacities'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
 import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
@@ -38,7 +39,12 @@ import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
+import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
+import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
+import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
+import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
+import { Route as AdminSeoQuickBrandsRouteImport } from './routes/admin.seo.quick.brands'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
 
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
@@ -150,6 +156,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCapacitiesRoute = AdminCapacitiesRouteImport.update({
+  id: '/capacities',
+  path: '/capacities',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCallbacksRoute = AdminCallbacksRouteImport.update({
   id: '/callbacks',
   path: '/callbacks',
@@ -186,9 +197,35 @@ const ManufacturersCategorySlugMakeSlugRoute =
     path: '/manufacturers/$categorySlug/$makeSlug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminSeoPagesRoute = AdminSeoPagesRouteImport.update({
+  id: '/seo/pages',
+  path: '/seo/pages',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   id: '/products/new',
   path: '/products/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSeoQuickProductsRoute = AdminSeoQuickProductsRouteImport.update({
+  id: '/seo/quick/products',
+  path: '/seo/quick/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSeoQuickManufacturersRoute =
+  AdminSeoQuickManufacturersRouteImport.update({
+    id: '/seo/quick/manufacturers',
+    path: '/seo/quick/manufacturers',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminSeoQuickCategoriesRoute = AdminSeoQuickCategoriesRouteImport.update({
+  id: '/seo/quick/categories',
+  path: '/seo/quick/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSeoQuickBrandsRoute = AdminSeoQuickBrandsRouteImport.update({
+  id: '/seo/quick/brands',
+  path: '/seo/quick/brands',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminProductsProductIdEditRoute =
@@ -214,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
+  '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
@@ -226,9 +264,14 @@ export interface FileRoutesByFullPath {
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
+  '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
+  '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -245,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
+  '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
@@ -257,9 +301,14 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
+  '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
+  '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -279,6 +328,7 @@ export interface FileRoutesById {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
+  '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
@@ -291,9 +341,14 @@ export interface FileRoutesById {
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
+  '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
+  '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -313,6 +368,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/brands'
     | '/admin/callbacks'
+    | '/admin/capacities'
     | '/admin/categories'
     | '/admin/locations'
     | '/admin/manufacturers'
@@ -325,9 +381,14 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/products/'
     | '/admin/products/new'
+    | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
+    | '/admin/seo/quick/brands'
+    | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/manufacturers'
+    | '/admin/seo/quick/products'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -344,6 +405,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/brands'
     | '/admin/callbacks'
+    | '/admin/capacities'
     | '/admin/categories'
     | '/admin/locations'
     | '/admin/manufacturers'
@@ -356,9 +418,14 @@ export interface FileRouteTypes {
     | '/orders'
     | '/products'
     | '/admin/products/new'
+    | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products'
     | '/admin/products/$productId/edit'
+    | '/admin/seo/quick/brands'
+    | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/manufacturers'
+    | '/admin/seo/quick/products'
   id:
     | '__root__'
     | '/'
@@ -377,6 +444,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/brands'
     | '/admin/callbacks'
+    | '/admin/capacities'
     | '/admin/categories'
     | '/admin/locations'
     | '/admin/manufacturers'
@@ -389,9 +457,14 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/products/'
     | '/admin/products/new'
+    | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
+    | '/admin/seo/quick/brands'
+    | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/manufacturers'
+    | '/admin/seo/quick/products'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -569,6 +642,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/capacities': {
+      id: '/admin/capacities'
+      path: '/capacities'
+      fullPath: '/admin/capacities'
+      preLoaderRoute: typeof AdminCapacitiesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/callbacks': {
       id: '/admin/callbacks'
       path: '/callbacks'
@@ -618,11 +698,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ManufacturersCategorySlugMakeSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/seo/pages': {
+      id: '/admin/seo/pages'
+      path: '/seo/pages'
+      fullPath: '/admin/seo/pages'
+      preLoaderRoute: typeof AdminSeoPagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/products/new': {
       id: '/admin/products/new'
       path: '/products/new'
       fullPath: '/admin/products/new'
       preLoaderRoute: typeof AdminProductsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seo/quick/products': {
+      id: '/admin/seo/quick/products'
+      path: '/seo/quick/products'
+      fullPath: '/admin/seo/quick/products'
+      preLoaderRoute: typeof AdminSeoQuickProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seo/quick/manufacturers': {
+      id: '/admin/seo/quick/manufacturers'
+      path: '/seo/quick/manufacturers'
+      fullPath: '/admin/seo/quick/manufacturers'
+      preLoaderRoute: typeof AdminSeoQuickManufacturersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seo/quick/categories': {
+      id: '/admin/seo/quick/categories'
+      path: '/seo/quick/categories'
+      fullPath: '/admin/seo/quick/categories'
+      preLoaderRoute: typeof AdminSeoQuickCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seo/quick/brands': {
+      id: '/admin/seo/quick/brands'
+      path: '/seo/quick/brands'
+      fullPath: '/admin/seo/quick/brands'
+      preLoaderRoute: typeof AdminSeoQuickBrandsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/products/$productId/edit': {
@@ -651,6 +766,7 @@ interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminBrandsRoute: typeof AdminBrandsRoute
   AdminCallbacksRoute: typeof AdminCallbacksRoute
+  AdminCapacitiesRoute: typeof AdminCapacitiesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
@@ -659,14 +775,20 @@ interface AdminRouteChildren {
   AdminVehiclesRoute: typeof AdminVehiclesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
+  AdminSeoPagesRoute: typeof AdminSeoPagesRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
+  AdminSeoQuickBrandsRoute: typeof AdminSeoQuickBrandsRoute
+  AdminSeoQuickCategoriesRoute: typeof AdminSeoQuickCategoriesRoute
+  AdminSeoQuickManufacturersRoute: typeof AdminSeoQuickManufacturersRoute
+  AdminSeoQuickProductsRoute: typeof AdminSeoQuickProductsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminBrandsRoute: AdminBrandsRoute,
   AdminCallbacksRoute: AdminCallbacksRoute,
+  AdminCapacitiesRoute: AdminCapacitiesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
@@ -675,8 +797,13 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVehiclesRoute: AdminVehiclesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
+  AdminSeoPagesRoute: AdminSeoPagesRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,
+  AdminSeoQuickBrandsRoute: AdminSeoQuickBrandsRoute,
+  AdminSeoQuickCategoriesRoute: AdminSeoQuickCategoriesRoute,
+  AdminSeoQuickManufacturersRoute: AdminSeoQuickManufacturersRoute,
+  AdminSeoQuickProductsRoute: AdminSeoQuickProductsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

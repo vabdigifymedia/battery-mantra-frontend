@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { rootCategoriesQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
@@ -44,6 +45,20 @@ const categorySchema = z.object({
   iconUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
   parentId: z.string().uuid().optional().nullable().or(z.literal("")),
+  seo: z.object({
+    slug: z.string().optional(),
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    metaKeywords: z.string().optional(),
+    metaTitleCity: z.string().optional(),
+    metaDescriptionCity: z.string().optional(),
+    metaKeywordsCity: z.string().optional(),
+    ogTitle: z.string().optional(),
+    ogDescription: z.string().optional(),
+    ogTitleCity: z.string().optional(),
+    ogDescriptionCity: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+  }).optional().default({})
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -96,11 +111,25 @@ function AdminCategories() {
       iconUrl: "",
       displayOrder: 0,
       parentId,
+      seo: {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
 
-  const openEditModal = (category: CategoryListResponse) => {
+  const openEditModal = (category: any) => {
     setEditingCategory(category);
     form.reset({
       categoryName: category.categoryName,
@@ -108,6 +137,20 @@ function AdminCategories() {
       iconUrl: category.iconUrl ?? "",
       displayOrder: category.displayOrder ?? 0,
       parentId: category.parentId ?? null,
+      seo: category.seo || {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
@@ -154,7 +197,8 @@ function AdminCategories() {
       iconUrl: values.iconUrl,
       displayOrder: values.displayOrder,
       parentId: values.parentId || undefined, // Convert empty string or null to undefined
-    };
+      seo: values.seo,
+    } as any;
 
     if (editingCategory) {
       editMutation.mutate({ id: editingCategory.categoryId, data: payload });
@@ -374,7 +418,7 @@ function AdminCategories() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
           </DialogHeader>
@@ -421,7 +465,70 @@ function AdminCategories() {
               <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
             </FormField>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="pt-6 pb-2">
+              <h3 className="text-lg font-semibold">SEO Information</h3>
+              <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this category</p>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Category URL (Slug)</Label>
+                    <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Title</Label>
+                    <Input placeholder="Buy Category at Best Price" {...form.register("seo.metaTitle")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Search / SEO Keywords</Label>
+                  <Input placeholder="Category price, buy category..." {...form.register("seo.metaKeywords")} />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description</Label>
+                  <Input placeholder="Buy Category At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label>SEO Title City</Label>
+                    <Input placeholder="Category Price in city_name" {...form.register("seo.metaTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Keywords City</Label>
+                    <Input placeholder="Category At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description City</Label>
+                  <Input placeholder="Buy Category At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Title</Label>
+                    <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Description</Label>
+                    <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Title City</Label>
+                    <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Description City</Label>
+                    <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-6 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
                 Cancel
               </Button>

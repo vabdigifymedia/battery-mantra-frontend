@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { vehiclesListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
@@ -57,6 +58,20 @@ const vehicleSchema = z.object({
   fuelType: z.enum(["PETROL", "DIESEL", "ELECTRIC", "CNG"]).optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   capacity: z.string().optional(),
+  seo: z.object({
+    slug: z.string().optional(),
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    metaKeywords: z.string().optional(),
+    metaTitleCity: z.string().optional(),
+    metaDescriptionCity: z.string().optional(),
+    metaKeywordsCity: z.string().optional(),
+    ogTitle: z.string().optional(),
+    ogDescription: z.string().optional(),
+    ogTitleCity: z.string().optional(),
+    ogDescriptionCity: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+  }).optional().default({})
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -105,7 +120,7 @@ function AdminVehicles() {
   const [activeMake, setActiveMake] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<VehicleResponse | null>(null);
+  const [editingVehicle, setEditingVehicle] = useState<any>(null);
 
   // Import states
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -145,11 +160,25 @@ function AdminVehicles() {
       fuelType: undefined,
       imageUrl: "",
       capacity: "",
+      seo: {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
 
-  const openEditModal = (vehicle: VehicleResponse) => {
+  const openEditModal = (vehicle: any) => {
     setEditingVehicle(vehicle);
     form.reset({
       vehicleType: vehicle.vehicleType || "CAR",
@@ -158,6 +187,20 @@ function AdminVehicles() {
       fuelType: vehicle.fuelType,
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
+      seo: vehicle.seo || {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
@@ -169,7 +212,7 @@ function AdminVehicles() {
   };
 
   const addMutation = useMutation({
-    mutationFn: (data: CreateVehicleRequest) => adminService.createVehicle(data),
+    mutationFn: (data: any) => adminService.createVehicle(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
       toast.success("Vehicle created successfully");
@@ -179,7 +222,7 @@ function AdminVehicles() {
   });
 
   const editMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CreateVehicleRequest }) => adminService.updateVehicle(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updateVehicle(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
       toast.success("Vehicle updated successfully");
@@ -198,13 +241,14 @@ function AdminVehicles() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    const data: CreateVehicleRequest = {
+    const data: any = {
       vehicleType: values.vehicleType,
       make: values.make,
       model: values.model,
       fuelType: values.fuelType,
       imageUrl: values.imageUrl || undefined,
       capacity: values.capacity || undefined,
+      seo: values.seo,
     };
 
     if (editingVehicle) {
@@ -500,49 +544,49 @@ function AdminVehicles() {
                   />
                 </PaginationItem>
               </PaginationContent>
-            </Pagination>
+              </Pagination>
           </div>
         )}
       </Tabs>
 
       {/* SINGLE ADD / EDIT MODAL */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingVehicle ? "Edit Vehicle" : "Add Vehicle"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
-            <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
-              <select
-                id="vehicleType"
-                {...form.register("vehicleType")}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="CAR">Car</option>
-                <option value="BIKE">Bike</option>
-                <option value="COMMERCIAL">Commercial</option>
-                <option value="E_RICKSHAW">E-Rickshaw</option>
-                <option value="INVERTER">Inverter</option>
-              </select>
-            </FormField>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
-                <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
+                <select
+                  id="vehicleType"
+                  {...form.register("vehicleType")}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="CAR">Car (Four Wheeler)</option>
+                  <option value="BIKE">Bike (Two Wheeler)</option>
+                  <option value="COMMERCIAL">Commercial</option>
+                  <option value="E_RICKSHAW">E-Rickshaw</option>
+                  <option value="INVERTER">Inverter</option>
+                </select>
               </FormField>
 
-              <FormField label="Model" htmlFor="model" required error={form.formState.errors.model?.message}>
-                <Input id="model" {...form.register("model")} placeholder="e.g. Swift" />
+              <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
+                <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki, Exide" />
               </FormField>
             </div>
 
-            <FormField label="Fuel Type" htmlFor="fuelType" error={form.formState.errors.fuelType?.message}>
+            <FormField label="Model" htmlFor="model" required error={form.formState.errors.model?.message}>
+              <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
+            </FormField>
+
+            <FormField label="Fuel Type (Optional)" htmlFor="fuelType" error={form.formState.errors.fuelType?.message}>
               <select
                 id="fuelType"
                 {...form.register("fuelType")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <option value="">Any</option>
+                <option value="">None / Not Applicable</option>
                 <option value="PETROL">Petrol</option>
                 <option value="DIESEL">Diesel</option>
                 <option value="CNG">CNG</option>
@@ -638,7 +682,70 @@ function AdminVehicles() {
               )}
             />
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="pt-6 pb-2">
+              <h3 className="text-lg font-semibold">SEO Information</h3>
+              <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this vehicle</p>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Vehicle URL (Slug)</Label>
+                    <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Title</Label>
+                    <Input placeholder="Buy Vehicle at Best Price" {...form.register("seo.metaTitle")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Search / SEO Keywords</Label>
+                  <Input placeholder="Vehicle price, buy vehicle..." {...form.register("seo.metaKeywords")} />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description</Label>
+                  <Input placeholder="Buy Vehicle At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label>SEO Title City</Label>
+                    <Input placeholder="Vehicle Price in city_name" {...form.register("seo.metaTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Keywords City</Label>
+                    <Input placeholder="Vehicle At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description City</Label>
+                  <Input placeholder="Buy Vehicle At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Title</Label>
+                    <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Description</Label>
+                    <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Title City</Label>
+                    <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Description City</Label>
+                    <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-6 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
                 Cancel
               </Button>

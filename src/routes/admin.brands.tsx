@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { brandsQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
@@ -42,6 +43,20 @@ const brandSchema = z.object({
   brandName: z.string().trim().min(1, "Name is required"),
   brandLogo: z.string().trim().optional(),
   featured: z.boolean().default(false),
+  seo: z.object({
+    slug: z.string().optional(),
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    metaKeywords: z.string().optional(),
+    metaTitleCity: z.string().optional(),
+    metaDescriptionCity: z.string().optional(),
+    metaKeywordsCity: z.string().optional(),
+    ogTitle: z.string().optional(),
+    ogDescription: z.string().optional(),
+    ogTitleCity: z.string().optional(),
+    ogDescriptionCity: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+  }).optional().default({})
 });
 
 type BrandFormValues = z.infer<typeof brandSchema>;
@@ -51,7 +66,7 @@ function AdminBrands() {
   const { data: brands, isLoading } = useQuery(brandsQuery());
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<BrandResponse | null>(null);
+  const [editingBrand, setEditingBrand] = useState<any>(null);
 
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandSchema),
@@ -59,6 +74,20 @@ function AdminBrands() {
       brandName: "",
       brandLogo: "",
       featured: false,
+      seo: {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     },
   });
 
@@ -68,16 +97,44 @@ function AdminBrands() {
       brandName: "",
       brandLogo: "",
       featured: false,
+      seo: {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
 
-  const openEditModal = (brand: BrandResponse) => {
+  const openEditModal = (brand: any) => {
     setEditingBrand(brand);
     form.reset({
       brandName: brand.brandName,
       brandLogo: brand.brandLogo ?? "",
       featured: brand.featured ?? false,
+      seo: brand.seo || {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        metaTitleCity: "",
+        metaDescriptionCity: "",
+        metaKeywordsCity: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogTitleCity: "",
+        ogDescriptionCity: "",
+        canonicalUrl: "",
+      }
     });
     setIsModalOpen(true);
   };
@@ -89,7 +146,7 @@ function AdminBrands() {
   };
 
   const addMutation = useMutation({
-    mutationFn: (data: BrandRequest) => adminService.createBrand(data),
+    mutationFn: (data: any) => adminService.createBrand(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       toast.success("Brand created successfully");
@@ -99,7 +156,7 @@ function AdminBrands() {
   });
 
   const editMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: BrandRequest }) => adminService.updateBrand(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updateBrand(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       toast.success("Brand updated successfully");
@@ -118,10 +175,16 @@ function AdminBrands() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
+    const payload: any = {
+      brandName: values.brandName,
+      brandLogo: values.brandLogo,
+      featured: values.featured,
+      seo: values.seo,
+    };
     if (editingBrand) {
-      editMutation.mutate({ id: editingBrand.brandId, data: values });
+      editMutation.mutate({ id: editingBrand.brandId, data: payload });
     } else {
-      addMutation.mutate(values);
+      addMutation.mutate(payload);
     }
   });
 
@@ -279,7 +342,7 @@ function AdminBrands() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingBrand ? "Edit Brand" : "Add Brand"}</DialogTitle>
           </DialogHeader>
@@ -307,7 +370,70 @@ function AdminBrands() {
               <label htmlFor="featured" className="text-sm font-medium text-foreground">Feature this brand on the homepage</label>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="pt-6 pb-2">
+              <h3 className="text-lg font-semibold">SEO Information</h3>
+              <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this brand</p>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Brand URL (Slug)</Label>
+                    <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Title</Label>
+                    <Input placeholder="Buy Brand at Best Price" {...form.register("seo.metaTitle")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Search / SEO Keywords</Label>
+                  <Input placeholder="Brand price, buy brand..." {...form.register("seo.metaKeywords")} />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description</Label>
+                  <Input placeholder="Buy Brand At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label>SEO Title City</Label>
+                    <Input placeholder="Brand Price in city_name" {...form.register("seo.metaTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SEO Keywords City</Label>
+                    <Input placeholder="Brand At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>SEO Description City</Label>
+                  <Input placeholder="Buy Brand At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Title</Label>
+                    <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label>OG Description</Label>
+                    <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Title City</Label>
+                    <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Description City</Label>
+                    <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-6 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
                 Cancel
               </Button>
