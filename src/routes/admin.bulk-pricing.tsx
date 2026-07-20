@@ -25,22 +25,26 @@ function BulkPricingPage() {
   const { data: categories = [], isLoading: loadingCategories } = useQuery({
     queryKey: ["admin", "categories"],
     queryFn: () => categoriesService.list(),
+    refetchOnWindowFocus: false,
   });
 
   const { data: brands = [], isLoading: loadingBrands } = useQuery({
     queryKey: ["admin", "brands"],
     queryFn: () => brandsService.list(),
+    refetchOnWindowFocus: false,
   });
 
   const { data: locations = [], isLoading: loadingLocations } = useQuery({
     queryKey: ["admin", "locations"],
     queryFn: () => locationService.getAllCities(),
+    refetchOnWindowFocus: false,
   });
 
   const { data: matrixData, isLoading: loadingMatrix } = useQuery({
     queryKey: ["admin", "bulk-pricing", selectedCategory, selectedBrand],
     queryFn: () => bulkPricingService.getMatrix(selectedCategory, selectedBrand),
     enabled: !!selectedCategory && !!selectedBrand,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

@@ -18,17 +18,17 @@ export interface BulkPricingRequest {
 export const bulkPricingService = {
   getMatrix: async (categoryId: string, brandId: string): Promise<BulkPricingMatrix[]> => {
     return apiFetch<BulkPricingMatrix[]>(
-      `${endpoints.admin.base}/bulk-pricing?categoryId=${categoryId}&brandId=${brandId}`,
+      `/api/admin/bulk-pricing?categoryId=${categoryId}&brandId=${brandId}`,
       { method: "GET" }
     );
   },
 
-  updateMatrix: async (data: BulkPricingRequest): Promise<BulkPricingMatrix> => {
-    return apiFetch<BulkPricingMatrix>(
-      `${endpoints.admin.base}/bulk-pricing`,
+  updateMatrix: async (data: BulkPricingRequest): Promise<void> => {
+    return apiFetch<void>(
+      `/api/admin/bulk-pricing`,
       { 
         method: "PUT",
-        body: JSON.stringify(data)
+        body: data
       }
     );
   },
