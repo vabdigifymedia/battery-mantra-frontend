@@ -329,7 +329,7 @@ function PdpPage() {
                   <div>
                     <p className="font-medium text-foreground">Delivery to <span className="text-primary font-semibold">{city.cityName}</span></p>
                     {isLoadingDeliveryTime ? (
-                      <p className="text-muted-foreground animate-pulse">Calculating delivery time...</p>
+                      <div className="h-4 w-32 bg-muted rounded animate-pulse mt-1"></div>
                     ) : (deliveryTime?.days || deliveryTime?.hours) ? (
                       <p className="text-muted-foreground">
                         Estimated time: <span className="font-medium text-foreground">{deliveryTime.days ? `${deliveryTime.days} Days` : ''} {deliveryTime.hours ? `${deliveryTime.hours} Hours` : ''}</span>
