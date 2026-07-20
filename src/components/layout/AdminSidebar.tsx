@@ -12,7 +12,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronRight, Search } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 
 const navigation = [
@@ -32,12 +37,15 @@ const navigation = [
 ];
 
 const seoNavigation = [
-  { name: "Google Products Feed", href: `${env.API_BASE_URL || 'http://localhost:8080'}/api/seo/google-feed.xml`, icon: Package, external: true },
   { name: "SEO Pages", href: "/admin/seo/pages", icon: Layers },
-  { name: "SEO Quick (Brands)", href: "/admin/seo/quick/brands", icon: Tag },
-  { name: "SEO Quick (Manufacturers)", href: "/admin/seo/quick/manufacturers", icon: Layers },
-  { name: "SEO Quick (Categories)", href: "/admin/seo/quick/categories", icon: Layers },
-  { name: "SEO Quick (Products)", href: "/admin/seo/quick/products", icon: Package },
+  { name: "Google Products Feed", href: `${env.API_BASE_URL || 'http://localhost:8080'}/api/seo/google-feed.xml`, icon: Package, external: true },
+];
+
+const seoQuickNavigation = [
+  { name: "Brands", href: "/admin/seo/quick/brands" },
+  { name: "Manufacturers", href: "/admin/seo/quick/manufacturers" },
+  { name: "Categories", href: "/admin/seo/quick/categories" },
+  { name: "Products", href: "/admin/seo/quick/products" },
 ];
 
 export function AdminSidebar() {
@@ -76,29 +84,73 @@ export function AdminSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>SEO</SidebarGroupLabel>
+          <SidebarGroupLabel>SEO Settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {seoNavigation.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href);
-                return (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild isActive={isActive && !item.external} tooltip={item.name}>
-                      {item.external ? (
-                        <a href={item.href} target="_blank" rel="noopener noreferrer">
-                          <item.icon />
-                          <span>{item.name}</span>
-                        </a>
-                      ) : (
-                        <Link to={item.href}>
-                          <item.icon />
-                          <span>{item.name}</span>
-                        </Link>
-                      )}
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="SEO">
+                      <Search />
+                      <span>SEO Management</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {seoNavigation.map((item) => {
+                        const isActive = pathname === item.href || pathname.startsWith(item.href);
+                        return (
+                          <SidebarMenuSubItem key={item.name}>
+                            <SidebarMenuSubButton asChild isActive={isActive && !item.external}>
+                              {item.external ? (
+                                <a href={item.href} target="_blank" rel="noopener noreferrer">
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.name}</span>
+                                </a>
+                              ) : (
+                                <Link to={item.href}>
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.name}</span>
+                                </Link>
+                              )}
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
+
+                      {/* Nested Collapsible for SEO Quick */}
+                      <Collapsible className="group/collapsible-quick">
+                        <SidebarMenuSubItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuSubButton>
+                              <Tag className="h-4 w-4" />
+                              <span>SEO Quick</span>
+                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible-quick:rotate-90" />
+                            </SidebarMenuSubButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {seoQuickNavigation.map((item) => {
+                                const isActive = pathname === item.href;
+                                return (
+                                  <SidebarMenuSubItem key={item.name}>
+                                    <SidebarMenuSubButton asChild isActive={isActive}>
+                                      <Link to={item.href}>
+                                        <span>{item.name}</span>
+                                      </Link>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                );
+                              })}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuSubItem>
+                      </Collapsible>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
