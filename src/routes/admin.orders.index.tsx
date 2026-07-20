@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/orders")({
+export const Route = createFileRoute("/admin/orders/")({
   component: AdminOrders,
 });
 
