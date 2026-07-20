@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,19 +27,19 @@ const navigation = [
   { name: "Categories", href: "/admin/categories", icon: Layers },
   { name: "Brands", href: "/admin/brands", icon: Tag },
   { name: "Vehicles", href: "/admin/vehicles", icon: Car },
-  { name: "Fuels", href: "/admin/fuels", icon: Layers },
-  { name: "Capacities (RL)", href: "/admin/capacities", icon: Layers },
-  { name: "Manufacturers", href: "/admin/manufacturers", icon: Layers },
+  { name: "Fuels", href: "/admin/fuels", icon: Fuel },
+  { name: "Capacities (RL)", href: "/admin/capacities", icon: Battery },
+  { name: "Manufacturers", href: "/admin/manufacturers", icon: Factory },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
-  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Layers },
+  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
 ];
 
 const seoNavigation = [
-  { name: "SEO Pages", href: "/admin/seo/pages", icon: Layers },
+  { name: "SEO Pages", href: "/admin/seo/pages", icon: Globe },
   { name: "Google Products Feed", href: `${env.API_BASE_URL || 'http://localhost:8080'}/api/seo/google-feed.xml`, icon: Package, external: true },
 ];
 
