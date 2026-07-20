@@ -32,7 +32,7 @@ const navigation = [
   { name: "Manufacturers", href: "/admin/manufacturers", icon: Layers },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
-  { name: "Bulk Pricing %", href: "/admin/bulk-pricing", icon: Layers },
+  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Layers },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },

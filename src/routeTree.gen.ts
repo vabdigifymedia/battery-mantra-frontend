@@ -27,18 +27,20 @@ import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminFuelsRouteImport } from './routes/admin.fuels'
+import { Route as AdminDeliveryTimeRouteImport } from './routes/admin.delivery-time'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCapacitiesRouteImport } from './routes/admin.capacities'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
+import { Route as AdminBulkPricingRouteImport } from './routes/admin.bulk-pricing'
 import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
+import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
 import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
@@ -138,11 +140,6 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminOrdersRoute = AdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminManufacturersRoute = AdminManufacturersRouteImport.update({
   id: '/manufacturers',
   path: '/manufacturers',
@@ -158,6 +155,11 @@ const AdminFuelsRoute = AdminFuelsRouteImport.update({
   path: '/fuels',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDeliveryTimeRoute = AdminDeliveryTimeRouteImport.update({
+  id: '/delivery-time',
+  path: '/delivery-time',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -171,6 +173,11 @@ const AdminCapacitiesRoute = AdminCapacitiesRouteImport.update({
 const AdminCallbacksRoute = AdminCallbacksRouteImport.update({
   id: '/callbacks',
   path: '/callbacks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBulkPricingRoute = AdminBulkPricingRouteImport.update({
+  id: '/bulk-pricing',
+  path: '/bulk-pricing',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBrandsRoute = AdminBrandsRouteImport.update({
@@ -198,6 +205,11 @@ const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ManufacturersCategorySlugMakeSlugRoute =
   ManufacturersCategorySlugMakeSlugRouteImport.update({
     id: '/manufacturers/$categorySlug/$makeSlug',
@@ -215,9 +227,9 @@ const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminOrdersCreateRoute = AdminOrdersCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AdminOrdersRoute,
+  id: '/orders/create',
+  path: '/orders/create',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminSeoQuickProductsRoute = AdminSeoQuickProductsRouteImport.update({
   id: '/seo/quick/products',
@@ -262,13 +274,14 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
-  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -280,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
@@ -301,13 +315,14 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
-  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -319,6 +334,7 @@ export interface FileRoutesByTo {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
+  '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
@@ -343,13 +359,14 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
-  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -361,6 +378,7 @@ export interface FileRoutesById {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
@@ -385,13 +403,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/bulk-pricing'
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/delivery-time'
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
-    | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
@@ -403,6 +422,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
+    | '/admin/orders/'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
@@ -424,13 +444,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/bulk-pricing'
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/delivery-time'
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
-    | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
@@ -442,6 +463,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
+    | '/admin/orders'
     | '/admin/products'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
@@ -465,13 +487,14 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/bulk-pricing'
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/delivery-time'
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
-    | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
@@ -483,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
+    | '/admin/orders/'
     | '/admin/products/'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
@@ -638,13 +662,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/orders': {
-      id: '/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AdminOrdersRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/manufacturers': {
       id: '/admin/manufacturers'
       path: '/manufacturers'
@@ -666,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFuelsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/delivery-time': {
+      id: '/admin/delivery-time'
+      path: '/delivery-time'
+      fullPath: '/admin/delivery-time'
+      preLoaderRoute: typeof AdminDeliveryTimeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -685,6 +709,13 @@ declare module '@tanstack/react-router' {
       path: '/callbacks'
       fullPath: '/admin/callbacks'
       preLoaderRoute: typeof AdminCallbacksRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bulk-pricing': {
+      id: '/admin/bulk-pricing'
+      path: '/bulk-pricing'
+      fullPath: '/admin/bulk-pricing'
+      preLoaderRoute: typeof AdminBulkPricingRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/brands': {
@@ -722,6 +753,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/orders/': {
+      id: '/admin/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminOrdersIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/manufacturers/$categorySlug/$makeSlug': {
       id: '/manufacturers/$categorySlug/$makeSlug'
       path: '/manufacturers/$categorySlug/$makeSlug'
@@ -745,10 +783,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/orders/create': {
       id: '/admin/orders/create'
-      path: '/create'
+      path: '/orders/create'
       fullPath: '/admin/orders/create'
       preLoaderRoute: typeof AdminOrdersCreateRouteImport
-      parentRoute: typeof AdminOrdersRoute
+      parentRoute: typeof AdminRoute
     }
     '/admin/seo/quick/products': {
       id: '/admin/seo/quick/products'
@@ -800,33 +838,24 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
-interface AdminOrdersRouteChildren {
-  AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
-}
-
-const AdminOrdersRouteChildren: AdminOrdersRouteChildren = {
-  AdminOrdersCreateRoute: AdminOrdersCreateRoute,
-}
-
-const AdminOrdersRouteWithChildren = AdminOrdersRoute._addFileChildren(
-  AdminOrdersRouteChildren,
-)
-
 interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminBrandsRoute: typeof AdminBrandsRoute
+  AdminBulkPricingRoute: typeof AdminBulkPricingRoute
   AdminCallbacksRoute: typeof AdminCallbacksRoute
   AdminCapacitiesRoute: typeof AdminCapacitiesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminDeliveryTimeRoute: typeof AdminDeliveryTimeRoute
   AdminFuelsRoute: typeof AdminFuelsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
-  AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
   AdminSeoPagesRoute: typeof AdminSeoPagesRoute
+  AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
   AdminSeoQuickBrandsRoute: typeof AdminSeoQuickBrandsRoute
@@ -838,18 +867,21 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminBrandsRoute: AdminBrandsRoute,
+  AdminBulkPricingRoute: AdminBulkPricingRoute,
   AdminCallbacksRoute: AdminCallbacksRoute,
   AdminCapacitiesRoute: AdminCapacitiesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminDeliveryTimeRoute: AdminDeliveryTimeRoute,
   AdminFuelsRoute: AdminFuelsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
-  AdminOrdersRoute: AdminOrdersRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminOrdersCreateRoute: AdminOrdersCreateRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
   AdminSeoPagesRoute: AdminSeoPagesRoute,
+  AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,
   AdminSeoQuickBrandsRoute: AdminSeoQuickBrandsRoute,

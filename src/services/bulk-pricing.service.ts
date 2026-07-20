@@ -1,4 +1,4 @@
-import api from "@/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
 
 export interface BulkPricingMatrix {
@@ -17,18 +17,19 @@ export interface BulkPricingRequest {
 
 export const bulkPricingService = {
   getMatrix: async (categoryId: string, brandId: string): Promise<BulkPricingMatrix[]> => {
-    const response = await api.get<BulkPricingMatrix[]>(
-      `${endpoints.admin.base}/bulk-pricing`,
-      { params: { categoryId, brandId } }
+    return apiFetch<BulkPricingMatrix[]>(
+      `${endpoints.admin.base}/bulk-pricing?categoryId=${categoryId}&brandId=${brandId}`,
+      { method: "GET" }
     );
-    return response.data;
   },
 
   updateMatrix: async (data: BulkPricingRequest): Promise<BulkPricingMatrix> => {
-    const response = await api.put<BulkPricingMatrix>(
+    return apiFetch<BulkPricingMatrix>(
       `${endpoints.admin.base}/bulk-pricing`,
-      data
+      { 
+        method: "PUT",
+        body: JSON.stringify(data)
+      }
     );
-    return response.data;
   },
 };

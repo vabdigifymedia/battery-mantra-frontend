@@ -107,7 +107,7 @@ function BulkPricingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Bulk Pricing % (Retail Matrix)</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Pricing %</h1>
         <p className="text-muted-foreground mt-2">
           Set a markup percentage for a Category + Brand combination. The system will automatically recalculate and round the prices for all cities.
         </p>
