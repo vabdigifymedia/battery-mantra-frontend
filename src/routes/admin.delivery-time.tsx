@@ -129,15 +129,15 @@ function AdminDeliveryTime() {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-muted/50 border-b">
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-auto max-h-[70vh] relative">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead className="sticky top-0 z-20 bg-muted shadow-sm">
             <tr>
-              <th className="px-4 py-3 font-semibold min-w-[200px] sticky left-0 bg-muted/95 backdrop-blur z-10 border-r">
+              <th className="px-4 py-3 font-semibold min-w-[200px] sticky left-0 top-0 bg-muted z-30 border-r border-b">
                 Category / City
               </th>
               {cities.map((city) => (
-                <th key={city.cityId} className="px-4 py-3 font-semibold min-w-[150px] text-center border-r last:border-0">
+                <th key={city.cityId} className="px-4 py-3 font-semibold min-w-[150px] text-center border-r border-b last:border-0 bg-muted">
                   {city.cityName}
                 </th>
               ))}
@@ -145,8 +145,8 @@ function AdminDeliveryTime() {
           </thead>
           <tbody>
             {categories.map((category) => (
-              <tr key={category.categoryId} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                <td className="px-4 py-3 font-medium sticky left-0 bg-card z-10 border-r shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
+              <tr key={category.categoryId} className="border-b last:border-0 hover:bg-muted/30 transition-colors group">
+                <td className="px-4 py-3 font-medium sticky left-0 bg-card group-hover:bg-muted/10 z-10 border-r shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
                   {category.categoryName}
                 </td>
                 {cities.map((city) => {
