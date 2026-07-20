@@ -118,7 +118,7 @@ function PdpPage() {
 
   const galleryImages = [data?.productImage, ...(data?.additionalImages || [])].filter(Boolean) as string[];
 
-  const inStock = (data.productStock ?? 0) > 0;
+
   const isExchange = exchange === "yes";
 
   const addToCart = useMutation({
