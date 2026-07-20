@@ -141,8 +141,8 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
           } catch (err) {
             tokenStore.clear();
             onRefreshed(""); // Flush queue, they will fail
-            if (!window.location.pathname.includes("/auth/login")) {
-              window.location.href = "/auth/login";
+            if (!window.location.pathname.includes("/login")) {
+              window.location.href = "/login";
             }
             throw parseApiError(res.status, data);
           } finally {
@@ -175,8 +175,8 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
         }
       } else {
         tokenStore.clear();
-        if (!window.location.pathname.includes("/auth/login")) {
-          window.location.href = "/auth/login";
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = "/login";
         }
       }
     }
