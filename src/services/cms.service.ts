@@ -17,7 +17,11 @@ export interface SeoMetadata {
 export interface CmsPageDto {
   pageId: string;
   title: string;
+  subTitle?: string;
+  image1?: string;
+  image2?: string;
   content: string;
+  content2?: string;
   isActive: boolean;
   seo?: SeoMetadata;
   createdAt: string;
@@ -26,7 +30,11 @@ export interface CmsPageDto {
 
 export interface CreateCmsPageRequest {
   title: string;
+  subTitle?: string;
+  image1?: string;
+  image2?: string;
   content: string;
+  content2?: string;
   isActive: boolean;
   seo?: SeoMetadata;
 }

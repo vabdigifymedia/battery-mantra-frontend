@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -22,7 +23,11 @@ function NewPage() {
   const { register, handleSubmit, control, formState: { errors }, watch } = useForm<CreateCmsPageRequest>({
     defaultValues: {
       title: "",
+      subTitle: "",
+      image1: "",
+      image2: "",
       content: "",
+      content2: "",
       isActive: true,
       seo: {
         slug: "",
@@ -84,7 +89,43 @@ function NewPage() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="subTitle">Sub Title</Label>
+              <Input
+                id="subTitle"
+                {...register("subTitle")}
+                placeholder="e.g. India's top battery provider"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Controller
+                control={control}
+                name="image1"
+                render={({ field }) => (
+                  <CloudinaryUpload
+                    label="Hero Image (Image 1)"
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    folder="cms"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="image2"
+                render={({ field }) => (
+                  <CloudinaryUpload
+                    label="Secondary Image (Image 2)"
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    folder="cms"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="grid gap-2 pt-4">
+              <Label htmlFor="content">Description 1 (Main Content)</Label>
               <Controller
                 control={control}
                 name="content"
@@ -92,7 +133,22 @@ function NewPage() {
                   <RichTextEditor
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Write your page content here..."
+                    placeholder="Write your main page content here..."
+                  />
+                )}
+              />
+            </div>
+
+            <div className="grid gap-2 pt-4">
+              <Label htmlFor="content2">Description 2 (Secondary Content)</Label>
+              <Controller
+                control={control}
+                name="content2"
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder="Write your secondary page content here (optional)..."
                   />
                 )}
               />
