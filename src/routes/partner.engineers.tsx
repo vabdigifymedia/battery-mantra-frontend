@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, UserPlus, Search, Phone, Mail, MapPin, Edit, Trash2, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
 import { FormField } from "@/components/forms/FormField";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/partner/engineers")({
   component: PartnerEngineersPage,
@@ -81,6 +82,7 @@ function PartnerEngineersPage() {
       address: "",
       city: "",
       password: "",
+      isActive: true,
     });
     setIsDialogOpen(true);
   };
@@ -96,6 +98,7 @@ function PartnerEngineersPage() {
       address: eng.address || "",
       city: eng.city || "",
       password: "", // Optional during update
+      isActive: eng.isActive,
     });
     setIsDialogOpen(true);
   };
@@ -402,6 +405,26 @@ function PartnerEngineersPage() {
                 required={!editingEngineer}
               />
             </FormField>
+
+            {editingEngineer && (
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">Account Status</p>
+                  <p className="text-xs text-muted-foreground">
+                    Active staff can receive work assignments.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold ${formData.isActive ? "text-emerald-600" : "text-red-500"}`}>
+                    {formData.isActive ? "Active" : "Suspended"}
+                  </span>
+                  <Switch
+                    checked={!!formData.isActive}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  />
+                </div>
+              </div>
+            )}
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={closeDialog}>
