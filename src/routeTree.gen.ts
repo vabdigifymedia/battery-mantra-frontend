@@ -23,6 +23,7 @@ import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as PartnerOrdersRouteImport } from './routes/partner.orders'
+import { Route as PartnerEngineersRouteImport } from './routes/partner.engineers'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
@@ -125,6 +126,11 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
 const PartnerOrdersRoute = PartnerOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerEngineersRoute = PartnerEngineersRouteImport.update({
+  id: '/engineers',
+  path: '/engineers',
   getParentRoute: () => PartnerRoute,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
@@ -325,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -372,6 +379,7 @@ export interface FileRoutesByTo {
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin': typeof AdminIndexRoute
@@ -423,6 +431,7 @@ export interface FileRoutesById {
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -474,6 +483,7 @@ export interface FileRouteTypes {
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/p/$slug'
+    | '/partner/engineers'
     | '/partner/orders'
     | '/products/$id'
     | '/admin/'
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/p/$slug'
+    | '/partner/engineers'
     | '/partner/orders'
     | '/products/$id'
     | '/admin'
@@ -571,6 +582,7 @@ export interface FileRouteTypes {
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/p/$slug'
+    | '/partner/engineers'
     | '/partner/orders'
     | '/products/$id'
     | '/admin/'
@@ -712,6 +724,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/partner/orders'
       preLoaderRoute: typeof PartnerOrdersRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/engineers': {
+      id: '/partner/engineers'
+      path: '/engineers'
+      fullPath: '/partner/engineers'
+      preLoaderRoute: typeof PartnerEngineersRouteImport
       parentRoute: typeof PartnerRoute
     }
     '/p/$slug': {
@@ -1036,11 +1055,13 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PartnerRouteChildren {
+  PartnerEngineersRoute: typeof PartnerEngineersRoute
   PartnerOrdersRoute: typeof PartnerOrdersRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
 }
 
 const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerEngineersRoute: PartnerEngineersRoute,
   PartnerOrdersRoute: PartnerOrdersRoute,
   PartnerIndexRoute: PartnerIndexRoute,
 }
