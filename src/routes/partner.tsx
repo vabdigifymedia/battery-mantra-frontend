@@ -10,12 +10,12 @@ export const Route = createFileRoute("/partner")({
 });
 
 function PartnerLayout() {
-  const { clearSession } = useAuth();
+  const { signOut } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {
-    clearSession();
-    router.navigate({ to: "/_auth/login" });
+    signOut();
+    router.navigate({ to: "/login" as any });
   };
 
   return (

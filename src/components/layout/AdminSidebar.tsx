@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { env } from "@/lib/utils/env";
 import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText } from "lucide-react";
 import {
@@ -56,6 +56,7 @@ const seoQuickNavigation = [
 export function AdminSidebar() {
   const { pathname } = useLocation();
   const { signOut } = useAuth();
+  const router = useRouter();
 
   return (
     <Sidebar variant="inset">
@@ -164,7 +165,7 @@ export function AdminSidebar() {
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => signOut()} className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+            <SidebarMenuButton onClick={() => { signOut(); router.navigate({ to: "/login" as any }); }} className="text-destructive hover:bg-destructive/10 hover:text-destructive">
               <LogOut />
               <span>Sign out</span>
             </SidebarMenuButton>

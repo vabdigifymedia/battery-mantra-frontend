@@ -158,7 +158,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => signOut()}>
+                <DropdownMenuItem onSelect={() => { signOut(); navigate({ to: "/login" }); }}>
                   <LogOut className="mr-2 h-4 w-4" /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

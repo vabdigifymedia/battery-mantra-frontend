@@ -151,6 +151,7 @@ export function MobileNav({
                     onClick={() => {
                       onOpenChange(false);
                       signOut();
+                      navigate({ to: "/login" });
                     }}
                     className="flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-200 mt-2 text-left"
                   >
