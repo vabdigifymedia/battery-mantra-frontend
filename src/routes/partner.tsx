@@ -19,7 +19,7 @@ function PartnerLayout() {
   };
 
   return (
-    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/_auth/login">
+    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/login">
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 shadow-sm">
           <Link to="/partner" className="flex items-center gap-2 font-semibold md:text-lg">
