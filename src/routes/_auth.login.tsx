@@ -55,17 +55,25 @@ function LoginPage() {
     try {
       const res = await authService.login(values);
 
-      let role = res.role || "CUSTOMER";
-      try {
-        const p = decodeJwt(res.token);
-        const rawRoles = (p.roles as string[] | undefined) ?? (p.authorities as string[] | undefined) ?? (typeof p.role === "string" ? [p.role as string] : []);
-        const parsedRoles = rawRoles.map((r) => r.replace(/^ROLE_/, "").toUpperCase()).filter((r): r is Role => (Object.values(ROLES) as string[]).includes(r));
+      // 1) Start with the role from the API response body
+      let role: string = res.role || "CUSTOMER";
+
+      // 2) Also try to extract role from JWT token (more reliable)
+      const jwtPayload = decodeJwt(res.token);
+      if (jwtPayload) {
+        const rawRoles =
+          (jwtPayload.roles as string[] | undefined) ??
+          (jwtPayload.authorities as string[] | undefined) ??
+          (typeof jwtPayload.role === "string" ? [jwtPayload.role] : []);
+        const parsedRoles = rawRoles
+          .map((r) => r.replace(/^ROLE_/, "").toUpperCase())
+          .filter((r): r is Role => (Object.values(ROLES) as string[]).includes(r));
         if (parsedRoles.length > 0) {
           role = parsedRoles[0];
         }
-      } catch (e) {
-        console.error("Failed to parse JWT for role in login", e);
       }
+
+      console.log("[LOGIN] API res.role:", res.role, "| JWT role:", jwtPayload?.role, "| Final role:", role);
 
       if (role === "ENGINEER") {
         setServerError("Please use the Engineer Mobile App to login.");
@@ -75,7 +83,7 @@ function LoginPage() {
       setSession(res.token, res.refreshToken, {
         id: res.id,
         username: values.username,
-        roles: [role as any],
+        roles: [role as Role],
       });
       toast.success("Welcome back");
 

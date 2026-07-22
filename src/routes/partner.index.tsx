@@ -90,7 +90,7 @@ function PartnerDashboard() {
             Total assigned: <span className="font-semibold text-foreground">{filteredOrders.length}</span>
           </div>
         </div>
-        
+
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
