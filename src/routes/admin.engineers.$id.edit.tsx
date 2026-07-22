@@ -156,7 +156,7 @@ function EditEngineerPage() {
                 {form.watch("isActive") ? "Active" : "Suspended"}
               </span>
               <Switch
-                checked={form.watch("isActive")}
+                checked={!!form.watch("isActive")}
                 onCheckedChange={(checked) => form.setValue("isActive", checked, { shouldDirty: true })}
               />
             </div>
