@@ -12,7 +12,9 @@ function AuthLayout() {
   if (status === "loading") return <FullPageLoader />;
   if (status === "authenticated") {
     const isAdmin = user?.roles.includes("ADMIN");
-    return <Navigate to={isAdmin ? "/admin" : "/"} />;
+    const isPartner = user?.roles.includes("PARTNER");
+    const redirectTo = isAdmin ? "/admin" : isPartner ? "/partner" : "/";
+    return <Navigate to={redirectTo} />;
   }
   return (
     <Container size="sm" className="py-12 sm:py-16">
