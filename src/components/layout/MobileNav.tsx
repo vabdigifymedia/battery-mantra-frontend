@@ -3,6 +3,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Logo } from "@/components/common/Logo";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { cartQuery } from "@/queries";
 import {
   ShoppingBag,
   Car,
