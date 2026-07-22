@@ -57,7 +57,9 @@ import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.s
 import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
 import { Route as AdminSeoQuickBrandsRouteImport } from './routes/admin.seo.quick.brands'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
+import { Route as AdminPartnersIdEditRouteImport } from './routes/admin.partners.$id.edit'
 import { Route as AdminPagesPageIdEditRouteImport } from './routes/admin.pages.$pageId.edit'
+import { Route as AdminEngineersIdEditRouteImport } from './routes/admin.engineers.$id.edit'
 
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
   id: '/vehicle-finder',
@@ -301,9 +303,19 @@ const AdminProductsProductIdEditRoute =
     path: '/products/$productId/edit',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminPartnersIdEditRoute = AdminPartnersIdEditRouteImport.update({
+  id: '/partners/$id/edit',
+  path: '/partners/$id/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPagesPageIdEditRoute = AdminPagesPageIdEditRouteImport.update({
   id: '/pages/$pageId/edit',
   path: '/pages/$pageId/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEngineersIdEditRoute = AdminEngineersIdEditRouteImport.update({
+  id: '/engineers/$id/edit',
+  path: '/engineers/$id/edit',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -350,7 +362,9 @@ export interface FileRoutesByFullPath {
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
+  '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -398,7 +412,9 @@ export interface FileRoutesByTo {
   '/admin/pages': typeof AdminPagesIndexRoute
   '/admin/partners': typeof AdminPartnersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
+  '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -450,7 +466,9 @@ export interface FileRoutesById {
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
+  '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -502,7 +520,9 @@ export interface FileRouteTypes {
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
+    | '/admin/engineers/$id/edit'
     | '/admin/pages/$pageId/edit'
+    | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -550,7 +570,9 @@ export interface FileRouteTypes {
     | '/admin/pages'
     | '/admin/partners'
     | '/admin/products'
+    | '/admin/engineers/$id/edit'
     | '/admin/pages/$pageId/edit'
+    | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -601,7 +623,9 @@ export interface FileRouteTypes {
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
+    | '/admin/engineers/$id/edit'
     | '/admin/pages/$pageId/edit'
+    | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -964,11 +988,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsProductIdEditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/partners/$id/edit': {
+      id: '/admin/partners/$id/edit'
+      path: '/partners/$id/edit'
+      fullPath: '/admin/partners/$id/edit'
+      preLoaderRoute: typeof AdminPartnersIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pages/$pageId/edit': {
       id: '/admin/pages/$pageId/edit'
       path: '/pages/$pageId/edit'
       fullPath: '/admin/pages/$pageId/edit'
       preLoaderRoute: typeof AdminPagesPageIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/engineers/$id/edit': {
+      id: '/admin/engineers/$id/edit'
+      path: '/engineers/$id/edit'
+      fullPath: '/admin/engineers/$id/edit'
+      preLoaderRoute: typeof AdminEngineersIdEditRouteImport
       parentRoute: typeof AdminRoute
     }
   }
@@ -1011,7 +1049,9 @@ interface AdminRouteChildren {
   AdminPagesIndexRoute: typeof AdminPagesIndexRoute
   AdminPartnersIndexRoute: typeof AdminPartnersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+  AdminEngineersIdEditRoute: typeof AdminEngineersIdEditRoute
   AdminPagesPageIdEditRoute: typeof AdminPagesPageIdEditRoute
+  AdminPartnersIdEditRoute: typeof AdminPartnersIdEditRoute
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
   AdminSeoQuickBrandsRoute: typeof AdminSeoQuickBrandsRoute
   AdminSeoQuickCategoriesRoute: typeof AdminSeoQuickCategoriesRoute
@@ -1044,7 +1084,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPagesIndexRoute: AdminPagesIndexRoute,
   AdminPartnersIndexRoute: AdminPartnersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
+  AdminEngineersIdEditRoute: AdminEngineersIdEditRoute,
   AdminPagesPageIdEditRoute: AdminPagesPageIdEditRoute,
+  AdminPartnersIdEditRoute: AdminPartnersIdEditRoute,
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,
   AdminSeoQuickBrandsRoute: AdminSeoQuickBrandsRoute,
   AdminSeoQuickCategoriesRoute: AdminSeoQuickCategoriesRoute,
