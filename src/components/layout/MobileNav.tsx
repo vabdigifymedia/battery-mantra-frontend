@@ -51,8 +51,16 @@ export function MobileNav({
   onOpenChange: (open: boolean) => void;
   links?: NavLink[];
 }) {
-  const { status, user, signOut } = useAuth();
+  const { status, user, signOut, hasRole } = useAuth();
   const navigate = useNavigate();
+
+  const isAdmin = hasRole("ADMIN");
+  const isPartner = hasRole("PARTNER");
+  const isEngineer = hasRole("ENGINEER");
+  
+  const shouldFetchCart = status === "authenticated" && !isAdmin && !isPartner && !isEngineer;
+  const cart = useQuery(cartQuery(shouldFetchCart));
+  const cartCount = (cart.data?.cartItems ?? []).reduce((s, it) => s + it.quantity, 0);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
