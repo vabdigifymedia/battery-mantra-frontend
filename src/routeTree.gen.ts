@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -17,6 +18,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
@@ -60,6 +62,11 @@ const VehicleFinderRoute = VehicleFinderRouteImport.update({
   path: '/vehicle-finder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
@@ -93,6 +100,11 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OrdersIndexRoute = OrdersIndexRouteImport.update({
   id: '/orders/',
@@ -289,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -309,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
@@ -354,6 +368,7 @@ export interface FileRoutesByTo {
   '/products/$id': typeof ProductsIdRoute
   '/admin': typeof AdminIndexRoute
   '/orders': typeof OrdersIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/products': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
@@ -382,6 +397,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/vehicle-finder': typeof VehicleFinderRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -402,6 +418,7 @@ export interface FileRoutesById {
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
@@ -430,6 +447,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/partner'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -450,6 +468,7 @@ export interface FileRouteTypes {
     | '/products/$id'
     | '/admin/'
     | '/orders/'
+    | '/partner/'
     | '/products/'
     | '/admin/engineers/new'
     | '/admin/orders/create'
@@ -495,6 +514,7 @@ export interface FileRouteTypes {
     | '/products/$id'
     | '/admin'
     | '/orders'
+    | '/partner'
     | '/products'
     | '/admin/engineers/new'
     | '/admin/orders/create'
@@ -522,6 +542,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/partner'
     | '/vehicle-finder'
     | '/_auth/login'
     | '/_auth/register'
@@ -542,6 +563,7 @@ export interface FileRouteTypes {
     | '/products/$id'
     | '/admin/'
     | '/orders/'
+    | '/partner/'
     | '/products/'
     | '/admin/engineers/new'
     | '/admin/orders/create'
@@ -570,6 +592,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   VehicleFinderRoute: typeof VehicleFinderRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PSlugRoute: typeof PSlugRoute
@@ -586,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/vehicle-finder'
       fullPath: '/vehicle-finder'
       preLoaderRoute: typeof VehicleFinderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -636,6 +666,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/products/'
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partner/': {
+      id: '/partner/'
+      path: '/'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/orders/': {
       id: '/orders/'
@@ -979,6 +1016,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface PartnerRouteChildren {
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
@@ -986,6 +1034,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   VehicleFinderRoute: VehicleFinderRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PSlugRoute: PSlugRoute,

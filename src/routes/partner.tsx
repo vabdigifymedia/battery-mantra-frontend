@@ -4,7 +4,6 @@ import { ROLES } from "@/constants/roles";
 import { useAuth } from "@/providers/AuthProvider";
 import { LogOut, Package2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export const Route = createFileRoute("/partner")({
   component: PartnerLayout,
@@ -31,7 +30,6 @@ function PartnerLayout() {
           <div className="flex-1" />
           
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={handleLogout} title="Log out">
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Log out</span>
