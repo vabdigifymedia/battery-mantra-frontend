@@ -34,12 +34,15 @@ function EngineersPage() {
     queryFn: engineerService.getAll,
   });
 
-  const filteredEngineers = engineers.filter(
-    (e) =>
-      e.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      e.email.toLowerCase().includes(search.toLowerCase()) ||
-      e.phoneNumber.includes(search)
-  );
+  const filteredEngineers = engineers.filter((e) => {
+    const fullName = `${e.firstName || ""} ${e.lastName || ""} ${e.fullName || ""}`.toLowerCase();
+    const query = search.toLowerCase();
+    return (
+      fullName.includes(query) ||
+      e.email.toLowerCase().includes(query) ||
+      e.phoneNumber.includes(query)
+    );
+  });
 
   const handleDelete = async (id: string) => {
     try {
@@ -109,7 +112,11 @@ function EngineersPage() {
                     key={engineer.id}
                     className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                   >
-                    <td className="p-4 align-middle font-medium">{engineer.fullName}</td>
+                    <td className="p-4 align-middle font-medium">
+                      {engineer.firstName && engineer.lastName 
+                        ? `${engineer.firstName} ${engineer.lastName}`
+                        : engineer.fullName || "Engineer"}
+                    </td>
                     <td className="p-4 align-middle">
                       <div className="flex flex-col">
                         <span>{engineer.email}</span>

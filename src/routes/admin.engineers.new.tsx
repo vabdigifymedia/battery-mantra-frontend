@@ -15,7 +15,8 @@ export const Route = createFileRoute("/admin/engineers/new")({
 });
 
 const schema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phoneNumber: z.string().min(10, "Phone number is required"),
   alternatePhone: z.string().optional(),
@@ -31,7 +32,8 @@ function NewEngineerPage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phoneNumber: "",
       alternatePhone: "",
@@ -42,7 +44,7 @@ function NewEngineerPage() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await engineerService.create(values);
+      await engineerService.create(values as any);
       toast.success("Engineer created successfully");
       navigate({ to: "/admin/engineers" });
     } catch (e: any) {
@@ -64,8 +66,12 @@ function NewEngineerPage() {
 
       <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
         <div className="grid gap-6 sm:grid-cols-2">
-          <FormField label="Full Name" error={form.formState.errors.fullName?.message}>
-            <Input {...form.register("fullName")} placeholder="e.g. John Doe" />
+          <FormField label="First Name" error={form.formState.errors.firstName?.message}>
+            <Input {...form.register("firstName")} placeholder="e.g. John" />
+          </FormField>
+
+          <FormField label="Last Name" error={form.formState.errors.lastName?.message}>
+            <Input {...form.register("lastName")} placeholder="e.g. Doe" />
           </FormField>
 
           <FormField label="Email Address" error={form.formState.errors.email?.message}>
