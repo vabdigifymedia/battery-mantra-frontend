@@ -3,6 +3,9 @@ import type { OrderResponse, ProductDetailResponse, CityPricingDto } from "@/typ
 import type { EngineerProfile, CreateEngineerRequest } from "@/services/engineer.service";
 
 export const partnerDashboardService = {
+  getMyProfile: (signal?: AbortSignal) =>
+    apiFetch<any>("/api/partner/profile", { signal }),
+
   listAssignedOrders: (signal?: AbortSignal) =>
     apiFetch<OrderResponse[]>("/api/partner/orders", { signal }),
   

@@ -46,15 +46,13 @@ function PartnerProductsPage() {
   const [newImageUrl, setNewImageUrl] = useState("");
   const [newDescription, setNewDescription] = useState("");
 
-  // Get cities list from admin locations endpoint or mock
-  const { data: cities = [] } = useQuery({
-    queryKey: ["cities", "all"],
-    queryFn: async () => {
-      const res = await fetch("/api/locations/cities");
-      if (!res.ok) return [];
-      return res.json() as Promise<Array<{ cityId: string; cityName: string }>>;
-    },
+  // Get partner profile to fetch operating cities
+  const { data: partnerProfile } = useQuery({
+    queryKey: ["partner", "profile"],
+    queryFn: ({ signal }) => partnerDashboardService.getMyProfile(signal),
   });
+
+  const operatingCities = partnerProfile?.operatingCities || [];
 
   // Mutations
   const updateCityPricingMutation = useMutation({
@@ -97,19 +95,25 @@ function PartnerProductsPage() {
     setCityPrice(product.productPrice.toString());
     setExchangeDiscount((product.exchangeDiscount || 0).toString());
     setStock("10");
-    if (cities.length > 0) setSelectedCityId(cities[0].cityId);
+    if (operatingCities.length > 0) {
+      setSelectedCityId(operatingCities[0].cityId);
+    } else {
+      setSelectedCityId("");
+    }
   };
 
   const handleSaveCityPricing = () => {
-    if (!selectedProductForPricing || !selectedCityId || !cityPrice) {
-      toast.error("Please fill in city and price");
+    if (!selectedProductForPricing || !cityPrice) {
+      toast.error("Please enter a valid price");
       return;
     }
+
+    const targetCityId = selectedCityId || (operatingCities.length > 0 ? operatingCities[0].cityId : undefined);
 
     updateCityPricingMutation.mutate({
       productId: selectedProductForPricing.productId,
       data: {
-        cityId: selectedCityId,
+        cityId: targetCityId,
         price: parseFloat(cityPrice),
         exchangeDiscount: exchangeDiscount ? parseFloat(exchangeDiscount) : 0,
         stock: stock ? parseInt(stock, 10) : 0,
@@ -272,27 +276,32 @@ function PartnerProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-semibold">Select Operating City</Label>
-                {cities.length > 0 ? (
+                <Label className="text-xs font-semibold">Operating City</Label>
+                {operatingCities.length === 1 ? (
+                  <div className="rounded-lg border bg-blue-500/10 border-blue-500/20 p-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-blue-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-blue-700">{operatingCities[0].cityName} {operatingCities[0].stateName ? `(${operatingCities[0].stateName})` : ""}</p>
+                      <p className="text-[11px] text-blue-600">Price changes will be applied to your branch city automatically.</p>
+                    </div>
+                  </div>
+                ) : operatingCities.length > 1 ? (
                   <Select value={selectedCityId} onValueChange={setSelectedCityId}>
                     <SelectTrigger className="w-full text-xs">
-                      <SelectValue placeholder="Select City" />
+                      <SelectValue placeholder="Select Operating City" />
                     </SelectTrigger>
                     <SelectContent>
-                      {cities.map((c) => (
+                      {operatingCities.map((c: any) => (
                         <SelectItem key={c.cityId} value={c.cityId}>
-                          {c.cityName}
+                          {c.cityName} {c.stateName ? `(${c.stateName})` : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 ) : (
-                  <Input
-                    placeholder="City ID"
-                    value={selectedCityId}
-                    onChange={(e) => setSelectedCityId(e.target.value)}
-                    className="text-xs"
-                  />
+                  <div className="rounded-lg border bg-amber-500/10 border-amber-500/20 p-3 text-xs text-amber-700">
+                    No operating city assigned to your partner account. Contact Admin to assign an operating city.
+                  </div>
                 )}
               </div>
 
