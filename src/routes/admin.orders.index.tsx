@@ -22,19 +22,23 @@ export const Route = createFileRoute("/admin/orders/")({
 
 const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
-const STATUS_NEW = ["PENDING"];
+const STATUS_NEW = ["PENDING", "CONFIRMED"];
 const STATUS_READY = ["PROCESSING"];
-const STATUS_DISPATCHED = ["SHIPPED"];
-const STATUS_DELIVERED = ["DELIVERED"];
-const STATUS_CANCELLED = ["CANCELLED"];
+const STATUS_DISPATCHED = ["SHIPPED", "OUT_FOR_DELIVERY"];
+const STATUS_DELIVERED = ["DELIVERED", "INSTALLED"];
+const STATUS_CANCELLED = ["CANCELLED", "RETURNED"];
 
 export const getStatusLabel = (status: string) => {
   switch (status) {
-    case "PENDING": return "Order Placed";
+    case "PENDING":
+    case "CONFIRMED": return "Order Placed";
     case "PROCESSING": return "Ready For Dispatch";
-    case "SHIPPED": return "Dispatched";
-    case "DELIVERED": return "Delivered";
-    case "CANCELLED": return "Cancelled";
+    case "SHIPPED":
+    case "OUT_FOR_DELIVERY": return "Dispatched";
+    case "DELIVERED":
+    case "INSTALLED": return "Delivered";
+    case "CANCELLED":
+    case "RETURNED": return "Cancelled";
     default: return status;
   }
 };

@@ -234,10 +234,14 @@ export type CartResponse = {
 /* ---------- Orders ---------- */
 export type OrderStatus =
   | "PENDING"
+  | "CONFIRMED"
   | "PROCESSING"
   | "SHIPPED"
+  | "OUT_FOR_DELIVERY"
   | "DELIVERED"
-  | "CANCELLED";
+  | "INSTALLED"
+  | "CANCELLED"
+  | "RETURNED";
 export type CheckoutRequest = {
   addressId: UUID;
   deliveryMethod: string;
