@@ -71,8 +71,8 @@ function AdminFaqsList() {
                   </TableCell>
                   <TableCell>{faq.title}</TableCell>
                   <TableCell>
-                    <Badge variant={faq.isActive ? "default" : "destructive"}>
-                      {faq.isActive ? "Active" : "Inactive"}
+                    <Badge variant={faq.isActive ?? faq.active ? "default" : "destructive"}>
+                      {faq.isActive ?? faq.active ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

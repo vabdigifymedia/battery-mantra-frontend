@@ -45,7 +45,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
   const [pageType, setPageType] = useState<string>(faq.pageType || "");
   const [title, setTitle] = useState(faq.title || "");
   const [description, setDescription] = useState(faq.description || "");
-  const [isActive, setIsActive] = useState(faq.isActive ?? true);
+  const [isActive, setIsActive] = useState(faq.isActive ?? faq.active ?? true);
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => faqService.updateFaq(id, data),
@@ -116,7 +116,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
           <Label>Answer (Description) <span className="text-destructive">*</span></Label>
           <div className="border rounded-md">
             <RichTextEditor 
-              content={description}
+              value={description}
               onChange={setDescription}
               placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, etc."
             />
