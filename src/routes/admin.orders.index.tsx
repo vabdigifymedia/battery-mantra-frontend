@@ -264,24 +264,35 @@ function AdminOrders() {
                     </p>
                   </TableCell>
                   <TableCell>
-                    <Select
-                      defaultValue={order.orderStatus}
-                      onValueChange={(val) =>
-                        updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
-                      }
-                      disabled={updateStatusMutation.isPending}
-                    >
-                      <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ORDER_STATUSES.map((s) => (
-                          <SelectItem key={s} value={s} className="text-xs font-medium">
-                            {s.replace(/_/g, ' ')}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {order.assignedPartner ? (
+                      <div className="space-y-1">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                          {order.orderStatus.replace(/_/g, ' ')}
+                        </span>
+                        <p className="text-[10px] font-medium text-amber-600 truncate max-w-[150px]">
+                          Partner: {order.assignedPartner.businessName}
+                        </p>
+                      </div>
+                    ) : (
+                      <Select
+                        defaultValue={order.orderStatus}
+                        onValueChange={(val) =>
+                          updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
+                        }
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ORDER_STATUSES.map((s) => (
+                            <SelectItem key={s} value={s} className="text-xs font-medium">
+                              {s.replace(/_/g, ' ')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details">
@@ -542,34 +553,43 @@ function AdminOrders() {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Direct Engineer Assignment</h3>
-                  <div className="rounded-xl border bg-card p-3.5 space-y-2">
-                    <p className="text-xs text-muted-foreground">Assign a Direct Admin technician for installation/delivery.</p>
-                    <Select
-                      value={selectedOrder.assignedEngineer?.id || ""}
-                      onValueChange={(val) => {
-                        assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
-                        const eng = adminEngineers.find(e => e.id === val);
-                        if (eng) setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any });
-                      }}
-                      disabled={assignEngineerMutation.isPending}
-                    >
-                      <SelectTrigger className="w-full text-xs font-medium">
-                        <SelectValue placeholder="Select Direct Engineer" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {adminEngineers.length === 0 ? (
-                          <div className="p-2 text-xs text-muted-foreground">No Direct Admin engineers found</div>
-                        ) : (
-                          adminEngineers.map(eng => {
-                            const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
-                            return (
-                              <SelectItem key={eng.id} value={eng.id}>{name} ({eng.city || "Admin Staff"})</SelectItem>
-                            );
-                          })
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {selectedOrder.assignedPartner ? (
+                    <div className="rounded-xl border bg-amber-500/10 border-amber-500/20 p-3.5 space-y-1">
+                      <p className="text-xs font-semibold text-amber-700">Handed over to Partner</p>
+                      <p className="text-[11px] text-amber-600 leading-relaxed">
+                        Order is assigned to <strong>{selectedOrder.assignedPartner.businessName}</strong>. Engineer assignment & fulfillment are managed by the partner branch.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border bg-card p-3.5 space-y-2">
+                      <p className="text-xs text-muted-foreground">Assign a Direct Admin technician for installation/delivery.</p>
+                      <Select
+                        value={selectedOrder.assignedEngineer?.id || ""}
+                        onValueChange={(val) => {
+                          assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
+                          const eng = adminEngineers.find(e => e.id === val);
+                          if (eng) setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any });
+                        }}
+                        disabled={assignEngineerMutation.isPending}
+                      >
+                        <SelectTrigger className="w-full text-xs font-medium">
+                          <SelectValue placeholder="Select Direct Engineer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {adminEngineers.length === 0 ? (
+                            <div className="p-2 text-xs text-muted-foreground">No Direct Admin engineers found</div>
+                          ) : (
+                            adminEngineers.map(eng => {
+                              const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
+                              return (
+                                <SelectItem key={eng.id} value={eng.id}>{name} ({eng.city || "Admin Staff"})</SelectItem>
+                              );
+                            })
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               </div>
 
