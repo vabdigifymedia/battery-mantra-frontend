@@ -8,6 +8,7 @@ import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
 import { ProductCard } from "@/components/products/ProductCard";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
+import { DynamicFaq } from "@/components/seo/DynamicFaq";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { Button } from "@/components/ui/button";
@@ -553,6 +554,22 @@ function PdpPage() {
         </Tabs>
       </Container>
       
+      <div className="bg-muted/10">
+        <DynamicFaq 
+          pageType="PRODUCT" 
+          context={{
+            product_name: data.productName,
+            brand_name: data.brandName || "Brand",
+            category_name: data.productCategory || "Battery",
+            city_name: "your city", // TODO: could use global location state if available, or leave generic until SEO city links take over
+            warranty_name: flattenedSpecs.find((s: any) => s.key.toLowerCase().includes("warranty"))?.value || "",
+            price_name: data.productPrice?.toString() || "",
+            mrp_name: (data.productPrice * 1.2).toFixed(2), // Mock MRP if not available
+            capa_ct_name: flattenedSpecs.find((s: any) => s.key.toLowerCase().includes("capacity"))?.value || "",
+          }} 
+        />
+      </div>
+
       <RelatedProducts currentProductId={id} currentProduct={data} />
       <Container size="xl" className="pb-8">
         <SeoCityLinks productName={data.productName} />

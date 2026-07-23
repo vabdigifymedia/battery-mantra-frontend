@@ -45,6 +45,7 @@ import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.
 import { Route as AdminPartnersIndexRouteImport } from './routes/admin.partners.index'
 import { Route as AdminPagesIndexRouteImport } from './routes/admin.pages.index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
+import { Route as AdminFaqsIndexRouteImport } from './routes/admin.faqs.index'
 import { Route as AdminEngineersIndexRouteImport } from './routes/admin.engineers.index'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
 import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
@@ -52,6 +53,7 @@ import { Route as AdminProductsNewRouteImport } from './routes/admin.products.ne
 import { Route as AdminPartnersNewRouteImport } from './routes/admin.partners.new'
 import { Route as AdminPagesNewRouteImport } from './routes/admin.pages.new'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
+import { Route as AdminFaqsNewRouteImport } from './routes/admin.faqs.new'
 import { Route as AdminEngineersNewRouteImport } from './routes/admin.engineers.new'
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
@@ -60,6 +62,7 @@ import { Route as AdminSeoQuickBrandsRouteImport } from './routes/admin.seo.quic
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
 import { Route as AdminPartnersIdEditRouteImport } from './routes/admin.partners.$id.edit'
 import { Route as AdminPagesPageIdEditRouteImport } from './routes/admin.pages.$pageId.edit'
+import { Route as AdminFaqsIdEditRouteImport } from './routes/admin.faqs.$id.edit'
 import { Route as AdminEngineersIdEditRouteImport } from './routes/admin.engineers.$id.edit'
 
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
@@ -241,6 +244,11 @@ const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   path: '/orders/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFaqsIndexRoute = AdminFaqsIndexRouteImport.update({
+  id: '/faqs/',
+  path: '/faqs/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEngineersIndexRoute = AdminEngineersIndexRouteImport.update({
   id: '/engineers/',
   path: '/engineers/',
@@ -275,6 +283,11 @@ const AdminPagesNewRoute = AdminPagesNewRouteImport.update({
 const AdminOrdersCreateRoute = AdminOrdersCreateRouteImport.update({
   id: '/orders/create',
   path: '/orders/create',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFaqsNewRoute = AdminFaqsNewRouteImport.update({
+  id: '/faqs/new',
+  path: '/faqs/new',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEngineersNewRoute = AdminEngineersNewRouteImport.update({
@@ -319,6 +332,11 @@ const AdminPagesPageIdEditRoute = AdminPagesPageIdEditRouteImport.update({
   path: '/pages/$pageId/edit',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFaqsIdEditRoute = AdminFaqsIdEditRouteImport.update({
+  id: '/faqs/$id/edit',
+  path: '/faqs/$id/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEngineersIdEditRoute = AdminEngineersIdEditRouteImport.update({
   id: '/engineers/$id/edit',
   path: '/engineers/$id/edit',
@@ -358,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/partner/': typeof PartnerIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
+  '/admin/faqs/new': typeof AdminFaqsNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
@@ -365,11 +384,13 @@ export interface FileRoutesByFullPath {
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/engineers/': typeof AdminEngineersIndexRoute
+  '/admin/faqs/': typeof AdminFaqsIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
+  '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
@@ -409,6 +430,7 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerIndexRoute
   '/products': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
+  '/admin/faqs/new': typeof AdminFaqsNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
@@ -416,11 +438,13 @@ export interface FileRoutesByTo {
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/engineers': typeof AdminEngineersIndexRoute
+  '/admin/faqs': typeof AdminFaqsIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/pages': typeof AdminPagesIndexRoute
   '/admin/partners': typeof AdminPartnersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
+  '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
@@ -464,6 +488,7 @@ export interface FileRoutesById {
   '/partner/': typeof PartnerIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/engineers/new': typeof AdminEngineersNewRoute
+  '/admin/faqs/new': typeof AdminFaqsNewRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
@@ -471,11 +496,13 @@ export interface FileRoutesById {
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/engineers/': typeof AdminEngineersIndexRoute
+  '/admin/faqs/': typeof AdminFaqsIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
+  '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/partners/$id/edit': typeof AdminPartnersIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
@@ -519,6 +546,7 @@ export interface FileRouteTypes {
     | '/partner/'
     | '/products/'
     | '/admin/engineers/new'
+    | '/admin/faqs/new'
     | '/admin/orders/create'
     | '/admin/pages/new'
     | '/admin/partners/new'
@@ -526,11 +554,13 @@ export interface FileRouteTypes {
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/engineers/'
+    | '/admin/faqs/'
     | '/admin/orders/'
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
     | '/admin/engineers/$id/edit'
+    | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
     | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
@@ -570,6 +600,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/products'
     | '/admin/engineers/new'
+    | '/admin/faqs/new'
     | '/admin/orders/create'
     | '/admin/pages/new'
     | '/admin/partners/new'
@@ -577,11 +608,13 @@ export interface FileRouteTypes {
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/engineers'
+    | '/admin/faqs'
     | '/admin/orders'
     | '/admin/pages'
     | '/admin/partners'
     | '/admin/products'
     | '/admin/engineers/$id/edit'
+    | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
     | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
@@ -624,6 +657,7 @@ export interface FileRouteTypes {
     | '/partner/'
     | '/products/'
     | '/admin/engineers/new'
+    | '/admin/faqs/new'
     | '/admin/orders/create'
     | '/admin/pages/new'
     | '/admin/partners/new'
@@ -631,11 +665,13 @@ export interface FileRouteTypes {
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/engineers/'
+    | '/admin/faqs/'
     | '/admin/orders/'
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
     | '/admin/engineers/$id/edit'
+    | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
     | '/admin/partners/$id/edit'
     | '/admin/products/$productId/edit'
@@ -916,6 +952,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrdersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/faqs/': {
+      id: '/admin/faqs/'
+      path: '/faqs'
+      fullPath: '/admin/faqs/'
+      preLoaderRoute: typeof AdminFaqsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/engineers/': {
       id: '/admin/engineers/'
       path: '/engineers'
@@ -963,6 +1006,13 @@ declare module '@tanstack/react-router' {
       path: '/orders/create'
       fullPath: '/admin/orders/create'
       preLoaderRoute: typeof AdminOrdersCreateRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/faqs/new': {
+      id: '/admin/faqs/new'
+      path: '/faqs/new'
+      fullPath: '/admin/faqs/new'
+      preLoaderRoute: typeof AdminFaqsNewRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/engineers/new': {
@@ -1021,6 +1071,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPagesPageIdEditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/faqs/$id/edit': {
+      id: '/admin/faqs/$id/edit'
+      path: '/faqs/$id/edit'
+      fullPath: '/admin/faqs/$id/edit'
+      preLoaderRoute: typeof AdminFaqsIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/engineers/$id/edit': {
       id: '/admin/engineers/$id/edit'
       path: '/engineers/$id/edit'
@@ -1058,17 +1115,20 @@ interface AdminRouteChildren {
   AdminVehiclesRoute: typeof AdminVehiclesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEngineersNewRoute: typeof AdminEngineersNewRoute
+  AdminFaqsNewRoute: typeof AdminFaqsNewRoute
   AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
   AdminPagesNewRoute: typeof AdminPagesNewRoute
   AdminPartnersNewRoute: typeof AdminPartnersNewRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
   AdminSeoPagesRoute: typeof AdminSeoPagesRoute
   AdminEngineersIndexRoute: typeof AdminEngineersIndexRoute
+  AdminFaqsIndexRoute: typeof AdminFaqsIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
   AdminPagesIndexRoute: typeof AdminPagesIndexRoute
   AdminPartnersIndexRoute: typeof AdminPartnersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminEngineersIdEditRoute: typeof AdminEngineersIdEditRoute
+  AdminFaqsIdEditRoute: typeof AdminFaqsIdEditRoute
   AdminPagesPageIdEditRoute: typeof AdminPagesPageIdEditRoute
   AdminPartnersIdEditRoute: typeof AdminPartnersIdEditRoute
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
@@ -1093,17 +1153,20 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVehiclesRoute: AdminVehiclesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEngineersNewRoute: AdminEngineersNewRoute,
+  AdminFaqsNewRoute: AdminFaqsNewRoute,
   AdminOrdersCreateRoute: AdminOrdersCreateRoute,
   AdminPagesNewRoute: AdminPagesNewRoute,
   AdminPartnersNewRoute: AdminPartnersNewRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
   AdminSeoPagesRoute: AdminSeoPagesRoute,
   AdminEngineersIndexRoute: AdminEngineersIndexRoute,
+  AdminFaqsIndexRoute: AdminFaqsIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
   AdminPagesIndexRoute: AdminPagesIndexRoute,
   AdminPartnersIndexRoute: AdminPartnersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminEngineersIdEditRoute: AdminEngineersIdEditRoute,
+  AdminFaqsIdEditRoute: AdminFaqsIdEditRoute,
   AdminPagesPageIdEditRoute: AdminPagesPageIdEditRoute,
   AdminPartnersIdEditRoute: AdminPartnersIdEditRoute,
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,

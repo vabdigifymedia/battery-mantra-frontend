@@ -7,6 +7,9 @@ import { vehiclesService } from "@/services/vehicles.service";
 import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
 import { adminService } from "@/services/admin.service";
+import { partnerDashboardService } from "@/services/partner-dashboard.service";
+import { seoQuickLinksService } from "@/services/seo.service";
+import { faqService } from "@/services/faq.service";
 import type { ProductFilterParams } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
@@ -166,4 +169,18 @@ export const adminOrdersQuery = () =>
     queryFn: () => adminService.getAllOrders(),
     staleTime: 10_000,
     refetchInterval: 15_000, // Poll every 15 seconds
+  });
+
+export const adminFaqsQuery = () =>
+  queryOptions({
+    queryKey: ["admin", "faqs"],
+    queryFn: () => faqService.getAllFaqs(),
+    staleTime: 60_000,
+  });
+
+export const publicFaqsQuery = (pageType: string) =>
+  queryOptions({
+    queryKey: ["faqs", "public", pageType],
+    queryFn: () => faqService.getPublicFaqsByPage(pageType),
+    staleTime: 300_000, // Cache for 5 mins
   });

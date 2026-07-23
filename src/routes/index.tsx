@@ -11,7 +11,7 @@ import { ManufacturerGrid } from "@/components/home/ManufacturerGrid";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
-import { FaqAccordion } from "@/components/home/FaqAccordion";
+import { DynamicFaq } from "@/components/seo/DynamicFaq";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
   productListQuery,
@@ -164,7 +164,7 @@ function HomePage() {
                 title={<span id="faq">Questions, answered</span>}
                 align="left"
               />
-              <FaqAccordion />
+              <DynamicFaq pageType="UNIVERSAL" context={{}} hideHeading />
             </div>
 
             {/* Image side */}

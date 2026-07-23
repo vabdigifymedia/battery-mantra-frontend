@@ -413,3 +413,20 @@ export interface PincodeCheckResponse {
   serviceable: boolean;
   city: CityDto | null;
 }
+
+export interface FaqRequest {
+  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  title: string;
+  description: string;
+  isActive: boolean;
+}
+
+export interface FaqResponse {
+  faqId: string;
+  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  title: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

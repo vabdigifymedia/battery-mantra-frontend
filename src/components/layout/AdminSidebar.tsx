@@ -1,6 +1,6 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -34,6 +34,7 @@ const navigation = [
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
   { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
   { name: "CMS Pages", href: "/admin/pages", icon: FileText },
+  { name: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Engineers", href: "/admin/engineers", icon: Users },
   { name: "Partners", href: "/admin/partners", icon: Users },
