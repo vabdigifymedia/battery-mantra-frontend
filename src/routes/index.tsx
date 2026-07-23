@@ -11,7 +11,7 @@ import { ManufacturerGrid } from "@/components/home/ManufacturerGrid";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
-import { DynamicFaq } from "@/components/seo/DynamicFaq";
+
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
   productListQuery,
@@ -155,28 +155,7 @@ function HomePage() {
             </div>
           </section>
 
-          <section aria-labelledby="faq" className="w-full">
-            <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-start">
-              {/* FAQ Accordion side */}
-              <div className="space-y-6 order-2 lg:pt-8">
-                <SectionHeading
-                  eyebrow="FAQ"
-                  title={<span id="faq">Questions, answered</span>}
-                  align="left"
-                />
-                <DynamicFaq pageType="UNIVERSAL" context={{}} hideHeading />
-              </div>
 
-              {/* Image side */}
-              <div className="hidden lg:flex justify-center order-1">
-                <img
-                  src="/images/FAQ%20Side%20Image.png"
-                  alt="FAQ"
-                  className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105"
-                />
-              </div>
-            </div>
-          </section>
         </Container>
       </div>
 
