@@ -100,6 +100,8 @@ export const adminService = {
     apiFetch<OrderResponse>(endpoints.admin.updateOrderStatus(orderId), { method: "PATCH", body }),
   assignPartner: (orderId: string, partnerId: string) =>
     apiFetch<OrderResponse>(endpoints.admin.assignPartner(orderId, partnerId), { method: "PATCH" }),
+  assignEngineer: (orderId: string, engineerId: string) =>
+    apiFetch<OrderResponse>(`/api/admin/orders/${orderId}/assign-engineer?engineerId=${engineerId}`, { method: "PATCH" }),
 
   // Products
   createProduct: (body: CreateProductRequest) => 

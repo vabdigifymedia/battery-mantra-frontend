@@ -11,6 +11,11 @@ export const partnerDashboardService = {
       method: "PUT" 
     }),
 
+  assignEngineer: (orderId: string, engineerId: string) =>
+    apiFetch<OrderResponse>(`/api/partner/orders/${orderId}/assign-engineer?engineerId=${engineerId}`, { 
+      method: "PUT" 
+    }),
+
   listEngineers: (signal?: AbortSignal) =>
     apiFetch<EngineerProfile[]>("/api/partner/engineers", { signal }),
 

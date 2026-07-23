@@ -29,6 +29,11 @@ function PartnerOrdersPage() {
     queryFn: ({ signal }) => partnerDashboardService.listAssignedOrders(signal),
   });
 
+  const { data: branchEngineers = [] } = useQuery({
+    queryKey: ["partner", "engineers"],
+    queryFn: ({ signal }) => partnerDashboardService.listEngineers(signal),
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
       partnerDashboardService.updateOrderStatus(orderId, status),
@@ -37,6 +42,16 @@ function PartnerOrdersPage() {
       toast.success("Order status updated");
     },
     onError: (err: any) => toast.error(err?.message || "Failed to update order status"),
+  });
+
+  const assignEngineerMutation = useMutation({
+    mutationFn: ({ orderId, engineerId }: { orderId: string; engineerId: string }) =>
+      partnerDashboardService.assignEngineer(orderId, engineerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner", "orders"] });
+      toast.success("Branch Engineer assigned to order");
+    },
+    onError: (err: any) => toast.error(err?.message || "Failed to assign engineer"),
   });
 
   const filteredOrders = orders.filter((o) => {
@@ -248,6 +263,41 @@ function PartnerOrdersPage() {
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                     {selectedOrder.shippingAddress}
                   </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Assign Branch Engineer</h3>
+                <div className="rounded-xl border bg-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium">Technician / Engineer</p>
+                    <p className="text-xs text-muted-foreground">Select an active engineer from your store branch to fulfill this job.</p>
+                  </div>
+                  <Select
+                    value={selectedOrder.assignedEngineer?.id || ""}
+                    onValueChange={(val) => {
+                      assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
+                      const eng = branchEngineers.find(e => e.id === val);
+                      if (eng) setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any });
+                    }}
+                    disabled={assignEngineerMutation.isPending}
+                  >
+                    <SelectTrigger className="w-full sm:w-[220px] text-xs font-medium">
+                      <SelectValue placeholder="Select Branch Engineer" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branchEngineers.length === 0 ? (
+                        <div className="p-2 text-xs text-muted-foreground">No branch engineers found</div>
+                      ) : (
+                        branchEngineers.map(eng => {
+                          const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
+                          return (
+                            <SelectItem key={eng.id} value={eng.id}>{name} ({eng.phoneNumber})</SelectItem>
+                          );
+                        })
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

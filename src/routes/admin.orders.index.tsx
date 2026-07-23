@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye } from "lucide-react";
 import { partnerService } from "@/services/partner.service";
+import { engineerService } from "@/services/engineer.service";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/admin/orders/")({
@@ -32,6 +33,7 @@ function AdminOrders() {
   const { data: orders = [], isLoading } = useQuery(adminOrdersQuery());
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
+  const [activeTab, setActiveTab] = useState("all");
   const prevOrdersCountRef = useRef(orders.length);
 
   useEffect(() => {
@@ -59,6 +61,14 @@ function AdminOrders() {
     queryFn: partnerService.getAll,
   });
 
+  const { data: allEngineers = [] } = useQuery({
+    queryKey: ["admin", "engineers"],
+    queryFn: engineerService.getAll,
+  });
+
+  // Filter only Direct Admin Engineers for Admin assignment
+  const adminEngineers = allEngineers.filter((e) => !e.partnerId && e.isActive);
+
   const assignPartnerMutation = useMutation({
     mutationFn: ({ orderId, partnerId }: { orderId: string; partnerId: string }) =>
       adminService.assignPartner(orderId, partnerId),
@@ -66,22 +76,41 @@ function AdminOrders() {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
       toast.success("Partner assigned successfully");
     },
-    onError: () => toast.error("Failed to assign partner"),
+    onError: (err: any) => toast.error(err?.message || "Failed to assign partner"),
+  });
+
+  const assignEngineerMutation = useMutation({
+    mutationFn: ({ orderId, engineerId }: { orderId: string; engineerId: string }) =>
+      adminService.assignEngineer(orderId, engineerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      toast.success("Engineer assigned successfully");
+    },
+    onError: (err: any) => toast.error(err?.message || "Failed to assign engineer"),
   });
 
   const filteredOrders = orders.filter((o) =>
     o.orderId.toLowerCase().includes(search.toLowerCase()) ||
-    (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase()))
+    (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase())) ||
+    (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const newOrders = filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus));
-  const readyOrders = filteredOrders.filter((o) => STATUS_READY.includes(o.orderStatus));
-  const dispatchedOrders = filteredOrders.filter((o) => STATUS_DISPATCHED.includes(o.orderStatus));
-  const deliveredOrders = filteredOrders.filter((o) => STATUS_DELIVERED.includes(o.orderStatus));
-  const cancelledOrders = filteredOrders.filter((o) => STATUS_CANCELLED.includes(o.orderStatus));
-  const allOrders = filteredOrders;
+  const getOrdersForTab = (tab: string) => {
+    switch (tab) {
+      case "new": return filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus));
+      case "ready": return filteredOrders.filter((o) => STATUS_READY.includes(o.orderStatus));
+      case "dispatched": return filteredOrders.filter((o) => STATUS_DISPATCHED.includes(o.orderStatus));
+      case "delivered": return filteredOrders.filter((o) => STATUS_DELIVERED.includes(o.orderStatus));
+      case "cancelled": return filteredOrders.filter((o) => STATUS_CANCELLED.includes(o.orderStatus));
+      case "admin_direct": return filteredOrders.filter((o) => !o.assignedPartner);
+      case "partner_assigned": return filteredOrders.filter((o) => !!o.assignedPartner);
+      default: return filteredOrders;
+    }
+  };
 
-  const pendingCount = newOrders.length;
+  const pendingCount = filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus)).length;
+  const adminDirectCount = filteredOrders.filter((o) => !o.assignedPartner).length;
+  const partnerAssignedCount = filteredOrders.filter((o) => !!o.assignedPartner).length;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -386,9 +415,18 @@ function AdminOrders() {
         </div>
       </div>
 
-      <Tabs defaultValue="new" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
           <TabsList className="mb-6 inline-flex min-w-max h-auto p-1 bg-muted/60 rounded-xl">
+            <TabsTrigger value="all" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              All Orders ({filteredOrders.length})
+            </TabsTrigger>
+            <TabsTrigger value="admin_direct" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Main Branch (Admin Direct) ({adminDirectCount})
+            </TabsTrigger>
+            <TabsTrigger value="partner_assigned" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Partner Assigned ({partnerAssignedCount})
+            </TabsTrigger>
             <TabsTrigger value="new" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               New Orders
               {pendingCount > 0 && (
@@ -409,30 +447,10 @@ function AdminOrders() {
             <TabsTrigger value="cancelled" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               Cancelled
             </TabsTrigger>
-            <TabsTrigger value="all" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              All Orders
-            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="new" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={newOrders} />
-        </TabsContent>
-        <TabsContent value="ready" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={readyOrders} />
-        </TabsContent>
-        <TabsContent value="dispatched" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={dispatchedOrders} />
-        </TabsContent>
-        <TabsContent value="delivered" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={deliveredOrders} />
-        </TabsContent>
-        <TabsContent value="cancelled" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={cancelledOrders} />
-        </TabsContent>
-        <TabsContent value="all" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <OrderTable data={allOrders} />
-        </TabsContent>
+        <OrderTable data={getOrdersForTab(activeTab)} />
       </Tabs>
 
       {selectedOrder && (
@@ -496,32 +514,62 @@ function AdminOrders() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Partner Assignment</h3>
-                <div className="rounded-xl border bg-card p-4 flex items-center gap-4">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Assign to Partner</p>
-                    <p className="text-xs text-muted-foreground">Select a partner to manage fulfillment for this order.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Partner Assignment</h3>
+                  <div className="rounded-xl border bg-card p-3.5 space-y-2">
+                    <p className="text-xs text-muted-foreground">Assign or reassign to local partner store for fulfillment.</p>
+                    <Select
+                      value={selectedOrder.assignedPartner?.id || ""}
+                      onValueChange={(val) => {
+                        assignPartnerMutation.mutate({ orderId: selectedOrder.orderId, partnerId: val });
+                        const p = partners.find(p => p.id === val);
+                        if (p) setSelectedOrder({ ...selectedOrder, assignedPartner: p as any });
+                      }}
+                      disabled={assignPartnerMutation.isPending}
+                    >
+                      <SelectTrigger className="w-full text-xs font-medium">
+                        <SelectValue placeholder="Select Partner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {partners.map(p => (
+                          <SelectItem key={p.id} value={p.id}>{p.businessName} ({p.operatingCities.map(c => c.cityName).join(", ")})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Select
-                    defaultValue={selectedOrder.assignedPartner?.id || ""}
-                    onValueChange={(val) => {
-                      assignPartnerMutation.mutate({ orderId: selectedOrder.orderId, partnerId: val });
-                      // Optimistically update local selected order
-                      const p = partners.find(p => p.id === val);
-                      if (p) setSelectedOrder({ ...selectedOrder, assignedPartner: p as any });
-                    }}
-                    disabled={assignPartnerMutation.isPending}
-                  >
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Select Partner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {partners.map(p => (
-                        <SelectItem key={p.id} value={p.id}>{p.businessName} - {p.operatingCities.map(c => c.cityName).join(", ")}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Direct Engineer Assignment</h3>
+                  <div className="rounded-xl border bg-card p-3.5 space-y-2">
+                    <p className="text-xs text-muted-foreground">Assign a Direct Admin technician for installation/delivery.</p>
+                    <Select
+                      value={selectedOrder.assignedEngineer?.id || ""}
+                      onValueChange={(val) => {
+                        assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
+                        const eng = adminEngineers.find(e => e.id === val);
+                        if (eng) setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any });
+                      }}
+                      disabled={assignEngineerMutation.isPending}
+                    >
+                      <SelectTrigger className="w-full text-xs font-medium">
+                        <SelectValue placeholder="Select Direct Engineer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {adminEngineers.length === 0 ? (
+                          <div className="p-2 text-xs text-muted-foreground">No Direct Admin engineers found</div>
+                        ) : (
+                          adminEngineers.map(eng => {
+                            const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
+                            return (
+                              <SelectItem key={eng.id} value={eng.id}>{name} ({eng.city || "Admin Staff"})</SelectItem>
+                            );
+                          })
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
