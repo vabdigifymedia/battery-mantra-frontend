@@ -64,28 +64,36 @@ function OrderDetailPage() {
     );
 
   const o = order.data;
-  const canCancel = ["PENDING", "PROCESSING", "CONFIRMED"].includes(o.orderStatus);
+  const canCancel = o.orderStatus === "PENDING";
 
   const getStatusIndex = (status: string) => {
     switch (status) {
       case "PENDING": return 0;
-      case "CONFIRMED":
       case "PROCESSING": return 1;
-      case "OUT_FOR_DELIVERY":
       case "SHIPPED": return 2;
       case "DELIVERED": return 3;
-      case "INSTALLED": return 4;
       default: return -1;
     }
   };
   
   const statusIndex = getStatusIndex(o.orderStatus);
-  const isCancelled = o.orderStatus === "CANCELLED" || o.orderStatus === "RETURNED";
+  const isCancelled = o.orderStatus === "CANCELLED";
 
   const getDeliveryLabel = (method?: string) => {
     if (method === "HOME_INSTALLATION") return "Home Installation";
     if (method === "STORE_PICKUP") return "Store Pickup";
     return "Standard Delivery";
+  };
+
+  const getStatusDisplayLabel = (status: string) => {
+    switch (status) {
+      case "PENDING": return "Order Placed";
+      case "PROCESSING": return "Ready For Dispatch";
+      case "SHIPPED": return "Dispatched";
+      case "DELIVERED": return "Delivered";
+      case "CANCELLED": return "Cancelled";
+      default: return status;
+    }
   };
 
   return (
@@ -97,7 +105,7 @@ function OrderDetailPage() {
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <Badge variant="outline">{o.orderStatus}</Badge>
+            <Badge variant="outline">{getStatusDisplayLabel(o.orderStatus)}</Badge>
             {canCancel ? (
               <Button
                 variant="outline"
@@ -117,16 +125,15 @@ function OrderDetailPage() {
                 <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 bg-border z-0">
                   <div 
                     className="h-full bg-primary transition-all duration-500 ease-in-out" 
-                    style={{ width: `${(Math.min(statusIndex, (o.deliveryMethod === 'HOME_INSTALLATION' ? 4 : 3)) / (o.deliveryMethod === 'HOME_INSTALLATION' ? 4 : 3)) * 100}%` }}
+                    style={{ width: `${(Math.min(statusIndex, 3) / 3) * 100}%` }}
                   />
                 </div>
                 
                 {[
-                  { label: "Pending", icon: Clock },
-                  { label: "Confirmed", icon: Package },
-                  { label: "Out for Delivery", icon: Truck },
+                  { label: "Order Placed", icon: Clock },
+                  { label: "Ready for Dispatch", icon: Package },
+                  { label: "Dispatched", icon: Truck },
                   { label: "Delivered", icon: Check },
-                  ...(o.deliveryMethod === "HOME_INSTALLATION" ? [{ label: "Installed", icon: Wrench }] : []),
                 ].map((step, idx) => {
                   const Icon = step.icon;
                   const isActive = statusIndex >= idx;

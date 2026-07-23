@@ -30,9 +30,7 @@ function AdminDashboard() {
   
   // Logic: Do not count cancelled/returned orders.
   // For COD, only count profit when DELIVERED or INSTALLED.
-  const validRevenueOrders = orders.filter(o => 
-    o.orderStatus === "DELIVERED" || o.orderStatus === "INSTALLED"
-  );
+  const validRevenueOrders = orders.filter(o => o.orderStatus === "DELIVERED");
   const totalRevenue = validRevenueOrders.reduce((acc, order) => acc + (order.totalAmount || 0), 0) || 0;
 
   // Group orders by date for the chart (last 7 days)
@@ -56,7 +54,7 @@ function AdminDashboard() {
       if (dataMap.has(label)) {
         const item = dataMap.get(label);
         item.Orders += 1;
-        if (order.orderStatus === "DELIVERED" || order.orderStatus === "INSTALLED") {
+        if (order.orderStatus === "DELIVERED") {
           item.Revenue += (order.totalAmount || 0);
         }
       }
@@ -73,14 +71,10 @@ function AdminDashboard() {
   const getStatusColor = (status: string) => {
     switch(status) {
       case "PENDING": return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
-      case "PROCESSING":
-      case "CONFIRMED": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
-      case "SHIPPED":
-      case "OUT_FOR_DELIVERY": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
-      case "DELIVERED":
-      case "INSTALLED": return "bg-green-500/10 text-green-600 border-green-500/20";
-      case "CANCELLED":
-      case "RETURNED": return "bg-red-500/10 text-red-600 border-red-500/20";
+      case "PROCESSING": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+      case "SHIPPED": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
+      case "DELIVERED": return "bg-green-500/10 text-green-600 border-green-500/20";
+      case "CANCELLED": return "bg-red-500/10 text-red-600 border-red-500/20";
       default: return "bg-gray-500/10 text-gray-600 border-gray-500/20";
     }
   };

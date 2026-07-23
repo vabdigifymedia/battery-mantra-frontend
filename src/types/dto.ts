@@ -237,8 +237,7 @@ export type OrderStatus =
   | "PROCESSING"
   | "SHIPPED"
   | "DELIVERED"
-  | "CANCELLED"
-  | "RETURNED";
+  | "CANCELLED";
 export type CheckoutRequest = {
   addressId: UUID;
   deliveryMethod: string;

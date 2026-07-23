@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Copy, MapPin, Phone, Mail, Calendar, Package2, User, Filter } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
+import { getStatusLabel } from "./admin.orders.index";
+
 export const Route = createFileRoute("/partner/orders")({
   component: PartnerOrdersPage,
 });
 
-const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"];
+const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 function PartnerOrdersPage() {
   const queryClient = useQueryClient();
@@ -118,7 +120,7 @@ function PartnerOrdersPage() {
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   {ORDER_STATUSES.map((s) => (
                     <SelectItem key={s} value={s}>
-                      {s}
+                      {getStatusLabel(s)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -185,13 +187,13 @@ function PartnerOrdersPage() {
                       }
                       disabled={updateStatusMutation.isPending}
                     >
-                      <SelectTrigger className={`h-8 w-[130px] border ${getStatusColor(order.orderStatus)}`}>
-                        <SelectValue />
+                      <SelectTrigger className={`h-8 w-[150px] border ${getStatusColor(order.orderStatus)}`}>
+                        <SelectValue>{getStatusLabel(order.orderStatus)}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {ORDER_STATUSES.map((s) => (
                           <SelectItem key={s} value={s}>
-                            {s}
+                            {getStatusLabel(s)}
                           </SelectItem>
                         ))}
                       </SelectContent>

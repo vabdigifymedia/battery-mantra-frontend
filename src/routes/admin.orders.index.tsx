@@ -20,13 +20,24 @@ export const Route = createFileRoute("/admin/orders/")({
   component: AdminOrders,
 });
 
-const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"];
+const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 const STATUS_NEW = ["PENDING"];
 const STATUS_READY = ["PROCESSING"];
 const STATUS_DISPATCHED = ["SHIPPED"];
 const STATUS_DELIVERED = ["DELIVERED"];
-const STATUS_CANCELLED = ["CANCELLED", "RETURNED"];
+const STATUS_CANCELLED = ["CANCELLED"];
+
+export const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "PENDING": return "Order Placed";
+    case "PROCESSING": return "Ready For Dispatch";
+    case "SHIPPED": return "Dispatched";
+    case "DELIVERED": return "Delivered";
+    case "CANCELLED": return "Cancelled";
+    default: return status;
+  }
+};
 
 function AdminOrders() {
   const queryClient = useQueryClient();
@@ -267,7 +278,7 @@ function AdminOrders() {
                     {order.assignedPartner ? (
                       <div className="space-y-1">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
-                          {order.orderStatus.replace(/_/g, ' ')}
+                          {getStatusLabel(order.orderStatus)}
                         </span>
                         <p className="text-[10px] font-medium text-amber-600 truncate max-w-[150px]">
                           Partner: {order.assignedPartner.businessName}
@@ -275,19 +286,19 @@ function AdminOrders() {
                       </div>
                     ) : (
                       <Select
-                        defaultValue={order.orderStatus}
+                        value={order.orderStatus}
                         onValueChange={(val) =>
                           updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
                         }
                         disabled={updateStatusMutation.isPending}
                       >
                         <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
-                          <SelectValue />
+                          <SelectValue>{getStatusLabel(order.orderStatus)}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {ORDER_STATUSES.map((s) => (
                             <SelectItem key={s} value={s} className="text-xs font-medium">
-                              {s.replace(/_/g, ' ')}
+                              {getStatusLabel(s)}
                             </SelectItem>
                           ))}
                         </SelectContent>
