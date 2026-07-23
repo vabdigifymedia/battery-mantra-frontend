@@ -26,7 +26,7 @@ const STATUS_NEW = ["PENDING", "CONFIRMED"];
 const STATUS_READY = ["PROCESSING"];
 const STATUS_DISPATCHED = ["SHIPPED", "OUT_FOR_DELIVERY"];
 const STATUS_DELIVERED = ["DELIVERED", "INSTALLED"];
-const STATUS_CANCELLED = ["CANCELLED", "RETURNED"];
+const STATUS_CANCELLED = ["CANCELLED"];
 
 export const getStatusLabel = (status: string) => {
   switch (status) {
@@ -37,8 +37,7 @@ export const getStatusLabel = (status: string) => {
     case "OUT_FOR_DELIVERY": return "Dispatched";
     case "DELIVERED":
     case "INSTALLED": return "Delivered";
-    case "CANCELLED":
-    case "RETURNED": return "Cancelled";
+    case "CANCELLED": return "Cancelled";
     default: return status;
   }
 };
@@ -138,8 +137,7 @@ function AdminOrders() {
       case "PROCESSING": return "bg-blue-500/10 text-blue-600 border-blue-500/20";
       case "SHIPPED": return "bg-purple-500/10 text-purple-600 border-purple-500/20";
       case "DELIVERED": return "bg-green-500/10 text-green-600 border-green-500/20";
-      case "CANCELLED":
-      case "RETURNED": return "bg-red-500/10 text-red-600 border-red-500/20";
+      case "CANCELLED": return "bg-red-500/10 text-red-600 border-red-500/20";
       default: return "bg-gray-500/10 text-gray-600 border-gray-500/20";
     }
   };

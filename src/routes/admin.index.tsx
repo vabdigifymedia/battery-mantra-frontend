@@ -28,7 +28,7 @@ function AdminDashboard() {
   const ordersCount = orders.length;
   const pendingOrders = orders.filter(o => o.orderStatus === "PENDING").length;
   
-  // Logic: Do not count cancelled/returned orders.
+  // Logic: Do not count cancelled orders.
   // For COD, only count profit when DELIVERED or INSTALLED.
   const validRevenueOrders = orders.filter(o => o.orderStatus === "DELIVERED");
   const totalRevenue = validRevenueOrders.reduce((acc, order) => acc + (order.totalAmount || 0), 0) || 0;

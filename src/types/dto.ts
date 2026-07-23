@@ -240,8 +240,7 @@ export type OrderStatus =
   | "OUT_FOR_DELIVERY"
   | "DELIVERED"
   | "INSTALLED"
-  | "CANCELLED"
-  | "RETURNED";
+  | "CANCELLED";
 export type CheckoutRequest = {
   addressId: UUID;
   deliveryMethod: string;

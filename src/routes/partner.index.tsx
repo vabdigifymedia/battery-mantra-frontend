@@ -25,7 +25,7 @@ function PartnerOverviewDashboard() {
     (o) => o.orderStatus === "DELIVERED"
   ).length;
   const totalRevenue = orders
-    .filter((o) => o.orderStatus !== "CANCELLED" && o.orderStatus !== "RETURNED")
+    .filter((o) => o.orderStatus !== "CANCELLED")
     .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
   // Take top 5 recent orders
