@@ -58,7 +58,7 @@ function PartnerOrdersPage() {
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
-      o.orderId.toLowerCase().includes(search.toLowerCase()) ||
+      o.orderId?.toLowerCase().includes(search.toLowerCase()) ||
       (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase())) ||
       (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase()));
 
@@ -160,7 +160,7 @@ function PartnerOrdersPage() {
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <span className="truncate max-w-[120px]" title={order.orderId}>
-                        {order.orderId.split("-")[0]}
+                        {order.orderId?.split("-")[0]}
                       </span>
                       <Button
                         variant="ghost"

@@ -101,7 +101,7 @@ function AdminOrders() {
   });
 
   const filteredOrders = orders.filter((o) =>
-    o.orderId.toLowerCase().includes(search.toLowerCase()) ||
+    o.orderId?.toLowerCase().includes(search.toLowerCase()) ||
     (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase())) ||
     (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase()))
   );
@@ -198,7 +198,7 @@ function AdminOrders() {
                       )}
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-xs font-semibold">#{order.orderId.slice(0, 8)}</span>
+                          <span className="font-mono text-xs font-semibold">#{order.orderId?.slice(0, 8)}</span>
                           <button onClick={() => copyToClipboard(order.orderId)} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
                             <Copy className="h-3 w-3" />
                           </button>
@@ -337,7 +337,7 @@ function AdminOrders() {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-sm font-bold text-foreground">#{order.orderId.slice(0, 8)}</span>
+                    <span className="font-mono text-sm font-bold text-foreground">#{order.orderId?.slice(0, 8)}</span>
                     <button onClick={() => copyToClipboard(order.orderId)} className="text-muted-foreground p-1 active:scale-95">
                       <Copy className="h-3.5 w-3.5" />
                     </button>
@@ -480,7 +480,7 @@ function AdminOrders() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center justify-between pr-8">
-                <span>Order #{selectedOrder.orderId.slice(0, 8)}</span>
+                <span>Order #{selectedOrder.orderId?.slice(0, 8)}</span>
                 <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getStatusColor(selectedOrder.orderStatus)}`}>
                   {selectedOrder.orderStatus.replace(/_/g, ' ')}
                 </span>
