@@ -9,7 +9,18 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 
+import { buildPageHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug")({
+  head: ({ params }) => {
+    const makeName = params.makeSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    
+    return buildPageHead(null, {
+      title: `Buy ${makeName} ${categoryName} Online at Best Price | Battery Mantra`,
+      description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
+    });
+  },
   component: ManufacturerPage,
 });
 
