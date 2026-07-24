@@ -21,16 +21,16 @@ const FOOTER_GROUPS: FooterGroup[] = [
   {
     title: "Company",
     links: [
-      { label: "About Us", to: "/p/about-us" },
+      { label: "About Us", to: "/about-us" },
       { label: "Home", to: "/" },
     ],
   },
   {
     title: "Policies",
     links: [
-      { label: "Shipping & Replacement", to: "/p/shipping-and-replacement" },
-      { label: "Privacy Policy", to: "/p/privacy-policy" },
-      { label: "Terms & Conditions", to: "/p/terms-and-conditions" },
+      { label: "Shipping & Replacement", to: "/shipping-and-replacement" },
+      { label: "Privacy Policy", to: "/privacy-policy" },
+      { label: "Terms & Conditions", to: "/terms-and-conditions" },
     ],
   },
 ];

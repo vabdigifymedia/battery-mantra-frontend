@@ -184,7 +184,7 @@ function NewPage() {
                 {...register("seo.slug")}
                 placeholder={titleValue ? titleValue.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") : "e.g. about-us"}
               />
-              <p className="text-xs text-muted-foreground">Leave empty to auto-generate from title. (e.g. /p/your-slug)</p>
+              <p className="text-xs text-muted-foreground">Leave empty to auto-generate from title. (e.g. /your-slug)</p>
             </div>
 
             <div className="grid gap-2">

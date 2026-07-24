@@ -5,7 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { Spinner } from "@/components/feedback/Spinner";
 import { APP } from "@/constants/app";
 
-export const Route = createFileRoute("/p/$slug")({
+export const Route = createFileRoute("/$slug")({
   component: CmsPageRender,
   loader: async ({ params: { slug } }) => {
     try {

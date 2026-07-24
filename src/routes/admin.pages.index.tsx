@@ -81,7 +81,7 @@ function AdminPages() {
               pages.map((page) => (
                 <TableRow key={page.pageId}>
                   <TableCell className="font-medium">{page.title}</TableCell>
-                  <TableCell className="text-muted-foreground">/p/{page.seo?.slug || page.pageId}</TableCell>
+                  <TableCell className="text-muted-foreground">/{page.seo?.slug || page.pageId}</TableCell>
                   <TableCell>
                     <Badge variant={page.isActive ? "default" : "secondary"}>
                       {page.isActive ? "Active" : "Draft"}
