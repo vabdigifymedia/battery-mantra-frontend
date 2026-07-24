@@ -95,7 +95,7 @@ function CartPage() {
                 >
                   <Link
                     to="/products/$id"
-                    params={{ id: it.product.productId }}
+                    params={{ id: (it.product as any).seo?.slug || it.product.productId }}
                     className="shrink-0"
                   >
                     <Image
@@ -115,7 +115,7 @@ function CartPage() {
                         ) : null}
                         <Link
                           to="/products/$id"
-                          params={{ id: it.product.productId }}
+                          params={{ id: (it.product as any).seo?.slug || it.product.productId }}
                           className="line-clamp-2 text-sm font-semibold hover:text-primary sm:text-base"
                         >
                           {it.product.productName}

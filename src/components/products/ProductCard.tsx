@@ -14,7 +14,7 @@ export function ProductCard({
   return (
     <Link
       to="/products/$id"
-      params={{ id: product.productId }}
+      params={{ id: product.seo?.slug || product.productId }}
       className={cn(
         "group block overflow-hidden rounded-2xl border border-border bg-card shadow-product transition-all hover:-translate-y-0.5 hover:shadow-floating focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,

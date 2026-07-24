@@ -64,7 +64,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
         e.preventDefault();
         const product = products[activeIndex];
         setIsOpen(false);
-        navigate({ to: "/products/$id", params: { id: product.productId } });
+        navigate({ to: "/products/$id", params: { id: product.seo?.slug || product.productId } });
       } else {
         setIsOpen(false);
         if (onSubmit) {
@@ -103,7 +103,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                 <Link
                   key={product.productId}
                   to="/products/$id"
-                  params={{ id: product.productId }}
+                  params={{ id: product.seo?.slug || product.productId }}
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     "flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0",

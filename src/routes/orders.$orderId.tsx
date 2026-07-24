@@ -170,7 +170,7 @@ function OrderDetailPage() {
                   <div className="min-w-0">
                     <Link
                       to="/products/$id"
-                      params={{ id: it.productId }}
+                      params={{ id: (it as any).productSeoSlug || it.productId }}
                       className="line-clamp-2 text-sm font-semibold hover:text-primary"
                     >
                       {it.productName}

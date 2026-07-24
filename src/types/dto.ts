@@ -158,11 +158,19 @@ export type ProductListResponse = {
   productPrice: number;
   exchangeDiscount?: number;
   productImage?: string;
+  additionalImages?: string[];
   productCategory?: string;
   capacity?: string;
+  isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
   createdByPartnerId?: UUID;
   partnerBusinessName?: string;
+  seo?: {
+    slug?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    [key: string]: unknown;
+  };
 };
 
 export type ProductDetailResponse = {
