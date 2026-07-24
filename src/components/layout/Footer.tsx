@@ -27,7 +27,7 @@ const SOCIALS = [
  */
 export function Footer({ groups = [] }: { groups?: FooterGroup[] }) {
   return (
-    <footer className="mt-16 border-t border-border bg-surface">
+    <footer className="border-t border-border bg-surface">
       <Container size="xl" className="py-12">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr]">
           <div className="min-w-0">
