@@ -197,7 +197,7 @@ function ContactUsPage() {
               
               <div className="flex flex-col space-y-1.5">
                 <ReCAPTCHA
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeL-dQaAAAAAAp4HTXQehloajLAJGMyA2ZHknwk"}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                   onChange={(val) => {
                     form.setValue("recaptcha", val || "", { shouldValidate: true });
                   }}
