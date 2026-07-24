@@ -177,11 +177,16 @@ export type ProductDetailResponse = {
   exchangeDiscount?: number;
   productStock?: number;
   productImage?: string;
+  additionalImages?: string[];
+  capacity?: string;
   specs?: Record<string, unknown>;
   compatibleVehicles?: VehicleResponse[];
+  cityPrices?: CityPricingDto[];
+  isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
   createdByPartnerId?: UUID;
   partnerBusinessName?: string;
+  seo?: Record<string, unknown>;
 };
 
 export type PageProductListResponse = {
