@@ -67,13 +67,19 @@ export const Route = createFileRoute("/products/$id")({
       throw e;
     }
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra" },
-      { name: "description", content: loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price." },
-      { name: "robots", content: "index,follow" }
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const seo = (loaderData?.specs?.seo as any) || loaderData?.seo;
+    return {
+      meta: [
+        { title: seo?.metaTitle || (loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra") },
+        { name: "description", content: seo?.metaDescription || (loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price.") },
+        { name: "keywords", content: seo?.metaKeywords || "" },
+        { property: "og:title", content: seo?.ogTitle || "" },
+        { property: "og:description", content: seo?.ogDescription || "" },
+        { name: "robots", content: "index,follow" }
+      ].filter(m => m.content),
+    };
+  },
   component: PdpPage,
   errorComponent: ({ error, reset }) => (
     <Container size="lg" className="py-12">

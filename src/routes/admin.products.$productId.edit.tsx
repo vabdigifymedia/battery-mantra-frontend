@@ -99,7 +99,7 @@ function EditProductPage() {
     capacity: product.capacity || "",
     specs: product.specs
       ? (() => {
-          const entries = Object.entries(product.specs);
+          const entries = Object.entries(product.specs).filter(([k]) => k !== 'seo' && k !== 'originalPrice');
           // Check if it's already grouped (nested objects) or flat
           const hasNestedObjects = entries.some(
             ([, v]) => typeof v === "object" && v !== null && !Array.isArray(v)
@@ -125,7 +125,7 @@ function EditProductPage() {
         })()
       : [],
     isAutoAssignToPartner: product.isAutoAssignToPartner !== false,
-    seo: product.seo || {
+    seo: (product.specs?.seo as any) || product.seo || {
       slug: "",
       metaTitle: "",
       metaDescription: "",
@@ -262,9 +262,11 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       categoryId: data.categoryId,
       brandId: data.brandId,
       capacity: data.capacity || undefined,
-      specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
+      specs: {
+        ...(Object.keys(specsRecord).length > 0 ? specsRecord : {}),
+        seo: data.seo
+      },
       isAutoAssignToPartner: data.isAutoAssignToPartner,
-      seo: data.seo
     };
 
     updateMutation.mutate(payload);
