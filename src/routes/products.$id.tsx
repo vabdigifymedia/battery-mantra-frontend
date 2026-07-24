@@ -5,7 +5,9 @@ import { z } from "zod";
 import { 
   Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText, 
   Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert, 
-  ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall
+  ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
+  ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
+  Maximize, Scale, Activity, Layers, Plug, X
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
