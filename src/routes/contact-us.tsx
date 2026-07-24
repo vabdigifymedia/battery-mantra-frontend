@@ -11,6 +11,7 @@ import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Youtube, A
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { sendContactEmail } from "@/server/contact";
 
 export const Route = createFileRoute("/contact-us")({
   component: ContactUsPage,
@@ -44,12 +45,22 @@ function ContactUsPage() {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    console.log("Form data:", data);
-    // In a real app, send to API
-    toast.success("Message sent successfully! We will get back to you soon.");
-    form.reset();
-  };
+  async function onSubmit(data: ContactFormValues) {
+    try {
+      await sendContactEmail(data);
+      
+      toast.success("Message Sent Successfully!", {
+        description: "Our executive will call you soon.",
+        icon: <AlertCircle className="h-5 w-5 text-green-500" />
+      });
+      
+      form.reset();
+    } catch (error) {
+      toast.error("Failed to send message", {
+        description: "Please check if SMTP is configured correctly or try again later."
+      });
+    }
+  }
 
   return (
     <div className="bg-muted/30 pb-20">
