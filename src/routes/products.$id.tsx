@@ -665,7 +665,7 @@ function PdpPage() {
                     <img 
                       src={img} 
                       alt={`Gallery view ${idx + 1}`} 
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 hover:scale-[1.5] hover:z-50 cursor-zoom-in" 
+                      className="max-w-full max-h-full object-contain" 
                     />
                   </div>
                 </CarouselItem>
