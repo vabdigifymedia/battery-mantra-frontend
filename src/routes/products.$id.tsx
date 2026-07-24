@@ -26,6 +26,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { ApiError } from "@/lib/api/errors";
@@ -287,11 +293,30 @@ function PdpPage() {
               <Card className="flex-1 overflow-hidden border-border/40 shadow-sm rounded-2xl w-full relative bg-gradient-to-br from-white to-muted/20 transition-all hover:shadow-md">
                 <div className="p-6 flex justify-center items-center aspect-[4/3] lg:aspect-square relative">
                   {activeImage ? (
-                    <img 
-                      src={activeImage} 
-                      alt={data.productName} 
-                      className="w-full h-full object-contain hover:scale-110 transition-transform duration-700 cursor-crosshair mix-blend-multiply drop-shadow-xl" 
-                    />
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="w-full h-full cursor-zoom-in outline-none relative group">
+                          <img 
+                            src={activeImage} 
+                            alt={data.productName} 
+                            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 mix-blend-multiply drop-shadow-xl" 
+                          />
+                          <div className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Search className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] bg-white p-2 sm:p-6 rounded-2xl border-none shadow-2xl">
+                        <DialogTitle className="sr-only">Zoom Product Image</DialogTitle>
+                        <div className="w-full h-[60vh] sm:h-[80vh] flex items-center justify-center relative group overflow-hidden bg-white rounded-xl">
+                          <img 
+                            src={activeImage} 
+                            alt={data.productName} 
+                            className="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 ease-out group-hover:scale-150 sm:group-hover:scale-[2]" 
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   ) : (
                     <div className="text-muted-foreground flex flex-col items-center">
                       <Battery className="h-16 w-16 mb-2 opacity-20" />
