@@ -125,19 +125,19 @@ function EditProductPage() {
         })()
       : [],
     isAutoAssignToPartner: product.isAutoAssignToPartner !== false,
-    seo: (product.specs?.seo as any) || product.seo || {
-      slug: "",
-      metaTitle: "",
-      metaDescription: "",
-      metaKeywords: "",
-      metaTitleCity: "",
-      metaDescriptionCity: "",
-      metaKeywordsCity: "",
-      ogTitle: "",
-      ogDescription: "",
-      ogTitleCity: "",
-      ogDescriptionCity: "",
-      canonicalUrl: "",
+    seo: {
+      slug: product.seo?.slug || (product.specs?.seo as any)?.slug || "",
+      metaTitle: product.seo?.metaTitle || (product.specs?.seo as any)?.metaTitle || "",
+      metaDescription: product.seo?.metaDescription || (product.specs?.seo as any)?.metaDescription || "",
+      metaKeywords: product.seo?.metaKeywords || (product.specs?.seo as any)?.metaKeywords || "",
+      metaTitleCity: product.seo?.metaTitleCity || (product.specs?.seo as any)?.metaTitleCity || "",
+      metaDescriptionCity: product.seo?.metaDescriptionCity || (product.specs?.seo as any)?.metaDescriptionCity || "",
+      metaKeywordsCity: product.seo?.metaKeywordsCity || (product.specs?.seo as any)?.metaKeywordsCity || "",
+      ogTitle: product.seo?.ogTitle || (product.specs?.seo as any)?.ogTitle || "",
+      ogDescription: product.seo?.ogDescription || (product.specs?.seo as any)?.ogDescription || "",
+      ogTitleCity: product.seo?.ogTitleCity || (product.specs?.seo as any)?.ogTitleCity || "",
+      ogDescriptionCity: product.seo?.ogDescriptionCity || (product.specs?.seo as any)?.ogDescriptionCity || "",
+      canonicalUrl: product.seo?.canonicalUrl || (product.specs?.seo as any)?.canonicalUrl || "",
     }
   };
 
