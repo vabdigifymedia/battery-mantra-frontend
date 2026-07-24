@@ -7,7 +7,7 @@ import {
   Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert, 
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
   ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
-  Maximize, Scale, Activity, Layers, Plug, X
+  Maximize, Scale, Activity, Layers, Plug, X, Headset
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -555,9 +555,8 @@ function PdpPage() {
                     <div className="flex gap-4 items-center sm:items-start">
                       <div className="relative shrink-0">
                         <div className="bg-gradient-to-tr from-primary to-primary/60 p-[2px] rounded-full shadow-md">
-                          <div className="bg-background rounded-full h-14 w-14 sm:h-16 sm:w-16 overflow-hidden border-2 border-background">
-                            {/* Replaced generic avatar with a professional premium look avatar */}
-                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Vikas&backgroundColor=e2e8f0" alt="Vikas" className="h-full w-full object-cover" />
+                          <div className="bg-background rounded-full h-14 w-14 sm:h-16 sm:w-16 overflow-hidden border-2 border-background flex items-center justify-center text-primary">
+                            <Headset className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.5} />
                           </div>
                         </div>
                         {/* Online indicator */}
