@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminService } from "@/services/admin.service";
+import { apiFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,10 +35,7 @@ function SeoPagesPage() {
   const queryClient = useQueryClient();
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ["seo", "pages"],
-    queryFn: async () => {
-      const res = await adminService.api.get("/api/seo/pages");
-      return res.data;
-    }
+    queryFn: () => apiFetch<any[]>("/api/seo/pages"),
   });
 
   const [editItem, setEditItem] = useState<any>(null);
@@ -47,7 +43,7 @@ function SeoPagesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await adminService.api.delete(`/api/seo/pages/${id}`);
+      await apiFetch(`/api/seo/pages/${id}`, { method: "DELETE" });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["seo", "pages"] });
@@ -164,9 +160,9 @@ function SeoPageForm({ initialData, onClose }: any) {
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       if (initialData?.pageId) {
-        await adminService.api.put(`/api/seo/pages/${initialData.pageId}`, data);
+        await apiFetch(`/api/seo/pages/${initialData.pageId}`, { method: "PUT", body: data });
       } else {
-        await adminService.api.post("/api/seo/pages", data);
+        await apiFetch("/api/seo/pages", { method: "POST", body: data });
       }
     },
     onSuccess: () => {

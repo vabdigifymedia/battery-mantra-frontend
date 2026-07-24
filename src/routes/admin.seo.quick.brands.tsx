@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminService } from "@/services/admin.service";
+import { apiFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,17 +19,11 @@ function SeoQuickBrandsPage() {
   const queryClient = useQueryClient();
   const { data: templates, isLoading } = useQuery({
     queryKey: ["seo", "templates"],
-    queryFn: async () => {
-      const res = await adminService.api.get("/api/seo/templates");
-      return res.data;
-    }
+    queryFn: () => apiFetch<any[]>("/api/seo/templates"),
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const res = await adminService.api.post("/api/seo/templates", data);
-      return res.data;
-    },
+    mutationFn: (data: any) => apiFetch<any>("/api/seo/templates", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["seo", "templates"] });
       toast.success("SEO template saved successfully");
