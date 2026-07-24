@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench, ShieldAlert, Maximize, Scale, Activity, Layers, Plug, Info, ArrowLeft, Search } from "lucide-react";
+import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench, ShieldAlert, Maximize, Scale, Activity, Layers, Plug, Info, ArrowLeft, Search, X } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
@@ -23,15 +23,14 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { ApiError } from "@/lib/api/errors";
@@ -99,6 +98,8 @@ function PdpPage() {
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [isFullscreenGallery, setIsFullscreenGallery] = useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
 
   const { isServiceable, pincode, city } = useLocationStore();
   const locationChecked = Boolean(pincode || city);
@@ -293,30 +294,23 @@ function PdpPage() {
               <Card className="flex-1 overflow-hidden border-border/40 shadow-sm rounded-2xl w-full relative bg-gradient-to-br from-white to-muted/20 transition-all hover:shadow-md">
                 <div className="p-6 flex justify-center items-center aspect-[4/3] lg:aspect-square relative">
                   {activeImage ? (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <button className="w-full h-full cursor-zoom-in outline-none relative group">
-                          <img 
-                            src={activeImage} 
-                            alt={data.productName} 
-                            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 mix-blend-multiply drop-shadow-xl" 
-                          />
-                          <div className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Search className="h-5 w-5 text-muted-foreground" />
-                          </div>
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] bg-white p-2 sm:p-6 rounded-2xl border-none shadow-2xl">
-                        <DialogTitle className="sr-only">Zoom Product Image</DialogTitle>
-                        <div className="w-full h-[60vh] sm:h-[80vh] flex items-center justify-center relative group overflow-hidden bg-white rounded-xl">
-                          <img 
-                            src={activeImage} 
-                            alt={data.productName} 
-                            className="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 ease-out group-hover:scale-150 sm:group-hover:scale-[2]" 
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <button 
+                      onClick={() => {
+                        const idx = galleryImages.indexOf(activeImage);
+                        setInitialSlide(Math.max(0, idx));
+                        setIsFullscreenGallery(true);
+                      }} 
+                      className="w-full h-full cursor-zoom-in outline-none relative group"
+                    >
+                      <img 
+                        src={activeImage} 
+                        alt={data.productName} 
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 mix-blend-multiply drop-shadow-xl" 
+                      />
+                      <div className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Search className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </button>
                   ) : (
                     <div className="text-muted-foreground flex flex-col items-center">
                       <Battery className="h-16 w-16 mb-2 opacity-20" />
@@ -645,6 +639,45 @@ function PdpPage() {
       <Container size="xl" className="pb-8">
         <SeoCityLinks productName={data.productName} />
       </Container>
+
+      {/* FULLSCREEN GALLERY APP OVERLAY */}
+      {isFullscreenGallery && (
+        <div className="fixed inset-0 z-[1000] bg-black flex flex-col animate-in fade-in duration-300">
+          <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-end z-[1001] bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+            <button 
+              onClick={() => setIsFullscreenGallery(false)}
+              className="text-white p-2 sm:p-3 rounded-full hover:bg-white/20 transition-colors pointer-events-auto backdrop-blur-sm bg-black/40"
+            >
+              <X className="h-6 w-6 sm:h-8 sm:w-8" />
+            </button>
+          </div>
+          
+          <Carousel 
+            opts={{ startIndex: initialSlide, loop: true }} 
+            className="w-full h-full flex-1 flex items-center"
+          >
+            <CarouselContent className="h-full ml-0">
+              {galleryImages.map((img, idx) => (
+                <CarouselItem key={idx} className="w-full h-full pl-0 flex items-center justify-center relative overflow-hidden group">
+                  <div className="w-full h-full overflow-auto flex items-center justify-center snap-center p-2 sm:p-8">
+                    <img 
+                      src={img} 
+                      alt={`Gallery view ${idx + 1}`} 
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 ease-out sm:group-hover:scale-[1.5] cursor-zoom-in" 
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {galleryImages.length > 1 && (
+              <>
+                <CarouselPrevious className="left-4 sm:left-8 bg-white/10 text-white border-none hover:bg-white/20 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
+                <CarouselNext className="right-4 sm:right-8 bg-white/10 text-white border-none hover:bg-white/20 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
+              </>
+            )}
+          </Carousel>
+        </div>
+      )}
     </div>
   );
 }
