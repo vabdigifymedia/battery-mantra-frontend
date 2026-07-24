@@ -544,41 +544,50 @@ function PdpPage() {
                 </div>
               )}
 
-              {/* Need Help in Buying Block */}
-              <div className="mt-8 bg-muted/10 border rounded-2xl p-4 sm:p-5 shadow-sm">
-                <div className="flex flex-col mb-4">
-                  <h3 className="font-bold text-lg sm:text-xl text-foreground relative inline-block pb-2 mb-2">
-                    Need help in buying?
-                    <div className="absolute bottom-0 left-0 w-12 h-1 bg-primary rounded-full"></div>
-                  </h3>
-                  <div className="flex items-center gap-3 mt-1">
-                    <div className="bg-white border border-border/50 rounded-full h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-                      <img src="https://ui-avatars.com/api/?name=Vikas&background=0D8ABC&color=fff&rounded=true&bold=true" alt="Vikas" className="h-full w-full object-cover rounded-full" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Get advice directly from Vikas!</p>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">Available Monday to Saturday: 9:30 am to 5:30 pm</p>
+              {/* Need Help in Buying Block (Premium Redesign) */}
+              <div className="mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-background to-muted border border-border shadow-md transition-all hover:shadow-lg">
+                {/* Decorative background elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl -z-0"></div>
+                
+                <div className="p-5 sm:p-6 relative z-10">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-5 gap-4">
+                    <div className="flex gap-4 items-center sm:items-start">
+                      <div className="relative shrink-0">
+                        <div className="bg-gradient-to-tr from-primary to-primary/60 p-[2px] rounded-full shadow-md">
+                          <div className="bg-background rounded-full h-14 w-14 sm:h-16 sm:w-16 overflow-hidden border-2 border-background">
+                            {/* Replaced generic avatar with a professional premium look avatar */}
+                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Vikas&backgroundColor=e2e8f0" alt="Vikas" className="h-full w-full object-cover" />
+                          </div>
+                        </div>
+                        {/* Online indicator */}
+                        <div className="absolute bottom-0 right-1 h-4 w-4 bg-green-500 border-2 border-background rounded-full shadow-sm">
+                          <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-extrabold text-lg sm:text-xl text-foreground tracking-tight">Need expert advice?</h3>
+                        <p className="text-sm font-medium text-muted-foreground mt-0.5">Talk directly to Vikas</p>
+                        <div className="flex items-center gap-1.5 mt-2 text-[10px] sm:text-xs font-semibold text-primary uppercase tracking-wider bg-primary/10 border border-primary/20 w-fit px-2.5 py-1 rounded-full">
+                          <Clock className="w-3.5 h-3.5" />
+                          Mon - Sat (9:30 AM - 5:30 PM)
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <a href="https://wa.me/919667123456?text=Hi,%20I%20need%20help%20buying%20a%20battery" target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center bg-[#005c9a] hover:bg-[#004a7a] text-white rounded-xl p-3 sm:p-4 transition-colors group shadow-sm">
-                    <div className="bg-green-500 rounded-full p-1.5 mb-2 group-hover:scale-110 transition-transform">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                    </div>
-                    <span className="font-bold text-xs sm:text-[13px] mb-1.5 tracking-wide uppercase">WhatsApp</span>
-                    <span className="text-[10px] sm:text-[11px] text-center opacity-90 leading-[1.3] font-medium">Send a 'Hi' On<br/>Whatsapp To<br/><b className="text-[11px] sm:text-xs mt-0.5 inline-block">+91 9667123456</b></span>
-                  </a>
                   
-                  <a href="tel:+919667123456" className="flex flex-col items-center justify-center bg-white hover:bg-muted border border-border text-foreground rounded-xl p-3 sm:p-4 transition-colors group shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-bl-[100%] -z-0"></div>
-                    <div className="bg-amber-100 text-amber-600 rounded-full p-2 mb-2 group-hover:scale-110 transition-transform z-10 relative shadow-sm border border-amber-200">
-                      <PhoneCall className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </div>
-                    <span className="font-bold text-xs sm:text-[13px] mb-1.5 text-center leading-tight z-10 relative">Customer<br/>Support</span>
-                    <span className="text-[10px] sm:text-[11px] text-center text-muted-foreground leading-[1.3] font-medium z-10 relative">Need Help In<br/>Buying Call To<br/><b className="text-primary text-[11px] sm:text-xs mt-0.5 inline-block">+91 9667123456</b></span>
-                  </a>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a href="https://wa.me/919667123456?text=Hi,%20I%20need%20help%20buying%20a%20battery" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1DA851] text-white rounded-xl py-3.5 px-4 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md font-semibold text-sm w-full group">
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                      Chat on WhatsApp
+                    </a>
+                    
+                    <a href="tel:+919667123456" className="flex items-center justify-center gap-2.5 bg-background hover:bg-muted border-2 border-border text-foreground rounded-xl py-3.5 px-4 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md font-semibold text-sm w-full group">
+                      <PhoneCall className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
+                      +91 9667123456
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
