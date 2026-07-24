@@ -630,10 +630,10 @@ function PdpPage() {
           brand_name: data.brandName || "Brand",
           category_name: data.productCategory || "Battery",
           city_name: "your city",
-          warranty_name: allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || "",
+          warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
           price_name: data.productPrice?.toString() || "",
           mrp_name: (data.productPrice * 1.2).toFixed(2),
-          capa_ct_name: allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || "",
+          capa_ct_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || ""),
         }} 
       />
 
@@ -644,11 +644,11 @@ function PdpPage() {
 
       {/* FULLSCREEN GALLERY APP OVERLAY */}
       {isFullscreenGallery && (
-        <div className="fixed inset-0 z-[1000] bg-black flex flex-col animate-in fade-in duration-300">
-          <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-end z-[1001] bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+        <div className="fixed inset-0 z-[1000] bg-black/95 flex flex-col animate-in fade-in duration-200">
+          <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-end z-[1001] pointer-events-none">
             <button 
               onClick={() => setIsFullscreenGallery(false)}
-              className="text-white p-2 sm:p-3 rounded-full hover:bg-white/20 transition-colors pointer-events-auto backdrop-blur-sm bg-black/40"
+              className="text-white p-2 sm:p-3 rounded-full hover:bg-white/10 transition-colors pointer-events-auto bg-black/20"
             >
               <X className="h-6 w-6 sm:h-8 sm:w-8" />
             </button>
@@ -656,16 +656,16 @@ function PdpPage() {
           
           <Carousel 
             opts={{ startIndex: initialSlide, loop: true }} 
-            className="w-full h-full flex-1 flex items-center"
+            className="w-full h-full flex items-center justify-center"
           >
-            <CarouselContent className="h-full ml-0">
+            <CarouselContent className="ml-0 w-full">
               {galleryImages.map((img, idx) => (
-                <CarouselItem key={idx} className="w-full h-full pl-0 flex items-center justify-center relative overflow-hidden group">
-                  <div className="w-full h-full overflow-auto flex items-center justify-center snap-center p-2 sm:p-8">
+                <CarouselItem key={idx} className="pl-0 basis-full flex items-center justify-center h-[100dvh]">
+                  <div className="w-full h-full p-4 sm:p-12 flex items-center justify-center relative">
                     <img 
                       src={img} 
                       alt={`Gallery view ${idx + 1}`} 
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 ease-out sm:group-hover:scale-[1.5] cursor-zoom-in" 
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 hover:scale-[1.5] hover:z-50 cursor-zoom-in" 
                     />
                   </div>
                 </CarouselItem>
@@ -673,8 +673,8 @@ function PdpPage() {
             </CarouselContent>
             {galleryImages.length > 1 && (
               <>
-                <CarouselPrevious className="left-4 sm:left-8 bg-white/10 text-white border-none hover:bg-white/20 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
-                <CarouselNext className="right-4 sm:right-8 bg-white/10 text-white border-none hover:bg-white/20 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
+                <CarouselPrevious className="left-4 sm:left-8 bg-white/10 text-white border-none hover:bg-white/30 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
+                <CarouselNext className="right-4 sm:right-8 bg-white/10 text-white border-none hover:bg-white/30 hidden sm:flex h-12 w-12 sm:h-16 sm:w-16 shadow-lg backdrop-blur-md" />
               </>
             )}
           </Carousel>
