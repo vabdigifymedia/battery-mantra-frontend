@@ -4,12 +4,16 @@ export interface GeocodingResponse {
     city?: string;
     state?: string;
     country?: string;
+    town?: string;
+    village?: string;
+    county?: string;
   };
+  city?: string;
   error?: string;
 }
 
 export const geocodingService = {
-  reverseGeocode: async (lat: number, lon: number): Promise<string | null> => {
+  reverseGeocodeCity: async (lat: number, lon: number): Promise<string | null> => {
     try {
       // Using OpenStreetMap Nominatim API (Free, no key required)
       const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
@@ -24,8 +28,10 @@ export const geocodingService = {
 
       if (response.ok) {
         const data: GeocodingResponse = await response.json();
-        if (data.address?.postcode) {
-          return data.address.postcode;
+        // Nominatim might return city, town, or village
+        const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+        if (cityName) {
+          return cityName;
         }
       }
       
@@ -35,8 +41,8 @@ export const geocodingService = {
       
       if (fallbackResponse.ok) {
         const fallbackData = await fallbackResponse.json();
-        if (fallbackData.postcode) {
-          return fallbackData.postcode;
+        if (fallbackData.city || fallbackData.locality) {
+          return fallbackData.city || fallbackData.locality;
         }
       }
 

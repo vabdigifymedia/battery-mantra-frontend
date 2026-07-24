@@ -47,24 +47,27 @@ export const useGeolocation = () => {
       setPermission(true);
       const { latitude, longitude } = position.coords;
       
-      const postcode = await geocodingService.reverseGeocode(latitude, longitude);
+      const cityName = await geocodingService.reverseGeocodeCity(latitude, longitude);
       
-      if (!postcode) {
-        toast.error("Could not determine pincode from your location.");
+      if (!cityName) {
+        toast.error("Could not determine your city from your location.");
         setIsLocating(false);
         return;
       }
 
-      // Check if pincode is serviceable
-      const result = await locationService.checkPincode(postcode);
+      // Check if city is serviceable by finding it in public cities list
+      const publicCities = await locationService.getPublicCities();
+      const matchedCity = publicCities.find(c => 
+        c.cityName.toLowerCase() === cityName.toLowerCase() || 
+        cityName.toLowerCase().includes(c.cityName.toLowerCase())
+      );
       
-      setLocation(postcode, result.serviceable, result.city);
-      qc.invalidateQueries({ queryKey: ["products"] });
-      
-      if (result.serviceable) {
-        toast.success(`Location set to ${result.city?.cityName}, ${postcode}`);
+      if (matchedCity) {
+        setLocation("", true, matchedCity);
+        qc.invalidateQueries({ queryKey: ["products"] });
+        toast.success(`Location set to ${matchedCity.cityName}`);
       } else {
-        toast.error(`Sorry, we do not deliver to ${postcode} yet.`);
+        toast.error(`Sorry, we do not deliver to ${cityName} yet.`);
       }
     } catch (error: any) {
       setPermission(false);
