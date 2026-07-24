@@ -25,7 +25,8 @@ import { productFilterQuery, brandsQuery, categoriesQuery, vehiclesListQuery } f
 import type { ProductFilterParams } from "@/types/dto";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
-
+import { SeoPriceTable } from "@/components/products/SeoPriceTable";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 const searchSchema = z.object({
   q: z.string().optional(),
   categoryId: z.string().optional(),
@@ -212,6 +213,31 @@ function ProductsPage() {
                   </Button>
                 </div>
               ) : null}
+            </>
+          )}
+          
+          {products.length > 0 && (
+            <>
+              <SeoPriceTable 
+                products={products} 
+                title={`Price List, Capacity, Warranty Details for Best ${
+                  pageType === "BRAND_MODEL" 
+                    ? `${context.brand_name} ${context.model_name}` 
+                    : pageType === "BRAND" 
+                    ? context.brand_name 
+                    : ""
+                } ${context.category_name || "Batteries"} offered`} 
+              />
+              
+              <SeoCityLinks 
+                productName={`${
+                  pageType === "BRAND_MODEL" 
+                    ? `${context.brand_name} ${context.model_name}` 
+                    : pageType === "BRAND" 
+                    ? context.brand_name 
+                    : ""
+                } ${context.category_name || "Batteries"}`.trim()} 
+              />
             </>
           )}
         </div>
