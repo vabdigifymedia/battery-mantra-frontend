@@ -181,11 +181,9 @@ function AddProductPage() {
       categoryId: data.categoryId,
       brandId: data.brandId,
       capacity: data.capacity || undefined,
-      specs: {
-        ...(Object.keys(specsRecord).length > 0 ? specsRecord : {}),
-        seo: data.seo
-      },
+      specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
       isAutoAssignToPartner: data.isAutoAssignToPartner,
+      seo: data.seo
     };
 
     createMutation.mutate(payload);
