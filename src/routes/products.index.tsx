@@ -21,12 +21,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { productFilterQuery, brandsQuery, categoriesQuery, vehiclesListQuery } from "@/queries";
+import {
+  productListQuery,
+  productFilterQuery,
+  rootCategoriesQuery,
+  brandsQuery,
+  pageSeoQuery,
+  categoriesQuery,
+  vehiclesListQuery,
+} from "@/queries";
+import { buildPageHead } from "@/lib/seo";
 import type { ProductFilterParams } from "@/types/dto";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
+
 const searchSchema = z.object({
   q: z.string().optional(),
   categoryId: z.string().optional(),
@@ -40,16 +50,22 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/products/")({
-  head: () => ({
-    meta: [
-      { title: "Shop batteries — BatteryMantra" },
-      {
-        name: "description",
-        content:
-          "Browse premium automotive, inverter and industrial batteries from trusted brands.",
-      },
-    ],
-  }),
+  loader: async ({ context, search }) => {
+    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+    void context.queryClient.prefetchQuery(brandsQuery());
+
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/products"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Shop batteries — BatteryMantra",
+      description: "Browse premium automotive, inverter and industrial batteries from trusted brands.",
+    }),
   validateSearch: searchSchema,
   component: ProductsPage,
 });

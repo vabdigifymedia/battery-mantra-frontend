@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/queryKeys";
 import { productsService } from "@/services/products.service";
-import { categoriesService, brandsService, bannersService } from "@/services/catalog.service";
+import { categoriesService, brandsService, bannersService, seoService } from "@/services/catalog.service";
 import { manufacturersService } from "@/services/manufacturers.service";
 import { vehiclesService } from "@/services/vehicles.service";
 import { cartService } from "@/services/cart.service";
@@ -184,3 +184,11 @@ export const publicFaqsQuery = (pageType: string) =>
     queryFn: () => faqService.getPublicFaqsByPage(pageType),
     staleTime: 300_000, // Cache for 5 mins
   });
+
+export const pageSeoQuery = (route: string) =>
+  queryOptions({
+    queryKey: queryKeys.seo.page(route),
+    queryFn: () => seoService.getPageSeo(route),
+    staleTime: 5 * 60_000,
+  });
+

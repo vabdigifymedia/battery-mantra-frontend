@@ -61,4 +61,8 @@ export const queryKeys = {
     users: () => [...queryKeys.admin.all, "users"] as const,
     orders: () => [...queryKeys.admin.all, "orders"] as const,
   },
+  seo: {
+    all: ["seo"] as const,
+    page: (route: string) => [...queryKeys.seo.all, "page", route] as const,
+  },
 } as const;

@@ -37,3 +37,11 @@ export const callbacksService = {
       auth: false,
     }),
 };
+
+export const seoService = {
+  getPageSeo: (route: string) =>
+    apiFetch<{ pageId: string; pageName: string; pageRoute: string; seo: any }>(
+      endpoints.seo.pageByRoute(route),
+      { auth: false }
+    ).catch(() => null),
+};

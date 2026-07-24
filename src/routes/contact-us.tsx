@@ -13,14 +13,24 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { sendContactEmail } from "@/server/contact";
 
+import { pageSeoQuery } from "@/queries";
+import { buildPageHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/contact-us")({
+  loader: async ({ context }) => {
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/contact-us"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Contact Us - BatteryMantra",
+      description: "Get in touch with BatteryMantra. Quick contact, email, and phone support for your battery and inverter needs.",
+    }),
   component: ContactUsPage,
-  head: () => ({
-    meta: [
-      { title: "Contact Us - BatteryMantra" },
-      { name: "description", content: "Get in touch with BatteryMantra. Quick contact, email, and phone support for your battery and inverter needs." },
-    ],
-  }),
 });
 
 const contactSchema = z.object({

@@ -131,4 +131,8 @@ export const endpoints = {
     cities: "/api/locations/cities",
     checkPincode: (code: string) => `/api/locations/check-pincode?code=${encodeURIComponent(code)}`,
   },
+  seo: {
+    pages: "/api/seo/pages",
+    pageByRoute: (route: string) => `/api/seo/pages/route?route=${encodeURIComponent(route)}`,
+  },
 } as const;

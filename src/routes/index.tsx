@@ -20,33 +20,31 @@ import {
   featuredBrandsQuery,
   vehiclesListQuery,
   bannersListQuery,
+  pageSeoQuery,
 } from "@/queries";
 import { APP } from "@/constants/app";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: `${APP.name} — ${APP.tagline}` },
-      {
-        name: "description",
-        content:
-          "Shop premium automotive, inverter and industrial batteries with free installation, exchange offers and India-wide delivery.",
-      },
-      { property: "og:title", content: APP.name },
-      {
-        property: "og:description",
-        content:
-          "Premium batteries with free installation, exchange offers and India-wide delivery.",
-      },
-    ],
-  }),
-  loader: ({ context }) => {
+  loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(productListQuery());
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(featuredBrandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
     void context.queryClient.prefetchQuery(bannersListQuery());
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
   },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: `${APP.name} — ${APP.tagline}`,
+      description:
+        "Shop premium automotive, inverter and industrial batteries with free installation, exchange offers and India-wide delivery.",
+    }),
   component: HomePage,
 });
 

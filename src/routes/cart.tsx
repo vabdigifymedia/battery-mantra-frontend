@@ -12,20 +12,27 @@ import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { useAuth } from "@/providers/AuthProvider";
-import { cartQuery } from "@/queries";
+import { cartQuery, pageSeoQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { cartService } from "@/services/cart.service";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({
-    meta: [
-      { title: "Your cart — BatteryMantra" },
-      { name: "description", content: "Review the batteries in your cart before checkout." },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
-  }),
+  loader: async ({ context }) => {
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/cart"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Your cart — BatteryMantra",
+      description: "Review the batteries in your cart before checkout.",
+    }),
   component: CartPage,
 });
 
