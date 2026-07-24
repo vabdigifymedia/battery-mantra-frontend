@@ -99,7 +99,7 @@ export const Route = createFileRoute("/products/$id")({
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: ogDesc },
         { name: "robots", content: "index,follow" }
-      ].filter(m => m.content),
+      ].filter(m => ('title' in m) || m.content),
     };
   },
   component: PdpPage,
