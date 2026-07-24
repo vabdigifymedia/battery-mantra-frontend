@@ -26,6 +26,7 @@ const DEFAULT_LINKS: NavLink[] = [
   { label: "Shop", to: "/products" },
   { label: "Vehicle Finder", to: "/vehicle-finder" },
   { label: "About Us", to: "/about-us" },
+  { label: "Contact Us", to: "/contact-us" },
 ];
 
 export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {

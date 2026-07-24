@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -73,6 +74,11 @@ const VehicleFinderRoute = VehicleFinderRouteImport.update({
 const PartnerRoute = PartnerRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactUsRoute = ContactUsRouteImport.update({
+  id: '/contact-us',
+  path: '/contact-us',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -350,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact-us': typeof ContactUsRoute
   '/partner': typeof PartnerRouteWithChildren
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
@@ -405,6 +412,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact-us': typeof ContactUsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -462,6 +470,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact-us': typeof ContactUsRoute
   '/partner': typeof PartnerRouteWithChildren
   '/vehicle-finder': typeof VehicleFinderRoute
   '/_auth/login': typeof AuthLoginRoute
@@ -520,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/contact-us'
     | '/partner'
     | '/vehicle-finder'
     | '/login'
@@ -575,6 +585,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/cart'
     | '/checkout'
+    | '/contact-us'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/checkout'
+    | '/contact-us'
     | '/partner'
     | '/vehicle-finder'
     | '/_auth/login'
@@ -689,6 +701,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContactUsRoute: typeof ContactUsRoute
   PartnerRoute: typeof PartnerRouteWithChildren
   VehicleFinderRoute: typeof VehicleFinderRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
@@ -712,6 +725,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact-us': {
+      id: '/contact-us'
+      path: '/contact-us'
+      fullPath: '/contact-us'
+      preLoaderRoute: typeof ContactUsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -1203,6 +1223,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  ContactUsRoute: ContactUsRoute,
   PartnerRoute: PartnerRouteWithChildren,
   VehicleFinderRoute: VehicleFinderRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
