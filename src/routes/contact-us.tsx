@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Youtube, AlertCircle } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -26,6 +27,7 @@ const contactSchema = z.object({
   mobile: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number (10 digits required)"),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   message: z.string().min(10, "Message must be at least 10 characters"),
+  recaptcha: z.string().min(1, "Please complete the reCAPTCHA"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -38,6 +40,7 @@ function ContactUsPage() {
       mobile: "",
       email: "",
       message: "",
+      recaptcha: "",
     },
   });
 
@@ -181,16 +184,16 @@ function ContactUsPage() {
                 )}
               </div>
               
-              {/* Fake ReCAPTCHA block for aesthetics just like the original, in a real app would use google-recaptcha */}
-              <div className="bg-muted/30 border border-border rounded flex items-center justify-between p-3 h-[74px]">
-                 <div className="flex items-center gap-3">
-                   <div className="h-6 w-6 border-2 border-muted-foreground/30 rounded-sm bg-white shrink-0 cursor-pointer hover:border-primary/50 transition-colors"></div>
-                   <span className="text-sm font-medium">I'm not a robot</span>
-                 </div>
-                 <div className="flex flex-col items-center">
-                   <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" className="w-7 h-7" />
-                   <div className="text-[9px] text-muted-foreground mt-1">reCAPTCHA</div>
-                 </div>
+              <div className="flex flex-col space-y-1.5">
+                <ReCAPTCHA
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                  onChange={(val) => {
+                    form.setValue("recaptcha", val || "", { shouldValidate: true });
+                  }}
+                />
+                {form.formState.errors.recaptcha && (
+                  <p className="text-xs text-red-500 font-medium flex items-center gap-1 mt-1"><AlertCircle className="h-3 w-3" /> {form.formState.errors.recaptcha.message}</p>
+                )}
               </div>
 
               <Button 
