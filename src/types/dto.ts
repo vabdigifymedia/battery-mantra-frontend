@@ -182,8 +182,8 @@ export type ProductDetailResponse = {
   specs?: Record<string, unknown>;
   compatibleVehicles?: VehicleResponse[];
   cityPrices?: CityPricingDto[];
-  isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
+  isAutoAssignToPartner?: boolean;
   createdByPartnerId?: UUID;
   partnerBusinessName?: string;
   seo?: Record<string, unknown>;

@@ -69,7 +69,7 @@ function AdminBrands() {
   const [editingBrand, setEditingBrand] = useState<any>(null);
 
   const form = useForm<BrandFormValues>({
-    resolver: zodResolver(brandSchema),
+    resolver: zodResolver(brandSchema) as any,
     defaultValues: {
       brandName: "",
       brandLogo: "",
