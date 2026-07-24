@@ -69,13 +69,35 @@ export const Route = createFileRoute("/products/$id")({
   },
   head: ({ loaderData }) => {
     const seo = (loaderData?.specs?.seo as any) || loaderData?.seo;
+    const city = useLocationStore.getState().city;
+    const cityName = city?.cityName || "";
+    
+    // Fallback logic: Use city fields if city is selected AND city field exists, otherwise use default fields.
+    let title = (city && seo?.metaTitleCity) ? seo.metaTitleCity : seo?.metaTitle;
+    let desc = (city && seo?.metaDescriptionCity) ? seo.metaDescriptionCity : seo?.metaDescription;
+    let keywords = (city && seo?.metaKeywordsCity) ? seo.metaKeywordsCity : seo?.metaKeywords;
+    let ogTitle = (city && seo?.ogTitleCity) ? seo.ogTitleCity : seo?.ogTitle;
+    let ogDesc = (city && seo?.ogDescriptionCity) ? seo.ogDescriptionCity : seo?.ogDescription;
+
+    const replacePlaceholders = (str: string | undefined | null) => {
+      if (!str) return "";
+      // E.g., assume 2-4 Hours if we don't have exact time synchronously
+      return str.replace(/city_name/gi, cityName || "India").replace(/delivery_time/gi, "2-4 Hours");
+    };
+
+    title = replacePlaceholders(title) || (loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra");
+    desc = replacePlaceholders(desc) || (loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price.");
+    keywords = replacePlaceholders(keywords);
+    ogTitle = replacePlaceholders(ogTitle);
+    ogDesc = replacePlaceholders(ogDesc);
+
     return {
       meta: [
-        { title: seo?.metaTitle || (loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra") },
-        { name: "description", content: seo?.metaDescription || (loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price.") },
-        { name: "keywords", content: seo?.metaKeywords || "" },
-        { property: "og:title", content: seo?.ogTitle || "" },
-        { property: "og:description", content: seo?.ogDescription || "" },
+        { title },
+        { name: "description", content: desc },
+        { name: "keywords", content: keywords },
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: ogDesc },
         { name: "robots", content: "index,follow" }
       ].filter(m => m.content),
     };
