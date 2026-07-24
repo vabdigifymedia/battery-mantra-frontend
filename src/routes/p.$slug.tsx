@@ -86,11 +86,15 @@ function CmsPageRender() {
           </div>
         </div>
       ) : (
-        <div className="bg-slate-900 py-16 text-center">
-          <Container>
-            <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">{page.title}</h1>
+        <div className="relative py-16 md:py-24 border-b border-border bg-gradient-to-b from-muted/50 to-background overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-full -z-0"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-tr-full -z-0"></div>
+          
+          <Container className="relative z-10 text-center">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight">{page.title}</h1>
             {page.subTitle && (
-              <p className="text-lg md:text-xl text-slate-300 mt-4 max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-muted-foreground mt-4 max-w-3xl mx-auto font-medium">
                 {page.subTitle}
               </p>
             )}
