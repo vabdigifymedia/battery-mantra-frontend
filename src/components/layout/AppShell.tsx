@@ -57,7 +57,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <Navbar />
+      <div className={pathname.match(/^\/products\/[^\/]+$/) ? "hidden sm:block" : ""}>
+        <Navbar />
+      </div>
       <main id="main" className="flex-1 flex flex-col">
         {children}
       </main>

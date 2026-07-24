@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench, ShieldAlert, Maximize, Scale, Activity, Layers, Plug, Info } from "lucide-react";
+import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench, ShieldAlert, Maximize, Scale, Activity, Layers, Plug, Info, ArrowLeft, Search } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
@@ -206,9 +206,24 @@ function PdpPage() {
     : 0;
 
   return (
-    <div className="bg-muted/30 min-h-screen pb-16">
+    <div className="bg-muted/30 min-h-screen pb-24 sm:pb-16 pt-14 sm:pt-0">
+      {/* Mobile Navbar */}
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b h-14 flex items-center justify-between px-3 shadow-sm">
+        <button onClick={() => window.history.back()} className="p-2 -ml-1 rounded-full hover:bg-muted text-foreground">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <div className="flex items-center gap-1">
+          <button className="p-2 rounded-full hover:bg-muted text-foreground">
+            <Search className="h-5 w-5" />
+          </button>
+          <Link to="/checkout" className="p-2 rounded-full hover:bg-muted text-foreground relative">
+             <ShoppingCart className="h-5 w-5" />
+          </Link>
+        </div>
+      </div>
+
       {/* Breadcrumb Header */}
-      <div className="bg-background border-b mb-6">
+      <div className="bg-background border-b mb-6 hidden sm:block">
         <Container size="xl" className="py-4">
           <Breadcrumb>
             <BreadcrumbList>
@@ -371,24 +386,26 @@ function PdpPage() {
             {topSpecs.length > 0 && (
               <div className="pt-2 pb-4">
                 <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-10 gap-x-4">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
                   {topSpecs.map(([key, value], idx) => {
                     return (
-                      <div key={key} className="flex items-center gap-4 relative">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
-                           {getSpecIcon(key)}
+                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
+                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
+                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
+                             {getSpecIcon(key)}
+                           </div>
                         </div>
-                        <div className="flex flex-col pr-4">
-                           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">{key}</span>
-                           <span className="font-bold text-lg text-foreground leading-tight">{String(value)}</span>
+                        <div className="flex flex-col pr-1 sm:pr-4">
+                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
+                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
                         </div>
                         {/* Divider for desktop */}
                         {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
                           <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
                         )}
-                        {/* Divider for tablet */}
+                        {/* Divider for tablet and mobile */}
                         {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="hidden sm:block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
+                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
                         )}
                       </div>
                     )
@@ -448,8 +465,8 @@ function PdpPage() {
               )}
 
               {/* Actions */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-                <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start border rounded-lg bg-background px-4 py-2 h-14">
+              <div className="fixed bottom-0 left-0 right-0 z-[100] sm:static flex flex-row items-center gap-2 sm:gap-4 p-3 sm:p-0 pt-4 bg-background sm:bg-transparent border-t sm:border-none shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-none">
+                <div className="hidden sm:flex items-center justify-between sm:justify-start border rounded-lg bg-background px-4 py-2 h-14">
                   <span className="text-sm text-muted-foreground mr-4">Qty</span>
                   <QuantityStepper
                     value={qty}
@@ -460,25 +477,25 @@ function PdpPage() {
                   />
                 </div>
                 
-                <div className="flex-1 flex w-full gap-3">
+                <div className="flex-1 flex w-full gap-2 sm:gap-3">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="flex-1 h-14 text-base font-semibold border-2 hover:bg-brand/5"
+                    className="flex-1 h-12 sm:h-14 text-sm sm:text-base font-semibold border-2 hover:bg-brand/5 px-2"
                     onClick={onAdd}
                     disabled={!inStock || addToCart.isPending || blockPurchase}
                   >
-                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                     Add to Cart
                   </Button>
                   <Button
                     variant="brand"
                     size="lg"
-                    className="flex-1 h-14 text-base font-semibold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all"
+                    className="flex-1 h-12 sm:h-14 text-sm sm:text-base font-semibold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all px-2"
                     onClick={onBuyNow}
                     disabled={!inStock || addToCart.isPending || blockPurchase}
                   >
-                    <Zap className="h-5 w-5 mr-2" />
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                     Buy Now
                   </Button>
                 </div>
