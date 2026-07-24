@@ -55,14 +55,18 @@ export const Route = createFileRoute("/products/$id")({
   validateSearch: searchSchema,
   loader: async ({ context, params }) => {
     try {
-      await context.queryClient.ensureQueryData(productDetailQuery(params.id));
+      return await context.queryClient.ensureQueryData(productDetailQuery(params.id));
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) throw notFound();
       throw e;
     }
   },
-  head: () => ({
-    meta: [{ title: "Product · BatteryMantra" }, { name: "robots", content: "index,follow" }],
+  head: ({ loaderData }) => ({
+    meta: [
+      { title: loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra" },
+      { name: "description", content: loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price." },
+      { name: "robots", content: "index,follow" }
+    ],
   }),
   component: PdpPage,
   errorComponent: ({ error, reset }) => (
@@ -629,7 +633,7 @@ function PdpPage() {
           product_name: data.productName,
           brand_name: data.brandName || "Brand",
           category_name: data.productCategory || "Battery",
-          city_name: "your city",
+          city_name: city?.cityName || "your city",
           warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
           price_name: data.productPrice?.toString() || "",
           mrp_name: (data.productPrice * 1.2).toFixed(2),
