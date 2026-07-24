@@ -22,16 +22,24 @@ export const geocodingService = {
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch location data");
+      if (response.ok) {
+        const data: GeocodingResponse = await response.json();
+        if (data.address?.postcode) {
+          return data.address.postcode;
+        }
+      }
+      
+      // Fallback: BigDataCloud API (Free, no key required)
+      const fallbackUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
+      const fallbackResponse = await fetch(fallbackUrl);
+      
+      if (fallbackResponse.ok) {
+        const fallbackData = await fallbackResponse.json();
+        if (fallbackData.postcode) {
+          return fallbackData.postcode;
+        }
       }
 
-      const data: GeocodingResponse = await response.json();
-      
-      if (data.address?.postcode) {
-        return data.address.postcode;
-      }
-      
       return null;
     } catch (error) {
       console.error("Geocoding error:", error);
