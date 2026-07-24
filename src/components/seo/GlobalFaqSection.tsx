@@ -10,9 +10,9 @@ export function GlobalFaqSection({ pageType = "UNIVERSAL", context = {} }: Globa
   return (
     <Container size="xl" className="py-12 sm:py-16">
       <section aria-labelledby="faq" className="w-full">
-        <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-center">
           {/* FAQ Accordion side */}
-          <div className="space-y-6 order-2 lg:pt-8">
+          <div className="space-y-6 order-2">
             <SectionHeading
               eyebrow="FAQ"
               title={<span id="faq">Questions, answered</span>}
@@ -26,7 +26,7 @@ export function GlobalFaqSection({ pageType = "UNIVERSAL", context = {} }: Globa
             <img
               src="/images/FAQ Side Image.png"
               alt="FAQ"
-              className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105"
+              className="w-full max-w-md xl:max-w-lg max-h-[350px] lg:max-h-[450px] xl:max-h-[500px] object-contain drop-shadow-2xl"
             />
           </div>
         </div>
