@@ -21,19 +21,28 @@ import { ordersService } from "@/services/orders.service";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
 
+import { pageSeoQuery } from "@/queries";
+import { buildPageHead } from "@/lib/seo";
+
 const searchSchema = z.object({
   addressId: z.string().uuid().optional(),
 });
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({
-    meta: [
-      { title: "Checkout — BatteryMantra" },
-      { name: "description", content: "Review your order and place it securely." },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
-  }),
   validateSearch: searchSchema,
+  loader: async ({ context }) => {
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/checkout"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Checkout — BatteryMantra",
+      description: "Review your order and place it securely.",
+    }),
   component: CheckoutPage,
 });
 

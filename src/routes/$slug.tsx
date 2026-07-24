@@ -5,31 +5,48 @@ import { Container } from "@/components/layout/Container";
 import { Spinner } from "@/components/feedback/Spinner";
 import { APP } from "@/constants/app";
 
+import { pageSeoQuery } from "@/queries";
+import { buildPageHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/$slug")({
   component: CmsPageRender,
-  loader: async ({ params: { slug } }) => {
+  loader: async ({ context, params: { slug } }) => {
+    let page = null;
+    let pageSeo = null;
     try {
-      const page = await cmsService.getPageBySlug(slug);
-      return { page };
+      page = await cmsService.getPageBySlug(slug);
     } catch (e) {
-      // In a real SSR app, we'd throw a 404 here
-      return { page: null };
+      page = null;
     }
+    try {
+      pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/" + slug));
+    } catch (e) {
+      pageSeo = null;
+    }
+    return { page, pageSeo };
   },
   head: ({ loaderData }) => {
     const page = loaderData?.page;
-    if (!page) {
+    const pageSeo = loaderData?.pageSeo?.seo;
+
+    if (!page && !pageSeo) {
       return {
         meta: [{ title: `Page Not Found — ${APP.name}` }],
       };
     }
-    
-    return {
-      meta: [
-        { title: page.seo?.metaTitle || `${page.title} — ${APP.name}` },
-        { name: "description", content: page.seo?.metaDescription || page.title },
-      ],
+
+    const mergedSeo = {
+      metaTitle: pageSeo?.metaTitle || page?.seo?.metaTitle,
+      metaDescription: pageSeo?.metaDescription || page?.seo?.metaDescription,
+      metaKeywords: pageSeo?.metaKeywords || page?.seo?.metaKeywords,
+      ogTitle: pageSeo?.ogTitle || page?.seo?.ogTitle,
+      ogDescription: pageSeo?.ogDescription || page?.seo?.ogDescription,
     };
+
+    return buildPageHead(mergedSeo, {
+      title: page ? `${page.title} — ${APP.name}` : undefined,
+      description: page ? page.title : undefined,
+    });
   },
 });
 

@@ -13,27 +13,30 @@ import {
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { productFilterQuery, vehiclesListQuery, productListQuery } from "@/queries";
+import { productFilterQuery, vehiclesListQuery, productListQuery, pageSeoQuery } from "@/queries";
+import { buildPageHead } from "@/lib/seo";
 
 const searchSchema = z.object({
   vehicleId: z.string().optional(),
 });
 
 export const Route = createFileRoute("/vehicle-finder")({
-  head: () => ({
-    meta: [
-      { title: "Vehicle Finder — BatteryMantra" },
-      {
-        name: "description",
-        content:
-          "Find the perfect battery for your car, bike or commercial vehicle. Select make and model to see compatible options.",
-      },
-    ],
-  }),
   validateSearch: searchSchema,
-  loader: ({ context }) => {
+  loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(vehiclesListQuery());
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/vehicle-finder"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
   },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Vehicle Finder — BatteryMantra",
+      description:
+        "Find the perfect battery for your car, bike or commercial vehicle. Select make and model to see compatible options.",
+    }),
   component: VehicleFinderPage,
 });
 

@@ -25,14 +25,24 @@ const searchSchema = z.object({
   redirect: z.string().optional(),
 });
 
+import { pageSeoQuery } from "@/queries";
+import { buildPageHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/_auth/login")({
-  head: () => ({
-    meta: [
-      { title: "Sign in — BatteryMantra" },
-      { name: "description", content: "Sign in to your BatteryMantra account." },
-    ],
-  }),
   validateSearch: searchSchema,
+  loader: async ({ context }) => {
+    try {
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/login"));
+      return { pageSeo };
+    } catch {
+      return { pageSeo: null };
+    }
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: "Sign in — BatteryMantra",
+      description: "Sign in to your BatteryMantra account.",
+    }),
   component: LoginPage,
 });
 
