@@ -26,6 +26,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import { Textarea } from "@/components/ui/textarea";
+
 export const Route = createFileRoute("/admin/seo/pages")({
   component: SeoPagesPage,
 });
@@ -58,11 +60,11 @@ function SeoPagesPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8 pb-32">
+    <div className="p-6 max-w-7xl mx-auto space-y-8 pb-32">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">SEO Pages</h1>
-          <p className="text-muted-foreground mt-2">Manage SEO metadata for static website pages.</p>
+          <p className="text-muted-foreground mt-1 text-sm">Manage SEO metadata (Title, Keywords, Description) for static website pages.</p>
         </div>
         <Button onClick={() => { setEditItem(null); setIsDialogOpen(true); }}>
           <Plus className="h-4 w-4 mr-2" /> Add Page
@@ -73,32 +75,46 @@ function SeoPagesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Page Name</TableHead>
-              <TableHead>Route</TableHead>
-              <TableHead>SEO Title</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
+              <TableHead className="w-[180px] font-semibold">Page</TableHead>
+              <TableHead className="w-[280px] font-semibold">Title</TableHead>
+              <TableHead className="w-[280px] font-semibold">Keywords</TableHead>
+              <TableHead className="font-semibold">Description</TableHead>
+              <TableHead className="w-[100px] text-right font-semibold">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pages.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                  No SEO pages configured.
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  No SEO pages configured. Execute the SQL seed script to load all 22 default pages.
                 </TableCell>
               </TableRow>
             ) : (
               pages.map((p: any) => (
                 <TableRow key={p.pageId}>
                   <TableCell className="font-medium">{p.pageName}</TableCell>
-                  <TableCell>{p.pageRoute}</TableCell>
-                  <TableCell className="max-w-[300px] truncate">{p.seo?.metaTitle || "-"}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
+                  <TableCell className="max-w-[280px]">
+                    <div className="line-clamp-2 text-xs text-muted-foreground" title={p.seo?.metaTitle}>
+                      {p.seo?.metaTitle || "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[280px]">
+                    <div className="line-clamp-2 text-xs text-muted-foreground" title={p.seo?.metaKeywords}>
+                      {p.seo?.metaKeywords || "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[320px]">
+                    <div className="line-clamp-2 text-xs text-muted-foreground" title={p.seo?.metaDescription}>
+                      {p.seo?.metaDescription || "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" onClick={() => { setEditItem(p); setIsDialogOpen(true); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => {
-                        if (confirm("Are you sure?")) deleteMutation.mutate(p.pageId);
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => {
+                        if (confirm(`Delete SEO entry for "${p.pageName}"?`)) deleteMutation.mutate(p.pageId);
                       }}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -114,7 +130,9 @@ function SeoPagesPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editItem ? "Edit Page SEO" : "Add Page SEO"}</DialogTitle>
+            <DialogTitle>
+              {editItem ? `Update ${editItem.pageName}` : "Add Page SEO"}
+            </DialogTitle>
           </DialogHeader>
           <SeoPageForm 
             initialData={editItem} 
@@ -128,7 +146,7 @@ function SeoPagesPage() {
 
 function SeoPageForm({ initialData, onClose }: any) {
   const queryClient = useQueryClient();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: {
       pageName: initialData?.pageName || "",
       pageRoute: initialData?.pageRoute || "",
@@ -157,47 +175,51 @@ function SeoPageForm({ initialData, onClose }: any) {
       onClose();
     },
     onError: () => {
-      toast.error("Failed to save SEO");
+      toast.error("Failed to save Page SEO");
     }
   });
 
   return (
-    <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="space-y-4 pt-4">
+    <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="space-y-4 pt-2">
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Page Name</Label>
-          <Input placeholder="e.g. About Us" {...register("pageName", { required: "Required" })} />
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold">Page Name</Label>
+          <Input placeholder="e.g. About Us" {...register("pageName", { required: true })} />
         </div>
-        <div className="space-y-2">
-          <Label>Page Route</Label>
-          <Input placeholder="e.g. /about" {...register("pageRoute", { required: "Required" })} />
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold">Page Route</Label>
+          <Input placeholder="e.g. /about" {...register("pageRoute", { required: true })} />
         </div>
       </div>
 
-      <div className="space-y-2 pt-4 border-t">
-        <Label>SEO Title</Label>
-        <Input {...register("seo.metaTitle")} />
-      </div>
-      <div className="space-y-2">
-        <Label>SEO Keywords</Label>
-        <Input {...register("seo.metaKeywords")} />
-      </div>
-      <div className="space-y-2">
-        <Label>SEO Description</Label>
-        <Input {...register("seo.metaDescription")} />
-      </div>
-      <div className="space-y-2 pt-4 border-t">
-        <Label>OG Title</Label>
-        <Input {...register("seo.ogTitle")} />
-      </div>
-      <div className="space-y-2">
-        <Label>OG Description</Label>
-        <Input {...register("seo.ogDescription")} />
+      <div className="space-y-1.5 pt-2 border-t">
+        <Label className="text-xs font-semibold">Title</Label>
+        <Textarea rows={2} placeholder="SEO Meta Title" {...register("seo.metaTitle")} />
       </div>
 
-      <div className="pt-4 flex justify-end gap-2">
+      <div className="space-y-1.5">
+        <Label className="text-xs font-semibold">Keywords</Label>
+        <Textarea rows={3} placeholder="Comma-separated SEO keywords" {...register("seo.metaKeywords")} />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs font-semibold">Description</Label>
+        <Textarea rows={3} placeholder="SEO Meta Description" {...register("seo.metaDescription")} />
+      </div>
+
+      <div className="space-y-1.5 pt-2 border-t">
+        <Label className="text-xs font-semibold">OG Title (Social Sharing)</Label>
+        <Input placeholder="Social share title" {...register("seo.ogTitle")} />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs font-semibold">OG Description (Social Sharing)</Label>
+        <Textarea rows={2} placeholder="Social share description" {...register("seo.ogDescription")} />
+      </div>
+
+      <div className="pt-4 flex justify-end gap-2 border-t">
         <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={saveMutation.isPending}>
+        <Button type="submit" variant="brand" disabled={saveMutation.isPending}>
           {saveMutation.isPending && <Spinner size="sm" className="mr-2" />}
           <Save className="h-4 w-4 mr-2" /> Save
         </Button>
@@ -205,3 +227,4 @@ function SeoPageForm({ initialData, onClose }: any) {
     </form>
   );
 }
+
