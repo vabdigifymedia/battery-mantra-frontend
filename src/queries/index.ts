@@ -76,10 +76,10 @@ export const fuelsQuery = () =>
     staleTime: 5 * 60_000,
   });
 
-export const manufacturersListQuery = (type?: "CAR" | "BIKE") =>
+export const manufacturersListQuery = (categoryId?: string) =>
   queryOptions({
-    queryKey: queryKeys.manufacturers.list(type),
-    queryFn: ({ signal }) => manufacturersService.list(signal, type),
+    queryKey: queryKeys.manufacturers.list(categoryId),
+    queryFn: ({ signal }) => manufacturersService.list(signal, categoryId),
     staleTime: 10 * 60_000,
   });
 

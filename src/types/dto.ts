@@ -45,11 +45,13 @@ export type ManufacturerResponse = {
   name: string;
   logoUrl?: string;
   displayOrder?: number;
+  categories?: { categoryId: UUID; categoryName: string }[];
 };
 export type CreateManufacturerRequest = {
   name: string;
   logoUrl?: string;
   displayOrder?: number;
+  categoryIds?: string[];
 };
 export type UpdateManufacturerRequest = Partial<CreateManufacturerRequest>;
 

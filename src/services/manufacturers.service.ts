@@ -3,9 +3,9 @@ import { endpoints } from "@/lib/api/endpoints";
 import type { ManufacturerResponse, CreateManufacturerRequest, UpdateManufacturerRequest } from "@/types/dto";
 
 export const manufacturersService = {
-  list: (signal?: AbortSignal, type?: "CAR" | "BIKE") =>
+  list: (signal?: AbortSignal, categoryId?: string) =>
     apiFetch<ManufacturerResponse[]>(
-      type ? `${endpoints.manufacturers.list}?type=${type}` : endpoints.manufacturers.list, 
+      categoryId ? `${endpoints.manufacturers.list}?categoryId=${categoryId}` : endpoints.manufacturers.list, 
       { signal, auth: false }
     ),
   create: (data: CreateManufacturerRequest, signal?: AbortSignal) =>

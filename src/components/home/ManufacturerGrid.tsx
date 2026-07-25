@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Car } from "lucide-react";
+import { Car, Bike } from "lucide-react";
 import { manufacturersListQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -8,12 +8,12 @@ import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 
 interface ManufacturerGridProps {
-  type?: "CAR" | "BIKE";
   categorySlug: string;
+  categoryId: string;
 }
 
-export function ManufacturerGrid({ type, categorySlug }: ManufacturerGridProps) {
-  const { data, isLoading, isError } = useQuery(manufacturersListQuery(type));
+export function ManufacturerGrid({ categorySlug, categoryId }: ManufacturerGridProps) {
+  const { data, isLoading, isError } = useQuery(manufacturersListQuery(categoryId));
 
   if (isLoading) {
     return (
@@ -27,6 +27,8 @@ export function ManufacturerGrid({ type, categorySlug }: ManufacturerGridProps) 
   if (isError || !data || data.length === 0) return null;
 
   const sorted = [...data].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+  const isBike = categorySlug.includes("bike");
+  const FallbackIcon = isBike ? Bike : Car;
 
   return (
     <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
@@ -41,7 +43,7 @@ export function ManufacturerGrid({ type, categorySlug }: ManufacturerGridProps) 
             {m.logoUrl ? (
               <img src={m.logoUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
             ) : (
-              <Car className="h-8 w-8 text-muted-foreground" />
+              <FallbackIcon className="h-8 w-8 text-muted-foreground" />
             )}
           </span>
           <span className="text-sm font-medium text-foreground line-clamp-2">
@@ -52,3 +54,4 @@ export function ManufacturerGrid({ type, categorySlug }: ManufacturerGridProps) 
     </div>
   );
 }
+

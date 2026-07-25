@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, BatteryCharging, Zap } from "lucide-react";
 import { HeroSection } from "@/components/layout/HeroSection";
 import { Container } from "@/components/layout/Container";
@@ -49,6 +50,15 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const { data: categories } = useQuery(rootCategoriesQuery());
+
+  const carCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("car")
+  );
+  const bikeCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("bike")
+  );
+
   return (
     <div className="flex flex-col">
       <div className="order-3 lg:order-1">
@@ -101,27 +111,31 @@ function HomePage() {
             </div>
           </section>
 
-          <section aria-labelledby="car-manufacturers" className="mt-12">
-            <SectionHeading
-              eyebrow="Find by Make"
-              title={<span id="car-manufacturers">Shop by car manufacturer</span>}
-              description="Select your car manufacturer to find the perfect battery match."
-            />
-            <div className="mt-6">
-              <ManufacturerGrid type="CAR" categorySlug="car-batteries" />
-            </div>
-          </section>
+          {carCategory && (
+            <section aria-labelledby="car-manufacturers" className="mt-12">
+              <SectionHeading
+                eyebrow="Find by Make"
+                title={<span id="car-manufacturers">Shop by car manufacturer</span>}
+                description="Select your car manufacturer to find the perfect battery match."
+              />
+              <div className="mt-6">
+                <ManufacturerGrid categoryId={carCategory.categoryId} categorySlug="car-batteries" />
+              </div>
+            </section>
+          )}
 
-          <section aria-labelledby="bike-manufacturers" className="mt-12">
-            <SectionHeading
-              eyebrow="Find by Make"
-              title={<span id="bike-manufacturers">Shop by bike manufacturer</span>}
-              description="Select your bike manufacturer to find the perfect battery match."
-            />
-            <div className="mt-6">
-              <ManufacturerGrid type="BIKE" categorySlug="bike-batteries" />
-            </div>
-          </section>
+          {bikeCategory && (
+            <section aria-labelledby="bike-manufacturers" className="mt-12">
+              <SectionHeading
+                eyebrow="Find by Make"
+                title={<span id="bike-manufacturers">Shop by bike manufacturer</span>}
+                description="Select your bike manufacturer to find the perfect battery match."
+              />
+              <div className="mt-6">
+                <ManufacturerGrid categoryId={bikeCategory.categoryId} categorySlug="bike-batteries" />
+              </div>
+            </section>
+          )}
         </Container>
       </div>
 

@@ -5,7 +5,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
-import { manufacturersListQuery } from "@/queries";
+import { manufacturersListQuery, rootCategoriesQuery } from "@/queries";
+import { Checkbox } from "@/components/ui/checkbox";
 import { manufacturersService } from "@/services/manufacturers.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ const manufacturerSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
   logoUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
+  categoryIds: z.array(z.string()).default([]),
   seo: z.object({
     slug: z.string().optional(),
     metaTitle: z.string().optional(),
@@ -65,16 +67,18 @@ type ManufacturerFormValues = z.infer<typeof manufacturerSchema>;
 function AdminManufacturers() {
   const queryClient = useQueryClient();
   const { data: manufacturers, isLoading } = useQuery(manufacturersListQuery());
+  const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingManufacturer, setEditingManufacturer] = useState<any>(null);
 
   const form = useForm<ManufacturerFormValues>({
-    resolver: zodResolver(manufacturerSchema),
+    resolver: zodResolver(manufacturerSchema) as any,
     defaultValues: {
       name: "",
       logoUrl: "",
       displayOrder: 0,
+      categoryIds: [] as string[],
       seo: {
         slug: "",
         metaTitle: "",
@@ -98,6 +102,7 @@ function AdminManufacturers() {
       name: "",
       logoUrl: "",
       displayOrder: 0,
+      categoryIds: [],
       seo: {
         slug: "",
         metaTitle: "",
@@ -122,6 +127,7 @@ function AdminManufacturers() {
       name: manufacturer.name,
       logoUrl: manufacturer.logoUrl ?? "",
       displayOrder: manufacturer.displayOrder ?? 0,
+      categoryIds: manufacturer.categories?.map((c: any) => c.categoryId) ?? [],
       seo: manufacturer.seo || {
         slug: "",
         metaTitle: "",
@@ -149,7 +155,7 @@ function AdminManufacturers() {
   const addMutation = useMutation({
     mutationFn: (data: any) => manufacturersService.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.all });
       toast.success("Manufacturer created successfully");
       closeModal();
     },
@@ -160,7 +166,7 @@ function AdminManufacturers() {
     mutationFn: ({ id, data }: { id: string; data: any }) => 
       manufacturersService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.all });
       toast.success("Manufacturer updated successfully");
       closeModal();
     },
@@ -170,7 +176,7 @@ function AdminManufacturers() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => manufacturersService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.manufacturers.all });
       toast.success("Manufacturer deleted successfully");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete manufacturer"),
@@ -181,6 +187,7 @@ function AdminManufacturers() {
       name: data.name,
       logoUrl: data.logoUrl || undefined,
       displayOrder: data.displayOrder || 0,
+      categoryIds: data.categoryIds || [],
       seo: data.seo,
     };
 
@@ -217,6 +224,7 @@ function AdminManufacturers() {
             <TableRow>
               <TableHead>Logo</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Categories</TableHead>
               <TableHead>Order</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -238,6 +246,19 @@ function AdminManufacturers() {
                   )}
                 </TableCell>
                 <TableCell className="font-medium">{manufacturer.name}</TableCell>
+                <TableCell>
+                  {manufacturer.categories?.length ? (
+                    <div className="flex flex-wrap gap-1">
+                      {manufacturer.categories.map((c) => (
+                        <span key={c.categoryId} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                          {c.categoryName}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
                 <TableCell>{manufacturer.displayOrder}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button variant="ghost" size="icon" onClick={() => openEditModal(manufacturer)}>
@@ -272,7 +293,7 @@ function AdminManufacturers() {
             ))}
             {!manufacturers?.length && (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No manufacturers found.
                 </TableCell>
               </TableRow>
@@ -306,6 +327,41 @@ function AdminManufacturers() {
             <FormField label="Display Order" error={form.formState.errors.displayOrder?.message}>
               <Input type="number" {...form.register("displayOrder")} placeholder="e.g. 1" />
             </FormField>
+
+            <div className="space-y-2">
+              <Label>Categories</Label>
+              <p className="text-xs text-muted-foreground mb-2">Select categories this manufacturer belongs to</p>
+              <Controller
+                control={form.control}
+                name="categoryIds"
+                render={({ field }) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {rootCategories.map((cat) => {
+                      const isChecked = field.value?.includes(cat.categoryId) ?? false;
+                      return (
+                        <label
+                          key={cat.categoryId}
+                          className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer hover:bg-accent transition-colors"
+                        >
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              const current = field.value ?? [];
+                              if (checked) {
+                                field.onChange([...current, cat.categoryId]);
+                              } else {
+                                field.onChange(current.filter((id: string) => id !== cat.categoryId));
+                              }
+                            }}
+                          />
+                          <span className="text-sm">{cat.categoryName}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              />
+            </div>
 
             <div className="pt-6 pb-2">
               <h3 className="text-lg font-semibold">SEO Information</h3>
