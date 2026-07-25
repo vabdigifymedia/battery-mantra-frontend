@@ -79,9 +79,6 @@ export type VehicleResponse = {
   categoryId?: UUID;
   manufacturerId?: UUID;
   description?: string;
-  shortDescription?: string;
-  shortDescriptionDealer?: string;
-  seo?: Record<string, unknown>;
 };
 export type CreateVehicleRequest = {
   vehicleType: VehicleType;
@@ -93,10 +90,8 @@ export type CreateVehicleRequest = {
   categoryId?: UUID;
   manufacturerId?: UUID;
   description?: string;
-  shortDescription?: string;
-  shortDescriptionDealer?: string;
-  seo?: Record<string, unknown>;
 };
+
 
 /* ---------- Brands ---------- */
 export type BrandResponse = {

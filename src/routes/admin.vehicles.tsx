@@ -63,22 +63,6 @@ const vehicleSchema = z.object({
   categoryId: z.string().optional(),
   manufacturerId: z.string().optional(),
   description: z.string().optional(),
-  shortDescription: z.string().optional(),
-  shortDescriptionDealer: z.string().optional(),
-  seo: z.object({
-    slug: z.string().optional(),
-    metaTitle: z.string().optional(),
-    metaDescription: z.string().optional(),
-    metaKeywords: z.string().optional(),
-    metaTitleCity: z.string().optional(),
-    metaDescriptionCity: z.string().optional(),
-    metaKeywordsCity: z.string().optional(),
-    ogTitle: z.string().optional(),
-    ogDescription: z.string().optional(),
-    ogTitleCity: z.string().optional(),
-    ogDescriptionCity: z.string().optional(),
-    canonicalUrl: z.string().optional(),
-  }).optional().default({})
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -173,53 +157,24 @@ function AdminVehicles() {
       manufacturerId: "",
       description: "",
       shortDescription: "",
-      shortDescriptionDealer: "",
-      seo: {
-        slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
-        metaTitleCity: "",
-        metaDescriptionCity: "",
-        metaKeywordsCity: "",
-        ogTitle: "",
-        ogDescription: "",
-        ogTitleCity: "",
-        ogDescriptionCity: "",
-        canonicalUrl: "",
-      }
+      description: "",
     });
     setIsModalOpen(true);
   };
 
   const openEditModal = (vehicle: any) => {
     setEditingVehicle(vehicle);
+    const matchedMfr = manufacturers.find(m => m.id === vehicle.manufacturerId || m.name.toLowerCase() === vehicle.make?.toLowerCase());
     form.reset({
       vehicleType: vehicle.vehicleType || "CAR",
-      make: vehicle.make,
+      make: vehicle.make || matchedMfr?.name || "",
       model: vehicle.model,
       fuelId: vehicle.fuelId || "",
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
       categoryId: vehicle.categoryId || "",
-      manufacturerId: vehicle.manufacturerId || "",
+      manufacturerId: vehicle.manufacturerId || matchedMfr?.id || "",
       description: vehicle.description || "",
-      shortDescription: vehicle.shortDescription || "",
-      shortDescriptionDealer: vehicle.shortDescriptionDealer || "",
-      seo: vehicle.seo || {
-        slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
-        metaTitleCity: "",
-        metaDescriptionCity: "",
-        metaKeywordsCity: "",
-        ogTitle: "",
-        ogDescription: "",
-        ogTitleCity: "",
-        ogDescriptionCity: "",
-        canonicalUrl: "",
-      }
     });
     setIsModalOpen(true);
   };
@@ -270,9 +225,6 @@ function AdminVehicles() {
       categoryId: values.categoryId || undefined,
       manufacturerId: values.manufacturerId || undefined,
       description: values.description || undefined,
-      shortDescription: values.shortDescription || undefined,
-      shortDescriptionDealer: values.shortDescriptionDealer || undefined,
-      seo: values.seo,
     };
 
     if (editingVehicle) {
@@ -582,40 +534,73 @@ function AdminVehicles() {
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Category" htmlFor="categoryId" required error={form.formState.errors.categoryId?.message}>
-                <Select onValueChange={(val) => form.setValue("categoryId", val)}>
-                  <SelectTrigger className={form.formState.errors.categoryId ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {rootCategories.map((c) => (
-                      <SelectItem key={c.categoryId} value={c.categoryId}>{c.categoryName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        form.setValue("manufacturerId", "");
+                        form.setValue("make", "");
+                      }}
+                      value={field.value}
+                    >
+                      <SelectTrigger id="categoryId" className={form.formState.errors.categoryId ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rootCategories.map((c) => (
+                          <SelectItem key={c.categoryId} value={c.categoryId}>{c.categoryName}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </FormField>
 
-              <FormField label="Manufacturer" htmlFor="manufacturerId" required error={form.formState.errors.manufacturerId?.message}>
-                <Select onValueChange={(val) => form.setValue("manufacturerId", val)}>
-                  <SelectTrigger className={form.formState.errors.manufacturerId ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select a manufacturer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {manufacturers.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <FormField label="Manufacturer" htmlFor="manufacturerId" required error={form.formState.errors.manufacturerId?.message || form.formState.errors.make?.message}>
+                <Controller
+                  control={form.control}
+                  name="manufacturerId"
+                  render={({ field }) => {
+                    const selectedCatId = form.watch("categoryId");
+                    const categoryMfrs = selectedCatId
+                      ? manufacturers.filter((m) => m.categories?.some((c) => c.categoryId === selectedCatId))
+                      : manufacturers;
+                    const availableMfrs = categoryMfrs.length > 0 ? categoryMfrs : manufacturers;
+
+                    return (
+                      <Select
+                        value={field.value}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          const matched = manufacturers.find((m) => m.id === val);
+                          if (matched) {
+                            form.setValue("make", matched.name);
+                          }
+                        }}
+                      >
+                        <SelectTrigger id="manufacturerId" className={form.formState.errors.manufacturerId ? "border-red-500" : ""}>
+                          <SelectValue placeholder={selectedCatId ? "Select manufacturer for category" : "Select a manufacturer"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableMfrs.map((m) => (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    );
+                  }}
+                />
               </FormField>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
-                <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki, Exide" />
-              </FormField>
-              <FormField label="Model (Name)" htmlFor="model" required error={form.formState.errors.model?.message}>
-                <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
-              </FormField>
-            </div>
+            <FormField label="Model (Name)" htmlFor="model" required error={form.formState.errors.model?.message}>
+              <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
+            </FormField>
 
             <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
               <select
@@ -650,40 +635,15 @@ function AdminVehicles() {
               />
             </FormField>
 
-            <div className="space-y-6 pt-4 border-t">
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Controller
-                  name="description"
-                  control={form.control}
-                  render={({ field }) => (
-                    <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Detailed description..." />
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Short Description (Normal)</Label>
-                  <Controller
-                    name="shortDescription"
-                    control={form.control}
-                    render={({ field }) => (
-                      <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Short Description..." />
-                    )}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Short Description (Dealer)</Label>
-                  <Controller
-                    name="shortDescriptionDealer"
-                    control={form.control}
-                    render={({ field }) => (
-                      <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Short Description for dealers..." />
-                    )}
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Controller
+                name="description"
+                control={form.control}
+                render={({ field }) => (
+                  <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Detailed description..." />
+                )}
+              />
             </div>
 
             {(() => {
@@ -766,69 +726,6 @@ function AdminVehicles() {
                 />
               )}
             />
-
-            <div className="pt-6 pb-2">
-              <h3 className="text-lg font-semibold">SEO Information</h3>
-              <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this vehicle</p>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Vehicle URL (Slug)</Label>
-                    <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>SEO Title</Label>
-                    <Input placeholder="Buy Vehicle at Best Price" {...form.register("seo.metaTitle")} />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Search / SEO Keywords</Label>
-                  <Input placeholder="Vehicle price, buy vehicle..." {...form.register("seo.metaKeywords")} />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>SEO Description</Label>
-                  <Input placeholder="Buy Vehicle At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="space-y-2">
-                    <Label>SEO Title City</Label>
-                    <Input placeholder="Vehicle Price in city_name" {...form.register("seo.metaTitleCity")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>SEO Keywords City</Label>
-                    <Input placeholder="Vehicle At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>SEO Description City</Label>
-                  <Input placeholder="Buy Vehicle At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
-                  <div className="space-y-2 mt-4">
-                    <Label>OG Title</Label>
-                    <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
-                  </div>
-                  <div className="space-y-2 mt-4">
-                    <Label>OG Description</Label>
-                    <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>OG Title City</Label>
-                    <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>OG Description City</Label>
-                    <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <div className="flex justify-end gap-3 pt-6 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
