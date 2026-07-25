@@ -7,7 +7,7 @@ import {
   Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert, 
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
   ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
-  Maximize, Scale, Activity, Layers, Plug, X, Headset
+  Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -17,6 +17,7 @@ import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
+import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -134,6 +135,8 @@ function PdpPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [qty, setQty] = useState(1);
+  const [isQuotationOpen, setIsQuotationOpen] = useState(false);
+  const [isCorporateOpen, setIsCorporateOpen] = useState(false);
   const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
@@ -560,6 +563,28 @@ function PdpPage() {
                 </div>
               </div>
 
+              {/* Ask for Quotation & Corporate Enquiry Secondary Action Bar */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-11 sm:h-12 text-xs sm:text-sm font-semibold border-border hover:border-primary/50 hover:bg-primary/5 transition-all shadow-sm"
+                  onClick={() => setIsQuotationOpen(true)}
+                >
+                  <FileText className="h-4 w-4 mr-1.5 text-primary shrink-0" />
+                  Ask for Quotation
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-11 sm:h-12 text-xs sm:text-sm font-semibold border-border hover:border-blue-500/50 hover:bg-blue-50/60 dark:hover:bg-blue-950/20 text-foreground transition-all shadow-sm"
+                  onClick={() => setIsCorporateOpen(true)}
+                >
+                  <Building2 className="h-4 w-4 mr-1.5 text-blue-600 shrink-0" />
+                  Corporate Enquiry
+                </Button>
+              </div>
+
               {blockPurchase && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700">
                   <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -764,6 +789,22 @@ function PdpPage() {
           </Carousel>
         </div>
       )}
+
+      {/* Quotation & Corporate Enquiry Modals */}
+      <AskQuotationModal
+        open={isQuotationOpen}
+        onOpenChange={setIsQuotationOpen}
+        productName={data.productName}
+        brandName={data.brandName}
+        productPrice={data.productPrice}
+      />
+
+      <CorporateEnquiryModal
+        open={isCorporateOpen}
+        onOpenChange={setIsCorporateOpen}
+        productName={data.productName}
+        brandName={data.brandName}
+      />
     </div>
   );
 }
