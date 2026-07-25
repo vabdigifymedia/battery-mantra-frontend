@@ -118,9 +118,16 @@ function HomePage() {
                 eyebrow="Find by Make"
                 title={<span id="car-manufacturers">Shop by car manufacturer</span>}
                 description="Select your car manufacturer to find the perfect battery match."
+                action={
+                  <Button asChild variant="ghost-brand" size="sm">
+                    <Link to="/manufacturers/$categorySlug" params={{ categorySlug: carCategory.categorySlug || "car-batteries" }}>
+                      View all <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                }
               />
               <div className="mt-6">
-                <ManufacturerGrid categoryId={carCategory.categoryId} categorySlug="car-batteries" />
+                <ManufacturerGrid categoryId={carCategory.categoryId} categorySlug={carCategory.categorySlug || "car-batteries"} limit={6} />
               </div>
             </section>
           )}
@@ -131,9 +138,16 @@ function HomePage() {
                 eyebrow="Find by Make"
                 title={<span id="bike-manufacturers">Shop by bike manufacturer</span>}
                 description="Select your bike manufacturer to find the perfect battery match."
+                action={
+                  <Button asChild variant="ghost-brand" size="sm">
+                    <Link to="/manufacturers/$categorySlug" params={{ categorySlug: bikeCategory.categorySlug || "two-wheeler-batteries" }}>
+                      View all <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                }
               />
               <div className="mt-6">
-                <ManufacturerGrid categoryId={bikeCategory.categoryId} categorySlug="bike-batteries" />
+                <ManufacturerGrid categoryId={bikeCategory.categoryId} categorySlug={bikeCategory.categorySlug || "two-wheeler-batteries"} limit={6} />
               </div>
             </section>
           )}

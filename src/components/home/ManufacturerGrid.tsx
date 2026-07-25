@@ -10,15 +10,16 @@ const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 interface ManufacturerGridProps {
   categorySlug: string;
   categoryId: string;
+  limit?: number;
 }
 
-export function ManufacturerGrid({ categorySlug, categoryId }: ManufacturerGridProps) {
+export function ManufacturerGrid({ categorySlug, categoryId, limit }: ManufacturerGridProps) {
   const { data, isLoading, isError } = useQuery(manufacturersListQuery(categoryId));
 
   if (isLoading) {
     return (
       <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: limit ?? 6 }).map((_, i) => (
           <SkeletonBlock key={i} className="h-28 min-w-[120px] lg:min-w-0 snap-start" />
         ))}
       </div>
@@ -26,7 +27,9 @@ export function ManufacturerGrid({ categorySlug, categoryId }: ManufacturerGridP
   }
   if (isError || !data || data.length === 0) return null;
 
-  const sorted = [...data].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+  const sorted = [...data]
+    .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+    .slice(0, limit ?? data.length);
   const isBike = categorySlug.includes("bike");
   const FallbackIcon = isBike ? Bike : Car;
 

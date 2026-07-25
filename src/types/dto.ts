@@ -128,6 +128,7 @@ export type UpdateBannerRequest = Partial<CreateBannerRequest>;
 export type CategoryListResponse = {
   categoryId: UUID;
   categoryName: string;
+  categorySlug?: string;
   categoryDescription?: string;
   iconUrl?: string;
   displayOrder?: number;

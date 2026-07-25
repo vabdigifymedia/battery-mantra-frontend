@@ -42,6 +42,7 @@ import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
+import { Route as ManufacturersCategorySlugIndexRouteImport } from './routes/manufacturers.$categorySlug.index'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminPartnersIndexRouteImport } from './routes/admin.partners.index'
 import { Route as AdminPagesIndexRouteImport } from './routes/admin.pages.index'
@@ -230,6 +231,12 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const ManufacturersCategorySlugIndexRoute =
+  ManufacturersCategorySlugIndexRouteImport.update({
+    id: '/manufacturers/$categorySlug/',
+    path: '/manufacturers/$categorySlug/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -396,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/manufacturers/$categorySlug/': typeof ManufacturersCategorySlugIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
@@ -451,6 +459,7 @@ export interface FileRoutesByTo {
   '/admin/pages': typeof AdminPagesIndexRoute
   '/admin/partners': typeof AdminPartnersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/manufacturers/$categorySlug': typeof ManufacturersCategorySlugIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
@@ -510,6 +519,7 @@ export interface FileRoutesById {
   '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/partners/': typeof AdminPartnersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/manufacturers/$categorySlug/': typeof ManufacturersCategorySlugIndexRoute
   '/admin/engineers/$id/edit': typeof AdminEngineersIdEditRoute
   '/admin/faqs/$id/edit': typeof AdminFaqsIdEditRoute
   '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
+    | '/manufacturers/$categorySlug/'
     | '/admin/engineers/$id/edit'
     | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
@@ -624,6 +635,7 @@ export interface FileRouteTypes {
     | '/admin/pages'
     | '/admin/partners'
     | '/admin/products'
+    | '/manufacturers/$categorySlug'
     | '/admin/engineers/$id/edit'
     | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
@@ -682,6 +694,7 @@ export interface FileRouteTypes {
     | '/admin/pages/'
     | '/admin/partners/'
     | '/admin/products/'
+    | '/manufacturers/$categorySlug/'
     | '/admin/engineers/$id/edit'
     | '/admin/faqs/$id/edit'
     | '/admin/pages/$pageId/edit'
@@ -709,6 +722,7 @@ export interface RootRouteChildren {
   OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   ManufacturersCategorySlugMakeSlugRoute: typeof ManufacturersCategorySlugMakeSlugRoute
+  ManufacturersCategorySlugIndexRoute: typeof ManufacturersCategorySlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -943,6 +957,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/manufacturers/$categorySlug/': {
+      id: '/manufacturers/$categorySlug/'
+      path: '/manufacturers/$categorySlug'
+      fullPath: '/manufacturers/$categorySlug/'
+      preLoaderRoute: typeof ManufacturersCategorySlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/products/': {
       id: '/admin/products/'
@@ -1232,6 +1253,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIndexRoute: ProductsIndexRoute,
   ManufacturersCategorySlugMakeSlugRoute:
     ManufacturersCategorySlugMakeSlugRoute,
+  ManufacturersCategorySlugIndexRoute: ManufacturersCategorySlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
