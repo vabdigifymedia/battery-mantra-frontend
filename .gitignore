@@ -61,3 +61,4 @@ product_csvs/unknown.csv
 vehicles.csv
 vehicles.csv
 vehicles_clean_backup.csv
+update_capacities.sql

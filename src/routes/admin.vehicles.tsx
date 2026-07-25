@@ -106,8 +106,10 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
 
     let categoryId = row.categoryId || row.category_id;
     if (!categoryId && vehicleType) {
-      const targetName = vehicleType === "BIKE" ? "bike" : "car";
-      const matchedCat = rootCategories.find((c: any) => c.categoryName.toLowerCase().includes(targetName));
+      const targetNames = vehicleType === "BIKE" ? ["bike", "two wheeler"] : ["car"];
+      const matchedCat = rootCategories.find((c: any) => 
+        targetNames.some(name => c.categoryName.toLowerCase().includes(name))
+      );
       if (matchedCat) categoryId = matchedCat.categoryId;
     }
 
