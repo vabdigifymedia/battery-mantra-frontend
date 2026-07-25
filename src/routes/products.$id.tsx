@@ -132,7 +132,7 @@ function PdpPage() {
   const { id } = Route.useParams();
   const { data } = useSuspenseQuery(productDetailQuery(id));
   const { status } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: Route.fullPath });
   const qc = useQueryClient();
   const [qty, setQty] = useState(1);
   const [isQuotationOpen, setIsQuotationOpen] = useState(false);
@@ -150,12 +150,12 @@ function PdpPage() {
 
   const vehicles = useQuery(vehiclesListQuery());
   const displayVehicles = data.capacity 
-    ? (vehicles.data || []).filter(v => v.capacityId === data.capacity)
+    ? (vehicles.data || []).filter(v => v.capacity?.split(",").map(c => c.trim()).includes(data.capacity!))
     : [];
 
   const { data: deliveryTime, isLoading: isLoadingDeliveryTime } = useQuery({
     queryKey: ["delivery-time", data.categoryId, city?.cityId],
-    queryFn: () => deliveryTimeService.getDeliveryTime(data.categoryId, city!.cityId),
+    queryFn: () => deliveryTimeService.getDeliveryTime(data.categoryId!, city!.cityId!),
     enabled: !!data.categoryId && !!city?.cityId,
   });
 
@@ -187,10 +187,10 @@ function PdpPage() {
   
   useEffect(() => {
     if (status === "authenticated" && search.autoAdd === "true" && inStock && !addToCart.isPending && !addToCart.isSuccess) {
-      navigate({ search: (prev) => ({ ...prev, autoAdd: undefined }), replace: true });
+      navigate({ search: (prev: any) => ({ ...prev, autoAdd: undefined }), replace: true } as any);
       addToCart.mutate();
     } else if (status === "authenticated" && search.autoBuy === "true" && inStock && !addToCart.isPending && !addToCart.isSuccess) {
-      navigate({ search: (prev) => ({ ...prev, autoBuy: undefined }), replace: true });
+      navigate({ search: (prev: any) => ({ ...prev, autoBuy: undefined }), replace: true } as any);
       addToCart.mutate(undefined, {
         onSuccess: () => navigate({ to: "/checkout" }),
       });
@@ -371,9 +371,9 @@ function PdpPage() {
           </div>
 
           {/* RIGHT COLUMN: Details & Buy Box */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 flex flex-col space-y-8">
             {/* Title & Core Details */}
-            <div className="space-y-4">
+            <div className="space-y-4 order-1">
               <div>
                 {data.brandName && (
                   <p className="text-sm font-semibold uppercase tracking-wider text-brand mb-1">
@@ -414,76 +414,11 @@ function PdpPage() {
                   </Badge>
                 )}
               </div>
-              
-              {/* Delivery Time Widget */}
-              {city ? (
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
-                  <div className="bg-primary/10 p-2 rounded-full text-primary shrink-0">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Delivery to <span className="text-primary font-semibold">{city.cityName}</span></p>
-                    {isLoadingDeliveryTime ? (
-                      <div className="h-4 w-32 bg-muted rounded animate-pulse mt-1"></div>
-                    ) : (deliveryTime?.days || deliveryTime?.hours) ? (
-                      <p className="text-muted-foreground">
-                        Estimated time: <span className="font-medium text-foreground">{deliveryTime.days ? `${deliveryTime.days} Days` : ''} {deliveryTime.hours ? `${deliveryTime.hours} Hours` : ''}</span>
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground">Standard delivery time applies.</p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
-                  <div className="bg-muted p-2 rounded-full text-muted-foreground shrink-0">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <p className="text-muted-foreground">Please select a location above to see estimated delivery time.</p>
-                </div>
-              )}
             </div>
 
-            {/* Key Highlights */}
-            {topSpecs.length > 0 && (
-              <div className="pt-2 pb-4">
-                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
-                  {topSpecs.map(([key, value], idx) => {
-                    return (
-                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
-                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
-                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
-                             {getSpecIcon(key)}
-                           </div>
-                        </div>
-                        <div className="flex flex-col pr-1 sm:pr-4">
-                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
-                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
-                        </div>
-                        {/* Divider for desktop */}
-                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
-                        )}
-                        {/* Divider for tablet and mobile */}
-                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            <Separator />
-
-            {/* Buy Box */}
-            <div className="space-y-6">
-              
-              {/* Exchange Widget (Flipkart Style) */}
-              {(data.exchangeDiscount ?? 0) > 0 && (
-                <div className="space-y-3">
+            {/* Exchange Widget (On mobile: order-2, On desktop: lg:order-4) */}
+            {(data.exchangeDiscount ?? 0) > 0 && (
+              <div className="space-y-3 order-2 lg:order-4">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
                 <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
                   <Label
@@ -524,9 +459,74 @@ function PdpPage() {
                   </Label>
                 </RadioGroup>
               </div>
-              )}
+            )}
 
-              {/* Actions */}
+            {/* Delivery Time Widget (On mobile: order-3, On desktop: lg:order-2) */}
+            <div className="order-3 lg:order-2">
+              {city ? (
+                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
+                  <div className="bg-primary/10 p-2 rounded-full text-primary shrink-0">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Delivery to <span className="text-primary font-semibold">{city.cityName}</span></p>
+                    {isLoadingDeliveryTime ? (
+                      <div className="h-4 w-32 bg-muted rounded animate-pulse mt-1"></div>
+                    ) : (deliveryTime?.days || deliveryTime?.hours) ? (
+                      <p className="text-muted-foreground">
+                        Estimated time: <span className="font-medium text-foreground">{deliveryTime.days ? `${deliveryTime.days} Days` : ''} {deliveryTime.hours ? `${deliveryTime.hours} Hours` : ''}</span>
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">Standard delivery time applies.</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
+                  <div className="bg-muted p-2 rounded-full text-muted-foreground shrink-0">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <p className="text-muted-foreground">Please select a location above to see estimated delivery time.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Key Highlights (On mobile: order-4, On desktop: lg:order-3) */}
+            {topSpecs.length > 0 && (
+              <div className="pt-2 pb-4 order-4 lg:order-3">
+                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
+                  {topSpecs.map(([key, value], idx) => {
+                    return (
+                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
+                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
+                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
+                             {getSpecIcon(key)}
+                           </div>
+                        </div>
+                        <div className="flex flex-col pr-1 sm:pr-4">
+                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
+                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
+                        </div>
+                        {/* Divider for desktop */}
+                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
+                        )}
+                        {/* Divider for tablet and mobile */}
+                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <Separator className="order-4 lg:order-3" />
+
+            {/* Buy Box & Actions (On mobile: order-5, On desktop: lg:order-5) */}
+            <div className="space-y-6 order-5">
               <div className="fixed bottom-0 left-0 right-0 z-[100] sm:static flex flex-row items-center gap-2 sm:gap-4 p-3 sm:p-0 pt-4 bg-background sm:bg-transparent border-t sm:border-none shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-none">
                 <div className="hidden sm:flex items-center justify-between sm:justify-start border rounded-lg bg-background px-4 py-2 h-14">
                   <span className="text-sm text-muted-foreground mr-4">Qty</span>
@@ -693,7 +693,7 @@ function PdpPage() {
                         {v.make} {v.model}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 font-medium">
-                        {[v.fuelType].filter(Boolean).join(" • ")}
+                        {[v.fuelName].filter(Boolean).join(" • ")}
                       </div>
                     </div>
                   </div>
@@ -737,7 +737,7 @@ function PdpPage() {
         context={{
           product_name: data.productName,
           brand_name: data.brandName || "Brand",
-          category_name: data.productCategory || "Battery",
+          category_name: data.categoryName || "Battery",
           city_name: city?.cityName || "your city",
           warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
           price_name: data.productPrice?.toString() || "",
