@@ -783,13 +783,13 @@ function AdminVehicles() {
               <p className="text-muted-foreground leading-relaxed">
                 The CSV file must contain a header row with the following column names (exact case):
                 <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground">
-                  vehicleType,make,model,fuelType,imageUrl,capacity
+                  vehicleType,manufacturer,model,fuel,capacity,imageUrl,category
                 </code>
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li><strong className="text-foreground">vehicleType:</strong> CAR, BIKE, COMMERCIAL, E_RICKSHAW, INVERTER</li>
-                <li><strong className="text-foreground">fuelType:</strong> PETROL, DIESEL, ELECTRIC, CNG (or leave blank)</li>
-                <li><strong className="text-foreground">imageUrl/capacity:</strong> Optional (or leave blank)</li>
+                <li><strong className="text-foreground">fuel:</strong> PETROL, DIESEL, ELECTRIC, CNG (or leave blank)</li>
+                <li><strong className="text-foreground">capacity/imageUrl/category:</strong> Optional (or leave blank)</li>
               </ul>
             </div>
 
