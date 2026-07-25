@@ -203,11 +203,20 @@
   --sidebar-accent-foreground: oklch(0.97 0.003 260);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.66 0.215 27);
+
+  * {
+    scrollbar-color: oklch(0.35 0.02 260) transparent;
+  }
+  & ::-webkit-scrollbar-thumb {
+    background-color: oklch(0.35 0.02 260);
+  }
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.85 0.01 260) transparent;
   }
   html {
     -webkit-text-size-adjust: 100%;
@@ -226,6 +235,28 @@
   ::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);
+  }
+
+  /* Global custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: oklch(0.82 0.01 260);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
 
