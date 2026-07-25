@@ -55,9 +55,10 @@ function HomePage() {
   const carCategory = categories?.find((c) =>
     c.categoryName.toLowerCase().includes("car")
   );
-  const bikeCategory = categories?.find((c) =>
-    c.categoryName.toLowerCase().includes("bike")
-  );
+  const bikeCategory = categories?.find((c) => {
+    const name = c.categoryName.toLowerCase();
+    return name.includes("bike") || name.includes("two wheeler");
+  });
 
   return (
     <div className="flex flex-col">
