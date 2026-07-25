@@ -773,7 +773,7 @@ function AdminVehicles() {
 
       {/* CSV IMPORT DIALOG */}
       <Dialog open={isImportOpen} onOpenChange={(open) => !open && !importing && setIsImportOpen(false)}>
-        <DialogContent className="sm:max-w-[450px]">
+        <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
             <DialogTitle>Import Vehicles from CSV</DialogTitle>
           </DialogHeader>
@@ -783,7 +783,7 @@ function AdminVehicles() {
               <p className="text-muted-foreground leading-relaxed">
                 The CSV file must contain a header row with the following column names (exact case):
                 <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground break-all">
-                  vehicleType, manufacturer, model, fuel, capacity, imageUrl, category
+                  vehicleType,manufacturer,model,fuel,capacity,imageUrl,category
                 </code>
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
