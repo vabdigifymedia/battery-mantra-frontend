@@ -73,7 +73,7 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
 
   // Parse headers
   const headers = lines[0].split(",").map((h) => h.trim().replace(/^["']|["']$/g, ""));
-  
+
   const results: any[] = [];
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(",").map((v) => v.trim().replace(/^["']|["']$/g, ""));
@@ -112,7 +112,7 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
     }
     if (!categoryId && vehicleType) {
       const targetNames = vehicleType === "BIKE" ? ["bike", "two wheeler"] : ["car"];
-      const matchedCat = rootCategories.find((c: any) => 
+      const matchedCat = rootCategories.find((c: any) =>
         targetNames.some(name => c.categoryName.toLowerCase().includes(name))
       );
       if (matchedCat) categoryId = matchedCat.categoryId;
@@ -140,7 +140,7 @@ function AdminVehicles() {
   const { data: dbCapacities = [] } = useQuery(capacitiesQuery());
   const { data: manufacturers = [] } = useQuery(manufacturersListQuery());
   const { data: dbFuels = [] } = useQuery(fuelsQuery());
-  
+
   const [activeTab, setActiveTab] = useState("ALL");
   const [activeMake, setActiveMake] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
@@ -154,8 +154,8 @@ function AdminVehicles() {
 
   const PAGE_SIZE = 15;
 
-  const typeFilteredVehicles = activeTab === "ALL" 
-    ? vehicles 
+  const typeFilteredVehicles = activeTab === "ALL"
+    ? vehicles
     : vehicles?.filter(v => v.vehicleType === activeTab);
 
   const availableMakes = Array.from(new Set(typeFilteredVehicles?.map(v => v.make) ?? [])).sort();
@@ -271,7 +271,7 @@ function AdminVehicles() {
       try {
         const text = event.target?.result as string;
         const parsed = parseCSV(text, dbFuels, manufacturers, rootCategories);
-        
+
         if (parsed.length === 0) {
           toast.error("No valid vehicle rows found in the CSV. Please check formatting.");
           return;
@@ -281,7 +281,7 @@ function AdminVehicles() {
         setImportProgress({ current: 0, total: parsed.length });
 
         let successCount = 0;
-        
+
         for (let i = 0; i < parsed.length; i++) {
           const vehicle = parsed[i];
           try {
@@ -333,22 +333,22 @@ function AdminVehicles() {
           <TabsTrigger value="E_RICKSHAW" className="rounded-md">E-Rickshaws</TabsTrigger>
           <TabsTrigger value="INVERTER" className="rounded-md">Inverters</TabsTrigger>
         </TabsList>
-        
+
         {activeTab !== "ALL" && availableMakes.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            <Button 
-              variant={activeMake === "ALL" ? "default" : "outline"} 
-              size="sm" 
+            <Button
+              variant={activeMake === "ALL" ? "default" : "outline"}
+              size="sm"
               onClick={() => { setActiveMake("ALL"); setCurrentPage(1); }}
               className="h-7 text-xs rounded-full px-4"
             >
               All Brands
             </Button>
             {availableMakes.map(make => (
-              <Button 
+              <Button
                 key={make}
-                variant={activeMake === make ? "default" : "outline"} 
-                size="sm" 
+                variant={activeMake === make ? "default" : "outline"}
+                size="sm"
                 onClick={() => { setActiveMake(make); setCurrentPage(1); }}
                 className="h-7 text-xs rounded-full px-4"
               >
@@ -428,7 +428,7 @@ function AdminVehicles() {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
+                            <AlertDialogAction
                               onClick={() => deleteMutation.mutate(vehicle.vehicleId)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
@@ -506,7 +506,7 @@ function AdminVehicles() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction 
+                          <AlertDialogAction
                             onClick={() => deleteMutation.mutate(vehicle.vehicleId)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
@@ -533,22 +533,22 @@ function AdminVehicles() {
             <Pagination className="w-auto mx-0">
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>
                 <PaginationItem className="hidden sm:inline-flex px-4 text-sm font-medium">
                   Page {currentPage} of {totalPages}
                 </PaginationItem>
                 <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} 
+                  <PaginationNext
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>
               </PaginationContent>
-              </Pagination>
+            </Pagination>
           </div>
         )}
       </Tabs>
@@ -677,7 +677,7 @@ function AdminVehicles() {
             {(() => {
               const selectedCategoryId = form.watch("categoryId");
               let options = dbCapacities;
-              
+
               if (selectedCategoryId) {
                 options = dbCapacities.filter(c => c.categoryId === selectedCategoryId);
               }
@@ -696,13 +696,13 @@ function AdminVehicles() {
                             {currentCapacities.map((cap: string) => (
                               <Badge key={cap} variant="secondary" className="px-2 py-1 flex items-center gap-1 font-normal bg-background border shadow-sm">
                                 {cap}
-                                <X 
-                                  className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
+                                <X
+                                  className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const newCaps = currentCapacities.filter((c: string) => c !== cap);
                                     form.setValue("capacity", newCaps.join(","), { shouldDirty: true });
-                                  }} 
+                                  }}
                                 />
                               </Badge>
                             ))}
@@ -713,8 +713,8 @@ function AdminVehicles() {
                         );
                       })()}
                     </div>
-                    
-                    <Select 
+
+                    <Select
                       key={(() => {
                         const rawCap = form.watch("capacity");
                         const currentCapacities = typeof rawCap === "string" && rawCap ? rawCap.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
@@ -783,7 +783,7 @@ function AdminVehicles() {
               <p className="text-muted-foreground leading-relaxed">
                 The CSV file must contain a header row with the following column names (exact case):
                 <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground break-all">
-                  vehicleType,manufacturer,model,fuel,capacity,imageUrl,category
+                  vehicleType, manufacturer, model, fuel, capacity, imageUrl, category
                 </code>
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
@@ -807,8 +807,8 @@ function AdminVehicles() {
                 )}
                 {importProgress && (
                   <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-primary h-full transition-all duration-200" 
+                    <div
+                      className="bg-primary h-full transition-all duration-200"
                       style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
                     />
                   </div>
@@ -831,7 +831,7 @@ function AdminVehicles() {
                     <div className="text-xs text-muted-foreground">Click to browse your files</div>
                   </div>
                 </div>
-                
+
                 <div className="flex justify-end pt-2">
                   <Button variant="ghost" onClick={() => setIsImportOpen(false)}>
                     Cancel
