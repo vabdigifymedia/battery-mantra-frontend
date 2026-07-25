@@ -84,14 +84,14 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
       row[header] = values[index];
     });
 
-    const make = row.make || row.Make;
+    const make = row.manufacturer || row.Manufacturer || row.make || row.Make;
     const model = row.model || row.Model;
     if (!make || !model) continue;
 
     const rawType = (row.vehicle_type || row.vehicleType || "CAR").toUpperCase();
     const vehicleType = ["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"].includes(rawType) ? rawType : "CAR";
 
-    const fuelTypeName = (row.fuel_type || row.fuelType || "").toUpperCase();
+    const fuelTypeName = (row.fuel || row.fuel_type || row.fuelType || "").toUpperCase();
     let fuelId = row.fuelId || row.fuel_id;
     if (!fuelId && fuelTypeName) {
       const matchedFuel = dbFuels.find((f: any) => f.fuelName.toUpperCase() === fuelTypeName);
@@ -105,6 +105,11 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
     }
 
     let categoryId = row.categoryId || row.category_id;
+    const categoryName = row.category || row.Category;
+    if (!categoryId && categoryName) {
+      const matchedCat = rootCategories.find((c: any) => c.categoryName.toLowerCase() === categoryName.toLowerCase());
+      if (matchedCat) categoryId = matchedCat.categoryId;
+    }
     if (!categoryId && vehicleType) {
       const targetNames = vehicleType === "BIKE" ? ["bike", "two wheeler"] : ["car"];
       const matchedCat = rootCategories.find((c: any) => 
