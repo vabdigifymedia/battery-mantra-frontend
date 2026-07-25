@@ -266,6 +266,7 @@ function AdminVehicles() {
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
+        const text = event.target?.result as string;
         const parsed = parseCSV(text, dbFuels, manufacturers, rootCategories);
         
         if (parsed.length === 0) {
