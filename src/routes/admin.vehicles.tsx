@@ -67,7 +67,7 @@ const vehicleSchema = z.object({
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
-const parseCSV = (text: string) => {
+const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], rootCategories: any[] = []) => {
   const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
   if (lines.length < 2) return [];
 
@@ -84,18 +84,43 @@ const parseCSV = (text: string) => {
       row[header] = values[index];
     });
 
-    if (!row.make || !row.model) continue;
+    const make = row.make || row.Make;
+    const model = row.model || row.Model;
+    if (!make || !model) continue;
 
-    const vehicleType = row.vehicleType?.toUpperCase();
-    const fuelType = row.fuelType?.toUpperCase();
+    const rawType = (row.vehicle_type || row.vehicleType || "CAR").toUpperCase();
+    const vehicleType = ["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"].includes(rawType) ? rawType : "CAR";
+
+    const fuelTypeName = (row.fuel_type || row.fuelType || "").toUpperCase();
+    let fuelId = row.fuelId || row.fuel_id;
+    if (!fuelId && fuelTypeName) {
+      const matchedFuel = dbFuels.find((f: any) => f.fuelName.toUpperCase() === fuelTypeName);
+      if (matchedFuel) fuelId = matchedFuel.fuelId;
+    }
+
+    let manufacturerId = row.manufacturerId || row.manufacturer_id;
+    if (!manufacturerId && make) {
+      const matchedMfr = manufacturers.find((m: any) => m.name.toLowerCase() === make.toLowerCase());
+      if (matchedMfr) manufacturerId = matchedMfr.id;
+    }
+
+    let categoryId = row.categoryId || row.category_id;
+    if (!categoryId && vehicleType) {
+      const targetName = vehicleType === "BIKE" ? "bike" : "car";
+      const matchedCat = rootCategories.find((c: any) => c.categoryName.toLowerCase().includes(targetName));
+      if (matchedCat) categoryId = matchedCat.categoryId;
+    }
 
     results.push({
-      vehicleType: ["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"].includes(vehicleType) ? vehicleType : "CAR",
-      make: row.make,
-      model: row.model,
-      fuelId: row.fuelId || undefined,
-      imageUrl: row.imageUrl || undefined,
+      vehicleType,
+      make,
+      model,
+      fuelId: fuelId || undefined,
+      imageUrl: row.image_url || row.imageUrl || undefined,
       capacity: row.capacity || undefined,
+      description: row.description || undefined,
+      manufacturerId: manufacturerId || undefined,
+      categoryId: categoryId || undefined,
     });
   }
   return results;
@@ -241,8 +266,7 @@ function AdminVehicles() {
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
-        const text = event.target?.result as string;
-        const parsed = parseCSV(text);
+        const parsed = parseCSV(text, dbFuels, manufacturers, rootCategories);
         
         if (parsed.length === 0) {
           toast.error("No valid vehicle rows found in the CSV. Please check formatting.");
