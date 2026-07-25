@@ -42,6 +42,15 @@ function ManufacturerPage() {
 
   const categoryName = categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
+  const isBike = categorySlug.includes("bike") || categorySlug.includes("two-wheeler");
+  const isCar = categorySlug.includes("car");
+  const targetVehicleType = isBike ? "BIKE" : isCar ? "CAR" : null;
+
+  const filteredModels = models?.filter(model => {
+    if (!targetVehicleType) return true;
+    return model.vehicleType === targetVehicleType;
+  });
+
   return (
     <div className="flex flex-col gap-12">
       <Container size="xl" className="py-8 min-h-screen">
@@ -78,7 +87,7 @@ function ManufacturerPage() {
         </div>
 
         <p className="text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
-          You will get all types of cars battery for your {manufacturer?.name || exactMake} car in Delhi With Free Delivery & Installation.
+          You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
         </p>
 
         {/* Grid of Models */}
@@ -90,7 +99,7 @@ function ManufacturerPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {models?.map(model => (
+            {filteredModels?.map(model => (
               <Link
                 key={model.vehicleId}
                 to="/products"
@@ -115,7 +124,7 @@ function ManufacturerPage() {
                 </span>
               </Link>
             ))}
-            {models?.length === 0 && (
+            {filteredModels?.length === 0 && (
               <div className="col-span-full py-12 text-center text-muted-foreground">
                 No models found for {manufacturer?.name || exactMake}.
               </div>
