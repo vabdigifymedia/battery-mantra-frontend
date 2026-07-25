@@ -782,7 +782,7 @@ function AdminVehicles() {
               <p className="font-semibold text-foreground">CSV Format Guidelines:</p>
               <p className="text-muted-foreground leading-relaxed">
                 The CSV file must contain a header row with the following column names (exact case):
-                <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground">
+                <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground break-all">
                   vehicleType,manufacturer,model,fuel,capacity,imageUrl,category
                 </code>
               </p>
