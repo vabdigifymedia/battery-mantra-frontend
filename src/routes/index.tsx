@@ -101,14 +101,25 @@ function HomePage() {
             </div>
           </section>
 
-          <section aria-labelledby="manufacturers" className="mt-12">
+          <section aria-labelledby="car-manufacturers" className="mt-12">
             <SectionHeading
               eyebrow="Find by Make"
-              title={<span id="manufacturers">Shop by manufacturer</span>}
+              title={<span id="car-manufacturers">Shop by car manufacturer</span>}
               description="Select your car manufacturer to find the perfect battery match."
             />
             <div className="mt-6">
-              <ManufacturerGrid />
+              <ManufacturerGrid type="CAR" categorySlug="car-batteries" />
+            </div>
+          </section>
+
+          <section aria-labelledby="bike-manufacturers" className="mt-12">
+            <SectionHeading
+              eyebrow="Find by Make"
+              title={<span id="bike-manufacturers">Shop by bike manufacturer</span>}
+              description="Select your bike manufacturer to find the perfect battery match."
+            />
+            <div className="mt-6">
+              <ManufacturerGrid type="BIKE" categorySlug="bike-batteries" />
             </div>
           </section>
         </Container>

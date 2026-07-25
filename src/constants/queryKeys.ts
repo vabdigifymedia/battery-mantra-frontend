@@ -30,7 +30,7 @@ export const queryKeys = {
   },
   manufacturers: {
     all: ["manufacturers"] as const,
-    list: () => [...queryKeys.manufacturers.all, "list"] as const,
+    list: (type?: string) => [...queryKeys.manufacturers.all, "list", type] as const,
   },
   banners: {
     all: ["banners"] as const,

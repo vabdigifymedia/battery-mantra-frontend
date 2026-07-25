@@ -7,8 +7,13 @@ import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 
-export function ManufacturerGrid() {
-  const { data, isLoading, isError } = useQuery(manufacturersListQuery());
+interface ManufacturerGridProps {
+  type?: "CAR" | "BIKE";
+  categorySlug: string;
+}
+
+export function ManufacturerGrid({ type, categorySlug }: ManufacturerGridProps) {
+  const { data, isLoading, isError } = useQuery(manufacturersListQuery(type));
 
   if (isLoading) {
     return (
@@ -29,7 +34,7 @@ export function ManufacturerGrid() {
         <Link
           key={m.id}
           to="/manufacturers/$categorySlug/$makeSlug"
-          params={{ categorySlug: "car-batteries", makeSlug: toSlug(m.name) }}
+          params={{ categorySlug, makeSlug: toSlug(m.name) }}
           className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product min-w-[120px] snap-start lg:min-w-0"
         >
           <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
