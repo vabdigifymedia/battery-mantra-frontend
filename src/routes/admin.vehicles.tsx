@@ -180,9 +180,6 @@ function AdminVehicles() {
       capacity: "",
       categoryId: "",
       manufacturerId: "",
-      description: "",
-      shortDescription: "",
-      description: "",
     });
     setIsModalOpen(true);
   };
@@ -199,7 +196,6 @@ function AdminVehicles() {
       capacity: vehicle.capacity || "",
       categoryId: vehicle.categoryId || "",
       manufacturerId: vehicle.manufacturerId || matchedMfr?.id || "",
-      description: vehicle.description || "",
     });
     setIsModalOpen(true);
   };
@@ -686,7 +682,8 @@ function AdminVehicles() {
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2 min-h-[28px] p-2 border rounded-md bg-muted/20">
                       {(() => {
-                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        const rawCap = form.watch("capacity");
+                        const currentCapacities = typeof rawCap === "string" && rawCap ? rawCap.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
                         return (
                           <>
                             {currentCapacities.map((cap: string) => (
@@ -712,12 +709,14 @@ function AdminVehicles() {
                     
                     <Select 
                       key={(() => {
-                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        const rawCap = form.watch("capacity");
+                        const currentCapacities = typeof rawCap === "string" && rawCap ? rawCap.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
                         return currentCapacities.length;
                       })()}
                       onValueChange={(val) => {
                         if (!val) return;
-                        const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                        const rawCap = form.watch("capacity");
+                        const currentCapacities = typeof rawCap === "string" && rawCap ? rawCap.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
                         if (!currentCapacities.includes(val)) {
                           form.setValue("capacity", [...currentCapacities, val].join(","), { shouldDirty: true });
                         }
