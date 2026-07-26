@@ -412,9 +412,9 @@ function PdpPage() {
               </div>
             </div>
 
-            {/* Exchange Widget (On mobile: order-2, On desktop: lg:order-4) */}
+            {/* Exchange Widget (On mobile: order-2, On desktop: lg:order-2) */}
             {(data.exchangeDiscount ?? 0) > 0 && (
-              <div className="space-y-3 order-2 lg:order-4">
+              <div className="space-y-3 order-2 lg:order-2">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
                 <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
                   <Label
@@ -457,8 +457,8 @@ function PdpPage() {
               </div>
             )}
 
-            {/* Delivery & Policy Info Box (On mobile: order-3, On desktop: lg:order-2) */}
-            <div className="order-3 lg:order-2">
+            {/* Delivery & Policy Info Box (On mobile: order-3, On desktop: lg:order-3) */}
+            <div className="order-3 lg:order-3">
               <ProductDeliveryInfoBox
                 city={city}
                 deliveryTimeDays={deliveryTime?.days}
