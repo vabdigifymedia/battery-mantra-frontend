@@ -28,11 +28,11 @@ const searchSchema = z.object({
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/admin/login")({
+export const Route = createFileRoute("/partner_/login")({
   validateSearch: searchSchema,
   loader: async ({ context }) => {
     try {
-      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/admin/login"));
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/partner/login"));
       return { pageSeo };
     } catch {
       return { pageSeo: null };
@@ -40,8 +40,8 @@ export const Route = createFileRoute("/admin/login")({
   },
   head: ({ loaderData }) =>
     buildPageHead(loaderData?.pageSeo?.seo, {
-      title: "Admin Sign in — BatteryMantra",
-      description: "Sign in to your Admin account.",
+      title: "Partner Sign in — BatteryMantra",
+      description: "Sign in to your Partner account.",
     }),
   component: LoginPage,
 });
@@ -52,7 +52,7 @@ import { ROLES, type Role } from "@/constants/roles";
 function LoginPage() {
   const router = useRouter();
   const { setSession } = useAuth();
-  const { redirect } = useSearch({ from: "/admin/login" });
+  const { redirect } = useSearch({ from: "/partner/login" });
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<Values>({
