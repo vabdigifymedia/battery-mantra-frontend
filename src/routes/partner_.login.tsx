@@ -1,5 +1,4 @@
-
-import { createFileRoute, Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +13,8 @@ import { ApiError } from "@/lib/api/errors";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
 import { env } from "@/lib/utils/env";
+import { motion } from "framer-motion";
+import { BriefcaseBusiness, UsersRound } from "lucide-react";
 
 const schema = z.object({
   username: z.string().trim().min(1, "Username, email, or phone is required"),
@@ -105,7 +106,7 @@ function LoginPage() {
         const [path, query] = redirect.split("?");
         if (query) {
           const params = Object.fromEntries(new URLSearchParams(query));
-          router.navigate({ to: path as any, search: params });
+          router.navigate({ to: path as any, search: params as any });
         } else {
           router.navigate({ to: path as any });
         }
@@ -121,57 +122,120 @@ function LoginPage() {
   const submitting = form.formState.isSubmitting;
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-product sm:p-8">
-      <h1 className="font-display text-2xl font-bold tracking-tight">Sign in</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Welcome back. Enter your credentials to continue.
-      </p>
+    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden bg-slate-950">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 z-0">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, -90, 0],
+            opacity: [0.25, 0.45, 0.25]
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-emerald-600/20 blur-[120px]"
+        />
+        <motion.div
+          animate={{ 
+            scale: [1, 1.4, 1],
+            rotate: [0, 90, 0],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[30%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-teal-600/20 blur-[100px]"
+        />
+      </div>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-        <FormField
-          label="Username, Email or Phone"
-          htmlFor="username"
-          required
-          error={form.formState.errors.username?.message}
-        >
-          <Input
-            id="username"
-            autoComplete="username"
-            placeholder="your username or yourmail@example.com"
-            autoFocus
-            {...form.register("username")}
-          />
-        </FormField>
-        <FormField
-          label="Password"
-          htmlFor="password"
-          required
-          error={form.formState.errors.password?.message}
-        >
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            {...form.register("password")}
-          />
-        </FormField>
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
 
-        {serverError ? (
-          <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {serverError}
-          </p>
-        ) : null}
+      {/* Login Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-md"
+      >
+        <div className="rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-xl ring-1 ring-white/5">
+          
+          <div className="flex flex-col items-center mb-8 space-y-4">
+            <motion.div 
+              initial={{ rotate: 180, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.2, type: "spring" }}
+              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 shadow-lg shadow-emerald-500/30"
+            >
+              <UsersRound className="h-8 w-8 text-white" />
+            </motion.div>
+            <div className="text-center space-y-1">
+              <h1 className="text-3xl font-bold tracking-tight text-white">Partner Portal</h1>
+              <p className="text-sm text-slate-400 font-medium flex items-center justify-center gap-1.5">
+                <BriefcaseBusiness className="w-4 h-4 text-emerald-400" />
+                Business Operations
+              </p>
+            </div>
+          </div>
 
-        <Button type="submit" variant="brand" className="w-full" disabled={submitting}>
-          {submitting ? <Spinner size="sm" /> : "Sign in"}
-        </Button>
-      </form>
+          <form onSubmit={onSubmit} className="space-y-5" noValidate>
+            <div className="space-y-4">
+              <FormField
+                label="Username, Email or Phone"
+                htmlFor="username"
+                required
+                error={form.formState.errors.username?.message}
+                className="text-slate-200"
+              >
+                <Input
+                  id="username"
+                  autoComplete="username"
+                  placeholder="partner@example.com"
+                  autoFocus
+                  className="h-12 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-emerald-500/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-200"
+                  {...form.register("username")}
+                />
+              </FormField>
+              
+              <FormField
+                label="Password"
+                htmlFor="password"
+                required
+                error={form.formState.errors.password?.message}
+                className="text-slate-200"
+              >
+                <PasswordInput
+                  id="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="h-12 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-emerald-500/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-200"
+                  {...form.register("password")}
+                />
+              </FormField>
+            </div>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        New to BatteryMantra?{" "}
-        <Link to="/register" search={{ redirect }} className="font-semibold text-primary hover:underline">
-          Create an account
-        </Link>
-      </p>
+            {serverError ? (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="overflow-hidden"
+              >
+                <p role="alert" className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-400">
+                  {serverError}
+                </p>
+              </motion.div>
+            ) : null}
+
+            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="pt-2">
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-semibold bg-emerald-500 text-white hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-300 relative overflow-hidden group border-0" 
+                disabled={submitting}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-[150%] skew-x-12 group-hover:animate-shimmer" />
+                {submitting ? <Spinner className="text-white" /> : "Access Dashboard"}
+              </Button>
+            </motion.div>
+          </form>
+
+        </div>
+      </motion.div>
     </div>
   );
 }
