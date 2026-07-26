@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Truck, CheckCircle2, RotateCcw, Banknote, FileText, ChevronRight, MapPin } from "lucide-react";
+import { Truck, CheckCircle2, RotateCcw, Banknote, FileText, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LocationModal } from "@/components/location/LocationModal";
@@ -42,99 +42,109 @@ export function ProductDeliveryInfoBox({
   };
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-3 sm:p-4 shadow-sm text-xs sm:text-sm text-foreground space-y-3">
-      {/* Top Header: Location + Delivery Price */}
-      <div className="flex items-center justify-between gap-2 pb-2 border-b border-border/60">
-        <div className="flex items-center gap-1.5 font-medium text-foreground">
-          <MapPin className="w-4 h-4 text-primary shrink-0" />
-          <span>Deliver to <span className="font-bold text-foreground">{cityName}</span></span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 font-semibold text-xs">
+    <div className="space-y-3 font-sans">
+      {/* City Header */}
+      <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-foreground">
+        <span>Deliver to <span className="font-bold text-foreground">{cityName}</span></span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsLocationModalOpen(true)}
+          className="h-7 px-2.5 text-xs text-primary border-primary/30 hover:bg-primary/5 hover:text-primary rounded-md font-medium"
+        >
+          Change
+        </Button>
+      </div>
+
+      {/* Main Delivery Box */}
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4 text-sm text-foreground">
+        
+        {/* Row 1: Free / Discounted Delivery */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+            <Truck className="w-5 h-5" />
+          </div>
+          <div className="flex items-center gap-2 font-medium">
             {deliveryCharge === 0 ? (
-              <span className="text-emerald-600 font-bold">Free</span>
+              <span className="text-emerald-600 font-bold text-base">Free</span>
             ) : (
-              <span className="text-foreground">₹{deliveryCharge}</span>
+              <span className="text-foreground font-bold text-base">₹{deliveryCharge}</span>
             )}
             {originalDeliveryCharge > 0 && (
-              <span className="text-muted-foreground line-through text-[11px] font-normal">
+              <span className="text-muted-foreground line-through text-xs font-normal">
                 ₹{originalDeliveryCharge}
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setIsLocationModalOpen(true)}
-            className="text-xs text-primary font-semibold hover:underline underline-offset-2 ml-1"
-          >
-            Change
-          </button>
         </div>
-      </div>
 
-      {/* Row 1: Delivery Time & SLA */}
-      <button
-        type="button"
-        onClick={() => setIsLocationModalOpen(true)}
-        className="w-full flex items-center justify-between text-left group hover:bg-muted/30 p-1.5 -mx-1.5 rounded-lg transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+        {/* Row 2: Delivery SLA & Cutoff */}
+        <button
+          type="button"
+          onClick={() => setIsLocationModalOpen(true)}
+          className="w-full flex items-start justify-between text-left group hover:opacity-80 transition-opacity"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground leading-snug">
+                {formatSla()}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                if ordered between 9:00 A.M. to 6:00 P.M.
+              </p>
+            </div>
           </div>
-          <div className="leading-tight">
-            <p className="font-semibold text-foreground text-xs sm:text-sm">
-              {formatSla()}
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              if ordered between 9:00 A.M. to 6:00 P.M.
-            </p>
-          </div>
-        </div>
-        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:translate-x-0.5 transition-transform shrink-0" />
-      </button>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
+        </button>
 
-      {/* Row 2: Features Grid (Compact 3-Item List) */}
-      <div className="grid grid-cols-1 gap-1 pt-1 border-t border-border/40 text-xs">
-        {/* Replacement Policy */}
+        {/* Row 3: Replacement Policy */}
         <button
           type="button"
           onClick={() => setActiveModal("replacement")}
-          className="flex items-center justify-between p-1.5 -mx-1.5 rounded-lg hover:bg-muted/30 transition-colors group text-left"
+          className="w-full flex items-center justify-between text-left group hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center gap-2.5">
-            <RotateCcw className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span className="font-medium text-foreground">Replacement Policy</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <RotateCcw className="w-4 h-4" />
+            </div>
+            <span className="font-semibold text-foreground">Replacement Policy</span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform shrink-0" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform shrink-0" />
         </button>
 
-        {/* Cash on Delivery */}
+        {/* Row 4: Cash on Delivery */}
         <button
           type="button"
           onClick={() => setActiveModal("cod")}
-          className="flex items-center justify-between p-1.5 -mx-1.5 rounded-lg hover:bg-muted/30 transition-colors group text-left"
+          className="w-full flex items-center justify-between text-left group hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center gap-2.5">
-            <Banknote className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span className="font-medium text-foreground">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+              <Banknote className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-foreground">
               {isCodAvailable ? "Cash on Delivery Available" : "Pay Online Available"}
             </span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform shrink-0" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform shrink-0" />
         </button>
 
-        {/* GST Invoice */}
+        {/* Row 5: GST Invoice */}
         <button
           type="button"
           onClick={() => setActiveModal("gst")}
-          className="flex items-center justify-between p-1.5 -mx-1.5 rounded-lg hover:bg-muted/30 transition-colors group text-left"
+          className="w-full flex items-center justify-between text-left group hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center gap-2.5">
-            <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-            <span className="font-medium text-foreground">GST Invoice Available</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-foreground">GST Invoice Available</span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform shrink-0" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform shrink-0" />
         </button>
       </div>
 
