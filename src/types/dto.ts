@@ -23,6 +23,15 @@ export type RefreshTokenResponse = {
   refreshToken: string;
 };
 
+export type SendOtpRequest = {
+  phoneNumber: string;
+};
+
+export type VerifyOtpRequest = {
+  phoneNumber: string;
+  otp: string;
+};
+
 export type RegisterRole = "ADMIN" | "CUSTOMER";
 export type RegisterRequest = {
   username: string;

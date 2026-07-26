@@ -93,7 +93,7 @@ export function VehicleStepper({ value, onChange, compact, showSearch = false }:
                 id: v.vehicleId,
                 label: v.model,
                 meta: [
-                  v.fuelType,
+                  v.fuelName,
                 ]
                   .filter(Boolean)
                   .join(" · "),

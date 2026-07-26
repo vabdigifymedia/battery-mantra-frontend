@@ -10,7 +10,7 @@ export const Route = createFileRoute("/partner")({
 
 function PartnerLayout() {
   return (
-    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/login">
+    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/partner/login">
       <SidebarProvider>
         <PartnerSidebar />
         <SidebarInset>

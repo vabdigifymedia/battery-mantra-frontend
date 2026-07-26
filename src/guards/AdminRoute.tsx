@@ -8,7 +8,7 @@ import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 export function AdminRoute({
   children,
   roles = [ROLES.ADMIN],
-  redirectTo = "/",
+  redirectTo = "/admin/login",
 }: {
   children: ReactNode;
   roles?: Role[];

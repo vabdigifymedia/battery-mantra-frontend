@@ -1,6 +1,6 @@
 import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, RefreshTokenRequest, RefreshTokenResponse } from "@/types/dto";
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, RefreshTokenRequest, RefreshTokenResponse, SendOtpRequest, VerifyOtpRequest } from "@/types/dto";
 
 export const authService = {
   login: (body: LoginRequest) =>
@@ -18,6 +18,22 @@ export const authService = {
       method: "POST",
       body: req,
       auth: false, // Don't send the expired access token here
+    });
+  },
+
+  async sendOtp(req: SendOtpRequest): Promise<{ message: string }> {
+    return apiFetch<{ message: string }>(endpoints.auth.sendOtp, {
+      method: "POST",
+      body: req,
+      auth: false,
+    });
+  },
+
+  async verifyOtp(req: VerifyOtpRequest): Promise<LoginResponse> {
+    return apiFetch<LoginResponse>(endpoints.auth.verifyOtp, {
+      method: "POST",
+      body: req,
+      auth: false,
     });
   },
 };

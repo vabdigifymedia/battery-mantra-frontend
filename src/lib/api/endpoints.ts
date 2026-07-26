@@ -11,6 +11,8 @@ export const endpoints = {
     login: "/api/auth/login",
     register: "/api/auth/register",
     refresh: "/api/auth/refresh",
+    sendOtp: "/api/auth/send-otp",
+    verifyOtp: "/api/auth/verify-otp",
   },
   user: {
     profile: "/api/user/profile",

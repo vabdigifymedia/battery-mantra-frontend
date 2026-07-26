@@ -26,13 +26,16 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as PartnerProductsRouteImport } from './routes/partner.products'
 import { Route as PartnerOrdersRouteImport } from './routes/partner.orders'
+import { Route as PartnerLoginRouteImport } from './routes/partner.login'
 import { Route as PartnerEngineersRouteImport } from './routes/partner.engineers'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminFuelsRouteImport } from './routes/admin.fuels'
+import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
 import { Route as AdminDeliveryTimeRouteImport } from './routes/admin.delivery-time'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCapacitiesRouteImport } from './routes/admin.capacities'
@@ -151,6 +154,11 @@ const PartnerOrdersRoute = PartnerOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => PartnerRoute,
 } as any)
+const PartnerLoginRoute = PartnerLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PartnerRoute,
+} as any)
 const PartnerEngineersRoute = PartnerEngineersRouteImport.update({
   id: '/engineers',
   path: '/engineers',
@@ -176,6 +184,11 @@ const AdminManufacturersRoute = AdminManufacturersRouteImport.update({
   path: '/manufacturers',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLocationsRoute = AdminLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -184,6 +197,11 @@ const AdminLocationsRoute = AdminLocationsRouteImport.update({
 const AdminFuelsRoute = AdminFuelsRouteImport.update({
   id: '/fuels',
   path: '/fuels',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
+  id: '/enquiries',
+  path: '/enquiries',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDeliveryTimeRoute = AdminDeliveryTimeRouteImport.update({
@@ -375,13 +393,16 @@ export interface FileRoutesByFullPath {
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
+  '/partner/login': typeof PartnerLoginRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/products/$id': typeof ProductsIdRoute
@@ -431,13 +452,16 @@ export interface FileRoutesByTo {
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
+  '/partner/login': typeof PartnerLoginRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/products/$id': typeof ProductsIdRoute
@@ -491,13 +515,16 @@ export interface FileRoutesById {
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
+  '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
+  '/partner/login': typeof PartnerLoginRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/products/$id': typeof ProductsIdRoute
@@ -551,13 +578,16 @@ export interface FileRouteTypes {
     | '/admin/capacities'
     | '/admin/categories'
     | '/admin/delivery-time'
+    | '/admin/enquiries'
     | '/admin/fuels'
     | '/admin/locations'
+    | '/admin/login'
     | '/admin/manufacturers'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/partner/engineers'
+    | '/partner/login'
     | '/partner/orders'
     | '/partner/products'
     | '/products/$id'
@@ -607,13 +637,16 @@ export interface FileRouteTypes {
     | '/admin/capacities'
     | '/admin/categories'
     | '/admin/delivery-time'
+    | '/admin/enquiries'
     | '/admin/fuels'
     | '/admin/locations'
+    | '/admin/login'
     | '/admin/manufacturers'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/partner/engineers'
+    | '/partner/login'
     | '/partner/orders'
     | '/partner/products'
     | '/products/$id'
@@ -666,13 +699,16 @@ export interface FileRouteTypes {
     | '/admin/capacities'
     | '/admin/categories'
     | '/admin/delivery-time'
+    | '/admin/enquiries'
     | '/admin/fuels'
     | '/admin/locations'
+    | '/admin/login'
     | '/admin/manufacturers'
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
     | '/partner/engineers'
+    | '/partner/login'
     | '/partner/orders'
     | '/partner/products'
     | '/products/$id'
@@ -846,6 +882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnerOrdersRouteImport
       parentRoute: typeof PartnerRoute
     }
+    '/partner/login': {
+      id: '/partner/login'
+      path: '/login'
+      fullPath: '/partner/login'
+      preLoaderRoute: typeof PartnerLoginRouteImport
+      parentRoute: typeof PartnerRoute
+    }
     '/partner/engineers': {
       id: '/partner/engineers'
       path: '/engineers'
@@ -881,6 +924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminManufacturersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/locations': {
       id: '/admin/locations'
       path: '/locations'
@@ -893,6 +943,13 @@ declare module '@tanstack/react-router' {
       path: '/fuels'
       fullPath: '/admin/fuels'
       preLoaderRoute: typeof AdminFuelsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/enquiries': {
+      id: '/admin/enquiries'
+      path: '/enquiries'
+      fullPath: '/admin/enquiries'
+      preLoaderRoute: typeof AdminEnquiriesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/delivery-time': {
@@ -1149,8 +1206,10 @@ interface AdminRouteChildren {
   AdminCapacitiesRoute: typeof AdminCapacitiesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDeliveryTimeRoute: typeof AdminDeliveryTimeRoute
+  AdminEnquiriesRoute: typeof AdminEnquiriesRoute
   AdminFuelsRoute: typeof AdminFuelsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
@@ -1187,8 +1246,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCapacitiesRoute: AdminCapacitiesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDeliveryTimeRoute: AdminDeliveryTimeRoute,
+  AdminEnquiriesRoute: AdminEnquiriesRoute,
   AdminFuelsRoute: AdminFuelsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,
@@ -1221,6 +1282,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PartnerRouteChildren {
   PartnerEngineersRoute: typeof PartnerEngineersRoute
+  PartnerLoginRoute: typeof PartnerLoginRoute
   PartnerOrdersRoute: typeof PartnerOrdersRoute
   PartnerProductsRoute: typeof PartnerProductsRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
@@ -1228,6 +1290,7 @@ interface PartnerRouteChildren {
 
 const PartnerRouteChildren: PartnerRouteChildren = {
   PartnerEngineersRoute: PartnerEngineersRoute,
+  PartnerLoginRoute: PartnerLoginRoute,
   PartnerOrdersRoute: PartnerOrdersRoute,
   PartnerProductsRoute: PartnerProductsRoute,
   PartnerIndexRoute: PartnerIndexRoute,
