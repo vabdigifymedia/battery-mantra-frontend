@@ -122,54 +122,33 @@ function LoginPage() {
   const submitting = form.formState.isSubmitting;
 
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden bg-slate-950">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 z-0">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.3, 0.5, 0.3]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-indigo-600/20 blur-[120px]"
-        />
-        <motion.div
-          animate={{ 
-            scale: [1, 1.5, 1],
-            rotate: [0, -90, 0],
-            opacity: [0.2, 0.4, 0.2]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[40%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-rose-600/20 blur-[100px]"
-        />
+    <div className="min-h-screen w-full relative flex items-center justify-center bg-slate-50/50">
+      {/* Subtle brand background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[30%] -right-[10%] w-[70vw] h-[70vw] bg-gradient-to-b from-primary/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute -bottom-[30%] -left-[10%] w-[70vw] h-[70vw] bg-gradient-to-t from-primary/5 to-transparent rounded-full blur-3xl" />
       </div>
 
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
-
-      {/* Login Card */}
       <motion.div 
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-md"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-[420px] p-4"
       >
-        <div className="rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-xl ring-1 ring-white/5">
-          
-          <div className="flex flex-col items-center mb-8 space-y-4">
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-xl">
+          <div className="flex flex-col items-center mb-8 space-y-3">
             <motion.div 
-              initial={{ rotate: -180, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.2, type: "spring" }}
-              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/30"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1, type: "spring" }}
+              className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary mb-2 shadow-sm ring-1 ring-primary/20"
             >
-              <Fingerprint className="h-8 w-8 text-white" />
+              <ShieldAlert className="h-7 w-7" />
             </motion.div>
-            <div className="text-center space-y-1">
-              <h1 className="text-3xl font-bold tracking-tight text-white">Admin Portal</h1>
-              <p className="text-sm text-slate-400 font-medium flex items-center justify-center gap-1.5">
-                <ShieldAlert className="w-4 h-4 text-rose-400" />
-                Secure Access Only
+            <div className="text-center space-y-1.5">
+              <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Admin Portal</h1>
+              <p className="text-sm text-muted-foreground">
+                Sign in to manage BatteryMantra
               </p>
             </div>
           </div>
@@ -181,14 +160,13 @@ function LoginPage() {
                 htmlFor="username"
                 required
                 error={form.formState.errors.username?.message}
-                className="text-slate-200"
               >
                 <Input
                   id="username"
                   autoComplete="username"
                   placeholder="admin@example.com"
                   autoFocus
-                  className="h-12 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:bg-white/10 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                  className="h-11 transition-all"
                   {...form.register("username")}
                 />
               </FormField>
@@ -198,13 +176,12 @@ function LoginPage() {
                 htmlFor="password"
                 required
                 error={form.formState.errors.password?.message}
-                className="text-slate-200"
               >
                 <PasswordInput
                   id="password"
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="h-12 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:bg-white/10 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                  className="h-11 transition-all"
                   {...form.register("password")}
                 />
               </FormField>
@@ -216,25 +193,30 @@ function LoginPage() {
                 animate={{ opacity: 1, height: 'auto' }}
                 className="overflow-hidden"
               >
-                <p role="alert" className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-400">
+                <p role="alert" className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                   {serverError}
                 </p>
               </motion.div>
             ) : null}
 
-            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="pt-2">
+            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="pt-2">
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base font-semibold bg-white text-black hover:bg-slate-200 shadow-[0_0_20px_rgba(255,255,255,0.15)] transition-all duration-300 relative overflow-hidden group" 
+                variant="brand"
+                className="w-full h-11 text-base font-semibold shadow-md transition-all relative overflow-hidden group" 
                 disabled={submitting}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-[150%] skew-x-12 group-hover:animate-shimmer" />
-                {submitting ? <Spinner className="text-black" /> : "Sign in to Dashboard"}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] skew-x-12 group-hover:animate-shimmer" />
+                {submitting ? <Spinner size="sm" className="text-white" /> : "Sign in to Dashboard"}
               </Button>
             </motion.div>
           </form>
 
         </div>
+        
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          &copy; {new Date().getFullYear()} BatteryMantra. All rights reserved.
+        </p>
       </motion.div>
     </div>
   );
