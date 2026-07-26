@@ -18,6 +18,7 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
+import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -363,11 +364,6 @@ function PdpPage() {
                 </div>
               </Card>
             </div>
-            
-            <div className="flex gap-6 justify-center mt-6 text-sm font-medium text-muted-foreground">
-              <div className="flex items-center gap-1.5"><ShieldCheck className="h-5 w-5 text-green-600" /> Genuine Product</div>
-              <div className="flex items-center gap-1.5"><RefreshCw className="h-5 w-5 text-blue-600" /> Easy Replacement</div>
-            </div>
           </div>
 
           {/* RIGHT COLUMN: Details & Buy Box */}
@@ -461,34 +457,13 @@ function PdpPage() {
               </div>
             )}
 
-            {/* Delivery Time Widget (On mobile: order-3, On desktop: lg:order-2) */}
+            {/* Delivery & Policy Info Box (On mobile: order-3, On desktop: lg:order-2) */}
             <div className="order-3 lg:order-2">
-              {city ? (
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
-                  <div className="bg-primary/10 p-2 rounded-full text-primary shrink-0">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Delivery to <span className="text-primary font-semibold">{city.cityName}</span></p>
-                    {isLoadingDeliveryTime ? (
-                      <div className="h-4 w-32 bg-muted rounded animate-pulse mt-1"></div>
-                    ) : (deliveryTime?.days || deliveryTime?.hours) ? (
-                      <p className="text-muted-foreground">
-                        Estimated time: <span className="font-medium text-foreground">{deliveryTime.days ? `${deliveryTime.days} Days` : ''} {deliveryTime.hours ? `${deliveryTime.hours} Hours` : ''}</span>
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground">Standard delivery time applies.</p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
-                  <div className="bg-muted p-2 rounded-full text-muted-foreground shrink-0">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <p className="text-muted-foreground">Please select a location above to see estimated delivery time.</p>
-                </div>
-              )}
+              <ProductDeliveryInfoBox
+                city={city}
+                deliveryTimeDays={deliveryTime?.days}
+                deliveryTimeHours={deliveryTime?.hours}
+              />
             </div>
 
             {/* Key Highlights (On mobile: order-4, On desktop: lg:order-3) */}

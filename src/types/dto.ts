@@ -471,6 +471,8 @@ export interface CityDto {
   isCodAvailable: boolean;
   isExchangeAvailable: boolean;
   pincodeCount: number;
+  deliveryCharge?: number;
+  originalDeliveryCharge?: number;
 }
 
 export interface CreateCityRequest {
@@ -480,6 +482,8 @@ export interface CreateCityRequest {
   isPopular?: boolean;
   isCodAvailable?: boolean;
   isExchangeAvailable?: boolean;
+  deliveryCharge?: number;
+  originalDeliveryCharge?: number;
 }
 
 export type UpdateCityRequest = Partial<CreateCityRequest>;

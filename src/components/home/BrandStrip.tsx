@@ -9,9 +9,9 @@ export function BrandStrip() {
   const featured = useQuery(featuredBrandsQuery());
   const all = useQuery(brandsQuery());
 
-  const isLoading = featured.isLoading || (featured.isError && all.isLoading);
-  const data =
-    featured.data && featured.data.length > 0 ? featured.data : all.data ?? [];
+  const hasFeatured = Boolean(featured.data && featured.data.length > 0);
+  const isLoading = featured.isLoading || (!hasFeatured && all.isLoading);
+  const data = hasFeatured ? featured.data! : all.data ?? [];
 
   if (isLoading) {
     return (

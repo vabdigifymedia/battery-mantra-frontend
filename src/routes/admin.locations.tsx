@@ -45,6 +45,8 @@ const citySchema = z.object({
   isPopular: z.boolean().default(false),
   isCodAvailable: z.boolean().default(false),
   isExchangeAvailable: z.boolean().default(false),
+  deliveryCharge: z.coerce.number().min(0).default(0),
+  originalDeliveryCharge: z.coerce.number().min(0).default(40),
 });
 
 type CityFormValues = z.infer<typeof citySchema>;
@@ -65,7 +67,7 @@ function AdminLocations() {
   const [pincodeInput, setPincodeInput] = useState("");
 
   const form = useForm<CityFormValues>({
-    resolver: zodResolver(citySchema),
+    resolver: zodResolver(citySchema) as any,
     defaultValues: {
       cityName: "",
       stateName: "",
@@ -73,6 +75,8 @@ function AdminLocations() {
       isPopular: false,
       isCodAvailable: false,
       isExchangeAvailable: false,
+      deliveryCharge: 0,
+      originalDeliveryCharge: 40,
     },
   });
 
@@ -85,6 +89,8 @@ function AdminLocations() {
       isPopular: false,
       isCodAvailable: false,
       isExchangeAvailable: false,
+      deliveryCharge: 0,
+      originalDeliveryCharge: 40,
     });
     setIsCityModalOpen(true);
   };
@@ -98,6 +104,8 @@ function AdminLocations() {
       isPopular: city.isPopular,
       isCodAvailable: city.isCodAvailable,
       isExchangeAvailable: city.isExchangeAvailable,
+      deliveryCharge: city.deliveryCharge ?? 0,
+      originalDeliveryCharge: city.originalDeliveryCharge ?? 40,
     });
     setIsCityModalOpen(true);
   };
@@ -422,6 +430,21 @@ function AdminLocations() {
             >
               <Input {...form.register("cityImage")} placeholder="https://..." />
             </FormField>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label="Delivery Charge (₹)"
+                error={form.formState.errors.deliveryCharge?.message}
+              >
+                <Input type="number" {...form.register("deliveryCharge")} placeholder="0 for Free" />
+              </FormField>
+              <FormField
+                label="Original Fee (₹ - Crossed Out)"
+                error={form.formState.errors.originalDeliveryCharge?.message}
+              >
+                <Input type="number" {...form.register("originalDeliveryCharge")} placeholder="40" />
+              </FormField>
+            </div>
 
             <div className="space-y-4 pt-4 pb-2">
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
