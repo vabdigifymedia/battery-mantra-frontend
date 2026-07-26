@@ -39,6 +39,10 @@ export const endpoints = {
   callbacks: {
     create: "/api/callbacks",
   },
+  enquiries: {
+    quotation: "/api/enquiries/quotation",
+    corporate: "/api/enquiries/corporate",
+  },
   manufacturers: {
     list: "/api/manufacturers",
   },
@@ -112,6 +116,10 @@ export const endpoints = {
     callbacks: {
       list: "/api/admin/callbacks",
       updateStatus: (id: string) => `/api/admin/callbacks/${encodeURIComponent(id)}/status`,
+    },
+    enquiries: {
+      list: (type?: string) => type ? `/api/admin/enquiries?type=${encodeURIComponent(type)}` : "/api/admin/enquiries",
+      updateStatus: (id: string) => `/api/admin/enquiries/${encodeURIComponent(id)}/status`,
     },
     locations: {
       cities: {

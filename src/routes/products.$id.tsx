@@ -794,6 +794,7 @@ function PdpPage() {
       <AskQuotationModal
         open={isQuotationOpen}
         onOpenChange={setIsQuotationOpen}
+        productId={data.productId}
         productName={data.productName}
         brandName={data.brandName}
         productPrice={data.productPrice}
@@ -802,6 +803,7 @@ function PdpPage() {
       <CorporateEnquiryModal
         open={isCorporateOpen}
         onOpenChange={setIsCorporateOpen}
+        productId={data.productId}
         productName={data.productName}
         brandName={data.brandName}
       />

@@ -45,11 +45,16 @@ function CategoryManufacturersPage() {
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-  // Load manufacturers for this categoryId
-  const { data: manufacturers, isLoading } = useQuery({
+  // Load manufacturers for this categoryId (with fallback to all manufacturers)
+  const { data: categoryMfrs, isLoading: isLoadingCatMfrs } = useQuery({
     ...manufacturersListQuery(category?.categoryId),
-    enabled: true,
+    enabled: !!category?.categoryId,
   });
+
+  const { data: allMfrs, isLoading: isLoadingAllMfrs } = useQuery(manufacturersListQuery());
+
+  const manufacturers = categoryMfrs && categoryMfrs.length > 0 ? categoryMfrs : allMfrs;
+  const isLoading = category?.categoryId ? isLoadingCatMfrs && isLoadingAllMfrs : isLoadingAllMfrs;
 
   const sorted = manufacturers
     ? [...manufacturers].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))

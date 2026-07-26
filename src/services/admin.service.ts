@@ -24,7 +24,9 @@ import type {
   CreateCapacityRequest,
   FuelResponse,
   CreateFuelRequest,
-  UUID
+  UUID,
+  EnquiryResponse,
+  UpdateEnquiryStatusRequest,
 } from "@/types/dto";
 
 export interface AdminCreateCustomerRequest {
@@ -153,4 +155,10 @@ export const adminService = {
     apiFetch<BannerResponse>(endpoints.admin.banners.update(id), { method: "PUT", body: data }),
   deleteBanner: (id: string) => 
     apiFetch<void>(endpoints.admin.banners.delete(id), { method: "DELETE" }),
+
+  // Enquiries
+  getAllEnquiries: (type?: string) =>
+    apiFetch<EnquiryResponse[]>(endpoints.admin.enquiries.list(type), { method: "GET" }),
+  updateEnquiryStatus: (id: string, body: UpdateEnquiryStatusRequest) =>
+    apiFetch<EnquiryResponse>(endpoints.admin.enquiries.updateStatus(id), { method: "PATCH", body }),
 };

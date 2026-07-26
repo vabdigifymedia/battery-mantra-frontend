@@ -1,6 +1,6 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -40,6 +40,7 @@ const navigation = [
   { name: "Partners", href: "/admin/partners", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
+  { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
 ];
 
 const seoNavigation = [

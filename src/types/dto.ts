@@ -388,6 +388,61 @@ export interface UpdateCallbackStatusRequest {
   status: CallbackStatus;
 }
 
+/* ---------- Enquiries ---------- */
+export interface CreateQuotationRequest {
+  name: string;
+  mobileNumber: string;
+  email?: string;
+  quantity: string;
+  message?: string;
+  productId?: string;
+  productName?: string;
+}
+
+export interface CreateCorporateEnquiryRequest {
+  companyName: string;
+  contactPerson: string;
+  mobileNumber: string;
+  email?: string;
+  gstin?: string;
+  estimatedQty: string;
+  notes?: string;
+  productId?: string;
+  productName?: string;
+}
+
+export type EnquiryType = "QUOTATION" | "CORPORATE" | "CALLBACK";
+export type EnquiryStatus = "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CANCELLED";
+
+export interface EnquiryResponse {
+  id: number;
+  enquiryType: EnquiryType;
+  status: EnquiryStatus;
+  
+  // Quotation specific
+  name?: string;
+  quantity?: string;
+  message?: string;
+  
+  // Corporate specific
+  companyName?: string;
+  contactPerson?: string;
+  gstin?: string;
+  estimatedQty?: string;
+  notes?: string;
+  
+  // Common fields
+  mobileNumber: string;
+  email?: string;
+  productId?: string;
+  productName?: string;
+  createdAt: string;
+}
+
+export interface UpdateEnquiryStatusRequest {
+  status: EnquiryStatus;
+}
+
 /* ---------- Locations ---------- */
 export interface CityDto {
   cityId: UUID;

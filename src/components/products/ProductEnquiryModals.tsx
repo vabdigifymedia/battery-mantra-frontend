@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { callbacksService } from "@/services/catalog.service";
+import { enquiriesService } from "@/services/enquiries.service";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,7 @@ import {
 interface QuotationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  productId?: string;
   productName: string;
   brandName?: string;
   productPrice?: number;
@@ -38,6 +39,7 @@ interface QuotationModalProps {
 export function AskQuotationModal({
   open,
   onOpenChange,
+  productId,
   productName,
   brandName,
   productPrice,
@@ -49,7 +51,8 @@ export function AskQuotationModal({
   const [message, setMessage] = useState("");
 
   const mutation = useMutation({
-    mutationFn: (mobileNumber: string) => callbacksService.create({ mobileNumber }),
+    mutationFn: (data: Parameters<typeof enquiriesService.createQuotation>[0]) => 
+      enquiriesService.createQuotation(data),
     onSuccess: () => {
       toast.success("Quotation request submitted! Our sales team will email/call you shortly.");
       onOpenChange(false);
@@ -79,7 +82,15 @@ export function AskQuotationModal({
       return;
     }
 
-    mutation.mutate(mobile);
+    mutation.mutate({
+      name,
+      mobileNumber: mobile,
+      email: email || undefined,
+      quantity,
+      message: message || undefined,
+      productId,
+      productName: productName + (brandName ? ` (${brandName})` : ""),
+    });
   };
 
   const handleWhatsAppQuote = () => {
@@ -228,6 +239,7 @@ export function AskQuotationModal({
 interface CorporateEnquiryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  productId?: string;
   productName: string;
   brandName?: string;
 }
@@ -235,6 +247,7 @@ interface CorporateEnquiryModalProps {
 export function CorporateEnquiryModal({
   open,
   onOpenChange,
+  productId,
   productName,
   brandName,
 }: CorporateEnquiryModalProps) {
@@ -247,7 +260,8 @@ export function CorporateEnquiryModal({
   const [notes, setNotes] = useState("");
 
   const mutation = useMutation({
-    mutationFn: (mobileNumber: string) => callbacksService.create({ mobileNumber }),
+    mutationFn: (data: Parameters<typeof enquiriesService.createCorporate>[0]) => 
+      enquiriesService.createCorporate(data),
     onSuccess: () => {
       toast.success("Corporate enquiry submitted! Our B2B account manager will contact you shortly.");
       onOpenChange(false);
@@ -283,7 +297,17 @@ export function CorporateEnquiryModal({
       return;
     }
 
-    mutation.mutate(mobile);
+    mutation.mutate({
+      companyName,
+      contactPerson,
+      mobileNumber: mobile,
+      email: email || undefined,
+      gstin: gstin || undefined,
+      estimatedQty,
+      notes: notes || undefined,
+      productId,
+      productName: productName + (brandName ? ` (${brandName})` : ""),
+    });
   };
 
   const handleWhatsAppCorporate = () => {
