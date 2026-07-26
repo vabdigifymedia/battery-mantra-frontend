@@ -412,9 +412,9 @@ function PdpPage() {
               </div>
             </div>
 
-            {/* Exchange Widget (On mobile: order-2, On desktop: lg:order-2) */}
+            {/* Exchange Widget (order-2) */}
             {(data.exchangeDiscount ?? 0) > 0 && (
-              <div className="space-y-3 order-2 lg:order-2">
+              <div className="space-y-3 order-2">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
                 <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
                   <Label
@@ -457,51 +457,8 @@ function PdpPage() {
               </div>
             )}
 
-            {/* Delivery & Policy Info Box (On mobile: order-3, On desktop: lg:order-3) */}
-            <div className="order-3 lg:order-3">
-              <ProductDeliveryInfoBox
-                city={city}
-                deliveryTimeDays={deliveryTime?.days}
-                deliveryTimeHours={deliveryTime?.hours}
-              />
-            </div>
-
-            {/* Key Highlights (On mobile: order-4, On desktop: lg:order-3) */}
-            {topSpecs.length > 0 && (
-              <div className="pt-2 pb-4 order-4 lg:order-3">
-                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
-                  {topSpecs.map(([key, value], idx) => {
-                    return (
-                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
-                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
-                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
-                             {getSpecIcon(key)}
-                           </div>
-                        </div>
-                        <div className="flex flex-col pr-1 sm:pr-4">
-                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
-                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
-                        </div>
-                        {/* Divider for desktop */}
-                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
-                        )}
-                        {/* Divider for tablet and mobile */}
-                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            <Separator className="order-4 lg:order-3" />
-
-            {/* Buy Box & Actions (On mobile: order-5, On desktop: lg:order-5) */}
-            <div className="space-y-6 order-5">
+            {/* Buy Box & Actions (order-3 - Just below Exchange Offer) */}
+            <div className="space-y-6 order-3">
               <div className="fixed bottom-0 left-0 right-0 z-[100] sm:static flex flex-row items-center gap-2 sm:gap-4 p-3 sm:p-0 pt-4 bg-background sm:bg-transparent border-t sm:border-none shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-none">
                 <div className="hidden sm:flex items-center justify-between sm:justify-start border rounded-lg bg-background px-4 py-2 h-14">
                   <span className="text-sm text-muted-foreground mr-4">Qty</span>
