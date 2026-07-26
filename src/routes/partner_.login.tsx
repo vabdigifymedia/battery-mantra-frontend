@@ -52,7 +52,7 @@ import { ROLES, type Role } from "@/constants/roles";
 function LoginPage() {
   const router = useRouter();
   const { setSession } = useAuth();
-  const { redirect } = useSearch({ from: "/partner/login" });
+  const { redirect } = useSearch({ from: "/partner_/login" });
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<Values>({
