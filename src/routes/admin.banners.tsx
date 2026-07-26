@@ -60,7 +60,7 @@ function AdminBanners() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const form = useForm<BannerFormValues>({
-    resolver: zodResolver(bannerSchema),
+    resolver: zodResolver(bannerSchema) as any,
     defaultValues: {
       title: "",
       imageUrl: "",
@@ -139,9 +139,11 @@ function AdminBanners() {
 
   const onSubmit = form.handleSubmit((values) => {
     const payload: CreateBannerRequest = {
-      ...values,
+      imageUrl: values.imageUrl,
       linkUrl: values.linkUrl || undefined,
       title: values.title || undefined,
+      isActive: values.isActive,
+      displayOrder: values.displayOrder,
     };
 
     if (editingBanner) {

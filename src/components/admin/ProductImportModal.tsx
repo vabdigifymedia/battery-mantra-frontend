@@ -91,7 +91,7 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             const compatibleVehicleIds: string[] = [];
             for (const vName of vehicleNames) {
               const match = vehicles?.find(v => 
-                `${v.make} ${v.model} (${v.fuelType || 'Any'})`.toLowerCase().includes(vName.toLowerCase()) || 
+                `${v.make} ${v.model} (${v.fuelName || 'Any'})`.toLowerCase().includes(vName.toLowerCase()) || 
                 `${v.make} ${v.model}`.toLowerCase() === vName.toLowerCase()
               );
               if (match) compatibleVehicleIds.push(match.vehicleId);

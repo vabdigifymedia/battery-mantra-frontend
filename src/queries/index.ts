@@ -8,7 +8,6 @@ import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
 import { adminService } from "@/services/admin.service";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
-import { seoQuickLinksService } from "@/services/seo.service";
 import { faqService } from "@/services/faq.service";
 import type { ProductFilterParams } from "@/types/dto";
 

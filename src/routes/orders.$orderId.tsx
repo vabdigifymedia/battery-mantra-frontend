@@ -100,7 +100,7 @@ function OrderDetailPage() {
     <div>
       <PageHeader
         title={`Order #${o.orderId.slice(0, 8)}`}
-        description={`Placed ${formatDate(o.placedAt)}`}
+        description={`Placed ${formatDate(o.placedAt || o.createdAt || "")}`}
       />
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
@@ -155,7 +155,7 @@ function OrderDetailPage() {
           )}
 
           <ul className="space-y-3">
-            {o.orderItems.map((it) => (
+            {(o.orderItems || o.items || []).map((it) => (
               <li
                 key={it.productId}
                 className="flex gap-4 rounded-xl border border-border bg-card p-3"
@@ -176,7 +176,7 @@ function OrderDetailPage() {
                       {it.productName}
                     </Link>
                     <p className="text-xs text-muted-foreground">
-                      Qty {it.quantity} × <Price value={it.priceAtPurchase} size="sm" />
+                      Qty {it.quantity} × <Price value={it.priceAtPurchase || it.unitPrice || 0} size="sm" />
                     </p>
                   </div>
                   <Price value={it.subtotal} size="md" />
@@ -192,7 +192,7 @@ function OrderDetailPage() {
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Items</dt>
-                <dd>{o.orderItems.length}</dd>
+                <dd>{(o.orderItems || o.items || []).length}</dd>
               </div>
               {(o.exchangeDiscount ?? 0) > 0 && (
                 <div className="flex justify-between text-success">
