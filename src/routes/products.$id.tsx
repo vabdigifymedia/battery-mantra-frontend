@@ -575,6 +575,47 @@ function PdpPage() {
                 </div>
               </div>
             </div>
+
+            {/* Key Highlights / Features (order-4 - Between Buy Box and Delivery Box) */}
+            {topSpecs.length > 0 && (
+              <div className="pt-2 pb-4 order-4">
+                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
+                  {topSpecs.map(([key, value], idx) => {
+                    return (
+                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
+                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
+                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
+                             {getSpecIcon(key)}
+                           </div>
+                        </div>
+                        <div className="flex flex-col pr-1 sm:pr-4">
+                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
+                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
+                        </div>
+                        {/* Divider for desktop */}
+                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
+                        )}
+                        {/* Divider for tablet and mobile */}
+                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Delivery & Policy Info Box (order-5 - Bottom of right column) */}
+            <div className="order-5">
+              <ProductDeliveryInfoBox
+                city={city}
+                deliveryTimeDays={deliveryTime?.days}
+                deliveryTimeHours={deliveryTime?.hours}
+              />
+            </div>
           </div>
         </div>
       </Container>
