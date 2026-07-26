@@ -273,27 +273,35 @@ export type CheckoutRequest = {
   installationDate?: string;
 };
 export type OrderItemResponse = {
+  orderItemId?: UUID;
   productId: UUID;
   productName: string;
   productImage?: string;
-  priceAtPurchase: number;
+  priceAtPurchase?: number;
+  unitPrice?: number;
   quantity: number;
   subtotal: number;
+  exchangeOldBattery?: boolean;
 };
 export type OrderResponse = {
   orderId: UUID;
   orderStatus: OrderStatus | string;
-  shippingAddress?: string;
+  shippingAddress?: any;
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
-  placedAt: string;
+  placedAt?: string;
+  createdAt?: string;
   totalAmount: number;
   deliveryMethod?: string;
   paymentMethod?: string;
   installationDate?: string;
   exchangeDiscount?: number;
-  orderItems: OrderItemResponse[];
+  orderItems?: OrderItemResponse[];
+  items?: OrderItemResponse[];
+  deliveryAgentName?: string;
+  deliveryAgentPhone?: string;
+  deliverySecurityCode?: string;
 };
 
 /* ---------- Capacities (Battery RL) ---------- */
@@ -505,3 +513,27 @@ export interface FaqResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+/* ---------- Wishlist ---------- */
+export type WishlistCheckResponse = {
+  isWishlisted: boolean;
+};
+
+/* ---------- User Vehicles (My Garage) ---------- */
+export type UserVehicleRequest = {
+  vehicleType: VehicleType;
+  manufacturer: string;
+  modelName: string;
+  fuelType: string;
+  nickname?: string;
+};
+
+export type UserVehicleResponse = {
+  id: UUID;
+  vehicleType: VehicleType;
+  manufacturer: string;
+  modelName: string;
+  fuelType: string;
+  nickname?: string;
+  createdAt: string;
+};

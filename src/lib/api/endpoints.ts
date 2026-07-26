@@ -17,6 +17,17 @@ export const endpoints = {
   user: {
     profile: "/api/user/profile",
     password: "/api/user/password",
+    vehicles: {
+      list: "/api/user/vehicles",
+      add: "/api/user/vehicles",
+      delete: (id: string) => `/api/user/vehicles/${encodeURIComponent(id)}`,
+    },
+  },
+  wishlist: {
+    list: "/api/wishlist",
+    add: (productId: string) => `/api/wishlist/${encodeURIComponent(productId)}`,
+    remove: (productId: string) => `/api/wishlist/${encodeURIComponent(productId)}`,
+    check: (productId: string) => `/api/wishlist/check/${encodeURIComponent(productId)}`,
   },
   products: {
     list: "/api/products",
