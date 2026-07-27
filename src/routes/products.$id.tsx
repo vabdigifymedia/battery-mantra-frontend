@@ -603,7 +603,7 @@ function PdpPage() {
             </div>
 
             {/* Need Help in Buying Block (order-6 on mobile so it sits below Deliver to XYZ, order-3 on desktop) */}
-            <div className="order-6 sm:order-3">
+            <div className="order-6 sm:order-3 pt-6 sm:pt-4 pb-4">
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-background to-muted border border-border shadow-md transition-all hover:shadow-lg">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
@@ -652,7 +652,7 @@ function PdpPage() {
 
             {/* Key Highlights / Features (order-4 - Between Buy Box and Delivery Box) */}
             {topSpecs.length > 0 && (
-              <div className="pt-2 pb-4 order-4">
+              <div className="pt-6 pb-6 my-4 border-y border-border/50 order-4">
                 <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
                   {topSpecs.map(([key, value], idx) => {
@@ -683,7 +683,7 @@ function PdpPage() {
             )}
 
             {/* Delivery & Policy Info Box (order-5 - Bottom of right column on desktop, above expert advice on mobile) */}
-            <div className="order-5">
+            <div className="order-5 pt-6 sm:pt-4">
               <ProductDeliveryInfoBox
                 city={city}
                 deliveryTimeDays={deliveryTime?.days}
