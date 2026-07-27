@@ -600,9 +600,11 @@ function PdpPage() {
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Need Help in Buying Block (Premium Redesign) */}
-              <div className="mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-background to-muted border border-border shadow-md transition-all hover:shadow-lg">
+            {/* Need Help in Buying Block (order-6 on mobile so it sits below Deliver to XYZ, order-3 on desktop) */}
+            <div className="order-6 sm:order-3">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-background to-muted border border-border shadow-md transition-all hover:shadow-lg">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl -z-0"></div>
@@ -680,7 +682,7 @@ function PdpPage() {
               </div>
             )}
 
-            {/* Delivery & Policy Info Box (order-5 - Bottom of right column) */}
+            {/* Delivery & Policy Info Box (order-5 - Bottom of right column on desktop, above expert advice on mobile) */}
             <div className="order-5">
               <ProductDeliveryInfoBox
                 city={city}
