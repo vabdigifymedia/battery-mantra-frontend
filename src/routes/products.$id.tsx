@@ -382,64 +382,71 @@ function PdpPage() {
           </div>
 
           {/* RIGHT COLUMN: Details & Buy Box */}
-          <div className="lg:col-span-7 flex flex-col space-y-8">
+          <div className="lg:col-span-7 flex flex-col space-y-6 sm:space-y-8">
             {/* Title & Core Details */}
-            <div className="space-y-4 order-1">
+            <div className="space-y-2.5 sm:space-y-4 order-1">
               <div>
                 {data.brandName && (
-                  <p className="text-sm font-semibold uppercase tracking-wider text-brand mb-1">
+                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-brand mb-0.5 sm:mb-1">
                     {data.brandName}
                   </p>
                 )}
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+                <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
                   {data.productName}
                 </h1>
               </div>
 
               {/* Reviews, Sold Stats & Creative Warranty Guarantee Banner */}
-              <div className="space-y-4 pt-1">
-                {/* 1. Rating & Popularity Stats (Mocked) */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
-                  <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-lg text-amber-900 dark:text-amber-200 font-bold shadow-2xs">
+              <div className="space-y-2 sm:space-y-3 pt-0.5">
+                {/* 1. Rating & Popularity Stats (Mocked) - Compact & Inline on Mobile */}
+                <div className="flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-xs sm:text-sm">
+                  <div className="inline-flex items-center gap-1 sm:gap-1.5 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg text-amber-900 dark:text-amber-200 font-bold shadow-2xs">
                     <div className="flex items-center text-amber-500">
                       {[...Array(5)].map((_, i) => (
                         <Star 
                           key={i} 
-                          className={`w-3.5 h-3.5 ${i < Math.floor(Number(mockRating)) ? "fill-amber-500 text-amber-500" : "fill-amber-500/30 text-amber-500/40"}`} 
+                          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.floor(Number(mockRating)) ? "fill-amber-500 text-amber-500" : "fill-amber-500/30 text-amber-500/40"}`} 
                         />
                       ))}
                     </div>
-                    <span className="text-xs sm:text-sm font-extrabold ml-0.5">{mockRating}</span>
-                    <span className="text-xs font-medium text-amber-700/80 dark:text-amber-300/80 font-normal">({mockReviews} Reviews)</span>
+                    <span className="font-extrabold ml-0.5">{mockRating}</span>
+                    <span className="text-[11px] sm:text-xs text-amber-700/80 dark:text-amber-300/80 font-normal">({mockReviews} Reviews)</span>
                   </div>
 
                   <span className="text-muted-foreground/30 hidden sm:inline">•</span>
 
-                  <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 px-2.5 py-1 rounded-lg font-semibold text-xs sm:text-sm shadow-2xs">
-                    <Flame className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/20 animate-pulse" />
-                    <span><strong className="font-extrabold">{mockSold}+</strong> Sold this month</span>
+                  <div className="inline-flex items-center gap-1 sm:gap-1.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg font-semibold text-[11px] sm:text-sm shadow-2xs">
+                    <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/20 animate-pulse shrink-0" />
+                    <span><strong className="font-extrabold">{mockSold}+</strong> Sold</span>
                   </div>
                 </div>
 
-                {/* 2. Premium Warranty Guarantee Card (Creative Theme) */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-4 shadow-sm transition-all hover:shadow-md group">
+                {/* 2. Premium Warranty Guarantee Card - Ultra Compact on Phone */}
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-2.5 sm:p-4 shadow-2xs sm:shadow-sm transition-all hover:shadow-md group">
                   {/* Subtle Background Decorative Glow */}
                   <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
                   
-                  <div className="flex items-start sm:items-center gap-3.5 relative z-10">
-                    <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2.5 rounded-xl shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
-                      <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 stroke-[2.2]" />
+                  <div className="flex items-center sm:items-center gap-2.5 sm:gap-3.5 relative z-10">
+                    <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl shadow-sm sm:shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
+                      <ShieldCheck className="h-5 w-5 sm:h-7 sm:w-7 stroke-[2.2]" />
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
-                        <Award className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                        <span>Official Brand Warranty</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                          <Award className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                          <span>Brand Warranty</span>
+                        </div>
+                        <span className="text-[10px] sm:text-xs text-success font-semibold flex items-center gap-0.5 sm:gap-1 shrink-0">
+                          <CheckCircle2 className="h-3 w-3 inline shrink-0" />
+                          <span className="hidden sm:inline">100% Genuine</span>
+                          <span className="sm:hidden">Genuine</span>
+                        </span>
                       </div>
-                      <p className="text-sm sm:text-base font-extrabold text-foreground leading-snug mt-0.5">
+                      <p className="text-xs sm:text-base font-extrabold text-foreground leading-snug sm:leading-snug mt-0.5 truncate sm:whitespace-normal">
                         {warrantyText}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5 font-medium">
+                      <p className="hidden sm:flex text-xs text-muted-foreground mt-1 items-center gap-1.5 font-medium">
                         <CheckCircle2 className="h-3.5 w-3.5 text-success inline shrink-0" />
                         <span>100% Genuine product with doorstep claim support</span>
                       </p>
@@ -448,7 +455,7 @@ function PdpPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-3 pt-1 sm:pt-2">
                 <Price 
                   value={exchange === "yes" && hasExchangeOffer ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) : data.productPrice} 
                   size="xl" 
