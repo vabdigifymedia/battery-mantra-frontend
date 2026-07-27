@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,7 +24,21 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [resendLoading, setResendLoading] = useState(false);
   const { setSession } = useAuth();
+
+  useEffect(() => {
+    let interval: any = null;
+    if (step === "otp" && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [step, resendTimer]);
 
   const phoneForm = useForm({
     resolver: zodResolver(phoneSchema),
@@ -42,6 +56,7 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
       await authService.sendOtp({ phoneNumber: values.phoneNumber });
       setPhoneNumber(values.phoneNumber);
       setStep("otp");
+      setResendTimer(30);
       toast.success("OTP sent successfully");
     } catch (err: any) {
       toast.error(err.message || "Failed to send OTP");
@@ -49,6 +64,20 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
       setLoading(false);
     }
   });
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0 || resendLoading) return;
+    setResendLoading(true);
+    try {
+      await authService.sendOtp({ phoneNumber });
+      toast.success("OTP resent successfully");
+      setResendTimer(30);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to resend OTP");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const onVerifyOtp = otpForm.handleSubmit(async (values) => {
     setLoading(true);
@@ -104,19 +133,37 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
     <form onSubmit={onVerifyOtp} className="space-y-4">
       <div className="text-sm text-muted-foreground mb-4">
         OTP sent to <span className="font-semibold text-foreground">+91 {phoneNumber}</span>.{" "}
-        <button type="button" onClick={() => setStep("phone")} className="text-brand hover:underline">
+        <button type="button" onClick={() => setStep("phone")} className="text-brand hover:underline font-medium">
           Change
         </button>
       </div>
+
       <FormField label="Enter OTP" error={otpForm.formState.errors.otp?.message}>
         <Input
           {...otpForm.register("otp")}
           placeholder="4-digit OTP"
           maxLength={4}
-          className="h-12 text-center text-lg tracking-widest"
+          className="h-12 text-center text-lg tracking-widest font-semibold"
         />
       </FormField>
-      <Button type="submit" className="w-full h-12 text-md" disabled={loading}>
+
+      <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+        <span>Didn't receive the OTP?</span>
+        {resendTimer > 0 ? (
+          <span className="font-medium text-muted-foreground bg-muted px-2 py-1 rounded">Resend in {resendTimer}s</span>
+        ) : (
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={resendLoading}
+            className="font-semibold text-brand hover:underline disabled:opacity-50"
+          >
+            {resendLoading ? "Sending..." : "Resend OTP"}
+          </button>
+        )}
+      </div>
+
+      <Button type="submit" className="w-full h-12 text-md mt-2" disabled={loading}>
         {loading ? <Spinner className="mr-2" /> : null}
         Verify & Login
       </Button>
