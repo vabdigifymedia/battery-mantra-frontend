@@ -29,10 +29,10 @@ export function PartnerSidebar() {
   const router = useRouter();
 
   const assignedOrdersQuery = useQuery({
-    queryKey: ["partner", "sidebar-assigned-orders"],
+    queryKey: ["partner", "orders"],
     queryFn: () => partnerDashboardService.listAssignedOrders(),
-    staleTime: 30000,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
 
   const pendingAssignedOrdersCount = (assignedOrdersQuery.data || []).filter(

@@ -62,33 +62,33 @@ export function AdminSidebar() {
   const { signOut } = useAuth();
   const router = useRouter();
 
-  // Queries for Notification Badges
+  // Queries for Notification Badges (Sharing exact queryKeys with pages for instant real-time invalidation)
   const ordersQuery = useQuery({
-    queryKey: ["admin", "sidebar-orders"],
+    queryKey: ["admin", "orders"],
     queryFn: () => adminService.getAllOrders(),
-    staleTime: 30000,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
 
   const callbacksQuery = useQuery({
-    queryKey: ["admin", "sidebar-callbacks"],
+    queryKey: ["admin", "callbacks"],
     queryFn: () => adminService.getAllCallbacks(),
-    staleTime: 30000,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
 
   const enquiriesQuery = useQuery({
-    queryKey: ["admin", "sidebar-enquiries"],
+    queryKey: ["admin", "enquiries"],
     queryFn: () => adminService.getAllEnquiries(),
-    staleTime: 30000,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
 
   const pendingProductsQuery = useQuery({
-    queryKey: ["admin", "sidebar-pending-products"],
+    queryKey: ["admin", "products", "pending"],
     queryFn: () => adminService.getPendingProducts(),
-    staleTime: 30000,
-    refetchInterval: 30000,
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
 
   const newOrdersCount = ordersQuery.data?.filter(
