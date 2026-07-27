@@ -252,10 +252,21 @@ function PdpPage() {
     return <CheckCircle2 className={iconClass} />;
   };
 
-  const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
-  const hasDiscount = originalPrice && originalPrice > data.productPrice;
-  const discountPercent = hasDiscount 
-    ? Math.round(((originalPrice - data.productPrice) / originalPrice) * 100)
+  const currentPrice = exchange === "yes" && hasExchangeOffer 
+    ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) 
+    : data.productPrice;
+
+  const mrpFromSpec = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
+
+  // Calculate dynamic strike price & discount based on selected exchange mode
+  const strikePrice = mrpFromSpec && mrpFromSpec > currentPrice
+    ? mrpFromSpec
+    : (exchange === "yes" && hasExchangeOffer ? data.productPrice : null);
+
+  const hasDiscount = Boolean(strikePrice && strikePrice > currentPrice);
+
+  const discountPercent = hasDiscount && strikePrice
+    ? Math.round(((strikePrice - currentPrice) / strikePrice) * 100)
     : 0;
 
   // Generate consistent mock rating & sales data based on product name/id
@@ -447,18 +458,77 @@ function PdpPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Mobile-Only Compact Exchange Offer (below Brand Warranty, above Price) */}
+                {(data.exchangeDiscount ?? 0) > 0 && (
+                  <div className="block sm:hidden space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                        <span>Exchange Offer</span>
+                      </h3>
+                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        Save ₹{data.exchangeDiscount?.toLocaleString()}
+                      </span>
+                    </div>
+                    <RadioGroup
+                      value={exchange}
+                      onValueChange={(val: "yes" | "no") => setExchange(val)}
+                      className="grid grid-cols-2 gap-2"
+                    >
+                      <Label
+                        htmlFor="exchange-no-mobile"
+                        className={`flex cursor-pointer flex-col justify-between rounded-lg border-2 p-2.5 transition-colors ${
+                          exchange === "no" ? "border-brand bg-brand/5" : "border-muted/60"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <RadioGroupItem value="no" id="exchange-no-mobile" className="h-3.5 w-3.5" />
+                          <span className="font-bold text-xs">Buy New</span>
+                        </div>
+                        <div>
+                          <span className="text-sm font-extrabold block">
+                            ₹{data.productPrice.toLocaleString()}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground block font-normal">Keep old battery</span>
+                        </div>
+                      </Label>
+
+                      <Label
+                        htmlFor="exchange-yes-mobile"
+                        className={`flex cursor-pointer flex-col justify-between rounded-lg border-2 p-2.5 transition-colors ${
+                          exchange === "yes" ? "border-success bg-success/5" : "border-muted/60"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <RadioGroupItem
+                            value="yes"
+                            id="exchange-yes-mobile"
+                            className="h-3.5 w-3.5 text-success border-success data-[state=checked]:border-success data-[state=checked]:text-success"
+                          />
+                          <span className="font-bold text-xs text-success">With Exchange</span>
+                        </div>
+                        <div>
+                          <span className="text-sm font-extrabold text-success block">
+                            ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground block font-normal">Return old battery</span>
+                        </div>
+                      </Label>
+                    </RadioGroup>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3 pt-1 sm:pt-2">
                 <Price 
-                  value={exchange === "yes" && hasExchangeOffer ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) : data.productPrice} 
+                  value={currentPrice} 
                   size="xl" 
                   className="text-4xl tracking-tight" 
                 />
-                {hasDiscount && (
+                {hasDiscount && strikePrice && (
                   <>
                     <span className="text-2xl text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
-                      ₹{originalPrice.toLocaleString()}
+                      ₹{strikePrice.toLocaleString()}
                     </span>
                     <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
                       {discountPercent}% OFF
@@ -480,9 +550,9 @@ function PdpPage() {
               </div>
             </div>
 
-            {/* Exchange Widget (order-2) */}
+            {/* Exchange Widget (Desktop Only - order-2) */}
             {(data.exchangeDiscount ?? 0) > 0 && (
-              <div className="space-y-3 order-2">
+              <div className="hidden sm:block space-y-3 order-2">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
                 <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
                   <Label
