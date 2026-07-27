@@ -526,7 +526,7 @@ function PdpPage() {
 
             {/* Buy Box & Actions (order-3 - Just below Exchange Offer) */}
             <div className="space-y-6 order-3">
-              <div className="fixed bottom-0 left-0 right-0 z-[100] sm:static flex flex-row items-center gap-2 sm:gap-4 p-3 sm:p-0 pt-4 bg-background sm:bg-transparent border-t sm:border-none shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:shadow-none">
+              <div className="fixed bottom-0 left-0 right-0 z-[100] sm:static flex flex-row items-center gap-2 sm:gap-4 px-2.5 pt-2.5 pb-0 sm:p-0 bg-background sm:bg-transparent border-t sm:border-none shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:shadow-none">
                 <div className="hidden sm:flex items-center justify-between sm:justify-start border rounded-lg bg-background px-4 py-2 h-14">
                   <span className="text-sm text-muted-foreground mr-4">Qty</span>
                   <QuantityStepper
