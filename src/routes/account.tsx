@@ -4,7 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { LogOut, User, MapPin, Lock, Save, Trash2, LayoutDashboard, Package, Heart, Car, Plus } from "lucide-react";
+import { LogOut, User, MapPin, Save, Trash2, LayoutDashboard, Package, Heart, Car, Plus, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 import { userProfileQuery, addressesQuery } from "@/queries";
@@ -18,7 +18,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/forms/FormField";
-import { PasswordInput } from "@/components/forms/PasswordInput";
 import { Spinner } from "@/components/feedback/Spinner";
 
 import { OverviewTab } from "@/components/account/OverviewTab";
@@ -32,17 +31,9 @@ export const Route = createFileRoute("/account")({
 });
 
 const profileSchema = z.object({
+  username: z.string().min(2, "Full Name is required"),
   email: z.string().email("Invalid email address"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 characters"),
-});
-
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm password is required"),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
 });
 
 function AccountPage() {
@@ -60,6 +51,21 @@ function AccountPage() {
   const { data: profile, isLoading: isLoadingProfile } = useQuery(userProfileQuery(true));
   const { data: addresses, isLoading: isLoadingAddresses } = useQuery(addressesQuery(true));
 
+  const isDummyName = (name?: string, phone?: string) => !name || name === phone || /^\d+$/.test(name);
+  const isDummyEmail = (email?: string) => !email || email.endsWith("@batterymantra.com");
+
+  const displayName = profile && !isDummyName(profile.username, profile.phoneNumber)
+    ? profile.username
+    : "Valued Customer";
+
+  const displayEmail = profile && !isDummyEmail(profile.email)
+    ? profile.email
+    : profile?.phoneNumber || "";
+
+  const isProfileIncomplete = Boolean(
+    profile && (isDummyName(profile.username, profile.phoneNumber) || isDummyEmail(profile.email))
+  );
+
   // Mutations
   const updateProfileMutation = useMutation({
     mutationFn: userService.updateProfile,
@@ -68,15 +74,6 @@ function AccountPage() {
       toast.success("Profile updated successfully");
     },
     onError: (err: any) => toast.error(err.message || "Failed to update profile"),
-  });
-
-  const updatePasswordMutation = useMutation({
-    mutationFn: userService.updatePassword,
-    onSuccess: () => {
-      toast.success("Password updated successfully");
-      passwordForm.reset();
-    },
-    onError: (err: any) => toast.error(err.message || "Failed to update password"),
   });
 
   const deleteAddressMutation = useMutation({
@@ -92,17 +89,9 @@ function AccountPage() {
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     values: {
-      email: profile?.email || "",
+      username: profile && !isDummyName(profile.username, profile.phoneNumber) ? profile.username : "",
+      email: profile && !isDummyEmail(profile.email) ? profile.email : "",
       phoneNumber: profile?.phoneNumber || "",
-    },
-  });
-
-  const passwordForm = useForm<z.infer<typeof passwordSchema>>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
     },
   });
 
@@ -125,8 +114,8 @@ function AccountPage() {
               <User className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold">{profile?.username}</h3>
-              <p className="text-xs text-muted-foreground">{profile?.email}</p>
+              <h3 className="font-semibold">{displayName}</h3>
+              <p className="text-xs text-muted-foreground">{displayEmail}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={() => signOut()} className="text-muted-foreground hover:text-rose-500">
@@ -147,8 +136,8 @@ function AccountPage() {
                 <User className="h-10 w-10 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">{profile?.username}</h3>
-                <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                <h3 className="font-semibold text-lg">{displayName}</h3>
+                <p className="text-sm text-muted-foreground">{displayEmail}</p>
               </div>
               <Button variant="outline" className="w-full text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-rose-200" onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" /> Sign Out
@@ -159,6 +148,24 @@ function AccountPage() {
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
+          {/* Compulsory Profile Completion Alert */}
+          {isProfileIncomplete && (
+            <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-amber-900 dark:text-amber-200 shadow-sm animate-in fade-in-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+                <div className="space-y-0.5">
+                  <h3 className="font-bold text-base">Complete Your Profile</h3>
+                  <p className="text-xs text-amber-800/90 dark:text-amber-300/90">
+                    Please provide your <strong>Full Name</strong> and <strong>Email Address</strong> to finish setting up your account.
+                  </p>
+                </div>
+              </div>
+              <Button size="sm" variant="brand" className="shrink-0 w-full sm:w-auto" onClick={() => setActiveTab("profile")}>
+                Complete Profile
+              </Button>
+            </div>
+          )}
+
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="border-b mb-6 overflow-x-auto scrollbar-none">
               <TabsList className="h-14 bg-transparent p-0 inline-flex w-max min-w-full lg:w-full justify-start gap-1">
@@ -177,8 +184,11 @@ function AccountPage() {
                 <TabsTrigger value="addresses" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 h-full data-[state=active]:shadow-none data-[state=active]:text-primary text-muted-foreground whitespace-nowrap">
                   <MapPin className="mr-2 h-4 w-4" /> Addresses
                 </TabsTrigger>
-                <TabsTrigger value="profile" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 h-full data-[state=active]:shadow-none data-[state=active]:text-primary text-muted-foreground whitespace-nowrap">
+                <TabsTrigger value="profile" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 h-full data-[state=active]:shadow-none data-[state=active]:text-primary text-muted-foreground whitespace-nowrap relative">
                   <User className="mr-2 h-4 w-4" /> Profile
+                  {isProfileIncomplete && (
+                    <span className="absolute top-3 right-1 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                  )}
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -204,52 +214,26 @@ function AccountPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
-                  <CardDescription>Update your email address and phone number.</CardDescription>
+                  <CardDescription>Update your Full Name and Email Address.</CardDescription>
                 </CardHeader>
                 <form onSubmit={profileForm.handleSubmit((data) => updateProfileMutation.mutate(data))}>
                   <CardContent className="space-y-4">
-                    <FormField label="Username" htmlFor="username">
-                      <Input id="username" value={profile?.username || ""} disabled className="bg-muted" />
+                    <FormField label="Full Name" htmlFor="username" error={profileForm.formState.errors.username?.message}>
+                      <Input id="username" placeholder="Enter your full name" {...profileForm.register("username")} />
                     </FormField>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField label="Email Address" htmlFor="email" error={profileForm.formState.errors.email?.message}>
-                        <Input id="email" {...profileForm.register("email")} />
+                        <Input id="email" placeholder="name@example.com" {...profileForm.register("email")} />
                       </FormField>
                       <FormField label="Phone Number" htmlFor="phoneNumber" error={profileForm.formState.errors.phoneNumber?.message}>
-                        <Input id="phoneNumber" {...profileForm.register("phoneNumber")} />
+                        <Input id="phoneNumber" {...profileForm.register("phoneNumber")} disabled className="bg-muted font-medium" />
                       </FormField>
                     </div>
                   </CardContent>
                   <CardFooter className="border-t bg-muted/10 px-6 py-4">
-                    <Button type="submit" disabled={updateProfileMutation.isPending || !profileForm.formState.isDirty}>
+                    <Button type="submit" variant="brand" disabled={updateProfileMutation.isPending || !profileForm.formState.isDirty}>
                       {updateProfileMutation.isPending ? <Spinner className="mr-2" size="sm" /> : <Save className="mr-2 h-4 w-4" />}
-                      Save Changes
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Security</CardTitle>
-                  <CardDescription>Update your account password to stay secure.</CardDescription>
-                </CardHeader>
-                <form onSubmit={passwordForm.handleSubmit((data) => updatePasswordMutation.mutate(data))}>
-                  <CardContent className="space-y-4 max-w-md">
-                    <FormField label="Current Password" htmlFor="currentPassword" error={passwordForm.formState.errors.currentPassword?.message}>
-                      <PasswordInput id="currentPassword" {...passwordForm.register("currentPassword")} />
-                    </FormField>
-                    <FormField label="New Password" htmlFor="newPassword" error={passwordForm.formState.errors.newPassword?.message}>
-                      <PasswordInput id="newPassword" {...passwordForm.register("newPassword")} />
-                    </FormField>
-                    <FormField label="Confirm New Password" htmlFor="confirmPassword" error={passwordForm.formState.errors.confirmPassword?.message}>
-                      <PasswordInput id="confirmPassword" {...passwordForm.register("confirmPassword")} />
-                    </FormField>
-                  </CardContent>
-                  <CardFooter className="border-t bg-muted/10 px-6 py-4">
-                    <Button type="submit" variant="secondary" disabled={updatePasswordMutation.isPending}>
-                      {updatePasswordMutation.isPending ? <Spinner className="mr-2" size="sm" /> : <Lock className="mr-2 h-4 w-4" />}
-                      Update Password
+                      Save Profile
                     </Button>
                   </CardFooter>
                 </form>

@@ -35,10 +35,13 @@ export function OverviewTab({ setActiveTab }: { setActiveTab: (tab: string) => v
   const recentOrder = orders?.[0];
   const defaultAddress = addresses?.find((a) => a.isDefault) || addresses?.[0];
 
+  const isDummyName = !user?.username || user.username === user.phoneNumber || /^\d+$/.test(user.username);
+  const greetingName = !isDummyName ? user!.username : "there";
+
   return (
     <div className="space-y-6 animate-in fade-in-50">
       <div>
-        <h3 className="text-xl font-medium">Hello, {user?.username || "there"}!</h3>
+        <h3 className="text-xl font-medium">Hello, {greetingName}!</h3>
         <p className="text-sm text-muted-foreground">Welcome to your dashboard. Here's a quick overview of your account.</p>
       </div>
 

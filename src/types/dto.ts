@@ -407,6 +407,7 @@ export type UserProfileResponse = {
 };
 
 export type UpdateProfileRequest = {
+  username?: string;
   email: string;
   phoneNumber: string;
 };
