@@ -70,7 +70,8 @@ function OrderDetailPage() {
     switch (status) {
       case "PENDING": return 0;
       case "PROCESSING": return 1;
-      case "SHIPPED": return 2;
+      case "SHIPPED": 
+      case "OUT_FOR_DELIVERY": return 2;
       case "DELIVERED": return 3;
       default: return -1;
     }
@@ -89,7 +90,8 @@ function OrderDetailPage() {
     switch (status) {
       case "PENDING": return "Order Placed";
       case "PROCESSING": return "Ready For Dispatch";
-      case "SHIPPED": return "Dispatched";
+      case "SHIPPED": 
+      case "OUT_FOR_DELIVERY": return "Dispatched";
       case "DELIVERED": return "Delivered";
       case "CANCELLED": return "Cancelled";
       default: return status;
@@ -150,6 +152,24 @@ function OrderDetailPage() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {["SHIPPED", "OUT_FOR_DELIVERY", "DISPATCHED"].includes(String(o.orderStatus)) && o.deliverySecurityCode && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center">
+                  <Truck className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">Arriving Soon</p>
+                  <p className="text-xs text-blue-700/80 dark:text-blue-300/80">Please share the delivery code with our technician upon installation.</p>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-black/20 border border-blue-500/20 rounded-lg p-2 px-6 text-center shadow-sm w-full sm:w-auto">
+                <p className="text-[10px] uppercase font-bold text-blue-500 tracking-wider mb-0.5">Delivery Code</p>
+                <p className="font-mono text-xl font-bold tracking-widest text-blue-700 dark:text-blue-400">{o.deliverySecurityCode}</p>
               </div>
             </div>
           )}

@@ -31,7 +31,7 @@ export function OverviewTab({ setActiveTab }: { setActiveTab: (tab: string) => v
 
   const { data: addresses } = useQuery(addressesQuery(true));
 
-  const activeOrders = orders?.filter((o) => o.orderStatus === "PLACED" || o.orderStatus === "DISPATCHED") || [];
+  const activeOrders = orders?.filter((o) => ["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY", "PLACED", "DISPATCHED"].includes(String(o.orderStatus))) || [];
   const recentOrder = orders?.[0];
   const defaultAddress = addresses?.find((a) => a.isDefault) || addresses?.[0];
 
@@ -114,7 +114,7 @@ export function OverviewTab({ setActiveTab }: { setActiveTab: (tab: string) => v
                     {recentOrder.orderStatus}
                   </span>
                 </div>
-                {recentOrder.orderStatus === "DISPATCHED" && (
+                {["SHIPPED", "OUT_FOR_DELIVERY", "DISPATCHED"].includes(String(recentOrder.orderStatus)) && (
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center gap-3">
                     <Truck className="w-5 h-5 text-blue-600" />
                     <div className="flex-1">

@@ -15,8 +15,14 @@ import type { OrderResponse } from "@/types/dto";
 function OrderStatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; icon: any; className: string }> = {
     PLACED: { label: "Order Placed", icon: Package, className: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+    PENDING: { label: "Pending", icon: Package, className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+    CONFIRMED: { label: "Confirmed", icon: Package, className: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+    PROCESSING: { label: "Processing", icon: Package, className: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+    SHIPPED: { label: "Dispatched", icon: Truck, className: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
+    OUT_FOR_DELIVERY: { label: "Out for Delivery", icon: Truck, className: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
     DISPATCHED: { label: "Dispatched", icon: Truck, className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
     DELIVERED: { label: "Delivered", icon: CheckCircle2, className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+    INSTALLED: { label: "Installed", icon: CheckCircle2, className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
     CANCELLED: { label: "Cancelled", icon: XCircle, className: "bg-rose-500/10 text-rose-600 border-rose-500/20" },
   };
   const config = map[status] || { label: status, icon: Package, className: "bg-muted text-muted-foreground" };
@@ -90,7 +96,7 @@ export function OrdersTab() {
             </CardHeader>
             <CardContent className="p-0">
               {/* Delivery Agent & OTP (If dispatched) */}
-              {order.orderStatus === "DISPATCHED" && (
+              {["SHIPPED", "OUT_FOR_DELIVERY", "DISPATCHED"].includes(String(order.orderStatus)) && (
                 <div className="bg-blue-500/5 border-b border-blue-500/10 p-4 px-6 flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center">
