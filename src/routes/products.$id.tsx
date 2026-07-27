@@ -7,7 +7,8 @@ import {
   Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert, 
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
   ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
-  Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2
+  Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2,
+  Award, Flame, TrendingUp
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -256,6 +257,20 @@ function PdpPage() {
     ? Math.round(((originalPrice - data.productPrice) / originalPrice) * 100)
     : 0;
 
+  // Generate consistent mock rating & sales data based on product name/id
+  const charCodeSum = (data.productName || id || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const mockRating = (4.4 + (charCodeSum % 5) * 0.1).toFixed(1); // e.g., 4.4 to 4.8
+  const mockReviews = 84 + (charCodeSum % 160); // e.g., 84 to 243 reviews
+  const mockSold = 150 + (charCodeSum % 250); // e.g., 150 to 399+ sold
+
+  // Extract Warranty for Banner
+  const warrantySpec = allFlatSpecs.find((s: any) => {
+    const key = String(s[0]).toLowerCase();
+    return key.includes("warranty") || key.includes("guarantee") || key.includes("period");
+  });
+  const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
+  const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : "60 Months (36 Flat + 24 Pro-rata) Manufacturer Warranty");
+
   return (
     <div className="bg-muted/30 min-h-screen pb-24 sm:pb-16 pt-14 sm:pt-0">
       {/* Mobile Navbar */}
@@ -379,6 +394,58 @@ function PdpPage() {
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
                   {data.productName}
                 </h1>
+              </div>
+
+              {/* Reviews, Sold Stats & Creative Warranty Guarantee Banner */}
+              <div className="space-y-4 pt-1">
+                {/* 1. Rating & Popularity Stats (Mocked) */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
+                  <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-lg text-amber-900 dark:text-amber-200 font-bold shadow-2xs">
+                    <div className="flex items-center text-amber-500">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`w-3.5 h-3.5 ${i < Math.floor(Number(mockRating)) ? "fill-amber-500 text-amber-500" : "fill-amber-500/30 text-amber-500/40"}`} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs sm:text-sm font-extrabold ml-0.5">{mockRating}</span>
+                    <span className="text-xs font-medium text-amber-700/80 dark:text-amber-300/80 font-normal">({mockReviews} Reviews)</span>
+                  </div>
+
+                  <span className="text-muted-foreground/30 hidden sm:inline">•</span>
+
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 px-2.5 py-1 rounded-lg font-semibold text-xs sm:text-sm shadow-2xs">
+                    <Flame className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/20 animate-pulse" />
+                    <span><strong className="font-extrabold">{mockSold}+</strong> Sold this month</span>
+                  </div>
+                </div>
+
+                {/* 2. Premium Warranty Guarantee Card (Creative Theme) */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-4 shadow-sm transition-all hover:shadow-md group">
+                  {/* Subtle Background Decorative Glow */}
+                  <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
+                  
+                  <div className="flex items-start sm:items-center gap-3.5 relative z-10">
+                    <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2.5 rounded-xl shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
+                      <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 stroke-[2.2]" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                        <Award className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <span>Official Brand Warranty</span>
+                      </div>
+                      <p className="text-sm sm:text-base font-extrabold text-foreground leading-snug mt-0.5">
+                        {warrantyText}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5 font-medium">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-success inline shrink-0" />
+                        <span>100% Genuine product with doorstep claim support</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 pt-2">
