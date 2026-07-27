@@ -260,7 +260,6 @@ function PdpPage() {
   // Generate consistent mock rating & sales data based on product name/id
   const charCodeSum = (data.productName || id || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const mockRating = (4.4 + (charCodeSum % 5) * 0.1).toFixed(1); // e.g., 4.4 to 4.8
-  const mockReviews = 84 + (charCodeSum % 160); // e.g., 84 to 243 reviews
   const mockSold = 150 + (charCodeSum % 250); // e.g., 150 to 399+ sold
 
   // Extract Warranty for Banner
@@ -410,7 +409,6 @@ function PdpPage() {
                       ))}
                     </div>
                     <span className="font-extrabold ml-0.5">{mockRating}</span>
-                    <span className="text-[11px] sm:text-xs text-amber-700/80 dark:text-amber-300/80 font-normal">({mockReviews} Reviews)</span>
                   </div>
 
                   <span className="text-muted-foreground/30 hidden sm:inline">•</span>
