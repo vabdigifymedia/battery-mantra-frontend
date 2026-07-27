@@ -236,19 +236,20 @@ function PdpPage() {
 
   const getSpecIcon = (key: string) => {
     const k = key.toLowerCase();
-    if (k.includes("not covered") || k.includes("exclusion")) return <ShieldAlert className="h-6 w-6 text-white" />;
-    if (k.includes("warranty") || k.includes("life") || k.includes("guarantee")) return <ShieldCheck className="h-6 w-6 text-white" />;
-    if (k.includes("capacity") || k.includes("ah") || k.includes("battery")) return <Battery className="h-6 w-6 text-white" />;
-    if (k.includes("type") || k.includes("chemistry")) return <Zap className="h-6 w-6 text-white" />;
-    if (k.includes("maintenance")) return <Wrench className="h-6 w-6 text-white" />;
-    if (k.includes("cost") || k.includes("price") || k.includes("saving")) return <PiggyBank className="h-6 w-6 text-white" />;
-    if (k.includes("bms") || k.includes("compact") || k.includes("size")) return <Cpu className="h-6 w-6 text-white" />;
-    if (k.includes("dimension") || k.includes("length") || k.includes("width") || k.includes("height")) return <Maximize className="h-6 w-6 text-white" />;
-    if (k.includes("weight") || k.includes("kg")) return <Scale className="h-6 w-6 text-white" />;
-    if (k.includes("volt")) return <Activity className="h-6 w-6 text-white" />;
-    if (k.includes("layout") || k.includes("terminal") || k.includes("polarity")) return <Plug className="h-6 w-6 text-white" />;
-    if (k.includes("material") || k.includes("alloy") || k.includes("grid")) return <Layers className="h-6 w-6 text-white" />;
-    return <CheckCircle2 className="h-6 w-6 text-white" />;
+    const iconClass = "h-4 w-4 sm:h-5 sm:w-5 text-primary";
+    if (k.includes("not covered") || k.includes("exclusion")) return <ShieldAlert className={iconClass} />;
+    if (k.includes("warranty") || k.includes("life") || k.includes("guarantee")) return <ShieldCheck className={iconClass} />;
+    if (k.includes("capacity") || k.includes("ah") || k.includes("battery")) return <Battery className={iconClass} />;
+    if (k.includes("type") || k.includes("chemistry")) return <Zap className={iconClass} />;
+    if (k.includes("maintenance")) return <Wrench className={iconClass} />;
+    if (k.includes("cost") || k.includes("price") || k.includes("saving")) return <PiggyBank className={iconClass} />;
+    if (k.includes("bms") || k.includes("compact") || k.includes("size")) return <Cpu className={iconClass} />;
+    if (k.includes("dimension") || k.includes("length") || k.includes("width") || k.includes("height")) return <Maximize className={iconClass} />;
+    if (k.includes("weight") || k.includes("kg")) return <Scale className={iconClass} />;
+    if (k.includes("volt")) return <Activity className={iconClass} />;
+    if (k.includes("layout") || k.includes("terminal") || k.includes("polarity")) return <Plug className={iconClass} />;
+    if (k.includes("material") || k.includes("alloy") || k.includes("grid")) return <Layers className={iconClass} />;
+    return <CheckCircle2 className={iconClass} />;
   };
 
   const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
@@ -645,33 +646,30 @@ function PdpPage() {
               </div>
             </div>
 
-            {/* Key Highlights / Features (order-4 - Between Buy Box and Delivery Box) */}
+            {/* Key Features (order-4) */}
             {topSpecs.length > 0 && (
-              <div className="pt-6 pb-6 my-4 border-y border-border/50 order-4">
-                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-y-6 sm:gap-y-10 gap-x-2 sm:gap-x-4">
-                  {topSpecs.map(([key, value], idx) => {
+              <div className="pt-4 pb-4 my-2 border-y border-border/50 order-4">
+                <h3 className="font-bold text-base sm:text-lg mb-3 text-foreground">Key Features</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                  {topSpecs.map(([key, value]) => {
                     return (
-                      <div key={key} className="flex items-center gap-2 sm:gap-4 relative">
-                        <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
-                           <div className="scale-[0.65] sm:scale-100 flex items-center justify-center">
-                             {getSpecIcon(key)}
-                           </div>
+                      <div
+                        key={key}
+                        className="flex items-start gap-2 p-2 sm:p-2.5 rounded-xl bg-muted/20 border border-border/40 hover:bg-muted/40 transition-colors min-w-0"
+                      >
+                        <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/15 shadow-2xs mt-0.5">
+                          {getSpecIcon(key)}
                         </div>
-                        <div className="flex flex-col pr-1 sm:pr-4">
-                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0 sm:mb-0.5">{key}</span>
-                           <span className="font-bold text-xs sm:text-lg text-foreground leading-tight">{String(value)}</span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="text-[9px] sm:text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate mb-0.5">
+                            {key}
+                          </span>
+                          <span className="font-bold text-xs sm:text-sm text-foreground leading-snug break-words">
+                            {String(value)}
+                          </span>
                         </div>
-                        {/* Divider for desktop */}
-                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
-                        )}
-                        {/* Divider for tablet and mobile */}
-                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
-                          <div className="block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-8 sm:h-10 w-px bg-border -mr-1 sm:-mr-2" />
-                        )}
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </div>
