@@ -1,5 +1,7 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
-import { LayoutDashboard, ShoppingCart, Users, Package, Wallet, Store, LogOut, Package2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { partnerDashboardService } from "@/services/partner-dashboard.service";
+import { LayoutDashboard, ShoppingCart, Users, Package, LogOut, Package2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +28,17 @@ export function PartnerSidebar() {
   const { user, signOut } = useAuth();
   const router = useRouter();
 
+  const assignedOrdersQuery = useQuery({
+    queryKey: ["partner", "sidebar-assigned-orders"],
+    queryFn: () => partnerDashboardService.listAssignedOrders(),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
+  const pendingAssignedOrdersCount = (assignedOrdersQuery.data || []).filter(
+    (o) => o.orderStatus === "PENDING" || o.orderStatus === "CONFIRMED" || o.orderStatus === "PROCESSING"
+  ).length;
+
   const handleSignOut = () => {
     signOut();
     router.navigate({ to: "/login" as any });
@@ -47,12 +60,20 @@ export function PartnerSidebar() {
             <SidebarMenu>
               {partnerNavigation.map((item) => {
                 const isActive = pathname === item.href || (item.href !== "/partner" && pathname.startsWith(item.href));
+                const isOrders = item.href === "/partner/orders";
+                const badgeCount = isOrders ? pendingAssignedOrdersCount : 0;
+
                 return (
                   <SidebarMenuItem key={item.name}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.name}>
-                      <Link to={item.href}>
+                      <Link to={item.href} className="flex items-center w-full">
                         <item.icon className="h-4 w-4" />
-                        <span>{item.name}</span>
+                        <span className="flex-1 truncate">{item.name}</span>
+                        {badgeCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-sm">
+                            {badgeCount > 99 ? "99+" : badgeCount}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

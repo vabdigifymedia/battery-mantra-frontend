@@ -1,4 +1,6 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
 import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare } from "lucide-react";
 import {
@@ -60,6 +62,57 @@ export function AdminSidebar() {
   const { signOut } = useAuth();
   const router = useRouter();
 
+  // Queries for Notification Badges
+  const ordersQuery = useQuery({
+    queryKey: ["admin", "sidebar-orders"],
+    queryFn: () => adminService.getAllOrders(),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
+  const callbacksQuery = useQuery({
+    queryKey: ["admin", "sidebar-callbacks"],
+    queryFn: () => adminService.getAllCallbacks(),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
+  const enquiriesQuery = useQuery({
+    queryKey: ["admin", "sidebar-enquiries"],
+    queryFn: () => adminService.getAllEnquiries(),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
+  const pendingProductsQuery = useQuery({
+    queryKey: ["admin", "sidebar-pending-products"],
+    queryFn: () => adminService.getPendingProducts(),
+    staleTime: 30000,
+    refetchInterval: 30000,
+  });
+
+  const newOrdersCount = ordersQuery.data?.filter(
+    (o) => o.orderStatus === "PENDING" || o.orderStatus === "CONFIRMED" || o.orderStatus === "PROCESSING"
+  ).length || 0;
+
+  const pendingCallbacksCount = callbacksQuery.data?.filter(
+    (c) => c.status === "PENDING"
+  ).length || 0;
+
+  const pendingEnquiriesCount = enquiriesQuery.data?.filter(
+    (e) => e.status === "PENDING" || e.status === "IN_PROGRESS"
+  ).length || 0;
+
+  const pendingProductsCount = pendingProductsQuery.data?.length || 0;
+
+  const getBadgeCount = (href: string) => {
+    if (href === "/admin/orders") return newOrdersCount;
+    if (href === "/admin/callbacks") return pendingCallbacksCount;
+    if (href === "/admin/enquiries") return pendingEnquiriesCount;
+    if (href === "/admin/products") return pendingProductsCount;
+    return 0;
+  };
+
   return (
     <Sidebar variant="inset">
       <SidebarHeader className="p-4">
@@ -76,12 +129,19 @@ export function AdminSidebar() {
             <SidebarMenu>
               {navigation.map((item) => {
                 const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                const badgeCount = getBadgeCount(item.href);
+
                 return (
                   <SidebarMenuItem key={item.name}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.name}>
-                      <Link to={item.href}>
+                      <Link to={item.href} className="flex items-center w-full">
                         <item.icon />
-                        <span>{item.name}</span>
+                        <span className="flex-1 truncate">{item.name}</span>
+                        {badgeCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-sm">
+                            {badgeCount > 99 ? "99+" : badgeCount}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
