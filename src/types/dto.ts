@@ -270,7 +270,31 @@ export type OrderStatus =
 export type CheckoutRequest = {
   addressId: UUID;
   deliveryMethod: string;
+  paymentMethod?: string;
   installationDate?: string;
+};
+export type CreateRazorpayOrderRequest = {
+  addressId: UUID;
+  deliveryMethod: string;
+  installationDate?: string;
+};
+export type RazorpayOrderResponse = {
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
+  orderId: UUID;
+};
+export type VerifyPaymentRequest = {
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+};
+export type PaymentVerificationResponse = {
+  orderId: UUID;
+  orderStatus: string;
+  paymentStatus: string;
+  message: string;
 };
 export type OrderItemResponse = {
   orderItemId?: UUID;

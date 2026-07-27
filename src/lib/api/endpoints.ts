@@ -81,6 +81,12 @@ export const endpoints = {
     cancel: (orderId: string) => `/api/orders/${encodeURIComponent(orderId)}/cancel`,
     checkout: "/api/orders/checkout",
   },
+  payments: {
+    razorpay: {
+      createOrder: "/api/payments/razorpay/create-order",
+      verify: "/api/payments/razorpay/verify",
+    },
+  },
   addresses: {
     list: "/api/addresses",
     add: "/api/addresses",

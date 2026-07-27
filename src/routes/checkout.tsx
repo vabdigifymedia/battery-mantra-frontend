@@ -18,6 +18,9 @@ import { useAuth } from "@/providers/AuthProvider";
 import { cartQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
+import { paymentsService } from "@/services/payments.service";
+import { loadRazorpayScript } from "@/lib/razorpay";
+import { env } from "@/lib/utils/env";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
 
@@ -61,7 +64,7 @@ function CheckoutPage() {
 
   const checkout = useMutation({
     mutationFn: () => ordersService.checkout({ 
-      addressId, 
+      addressId: addressId as any, 
       deliveryMethod, 
       paymentMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined 
@@ -75,6 +78,84 @@ function CheckoutPage() {
     onError: (e) =>
       toast.error(e instanceof ApiError ? e.message : "Could not place order."),
   });
+
+  const createRazorpayOrder = useMutation({
+    mutationFn: () => paymentsService.createRazorpayOrder({
+      addressId: addressId as any,
+      deliveryMethod,
+      installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
+    }),
+  });
+
+  const verifyRazorpayPayment = useMutation({
+    mutationFn: (body: { razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }) =>
+      paymentsService.verifyPayment(body),
+  });
+
+  const handlePlaceOrder = async () => {
+    if (paymentMethod === "COD") {
+      checkout.mutate();
+      return;
+    }
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      toast.error("Could not load Razorpay SDK. Please check your internet connection.");
+      return;
+    }
+
+    try {
+      const orderRes = await createRazorpayOrder.mutateAsync();
+      const razorpayKey = orderRes.keyId || env.RAZORPAY_KEY_ID;
+
+      if (!razorpayKey) {
+        toast.error("Payment Gateway Key ID is missing. Please check backend config.");
+        return;
+      }
+
+      const options = {
+        key: razorpayKey,
+        amount: orderRes.amount,
+        currency: orderRes.currency || "INR",
+        name: "Battery Mantra",
+        description: "Order Payment",
+        order_id: orderRes.razorpayOrderId,
+        prefill: {
+          name: user?.username || "Customer",
+          email: user?.email || "",
+          contact: user?.phoneNumber || "",
+        },
+        theme: {
+          color: "#dc2626",
+        },
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await verifyRazorpayPayment.mutateAsync({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+            qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+            qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+            toast.success("Payment successful! Order confirmed.");
+            navigate({ to: "/orders/$orderId", params: { orderId: verifyRes.orderId || orderRes.orderId } });
+          } catch (e) {
+            toast.error(e instanceof ApiError ? e.message : "Payment verification failed.");
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            toast.error("Payment cancelled.");
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Could not initiate payment.");
+    }
+  };
 
   if (status === "loading") return <FullPageLoader />;
   if (status !== "authenticated")
@@ -104,7 +185,8 @@ function CheckoutPage() {
   const hasValidAddress = /^[0-9a-fA-F-]{36}$/.test(addressId);
   const hasValidDelivery = deliveryMethod !== "HOME_INSTALLATION" || installationDate !== "";
   
-  const canPlace = hasValidAddress && items.length > 0 && !checkout.isPending && hasValidDelivery;
+  const isProcessing = checkout.isPending || createRazorpayOrder.isPending || verifyRazorpayPayment.isPending;
+  const canPlace = hasValidAddress && items.length > 0 && !isProcessing && hasValidDelivery;
 
   return (
     <div className="bg-muted/20 min-h-screen pb-16">
@@ -277,10 +359,10 @@ function CheckoutPage() {
                 size="lg"
                 className="w-full sm:w-auto min-w-[200px] text-lg h-12 shadow-md shadow-brand/20"
                 disabled={!canPlace}
-                onClick={() => checkout.mutate()}
+                onClick={handlePlaceOrder}
               >
-                {checkout.isPending ? <Spinner size="sm" className="mr-2" /> : <CheckCircle2 className="mr-2 h-5 w-5" />}
-                Place Order
+                {isProcessing ? <Spinner size="sm" className="mr-2" /> : <CheckCircle2 className="mr-2 h-5 w-5" />}
+                {paymentMethod === "ONLINE" ? "Pay Now" : "Place Order"}
               </Button>
             </div>
           </CheckoutStep>
