@@ -319,6 +319,9 @@ export type OrderResponse = {
   totalAmount: number;
   deliveryMethod?: string;
   paymentMethod?: string;
+  paymentStatus?: string;
+  assignedPartner?: any;
+  assignedEngineer?: any;
   installationDate?: string;
   exchangeDiscount?: number;
   orderItems?: OrderItemResponse[];

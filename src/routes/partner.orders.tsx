@@ -172,7 +172,7 @@ function PartnerOrdersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {new Date(order.placedAt).toLocaleDateString()}
+                    {order.placedAt ? new Date(order.placedAt).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">{order.customerName}</div>
@@ -215,7 +215,7 @@ function PartnerOrdersPage() {
 
       {selectedOrder && (
         <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 Order Details
@@ -237,7 +237,7 @@ function PartnerOrdersPage() {
                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Calendar className="h-4 w-4" /> Date Placed
                   </p>
-                  <p className="text-sm">{new Date(selectedOrder.placedAt).toLocaleString()}</p>
+                  <p className="text-sm">{selectedOrder.placedAt ? new Date(selectedOrder.placedAt).toLocaleString() : "—"}</p>
                 </div>
               </div>
 
@@ -331,7 +331,7 @@ function PartnerOrdersPage() {
               <div className="flex justify-between items-center rounded-lg bg-primary/5 p-4 border border-primary/10">
                 <div className="space-y-1 text-sm">
                   <p><span className="text-muted-foreground">Payment Method:</span> <span className="font-medium">{selectedOrder.paymentMethod}</span></p>
-                  <p><span className="text-muted-foreground">Payment Status:</span> <span className="font-medium">{selectedOrder.paymentStatus}</span></p>
+                  <p><span className="text-muted-foreground">Payment Status:</span> <span className="font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-xs ml-1 inline-block">{selectedOrder.paymentStatus || (selectedOrder.orderStatus === "CONFIRMED" ? "PAID" : "PENDING")}</span></p>
                   <p><span className="text-muted-foreground">Delivery Method:</span> <span className="font-medium">{selectedOrder.deliveryMethod}</span></p>
                 </div>
                 <div className="text-right space-y-1">
