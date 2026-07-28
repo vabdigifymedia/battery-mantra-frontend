@@ -27,6 +27,7 @@ import type {
   UUID,
   EnquiryResponse,
   UpdateEnquiryStatusRequest,
+  CategorySpecTemplateResponse,
 } from "@/types/dto";
 
 export interface AdminCreateCustomerRequest {
