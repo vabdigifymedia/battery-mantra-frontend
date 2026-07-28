@@ -278,7 +278,7 @@ function PdpPage() {
 
   const getMrpFromProduct = (prodData: typeof data): number | null => {
     if (!prodData) return null;
-    const direct = (prodData as any).mrp || (prodData as any).originalPrice || prodData.specs?.originalPrice || prodData.specs?.mrp || prodData.specs?.MRP;
+    const direct = (prodData as any).originalPrice || (prodData as any).mrp || prodData.specs?.originalPrice || prodData.specs?.mrp || prodData.specs?.MRP;
     if (direct && !isNaN(Number(direct)) && Number(direct) > 0) {
       return Number(direct);
     }

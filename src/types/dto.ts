@@ -163,6 +163,7 @@ export type ProductListResponse = {
   productName: string;
   brandName?: string;
   productPrice: number;
+  originalPrice?: number;
   exchangeDiscount?: number;
   productImage?: string;
   additionalImages?: string[];
@@ -189,6 +190,7 @@ export type ProductDetailResponse = {
   categoryName?: string;
   categoryId?: UUID;
   productPrice: number;
+  originalPrice?: number;
   exchangeDiscount?: number;
   productStock?: number;
   productImage?: string;

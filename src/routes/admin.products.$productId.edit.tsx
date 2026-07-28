@@ -232,6 +232,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       productName: data.productName,
       productDescription: data.productDescription || undefined,
       productPrice: data.productPrice,
+      originalPrice: data.originalPrice || 0,
       exchangeDiscount: data.exchangeDiscount || 0,
       productStock: data.productStock,
       productImage: data.productImage || undefined,
