@@ -252,16 +252,40 @@ function PdpPage() {
     return <CheckCircle2 className={iconClass} />;
   };
 
+  const getMrpFromProduct = (prodData: typeof data): number | null => {
+    if (!prodData) return null;
+    const direct = (prodData as any).mrp || (prodData as any).originalPrice || prodData.specs?.originalPrice || prodData.specs?.mrp || prodData.specs?.MRP;
+    if (direct && !isNaN(Number(direct)) && Number(direct) > 0) {
+      return Number(direct);
+    }
+    if (prodData.specs && typeof prodData.specs === "object") {
+      for (const [key, value] of Object.entries(prodData.specs)) {
+        if (typeof value === "object" && value !== null) {
+          for (const [subKey, subVal] of Object.entries(value as Record<string, unknown>)) {
+            if (/mrp|original\s*price|list\s*price/i.test(subKey)) {
+              const num = Number(subVal);
+              if (!isNaN(num) && num > 0) return num;
+            }
+          }
+        } else if (/mrp|original\s*price|list\s*price/i.test(key)) {
+          const num = Number(value);
+          if (!isNaN(num) && num > 0) return num;
+        }
+      }
+    }
+    return null;
+  };
+
   const currentPrice = exchange === "yes" && hasExchangeOffer 
     ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) 
     : data.productPrice;
 
-  const mrpFromSpec = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
+  const productMrp = getMrpFromProduct(data);
 
   // Calculate dynamic strike price & discount based on selected exchange mode
-  const strikePrice = mrpFromSpec && mrpFromSpec > currentPrice
-    ? mrpFromSpec
-    : (exchange === "yes" && hasExchangeOffer ? data.productPrice : null);
+  const strikePrice = (productMrp && productMrp > currentPrice)
+    ? productMrp
+    : (exchange === "yes" && hasExchangeOffer && data.productPrice > currentPrice ? data.productPrice : null);
 
   const hasDiscount = Boolean(strikePrice && strikePrice > currentPrice);
 
@@ -270,7 +294,7 @@ function PdpPage() {
     : 0;
 
   // Generate consistent mock rating & sales data based on product name/id
-  const charCodeSum = (data.productName || id || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const charCodeSum = (data.productName || id || "").split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
   const mockRating = (4.4 + (charCodeSum % 5) * 0.1).toFixed(1); // e.g., 4.4 to 4.8
   const mockSold = 150 + (charCodeSum % 250); // e.g., 150 to 399+ sold
 
@@ -461,60 +485,64 @@ function PdpPage() {
 
                 {/* Mobile-Only Compact Exchange Offer (below Brand Warranty, above Price) */}
                 {(data.exchangeDiscount ?? 0) > 0 && (
-                  <div className="block sm:hidden space-y-2 pt-1">
+                  <div className="block sm:hidden pt-1 pb-0.5 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                        <RefreshCw className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         <span>Exchange Offer</span>
-                      </h3>
-                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      </span>
+                      <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                         Save ₹{data.exchangeDiscount?.toLocaleString()}
                       </span>
                     </div>
-                    <RadioGroup
-                      value={exchange}
-                      onValueChange={(val: "yes" | "no") => setExchange(val)}
-                      className="grid grid-cols-2 gap-2"
-                    >
-                      <Label
-                        htmlFor="exchange-no-mobile"
-                        className={`flex cursor-pointer flex-col justify-between rounded-lg border-2 p-2.5 transition-colors ${
-                          exchange === "no" ? "border-brand bg-brand/5" : "border-muted/60"
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <RadioGroupItem value="no" id="exchange-no-mobile" className="h-3.5 w-3.5" />
-                          <span className="font-bold text-xs">Buy New</span>
-                        </div>
-                        <div>
-                          <span className="text-sm font-extrabold block">
-                            ₹{data.productPrice.toLocaleString()}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground block font-normal">Keep old battery</span>
-                        </div>
-                      </Label>
 
-                      <Label
-                        htmlFor="exchange-yes-mobile"
-                        className={`flex cursor-pointer flex-col justify-between rounded-lg border-2 p-2.5 transition-colors ${
-                          exchange === "yes" ? "border-success bg-success/5" : "border-muted/60"
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setExchange("no")}
+                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
+                          exchange === "no"
+                            ? "border-brand bg-brand/5 ring-1 ring-brand/30"
+                            : "border-border bg-background hover:bg-muted/40"
                         }`}
                       >
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <RadioGroupItem
-                            value="yes"
-                            id="exchange-yes-mobile"
-                            className="h-3.5 w-3.5 text-success border-success data-[state=checked]:border-success data-[state=checked]:text-success"
-                          />
-                          <span className="font-bold text-xs text-success">With Exchange</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${exchange === "no" ? "border-brand bg-brand" : "border-muted-foreground"}`}>
+                              {exchange === "no" && <div className="w-1 h-1 rounded-full bg-white" />}
+                            </div>
+                            <span className="font-bold text-xs truncate">Buy New</span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground block mt-0.5 pl-4.5">Keep old</span>
                         </div>
-                        <div>
-                          <span className="text-sm font-extrabold text-success block">
-                            ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground block font-normal">Return old battery</span>
+                        <span className="text-xs font-extrabold text-foreground ml-1 shrink-0">
+                          ₹{data.productPrice.toLocaleString()}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setExchange("yes")}
+                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
+                          exchange === "yes"
+                            ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
+                            : "border-border bg-background hover:bg-muted/40"
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${exchange === "yes" ? "border-emerald-600 bg-emerald-600" : "border-muted-foreground"}`}>
+                              {exchange === "yes" && <div className="w-1 h-1 rounded-full bg-white" />}
+                            </div>
+                            <span className="font-bold text-xs text-emerald-700 dark:text-emerald-400 truncate">With Exchange</span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground block mt-0.5 pl-4.5">Return old</span>
                         </div>
-                      </Label>
-                    </RadioGroup>
+                        <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 ml-1 shrink-0">
+                          ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -554,16 +582,19 @@ function PdpPage() {
             {(data.exchangeDiscount ?? 0) > 0 && (
               <div className="hidden sm:block space-y-3 order-2">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
-                <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
-                  <Label
-                    htmlFor="exchange-no"
-                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 hover:bg-muted/50 transition-colors ${
-                      exchange === "no" ? "border-brand bg-brand/5" : "border-muted"
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => setExchange("no")}
+                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
+                      exchange === "no" ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-muted hover:bg-muted/50"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <RadioGroupItem value="no" id="exchange-no" />
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${exchange === "no" ? "border-brand bg-brand" : "border-muted-foreground"}`}>
+                          {exchange === "no" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
                         <span className="font-medium text-base">Buy New</span>
                       </div>
                     </div>
@@ -571,27 +602,30 @@ function PdpPage() {
                       ₹{data.productPrice.toLocaleString()}
                     </span>
                     <span className="text-sm text-muted-foreground ml-6 mt-1">Keep your old battery</span>
-                  </Label>
+                  </button>
 
-                  <Label
-                    htmlFor="exchange-yes"
-                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 hover:bg-muted/50 transition-colors ${
-                      exchange === "yes" ? "border-success bg-success/5" : "border-muted"
+                  <button
+                    type="button"
+                    onClick={() => setExchange("yes")}
+                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
+                      exchange === "yes" ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30" : "border-muted hover:bg-muted/50"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <RadioGroupItem value="yes" id="exchange-yes" className="text-success border-success data-[state=checked]:border-success data-[state=checked]:text-success" />
-                        <span className="font-medium text-base">With Exchange</span>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${exchange === "yes" ? "border-emerald-600 bg-emerald-600" : "border-muted-foreground"}`}>
+                          {exchange === "yes" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                        <span className="font-medium text-base text-emerald-700 dark:text-emerald-400">With Exchange</span>
                       </div>
-                      <Badge className="bg-success text-success-foreground hover:bg-success">Save ₹{data.exchangeDiscount?.toLocaleString()}</Badge>
+                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">Save ₹{data.exchangeDiscount?.toLocaleString()}</Badge>
                     </div>
-                    <span className="text-2xl font-bold text-success ml-6">
+                    <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 ml-6">
                       ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
                     </span>
                     <span className="text-sm text-muted-foreground ml-6 mt-1">Return old battery</span>
-                  </Label>
-                </RadioGroup>
+                  </button>
+                </div>
               </div>
             )}
 
