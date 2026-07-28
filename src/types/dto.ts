@@ -629,8 +629,13 @@ export type SpecGroupDto = {
   attributes: SpecAttributeDto[];
 };
 
+export type SpecUnitDto = {
+  unitId: UUID;
+  unitValue: string;
+};
+
 export type SpecAttributeDto = {
   attributeId: UUID;
   attributeName: string;
-  availableUnits: string[];
+  availableUnits: SpecUnitDto[];
 };

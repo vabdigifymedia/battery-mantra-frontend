@@ -159,6 +159,9 @@ export const adminService = {
   // Enquiries
   getAllEnquiries: (type?: string) =>
     apiFetch<EnquiryResponse[]>(endpoints.admin.enquiries.list(type), { method: "GET" }),
-  updateEnquiryStatus: (id: string, body: UpdateEnquiryStatusRequest) =>
+updateEnquiryStatus: (id: string, body: UpdateEnquiryStatusRequest) =>
     apiFetch<EnquiryResponse>(endpoints.admin.enquiries.updateStatus(id), { method: "PATCH", body }),
+
+  getCategorySpecTemplate: (categoryId: string) =>
+    apiFetch<CategorySpecTemplateResponse>(`/api/admin/specs/template/category/${categoryId}`, { method: "GET" }),
 };

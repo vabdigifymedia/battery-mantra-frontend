@@ -19,6 +19,7 @@ import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, Chevron
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
@@ -34,13 +35,7 @@ const formSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   brandId: z.string().min(1, "Brand is required"),
   capacity: z.string().optional(),
-  specs: z.array(z.object({
-    groupName: z.string().min(1, "Group name is required"),
-    items: z.array(z.object({
-      key: z.string().min(1, "Key is required"),
-      value: z.string().min(1, "Value is required")
-    })).default([])
-  })).default([]),
+  specUnitIds: z.record(z.string(), z.string()).default({}),
   isAutoAssignToPartner: z.boolean().default(true),
   seo: z.object({
     slug: z.string().nullish(),
@@ -89,7 +84,7 @@ function AddProductPage() {
       productImage: "",
       additionalImages: [],
       capacity: "",
-      specs: [],
+      specUnitIds: {},
       isAutoAssignToPartner: true,
       seo: {
         slug: "",
@@ -108,9 +103,11 @@ function AddProductPage() {
     }
   });
 
-  const { fields: specGroups, append: appendGroup, remove: removeGroup } = useFieldArray({
-    control: form.control,
-    name: "specs"
+  const categoryId = form.watch("categoryId");
+  const { data: specTemplate, isLoading: isSpecLoading } = useQuery({
+    queryKey: ["admin", "specs", "template", categoryId],
+    queryFn: () => adminService.getCategorySpecTemplate(categoryId),
+    enabled: !!categoryId,
   });
 
   const { fields: additionalImageFields, append: appendImage, remove: removeImage } = useFieldArray({
@@ -147,24 +144,13 @@ function AddProductPage() {
       console.error("Failed to fetch products for duplicate check", e);
     }
 
-    // Transform grouped specs into nested Record
-    const specsRecord: Record<string, Record<string, string>> = {};
-    data.specs.forEach(group => {
-      if (!group.groupName.trim()) return;
-      const groupSpecs: Record<string, string> = {};
-      group.items.forEach(item => {
-        if (item.key.trim() && item.value.trim()) {
-          groupSpecs[item.key.trim()] = item.value.trim();
-        }
-      });
-      if (Object.keys(groupSpecs).length > 0) {
-        specsRecord[group.groupName.trim()] = groupSpecs;
-      }
-    });
+    const specUnitIdsList = Object.values(data.specUnitIds).filter(Boolean);
 
-    if (data.originalPrice && data.originalPrice > 0) {
-      specsRecord["originalPrice"] = data.originalPrice.toString() as any;
-    }
+    // Backward compatibility for original price hack if needed, but wait: 
+    // If the backend drops `specs` map completely, originalPrice will be dropped from specs.
+    // However, `UpdateProductRequest` and `Product.java` still have `exchangeDiscount` etc.
+    // originalPrice isn't in Product.java, it's computed or stored in specs currently.
+    // I will leave it out of specs if the backend no longer has specs map in `Product`.
 
     const rootCat = rootCategories.find(c => c.categoryId === data.categoryId);
     const applicable = rootCat ? !/inverter|stabilizer|ups|solar/i.test(rootCat.categoryName) : true;
@@ -180,7 +166,7 @@ function AddProductPage() {
       categoryId: data.categoryId,
       brandId: data.brandId,
       capacity: data.capacity || undefined,
-      specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
+      specUnitIds: specUnitIdsList.length > 0 ? specUnitIdsList : undefined,
       isAutoAssignToPartner: data.isAutoAssignToPartner,
       seo: data.seo
     };
@@ -329,29 +315,61 @@ function AddProductPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Specifications</CardTitle>
-                <CardDescription>Group specs under headings like "Warranty Terms", "Technical Details", etc.</CardDescription>
+                <CardDescription>Select the predefined specification units for this category.</CardDescription>
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={() => appendGroup({ groupName: "", items: [{ key: "", value: "" }] })}>
-                <Plus className="h-4 w-4 mr-2" /> Add Group
-              </Button>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {specGroups.length === 0 ? (
+            <CardContent className="space-y-6">
+              {!categoryId ? (
                 <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
-                  No specifications added. Click "Add Group" to start.
+                  Select a category to load specifications.
+                </div>
+              ) : isSpecLoading ? (
+                <div className="text-center py-6 text-sm text-muted-foreground">Loading specifications...</div>
+              ) : !specTemplate || specTemplate.specGroups.length === 0 ? (
+                <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
+                  No specifications configured for this category.
                 </div>
               ) : (
-                specGroups.map((group, groupIndex) => (
-                  <SpecGroupEditor
-                    key={group.id}
-                    form={form}
-                    groupIndex={groupIndex}
-                    onRemoveGroup={() => removeGroup(groupIndex)}
-                  />
+                specTemplate.specGroups.map((group: SpecGroupDto) => (
+                  <div key={group.specCategoryId} className="space-y-4">
+                    <h3 className="font-semibold text-sm border-b pb-1">{group.specCategoryName}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {group.attributes.map((attr: SpecAttributeDto) => (
+                        <div key={attr.attributeId} className="space-y-2">
+                          <Label>{attr.attributeName}</Label>
+                          <Select
+                            value={form.watch(`specUnitIds.${attr.attributeId}`) || ""}
+                            onValueChange={(val) => {
+                              const currentUnits = { ...form.getValues("specUnitIds") };
+                              if (val === "none") {
+                                delete currentUnits[attr.attributeId];
+                              } else {
+                                currentUnits[attr.attributeId] = val;
+                              }
+                              form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={`Select ${attr.attributeName}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">-- None --</SelectItem>
+                              {attr.availableUnits.map((unit: SpecUnitDto) => (
+                                <SelectItem key={unit.unitId} value={unit.unitId}>
+                                  {unit.unitValue}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))
               )}
             </CardContent>
           </Card>
+
         </div>
 
         {/* RIGHT COLUMN - ORG & PRICING (30%) */}
@@ -532,98 +550,3 @@ function AddProductPage() {
   );
 }
 
-function SpecGroupEditor({
-  form,
-  groupIndex,
-  onRemoveGroup,
-}: {
-  form: any;
-  groupIndex: number;
-  onRemoveGroup: () => void;
-}) {
-  const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
-    control: form.control,
-    name: `specs.${groupIndex}.items` as const,
-  });
-
-  const [collapsed, setCollapsed] = useState(false);
-
-  return (
-    <div className="border rounded-lg bg-muted/20 overflow-hidden">
-      {/* Group Header */}
-      <div className="flex items-center gap-2 p-3 bg-muted/40 border-b">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 shrink-0"
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
-        <div className="flex-1">
-          <Input
-            placeholder="Group Name (e.g. Warranty Terms, Technical Details)"
-            className="bg-background font-medium"
-            {...form.register(`specs.${groupIndex}.groupName`)}
-          />
-          {form.formState.errors.specs?.[groupIndex]?.groupName && (
-            <p className="text-[10px] text-red-500 mt-1">{form.formState.errors.specs[groupIndex]?.groupName?.message}</p>
-          )}
-        </div>
-        <span className="text-xs text-muted-foreground shrink-0">{itemFields.length} specs</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8"
-          onClick={onRemoveGroup}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Group Items */}
-      {!collapsed && (
-        <div className="p-3 space-y-2">
-          {itemFields.map((item, itemIndex) => (
-            <div key={item.id} className="flex gap-2 items-start">
-              <div className="flex-1">
-                <Input
-                  placeholder="Key (e.g. Free Replacement)"
-                  className="text-sm"
-                  {...form.register(`specs.${groupIndex}.items.${itemIndex}.key`)}
-                />
-              </div>
-              <div className="flex-1">
-                <Input
-                  placeholder="Value (e.g. 36 Months)"
-                  className="text-sm"
-                  {...form.register(`specs.${groupIndex}.items.${itemIndex}.value`)}
-                />
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 shrink-0 h-9 w-9"
-                onClick={() => removeItem(itemIndex)}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="w-full border-dashed text-muted-foreground hover:text-foreground"
-            onClick={() => appendItem({ key: "", value: "" })}
-          >
-            <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Spec
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
