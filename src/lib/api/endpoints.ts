@@ -152,7 +152,13 @@ export const endpoints = {
         add: (cityId: string) => `/api/admin/cities/${encodeURIComponent(cityId)}/pincodes`,
         delete: (pincodeId: string) => `/api/admin/pincodes/${encodeURIComponent(pincodeId)}`,
       }
-    }
+    },
+    specs: {
+      categories: "/api/admin/specs/categories",
+      attributes: "/api/admin/specs/attributes",
+      units: "/api/admin/specs/units",
+      template: (categoryId: string) => `/api/admin/specs/template/category/${encodeURIComponent(categoryId)}`,
+    },
   },
   locations: {
     cities: "/api/locations/cities",

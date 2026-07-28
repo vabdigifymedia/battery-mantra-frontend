@@ -32,6 +32,7 @@ import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSpecificationsRouteImport } from './routes/admin.specifications'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminFuelsRouteImport } from './routes/admin.fuels'
@@ -182,6 +183,11 @@ const AdminVehiclesRoute = AdminVehiclesRouteImport.update({
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSpecificationsRoute = AdminSpecificationsRouteImport.update({
+  id: '/specifications',
+  path: '/specifications',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminManufacturersRoute = AdminManufacturersRouteImport.update({
@@ -397,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
@@ -456,6 +463,7 @@ export interface FileRoutesByTo {
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
@@ -519,6 +527,7 @@ export interface FileRoutesById {
   '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -582,6 +591,7 @@ export interface FileRouteTypes {
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
@@ -641,6 +651,7 @@ export interface FileRouteTypes {
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
@@ -703,6 +714,7 @@ export interface FileRouteTypes {
     | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin_/login'
@@ -924,6 +936,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/specifications': {
+      id: '/admin/specifications'
+      path: '/specifications'
+      fullPath: '/admin/specifications'
+      preLoaderRoute: typeof AdminSpecificationsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/manufacturers': {
@@ -1212,6 +1231,7 @@ interface AdminRouteChildren {
   AdminFuelsRoute: typeof AdminFuelsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
+  AdminSpecificationsRoute: typeof AdminSpecificationsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1251,6 +1271,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFuelsRoute: AdminFuelsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
+  AdminSpecificationsRoute: AdminSpecificationsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,
   AdminIndexRoute: AdminIndexRoute,

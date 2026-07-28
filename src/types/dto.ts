@@ -570,3 +570,67 @@ export type UserVehicleResponse = {
   nickname?: string;
   createdAt: string;
 };
+
+/* ---------- Specifications (3-Tier) ---------- */
+export type SpecCategoryResponse = {
+  id: UUID;
+  name: string;
+  categoryId: UUID;
+  categoryName: string;
+};
+
+export type SpecCategoryRequest = {
+  name: string;
+  categoryId: UUID;
+};
+
+export type SpecAttributeResponse = {
+  id: UUID;
+  name: string;
+  specCategoryId: UUID;
+  specCategoryName: string;
+  categoryId: UUID;
+  categoryName: string;
+};
+
+export type SpecAttributeRequest = {
+  name: string;
+  specCategoryId: UUID;
+  categoryId: UUID;
+};
+
+export type SpecUnitResponse = {
+  id: UUID;
+  value: string;
+  specAttributeId: UUID;
+  specAttributeName: string;
+  specCategoryId: UUID;
+  specCategoryName: string;
+  categoryId: UUID;
+  categoryName: string;
+};
+
+export type SpecUnitRequest = {
+  value: string;
+  specAttributeId: UUID;
+  specCategoryId: UUID;
+  categoryId: UUID;
+};
+
+export type CategorySpecTemplateResponse = {
+  categoryId: UUID;
+  categoryName: string;
+  specGroups: SpecGroupDto[];
+};
+
+export type SpecGroupDto = {
+  specCategoryId: UUID;
+  specCategoryName: string;
+  attributes: SpecAttributeDto[];
+};
+
+export type SpecAttributeDto = {
+  attributeId: UUID;
+  attributeName: string;
+  availableUnits: string[];
+};
