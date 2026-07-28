@@ -15,11 +15,30 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
-import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
+
+const AVAILABLE_ICONS = [
+  { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
+  { id: "Battery", icon: Battery, label: "Battery" },
+  { id: "Zap", icon: Zap, label: "Zap" },
+  { id: "Activity", icon: Activity, label: "Activity" },
+  { id: "Wrench", icon: Wrench, label: "Wrench" },
+  { id: "Box", icon: Box, label: "Box" },
+  { id: "Gauge", icon: Gauge, label: "Gauge" },
+  { id: "Sparkles", icon: Sparkles, label: "Sparkle" },
+  { id: "Award", icon: Award, label: "Award" },
+  { id: "Clock", icon: Clock, label: "Clock" },
+  { id: "Truck", icon: Truck, label: "Truck" },
+  { id: "Flame", icon: Flame, label: "Flame" },
+  { id: "Cpu", icon: Cpu, label: "CPU" },
+  { id: "RefreshCw", icon: RefreshCw, label: "Cycle" },
+  { id: "PiggyBank", icon: PiggyBank, label: "Savings" },
+  { id: "CheckCircle2", icon: CheckCircle2, label: "Check" }
+];
 
 const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
@@ -36,6 +55,8 @@ const formSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
   capacity: z.string().optional(),
   specUnitIds: z.record(z.string(), z.string()).default({}),
+  highlightedSpecAttributeIds: z.array(z.string()).default([]),
+  specAttributeIcons: z.record(z.string(), z.string()).default({}),
   isAutoAssignToPartner: z.boolean().default(true),
   seo: z.object({
     slug: z.string().nullish(),
@@ -85,6 +106,8 @@ function AddProductPage() {
       additionalImages: [],
       capacity: "",
       specUnitIds: {},
+      highlightedSpecAttributeIds: [],
+      specAttributeIcons: {},
       isAutoAssignToPartner: true,
       seo: {
         slug: "",
@@ -167,6 +190,8 @@ function AddProductPage() {
       brandId: data.brandId,
       capacity: data.capacity || undefined,
       specUnitIds: specUnitIdsList.length > 0 ? specUnitIdsList : undefined,
+      highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : undefined,
+      specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : undefined,
       isAutoAssignToPartner: data.isAutoAssignToPartner,
       seo: data.seo
     };
@@ -315,7 +340,10 @@ function AddProductPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Specifications</CardTitle>
-                <CardDescription>Select the predefined specification units for this category.</CardDescription>
+                <CardDescription>Select values and highlight up to 6 key features with custom icons.</CardDescription>
+              </div>
+              <div className="text-sm font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
+                Highlighted: {form.watch("highlightedSpecAttributeIds").length} / 6
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -334,35 +362,103 @@ function AddProductPage() {
                   <div key={group.specCategoryId} className="space-y-4">
                     <h3 className="font-semibold text-sm border-b pb-1">{group.specCategoryName}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {group.attributes.map((attr: SpecAttributeDto) => (
-                        <div key={attr.attributeId} className="space-y-2">
-                          <Label>{attr.attributeName}</Label>
-                          <Select
-                            value={form.watch(`specUnitIds.${attr.attributeId}`) || ""}
-                            onValueChange={(val) => {
-                              const currentUnits = { ...form.getValues("specUnitIds") };
-                              if (val === "none") {
-                                delete currentUnits[attr.attributeId];
-                              } else {
-                                currentUnits[attr.attributeId] = val;
-                              }
-                              form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={`Select ${attr.attributeName}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">-- None --</SelectItem>
-                              {attr.availableUnits.map((unit: SpecUnitDto) => (
-                                <SelectItem key={unit.unitId} value={unit.unitId}>
-                                  {unit.unitValue}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                      {group.attributes.map((attr: SpecAttributeDto) => {
+                        const isHighlighted = form.watch("highlightedSpecAttributeIds").includes(attr.attributeId);
+                        const highlightedCount = form.watch("highlightedSpecAttributeIds").length;
+                        return (
+                        <div key={attr.attributeId} className="space-y-3 p-3 border rounded-lg bg-background">
+                          <div className="flex items-center justify-between">
+                            <Label className="font-semibold text-sm">{attr.attributeName}</Label>
+                            <div className="flex items-center gap-2">
+                              <Label htmlFor={`highlight-${attr.attributeId}`} className="text-xs text-muted-foreground cursor-pointer">Highlight</Label>
+                              <Checkbox 
+                                id={`highlight-${attr.attributeId}`}
+                                checked={isHighlighted}
+                                onCheckedChange={(checked) => {
+                                  const current = form.getValues("highlightedSpecAttributeIds");
+                                  if (checked) {
+                                    if (current.length >= 6) {
+                                      toast.warning("Maximum 6 key features can be highlighted.");
+                                      return;
+                                    }
+                                    form.setValue("highlightedSpecAttributeIds", [...current, attr.attributeId], { shouldDirty: true });
+                                  } else {
+                                    form.setValue("highlightedSpecAttributeIds", current.filter(id => id !== attr.attributeId), { shouldDirty: true });
+                                    const icons = { ...form.getValues("specAttributeIcons") };
+                                    delete icons[attr.attributeId];
+                                    form.setValue("specAttributeIcons", icons, { shouldDirty: true });
+                                  }
+                                }}
+                                disabled={!isHighlighted && highlightedCount >= 6}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 items-start">
+                            <div className="flex-1">
+                              <Select
+                                value={form.watch(`specUnitIds.${attr.attributeId}`) || ""}
+                                onValueChange={(val) => {
+                                  const currentUnits = { ...form.getValues("specUnitIds") };
+                                  if (val === "none") {
+                                    delete currentUnits[attr.attributeId];
+                                  } else {
+                                    currentUnits[attr.attributeId] = val;
+                                  }
+                                  form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Select ${attr.attributeName}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">-- None --</SelectItem>
+                                  {attr.availableUnits.map((unit: SpecUnitDto) => (
+                                    <SelectItem key={unit.unitId} value={unit.unitId}>
+                                      {unit.unitValue}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {isHighlighted && (
+                              <div className="w-[110px]">
+                                <Select
+                                  value={form.watch(`specAttributeIcons.${attr.attributeId}`) || ""}
+                                  onValueChange={(val) => {
+                                    const icons = { ...form.getValues("specAttributeIcons") };
+                                    if (val === "none") {
+                                      delete icons[attr.attributeId];
+                                    } else {
+                                      icons[attr.attributeId] = val;
+                                    }
+                                    form.setValue("specAttributeIcons", icons, { shouldDirty: true });
+                                  }}
+                                >
+                                  <SelectTrigger className="px-2">
+                                    <SelectValue placeholder="Icon..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="none">Auto</SelectItem>
+                                    {AVAILABLE_ICONS.map((IconObj) => {
+                                      const IconComp = IconObj.icon;
+                                      return (
+                                        <SelectItem key={IconObj.id} value={IconObj.id}>
+                                          <div className="flex items-center gap-2">
+                                            <IconComp className="h-4 w-4" />
+                                            <span className="text-xs">{IconObj.label}</span>
+                                          </div>
+                                        </SelectItem>
+                                      );
+                                    })}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   </div>
                 ))

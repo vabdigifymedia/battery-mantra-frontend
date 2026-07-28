@@ -195,6 +195,14 @@ export type ProductDetailResponse = {
   additionalImages?: string[];
   capacity?: string;
   specs?: Record<string, unknown>;
+  highlightedSpecAttributeIds?: UUID[];
+  specAttributeIcons?: Record<UUID, string>;
+  specDetails?: Array<{
+    attributeId: string;
+    attributeName: string;
+    categoryName: string;
+    value: string;
+  }>;
   compatibleVehicles?: VehicleResponse[];
   cityPrices?: CityPricingDto[];
   isApproved?: boolean;

@@ -8,7 +8,7 @@ import {
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
   ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
   Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2,
-  Award, Flame, TrendingUp
+  Award, Flame, TrendingUp, Box
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -230,13 +230,37 @@ function PdpPage() {
     return 99;
   };
 
-  const topSpecs = [...allFlatSpecs]
-    .sort((a, b) => getPriorityScore(a[0]) - getPriorityScore(b[0]))
-    .slice(0, 6);
+  const getFallbackSpecs = () => {
+    return [...allFlatSpecs]
+      .sort((a, b) => getPriorityScore(a[0]) - getPriorityScore(b[0]))
+      .slice(0, 6)
+      .map(([key, value]) => ({ key, value, id: null }));
+  };
 
-  const getSpecIcon = (key: string) => {
-    const k = key.toLowerCase();
+  const topSpecs = (data.highlightedSpecAttributeIds && data.highlightedSpecAttributeIds.length > 0 && data.specDetails)
+    ? data.highlightedSpecAttributeIds.map((id: string) => {
+        const detail = data.specDetails?.find((d: any) => d.attributeId === id);
+        if (detail) {
+          return { key: detail.attributeName, value: detail.value, id };
+        }
+        return null;
+      }).filter(Boolean)
+    : getFallbackSpecs();
+
+  const iconMap: Record<string, any> = {
+    ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge: Settings, Sparkles: Star,
+    Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank
+  };
+
+  const getSpecIcon = (key: string, id: string | null) => {
     const iconClass = "h-4 w-4 sm:h-5 sm:w-5 text-primary";
+
+    if (id && data.specAttributeIcons && data.specAttributeIcons[id] && iconMap[data.specAttributeIcons[id]]) {
+      const IconComp = iconMap[data.specAttributeIcons[id]];
+      return <IconComp className={iconClass} />;
+    }
+
+    const k = key.toLowerCase();
     if (k.includes("not covered") || k.includes("exclusion")) return <ShieldAlert className={iconClass} />;
     if (k.includes("warranty") || k.includes("life") || k.includes("guarantee")) return <ShieldCheck className={iconClass} />;
     if (k.includes("capacity") || k.includes("ah") || k.includes("battery")) return <Battery className={iconClass} />;
@@ -755,14 +779,15 @@ function PdpPage() {
               <div className="pt-4 pb-4 my-2 border-y border-border/50 order-4">
                 <h3 className="font-bold text-base sm:text-lg mb-3 text-foreground">Key Features</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                  {topSpecs.map(([key, value]) => {
+                  {topSpecs.map((spec: any) => {
+                    const { key, value, id } = spec;
                     return (
                       <div
                         key={key}
                         className="flex items-start gap-2 p-2 sm:p-2.5 rounded-xl bg-muted/20 border border-border/40 hover:bg-muted/40 transition-colors min-w-0"
                       >
                         <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/15 shadow-2xs mt-0.5">
-                          {getSpecIcon(key)}
+                          {getSpecIcon(key, id)}
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
                           <span className="text-[9px] sm:text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate mb-0.5">
