@@ -29,6 +29,7 @@ import { Route as PartnerProductsRouteImport } from './routes/partner.products'
 import { Route as PartnerOrdersRouteImport } from './routes/partner.orders'
 import { Route as PartnerEngineersRouteImport } from './routes/partner.engineers'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
+import { Route as CategoriesCategorySlugRouteImport } from './routes/categories.$categorySlug'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -168,6 +169,11 @@ const PartnerEngineersRoute = PartnerEngineersRouteImport.update({
 const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
   id: '/orders/$orderId',
   path: '/orders/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesCategorySlugRoute = CategoriesCategorySlugRouteImport.update({
+  id: '/categories/$categorySlug',
+  path: '/categories/$categorySlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -407,6 +413,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
@@ -467,6 +474,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
@@ -531,6 +539,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin_/login': typeof AdminLoginRoute
+  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
@@ -595,6 +604,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
+    | '/categories/$categorySlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
@@ -655,6 +665,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
+    | '/categories/$categorySlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
@@ -718,6 +729,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin_/login'
+    | '/categories/$categorySlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
@@ -766,6 +778,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRouteWithChildren
   VehicleFinderRoute: typeof VehicleFinderRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  CategoriesCategorySlugRoute: typeof CategoriesCategorySlugRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
   ProductsIdRoute: typeof ProductsIdRoute
@@ -915,6 +928,13 @@ declare module '@tanstack/react-router' {
       path: '/orders/$orderId'
       fullPath: '/orders/$orderId'
       preLoaderRoute: typeof OrdersOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$categorySlug': {
+      id: '/categories/$categorySlug'
+      path: '/categories/$categorySlug'
+      fullPath: '/categories/$categorySlug'
+      preLoaderRoute: typeof CategoriesCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/login': {
@@ -1330,6 +1350,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRouteWithChildren,
   VehicleFinderRoute: VehicleFinderRoute,
   AdminLoginRoute: AdminLoginRoute,
+  CategoriesCategorySlugRoute: CategoriesCategorySlugRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PartnerLoginRoute: PartnerLoginRoute,
   ProductsIdRoute: ProductsIdRoute,

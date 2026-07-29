@@ -49,6 +49,19 @@ export function CategoryGrid() {
 
         const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product min-w-[120px] snap-start lg:min-w-0";
 
+        if (c.subCategories && c.subCategories.length > 0) {
+          return (
+            <Link
+              key={c.categoryId}
+              to="/categories/$categorySlug"
+              params={{ categorySlug: rawSlug }}
+              className={cardClassName}
+            >
+              {cardContent}
+            </Link>
+          );
+        }
+
         if (isCar || isBike) {
           const categorySlug = isCar
             ? (rawSlug.includes("car") ? rawSlug : "car-batteries")
