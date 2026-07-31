@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, Search, ArrowRight } from "lucide-react";
+import { Loader2, Search, ArrowRight, Layers, Bookmark, Factory } from "lucide-react";
 import { SearchBox } from "./SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
-import { productFilterQuery } from "@/queries";
+import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery } from "@/queries";
 import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +29,20 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
     enabled: debouncedQuery.length > 1 && isOpen,
   });
 
+  const { data: categories } = useQuery(rootCategoriesQuery());
+  const { data: brands } = useQuery(brandsQuery());
+  const { data: manufacturers } = useQuery(manufacturersListQuery());
+
   const products = data?.content || [];
+  const q = debouncedQuery.toLowerCase();
+  
+  const matchedCategories = q.length > 1 ? categories?.filter((c: any) => c.categoryName.toLowerCase().includes(q)).slice(0, 2) || [] : [];
+  const matchedBrands = q.length > 1 ? brands?.filter((b: any) => b.brandName.toLowerCase().includes(q)).slice(0, 3) || [] : [];
+  const matchedManufacturers = q.length > 1 ? manufacturers?.filter((m: any) => m.name.toLowerCase().includes(q)).slice(0, 3) || [] : [];
+
+  const hasResults = products.length > 0 || matchedCategories.length > 0 || matchedBrands.length > 0 || matchedManufacturers.length > 0;
+  
+  const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 
   useEffect(() => {
     if (value.length > 1) {
@@ -92,58 +105,136 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
 
       {isOpen && value.length > 1 && (
         <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl border bg-background shadow-lg overflow-hidden flex flex-col">
-          {isFetching ? (
+          {isFetching && !hasResults ? (
             <div className="flex items-center justify-center p-6 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin mr-2" />
               <span className="text-sm">Searching...</span>
             </div>
-          ) : products.length > 0 ? (
-            <div className="flex flex-col max-h-[60vh] overflow-y-auto scrollbar-custom">
-              {products.map((product, index) => (
-                <Link
-                  key={product.productId}
-                  to="/products/$id"
-                  params={{ id: product.seo?.slug || product.productId }}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0",
-                    index === activeIndex ? "bg-muted" : ""
-                  )}
-                >
-                  <div className="h-12 w-12 shrink-0 rounded-md border bg-white p-1 flex items-center justify-center">
-                    {product.productImage ? (
-                      <img
-                        src={product.productImage}
-                        alt={product.productName}
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <Search className="h-4 w-4 text-muted-foreground/50" />
-                    )}
+          ) : hasResults ? (
+            <div className="flex flex-col max-h-[70vh] overflow-y-auto scrollbar-custom">
+              
+              {matchedCategories.length > 0 && (
+                <div className="border-b">
+                  <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
+                    <Layers className="h-3 w-3 mr-1" /> Categories
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate text-foreground">{product.productName}</p>
-                    <p className="text-xs text-muted-foreground truncate">{product.brandName || "Unknown Brand"}</p>
+                  {matchedCategories.map((cat: any) => (
+                    <Link
+                      key={cat.categoryId}
+                      to="/products"
+                      search={{ categoryId: cat.categoryId }}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
+                    >
+                      <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
+                        {cat.iconUrl ? <img src={cat.iconUrl} alt={cat.categoryName} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{cat.categoryName}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {matchedBrands.length > 0 && (
+                <div className="border-b">
+                  <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
+                    <Bookmark className="h-3 w-3 mr-1" /> Brands
                   </div>
-                  <div className="shrink-0 text-right flex flex-col items-end">
-                    {(product.exchangeDiscount ?? 0) > 0 ? (
-                      <>
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <Price value={Math.max(0, product.productPrice - (product.exchangeDiscount || 0))} size="sm" className="font-semibold" />
-                          <span className="text-[9px] bg-success/10 text-success px-1 py-0.5 rounded border border-success/20">Exch</span>
+                  {matchedBrands.map((brand: any) => (
+                    <Link
+                      key={brand.brandId}
+                      to="/products"
+                      search={{ brandId: brand.brandId }}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
+                    >
+                      <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
+                        {brand.brandLogo ? <img src={brand.brandLogo} alt={brand.brandName} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{brand.brandName}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {matchedManufacturers.length > 0 && (
+                <div className="border-b">
+                  <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
+                    <Factory className="h-3 w-3 mr-1" /> Manufacturers
+                  </div>
+                  {matchedManufacturers.map((man: any) => {
+                    const catSlug = man.categories?.[0]?.categoryName ? toSlug(man.categories[0].categoryName) : "car-battery";
+                    return (
+                      <Link
+                        key={man.id}
+                        to="/manufacturers/$categorySlug/$makeSlug"
+                        params={{ categorySlug: catSlug, makeSlug: toSlug(man.name) }}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
+                      >
+                        <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
+                          {man.logoUrl ? <img src={man.logoUrl} alt={man.name} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
                         </div>
-                        <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/50">
-                          ₹{product.productPrice.toLocaleString()}
-                        </span>
-                      </>
-                    ) : (
-                      <Price value={product.productPrice} size="sm" className="font-semibold" />
-                    )}
+                        <span className="text-sm font-medium text-foreground">{man.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+
+              {products.length > 0 && (
+                <div className="border-b last:border-b-0">
+                  <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
+                    <Search className="h-3 w-3 mr-1" /> Products
                   </div>
-                </Link>
-              ))}
+                  {products.map((product, index) => (
+                    <Link
+                      key={product.productId}
+                      to="/products/$id"
+                      params={{ id: product.seo?.slug || product.productId }}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0",
+                        index === activeIndex ? "bg-muted" : ""
+                      )}
+                    >
+                      <div className="h-12 w-12 shrink-0 rounded-md border bg-white p-1 flex items-center justify-center">
+                        {product.productImage ? (
+                          <img
+                            src={product.productImage}
+                            alt={product.productName}
+                            className="h-full w-full object-contain"
+                          />
+                        ) : (
+                          <Search className="h-4 w-4 text-muted-foreground/50" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate text-foreground">{product.productName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{product.brandName || "Unknown Brand"}</p>
+                      </div>
+                      <div className="shrink-0 text-right flex flex-col items-end">
+                        {(product.exchangeDiscount ?? 0) > 0 ? (
+                          <>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <Price value={Math.max(0, product.productPrice - (product.exchangeDiscount || 0))} size="sm" className="font-semibold" />
+                              <span className="text-[9px] bg-success/10 text-success px-1 py-0.5 rounded border border-success/20">Exch</span>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground line-through decoration-muted-foreground/50">
+                              ₹{product.productPrice.toLocaleString()}
+                            </span>
+                          </>
+                        ) : (
+                          <Price value={product.productPrice} size="sm" className="font-semibold" />
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
               <div 
-                className="p-3 bg-muted/30 border-t flex justify-center items-center hover:bg-muted/50 cursor-pointer transition-colors"
+                className="p-3 bg-muted/30 border-t flex justify-center items-center hover:bg-muted/50 cursor-pointer transition-colors mt-auto"
                 onClick={() => {
                   setIsOpen(false);
                   if (onSubmit) onSubmit();
