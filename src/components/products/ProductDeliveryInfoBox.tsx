@@ -17,7 +17,7 @@ export function ProductDeliveryInfoBox({
   deliveryTimeHours,
 }: ProductDeliveryInfoBoxProps) {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<"replacement" | "cod" | "gst" | null>(null);
+  const [activeModal, setActiveModal] = useState<"replacement" | "cod" | "gst" | "delivery_details" | null>(null);
 
   const cityName = city?.cityName || "Noida";
   const isCodAvailable = city?.isCodAvailable !== false;
@@ -61,60 +61,38 @@ export function ProductDeliveryInfoBox({
       {/* Main Delivery Box */}
       <div className="rounded-xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4 text-sm text-foreground">
         
-        {/* Row 1: Free / Discounted Delivery */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-            <Truck className="w-5 h-5" />
-          </div>
-          <div className="flex items-center gap-2 font-medium">
-            {deliveryCharge === 0 ? (
-              <span className="text-emerald-600 font-bold text-base">Free</span>
-            ) : (
-              <span className="text-foreground font-bold text-base">₹{deliveryCharge}</span>
-            )}
-            {originalDeliveryCharge > 0 && (
-              <span className="text-muted-foreground line-through text-xs font-normal">
-                ₹{originalDeliveryCharge}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Row 2: Delivery SLA & Cutoff */}
+        {/* Combined Delivery Row */}
         <button
           type="button"
-          onClick={() => setIsLocationModalOpen(true)}
-          className={`w-full flex items-start justify-between text-left group hover:opacity-90 transition-opacity p-3 rounded-lg border ${
-            isSameDay 
-              ? "bg-emerald-50/50 border-emerald-200/60" 
-              : "bg-muted/30 border-transparent"
-          }`}
+          onClick={() => setActiveModal("delivery_details")}
+          className="w-full flex items-start justify-between text-left group hover:opacity-90 transition-opacity pb-2"
         >
           <div className="flex items-start gap-3">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-              isSameDay ? "bg-emerald-500 text-white shadow-sm" : "bg-primary/10 text-primary"
-            }`}>
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="w-6 h-6 shrink-0 mt-0.5 text-orange-500">
+              <Truck className="w-6 h-6 fill-orange-500/20" />
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className={`font-bold leading-snug ${isSameDay ? "text-emerald-700" : "text-foreground"}`}>
-                  {formatSla()}
-                </p>
-                {isSameDay && (
-                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                    Same Day
+              <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base">
+                <span className="font-semibold text-emerald-600">
+                  {deliveryCharge === 0 ? "Free" : `₹${deliveryCharge}`}
+                </span>
+                {originalDeliveryCharge > 0 && (
+                  <span className="text-muted-foreground line-through text-xs font-normal">
+                    ₹{originalDeliveryCharge}
                   </span>
                 )}
+                <span className="text-muted-foreground/60">|</span>
+                <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+                  <CheckCircle2 className="w-4 h-4" />
+                  {formatSla()}
+                </span>
               </div>
-              <p className={`text-xs mt-1 ${isSameDay ? "text-emerald-600/80" : "text-muted-foreground"}`}>
-                Order between 9:00 AM - 6:00 PM
+              <p className="text-xs text-muted-foreground mt-1 text-left">
+                if ordered between 9:00 A.M. to 6:00 P.M.
               </p>
             </div>
           </div>
-          <ChevronRight className={`w-4 h-4 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 ${
-            isSameDay ? "text-emerald-500" : "text-muted-foreground/60"
-          }`} />
+          <ChevronRight className="w-4 h-4 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 text-muted-foreground/60" />
         </button>
 
         {/* Row 3: Replacement Policy */}
@@ -169,6 +147,34 @@ export function ProductDeliveryInfoBox({
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
       {/* Info Modals */}
+      <Dialog open={activeModal === "delivery_details"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delivery & Installation details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2 text-sm text-foreground">
+            <div className="flex items-center gap-2 font-medium flex-wrap">
+              <span className="text-emerald-600 font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4" />
+                {formatSla()}
+              </span>
+              <span className="text-muted-foreground/60">|</span>
+              <span className="font-semibold text-emerald-600">
+                {deliveryCharge === 0 ? "Free" : `₹${deliveryCharge}`}
+              </span>
+              {originalDeliveryCharge > 0 && (
+                <span className="text-muted-foreground line-through text-xs">
+                  {originalDeliveryCharge}
+                </span>
+              )}
+              <span className="text-primary cursor-pointer hover:underline text-xs ml-1 font-bold">T&C</span>
+            </div>
+            <p className="leading-relaxed text-muted-foreground">
+              Free Quick Delivery & Install at Your Doorstep, For More info Contact Us At- 9200920051, Info@Batterymantra.com
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={activeModal === "replacement"} onOpenChange={(open) => !open && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
