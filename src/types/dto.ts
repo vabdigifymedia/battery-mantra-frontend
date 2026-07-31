@@ -53,12 +53,14 @@ export type ManufacturerResponse = {
   id: UUID;
   name: string;
   logoUrl?: string;
+  description?: string;
   displayOrder?: number;
   categories?: { categoryId: UUID; categoryName: string }[];
 };
 export type CreateManufacturerRequest = {
   name: string;
   logoUrl?: string;
+  description?: string;
   displayOrder?: number;
   categoryIds?: string[];
 };
@@ -107,11 +109,13 @@ export type BrandResponse = {
   brandId: UUID;
   brandName: string;
   brandLogo?: string;
+  description?: string;
   featured?: boolean;
 };
 export type BrandRequest = {
   brandName: string;
   brandLogo?: string;
+  description?: string;
   featured?: boolean;
 };
 

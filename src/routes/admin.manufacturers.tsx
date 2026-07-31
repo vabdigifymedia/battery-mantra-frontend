@@ -15,6 +15,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/admin/manufacturers")({
 const manufacturerSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
   logoUrl: z.string().trim().optional(),
+  description: z.string().optional(),
   displayOrder: z.coerce.number().optional(),
   categoryIds: z.array(z.string()).default([]),
   seo: z.object({
@@ -77,6 +79,7 @@ function AdminManufacturers() {
     defaultValues: {
       name: "",
       logoUrl: "",
+      description: "",
       displayOrder: 0,
       categoryIds: [] as string[],
       seo: {
@@ -101,6 +104,7 @@ function AdminManufacturers() {
     form.reset({
       name: "",
       logoUrl: "",
+      description: "",
       displayOrder: 0,
       categoryIds: [],
       seo: {
@@ -126,6 +130,7 @@ function AdminManufacturers() {
     form.reset({
       name: manufacturer.name,
       logoUrl: manufacturer.logoUrl ?? "",
+      description: manufacturer.description ?? "",
       displayOrder: manufacturer.displayOrder ?? 0,
       categoryIds: manufacturer.categories?.map((c: any) => c.categoryId) ?? [],
       seo: manufacturer.seo || {
@@ -186,6 +191,7 @@ function AdminManufacturers() {
     const payload: any = {
       name: data.name,
       logoUrl: data.logoUrl || undefined,
+      description: data.description,
       displayOrder: data.displayOrder || 0,
       categoryIds: data.categoryIds || [],
       seo: data.seo,
@@ -324,6 +330,17 @@ function AdminManufacturers() {
                 />
               )}
             />
+            
+            <Controller
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormField label="Manufacturer Description (HTML / SEO Content)" htmlFor="description" error={form.formState.errors.description?.message}>
+                  <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                </FormField>
+              )}
+            />
+
             <FormField label="Display Order" error={form.formState.errors.displayOrder?.message}>
               <Input type="number" {...form.register("displayOrder")} placeholder="e.g. 1" />
             </FormField>

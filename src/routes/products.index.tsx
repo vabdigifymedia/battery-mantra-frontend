@@ -50,7 +50,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/products/")({
-  loader: async ({ context, search }) => {
+  loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
 
@@ -80,7 +80,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
 
 function ProductsPage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/products" });
+  const navigate = useNavigate({ from: "/products/" });
 
   const filters: ProductFilterState = {
     categoryId: search.categoryId,
@@ -234,6 +234,12 @@ function ProductsPage() {
           
           {products.length > 0 && (
             <>
+              {brand?.description && (
+                <div 
+                  className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: brand.description }}
+                />
+              )}
               <SeoPriceTable 
                 products={products} 
                 title={`Price List, Capacity, Warranty Details for Best ${

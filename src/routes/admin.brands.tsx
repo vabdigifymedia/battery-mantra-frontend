@@ -14,6 +14,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/admin/brands")({
 const brandSchema = z.object({
   brandName: z.string().trim().min(1, "Name is required"),
   brandLogo: z.string().trim().optional(),
+  description: z.string().optional(),
   featured: z.boolean().default(false),
   seo: z.object({
     slug: z.string().optional(),
@@ -73,6 +75,7 @@ function AdminBrands() {
     defaultValues: {
       brandName: "",
       brandLogo: "",
+      description: "",
       featured: false,
       seo: {
         slug: "",
@@ -96,6 +99,7 @@ function AdminBrands() {
     form.reset({
       brandName: "",
       brandLogo: "",
+      description: "",
       featured: false,
       seo: {
         slug: "",
@@ -120,6 +124,7 @@ function AdminBrands() {
     form.reset({
       brandName: brand.brandName,
       brandLogo: brand.brandLogo ?? "",
+      description: brand.description ?? "",
       featured: brand.featured ?? false,
       seo: brand.seo || {
         slug: "",
@@ -178,6 +183,7 @@ function AdminBrands() {
     const payload: any = {
       brandName: values.brandName,
       brandLogo: values.brandLogo,
+      description: values.description,
       featured: values.featured,
       seo: values.seo,
     };
@@ -362,6 +368,16 @@ function AdminBrands() {
                   label="Logo URL (Optional)"
                   error={form.formState.errors.brandLogo?.message}
                 />
+              )}
+            />
+            
+            <Controller
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormField label="Brand Description (HTML / SEO Content)" htmlFor="description" error={form.formState.errors.description?.message}>
+                  <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                </FormField>
               )}
             />
 

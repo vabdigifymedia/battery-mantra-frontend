@@ -86,9 +86,16 @@ function ManufacturerPage() {
           </div>
         </div>
 
-        <p className="text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
-          You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
-        </p>
+        {manufacturer?.description ? (
+          <div 
+            className="prose prose-sm md:prose-base max-w-none mb-10 text-muted-foreground"
+            dangerouslySetInnerHTML={{ __html: manufacturer.description }}
+          />
+        ) : (
+          <p className="text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
+            You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
+          </p>
+        )}
 
         {/* Grid of Models */}
         {isLoading ? (
