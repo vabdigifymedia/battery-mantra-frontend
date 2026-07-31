@@ -27,10 +27,12 @@ export function ProductDeliveryInfoBox({
   const parsedHours = deliveryTimeHours ? Number(deliveryTimeHours) : undefined;
   const parsedDays = deliveryTimeDays ? Number(deliveryTimeDays) : undefined;
 
+  const isSameDay = !!parsedHours || !parsedDays;
+
   // Delivery SLA Text
   const formatSla = () => {
-    if (parsedHours && parsedHours <= 2) {
-      return `Delivery by Today within ${parsedHours} Hours`;
+    if (parsedHours) {
+      return `Delivery by Today in ${parsedHours} Hours`;
     }
     if (parsedDays && parsedDays === 1) {
       return "Delivery by Tomorrow";
@@ -38,7 +40,7 @@ export function ProductDeliveryInfoBox({
     if (parsedDays) {
       return `Delivery within ${parsedDays} Days`;
     }
-    return "Delivery by Today within 1 Hours";
+    return "Delivery by Today in 1 Hours";
   };
 
   return (
@@ -82,22 +84,37 @@ export function ProductDeliveryInfoBox({
         <button
           type="button"
           onClick={() => setIsLocationModalOpen(true)}
-          className="w-full flex items-start justify-between text-left group hover:opacity-80 transition-opacity"
+          className={`w-full flex items-start justify-between text-left group hover:opacity-90 transition-opacity p-3 rounded-lg border ${
+            isSameDay 
+              ? "bg-emerald-50/50 border-emerald-200/60" 
+              : "bg-muted/30 border-transparent"
+          }`}
         >
           <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+              isSameDay ? "bg-emerald-500 text-white shadow-sm" : "bg-primary/10 text-primary"
+            }`}>
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-semibold text-foreground leading-snug">
-                {formatSla()}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                if ordered between 9:00 A.M. to 6:00 P.M.
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className={`font-bold leading-snug ${isSameDay ? "text-emerald-700" : "text-foreground"}`}>
+                  {formatSla()}
+                </p>
+                {isSameDay && (
+                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                    Same Day
+                  </span>
+                )}
+              </div>
+              <p className={`text-xs mt-1 ${isSameDay ? "text-emerald-600/80" : "text-muted-foreground"}`}>
+                Order between 9:00 AM - 6:00 PM
               </p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
+          <ChevronRight className={`w-4 h-4 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 ${
+            isSameDay ? "text-emerald-500" : "text-muted-foreground/60"
+          }`} />
         </button>
 
         {/* Row 3: Replacement Policy */}
