@@ -89,23 +89,7 @@ function ManufacturerPage() {
           </div>
         </div>
 
-        {manufacturer?.description ? (
-          <div 
-            className="prose prose-sm md:prose-base max-w-none mb-10 text-muted-foreground"
-            dangerouslySetInnerHTML={{ 
-              __html: replaceSeoVariables(manufacturer.description, {
-                city: city?.cityName || "Delhi / NCR",
-                City: city?.cityName || "Delhi / NCR",
-                manufacturer: manufacturer.name || exactMake,
-                category: categoryName,
-              }) 
-            }}
-          />
-        ) : (
-          <p className="text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
-            You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
-          </p>
-        )}
+
 
         {/* Grid of Models */}
         {isLoading ? (
@@ -147,6 +131,24 @@ function ManufacturerPage() {
               </div>
             )}
           </div>
+        )}
+
+        {manufacturer?.description ? (
+          <div 
+            className="prose prose-sm md:prose-base max-w-none mt-12 mb-10 text-muted-foreground"
+            dangerouslySetInnerHTML={{ 
+              __html: replaceSeoVariables(manufacturer.description, {
+                city: city?.cityName || "Delhi / NCR",
+                City: city?.cityName || "Delhi / NCR",
+                manufacturer: manufacturer.name || exactMake,
+                category: categoryName,
+              }) 
+            }}
+          />
+        ) : (
+          <p className="text-muted-foreground mt-12 mb-8 text-center max-w-2xl mx-auto">
+            You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
+          </p>
         )}
 
         <SeoCityLinks productName={`${manufacturer?.name || exactMake} ${categoryName}`} />
