@@ -36,6 +36,8 @@ import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
+import { useLocationStore } from "@/store/useLocationStore";
+import { replaceSeoVariables } from "@/lib/seo-variables";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -107,6 +109,8 @@ function ProductsPage() {
   const brand = search.brandId ? brands?.find((b: any) => b.brandId === search.brandId) : null;
   const category = search.categoryId ? categories?.find((c: any) => c.categoryId === search.categoryId) : null;
   const vehicle = search.vehicleId ? vehicles?.find((v: any) => v.vehicleId === search.vehicleId) : null;
+
+  const { city } = useLocationStore();
 
   let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
   let context: Record<string, string> = {};
@@ -237,7 +241,14 @@ function ProductsPage() {
               {brand?.description && (
                 <div 
                   className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: brand.description }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: replaceSeoVariables(brand.description, {
+                      city: city?.cityName || "Delhi / NCR",
+                      City: city?.cityName || "Delhi / NCR",
+                      brand: brand.brandName || "",
+                      category: category?.categoryName || "Battery",
+                    }) 
+                  }}
                 />
               )}
               <SeoPriceTable 

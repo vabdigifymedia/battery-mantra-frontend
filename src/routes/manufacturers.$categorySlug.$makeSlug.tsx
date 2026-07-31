@@ -5,6 +5,8 @@ import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery } from "
 import { ChevronRight } from "lucide-react";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
+import { useLocationStore } from "@/store/useLocationStore";
+import { replaceSeoVariables } from "@/lib/seo-variables";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug")({
 
 function ManufacturerPage() {
   const { categorySlug, makeSlug } = Route.useParams();
+  const { city } = useLocationStore();
 
   // Find the exact manufacturer object to get the logo
   const { data: manufacturers } = useQuery(manufacturersListQuery());
@@ -89,7 +92,14 @@ function ManufacturerPage() {
         {manufacturer?.description ? (
           <div 
             className="prose prose-sm md:prose-base max-w-none mb-10 text-muted-foreground"
-            dangerouslySetInnerHTML={{ __html: manufacturer.description }}
+            dangerouslySetInnerHTML={{ 
+              __html: replaceSeoVariables(manufacturer.description, {
+                city: city?.cityName || "Delhi / NCR",
+                City: city?.cityName || "Delhi / NCR",
+                manufacturer: manufacturer.name || exactMake,
+                category: categoryName,
+              }) 
+            }}
           />
         ) : (
           <p className="text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
