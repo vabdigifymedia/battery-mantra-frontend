@@ -490,10 +490,9 @@ function PdpPage() {
                           <Award className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                           <span>Brand Warranty</span>
                         </div>
-                        <span className="text-[10px] sm:text-xs text-success font-semibold flex items-center gap-0.5 sm:gap-1 shrink-0">
-                          <CheckCircle2 className="h-3 w-3 inline shrink-0" />
-                          <span className="hidden sm:inline">100% Genuine</span>
-                          <span className="sm:hidden">Genuine</span>
+                        <span className="text-[10px] sm:text-xs text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 font-bold px-2 py-0.5 rounded flex items-center gap-1 border border-emerald-200 dark:border-emerald-800 shrink-0 shadow-sm shadow-emerald-500/10">
+                          <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 inline shrink-0" />
+                          <span>100% Genuine</span>
                         </span>
                       </div>
                       <p className="text-xs sm:text-base font-extrabold text-foreground leading-snug sm:leading-snug mt-0.5 truncate sm:whitespace-normal">
@@ -501,7 +500,7 @@ function PdpPage() {
                       </p>
                       <p className="hidden sm:flex text-xs text-muted-foreground mt-1 items-center gap-1.5 font-medium">
                         <CheckCircle2 className="h-3.5 w-3.5 text-success inline shrink-0" />
-                        <span>100% Genuine product with doorstep claim support</span>
+                        <span><span className="font-bold text-success dark:text-emerald-400">100% Genuine</span> product with doorstep claim support</span>
                       </p>
                     </div>
                   </div>
