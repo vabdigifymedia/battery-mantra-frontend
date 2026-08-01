@@ -41,7 +41,7 @@ export function WhyChooseUs() {
   return (
     <>
       {/* Mobile Premium Animated View */}
-      <div className="block sm:hidden relative h-[180px] w-full max-w-[320px] mx-auto px-1">
+      <div className="block sm:hidden relative h-[240px] w-full max-w-[340px] mx-auto px-1">
         <AnimatePresence mode="popLayout">
           {(() => {
             const ActiveIcon = ITEMS[activeIndex].icon;
@@ -54,17 +54,17 @@ export function WhyChooseUs() {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute inset-0 px-2"
               >
-                <div className="flex flex-col items-center justify-center h-[140px] rounded-2xl border border-primary/20 bg-gradient-to-br from-card to-primary/5 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(255,255,255,0.02)] text-center ring-1 ring-white/50 dark:ring-white/10 relative overflow-hidden">
+                <div className="flex flex-col items-center justify-center h-[200px] rounded-2xl border border-primary/20 bg-gradient-to-br from-card to-primary/5 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(255,255,255,0.02)] text-center ring-1 ring-white/50 dark:ring-white/10 relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-4 opacity-5">
                     <ActiveIcon className="w-24 h-24" />
                   </div>
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary mb-3 shadow-inner relative z-10">
                     <ActiveIcon className="h-6 w-6" />
                   </span>
-                  <h3 className="font-display text-lg font-bold text-foreground relative z-10 leading-tight">
+                  <h3 className="font-display text-xl font-bold text-foreground relative z-10 leading-tight">
                     {ITEMS[activeIndex].title}
                   </h3>
-                  <p className="mt-1.5 text-xs text-muted-foreground max-w-[220px] relative z-10 leading-relaxed">
+                  <p className="mt-2 text-sm text-muted-foreground max-w-[260px] relative z-10 leading-relaxed">
                     {ITEMS[activeIndex].desc}
                   </p>
                 </div>
