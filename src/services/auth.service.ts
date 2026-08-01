@@ -36,4 +36,11 @@ export const authService = {
       auth: false,
     });
   },
+
+  async checkUser(phoneNumber: string): Promise<{ exists: boolean; name: string | null }> {
+    return apiFetch<{ exists: boolean; name: string | null }>(`${endpoints.auth.checkUser}?phoneNumber=${encodeURIComponent(phoneNumber)}`, {
+      method: "GET",
+      auth: false,
+    });
+  },
 };

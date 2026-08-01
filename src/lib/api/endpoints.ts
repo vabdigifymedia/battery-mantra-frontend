@@ -13,6 +13,7 @@ export const endpoints = {
     refresh: "/api/auth/refresh",
     sendOtp: "/api/auth/send-otp",
     verifyOtp: "/api/auth/verify-otp",
+    checkUser: "/api/auth/check-user",
   },
   user: {
     profile: "/api/user/profile",

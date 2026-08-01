@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/forms/FormField";
 import { Spinner } from "@/components/feedback/Spinner";
+import { CheckCircle2 } from "lucide-react";
 import { ROLES, type Role } from "@/constants/roles";
 import { decodeJwt } from "@/lib/auth/jwt";
 
@@ -26,6 +27,8 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const [resendLoading, setResendLoading] = useState(false);
+  const [existingUser, setExistingUser] = useState<{ exists: boolean; name: string | null } | null>(null);
+  const [checkingUser, setCheckingUser] = useState(false);
   const { setSession } = useAuth();
 
   useEffect(() => {
@@ -49,6 +52,20 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
     resolver: zodResolver(otpSchema),
     defaultValues: { otp: "" },
   });
+
+  const watchPhone = phoneForm.watch("phoneNumber");
+
+  useEffect(() => {
+    if (watchPhone?.length === 10) {
+      setCheckingUser(true);
+      authService.checkUser(watchPhone)
+        .then(res => setExistingUser(res))
+        .catch(() => setExistingUser(null))
+        .finally(() => setCheckingUser(false));
+    } else {
+      setExistingUser(null);
+    }
+  }, [watchPhone]);
 
   const onSendOtp = phoneForm.handleSubmit(async (values) => {
     setLoading(true);
@@ -114,15 +131,28 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
   if (step === "phone") {
     return (
       <form onSubmit={onSendOtp} className="space-y-4">
-        <FormField label="Phone Number" error={phoneForm.formState.errors.phoneNumber?.message}>
-          <Input
-            {...phoneForm.register("phoneNumber")}
-            placeholder="Enter 10-digit mobile number"
-            maxLength={10}
-            className="h-12"
-          />
-        </FormField>
-        <Button type="submit" className="w-full h-12 text-md" disabled={loading}>
+        <div className="space-y-1">
+          <FormField label="Phone Number" error={phoneForm.formState.errors.phoneNumber?.message}>
+            <Input
+              {...phoneForm.register("phoneNumber")}
+              placeholder="Enter 10-digit mobile number"
+              maxLength={10}
+              className="h-12"
+            />
+          </FormField>
+          
+          <div className="h-5">
+            {checkingUser && <span className="text-xs text-muted-foreground ml-1">Checking...</span>}
+            {!checkingUser && existingUser?.exists && (
+              <div className="flex items-center gap-1.5 text-success ml-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium">Hello! {existingUser.name}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <Button type="submit" className="w-full h-12 text-md" disabled={loading || checkingUser}>
           {loading ? <Spinner className="mr-2" /> : null}
           Send OTP
         </Button>
