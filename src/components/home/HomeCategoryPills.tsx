@@ -30,24 +30,16 @@ export function HomeCategoryPills() {
         {categories.map((category) => (
           <Link
             key={category.categoryId}
-            to={`/products?category=${category.slug}`}
+            to="/products"
+            search={{ categoryId: category.categoryId }}
             className="flex flex-col items-center gap-2 min-w-[64px] snap-start active:scale-95 transition-transform duration-200"
           >
             <div className="grid h-16 w-16 place-items-center rounded-2xl shadow-sm border border-border/50 bg-secondary/20 overflow-hidden relative">
-              {category.categoryIcon ? (
+              {category.iconUrl ? (
                 <img 
-                  src={category.categoryIcon} 
+                  src={category.iconUrl} 
                   alt={category.categoryName} 
                   className="w-10 h-10 object-contain drop-shadow-sm"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/placeholder.webp';
-                  }}
-                />
-              ) : category.categoryImage ? (
-                <img 
-                  src={category.categoryImage} 
-                  alt={category.categoryName} 
-                  className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/images/placeholder.webp';
                   }}
