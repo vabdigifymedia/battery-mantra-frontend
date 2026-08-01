@@ -21,6 +21,7 @@ import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -142,6 +143,7 @@ function PdpPage() {
   const [isCorporateOpen, setIsCorporateOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [showDeliveryPill, setShowDeliveryPill] = useState(true);
   const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
@@ -165,6 +167,32 @@ function PdpPage() {
   });
 
   const inStock = (data.productStock ?? 0) > 0;
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let timer: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        setShowDeliveryPill(false);
+      } else {
+        setShowDeliveryPill(true);
+      }
+      lastScrollY = currentScrollY;
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setShowDeliveryPill(true);
+      }, 2000);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (data?.productImage && !activeImage) {
@@ -728,6 +756,23 @@ function PdpPage() {
                     <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                     Buy Now
                   </Button>
+                </div>
+
+                {/* Mobile Floating Delivery Pill (Fades away on scroll down, reappears on scroll up or pause) */}
+                <div
+                  className={cn(
+                    "fixed bottom-[74px] left-1/2 -translate-x-1/2 z-[55] sm:hidden flex items-center gap-2 rounded-full bg-slate-900/90 text-white px-3.5 py-1.5 shadow-xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/15 text-xs font-semibold whitespace-nowrap",
+                    showDeliveryPill
+                      ? "opacity-100 translate-y-0 scale-100"
+                      : "opacity-0 translate-y-4 scale-95"
+                  )}
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-emerald-400 font-bold">⚡ Express Delivery:</span>
+                  <span>Get it Today in 2-4 Hours</span>
                 </div>
               </div>
 
