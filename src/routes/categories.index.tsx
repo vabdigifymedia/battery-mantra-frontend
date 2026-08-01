@@ -32,40 +32,10 @@ function CategoriesPage() {
             {(categories || [])
               .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
               .map((c) => {
-                const name = c.categoryName.toLowerCase();
-                const isCar = name.includes("car");
-                const isBike = name.includes("bike") || name.includes("two wheeler") || name.includes("2 wheeler");
                 const rawSlug = c.categorySlug || toSlug(c.categoryName);
 
-                let linkTo = "/products";
-                let linkParams: any = { categoryId: c.categoryId };
-                let linkSearch: any = {};
-
-                if (c.subCategories && c.subCategories.length > 0) {
-                  linkTo = "/categories/$categorySlug";
-                  linkParams = { categorySlug: rawSlug };
-                  linkSearch = undefined;
-                } else if (isCar || isBike) {
-                  linkTo = "/manufacturers/$categorySlug";
-                  linkParams = { 
-                    categorySlug: isCar 
-                      ? (rawSlug.includes("car") ? rawSlug : "car-batteries") 
-                      : (rawSlug.includes("bike") || rawSlug.includes("two-wheeler") ? rawSlug : "two-wheeler-batteries") 
-                  };
-                  linkSearch = undefined;
-                } else {
-                  linkSearch = { categoryId: c.categoryId };
-                  linkParams = undefined;
-                }
-
-                return (
-                  <Link
-                    key={c.categoryId}
-                    to={linkTo}
-                    params={linkParams}
-                    search={linkSearch}
-                    className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 sm:p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product"
-                  >
+                const cardContent = (
+                  <>
                     <span className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                       {c.iconUrl ? (
                         <img src={c.iconUrl} alt={c.categoryName} className="h-full w-full object-contain mix-blend-multiply" />
@@ -76,6 +46,32 @@ function CategoriesPage() {
                     <span className="text-[11px] sm:text-sm font-medium text-foreground line-clamp-2 leading-tight">
                       {c.categoryName}
                     </span>
+                  </>
+                );
+
+                const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 sm:p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product";
+
+                if (c.subCategories && c.subCategories.length > 0) {
+                  return (
+                    <Link
+                      key={c.categoryId}
+                      to="/categories/$categorySlug"
+                      params={{ categorySlug: rawSlug }}
+                      className={cardClassName}
+                    >
+                      {cardContent}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={c.categoryId}
+                    to="/manufacturers/$categorySlug"
+                    params={{ categorySlug: rawSlug }}
+                    className={cardClassName}
+                  >
+                    {cardContent}
                   </Link>
                 );
               })}

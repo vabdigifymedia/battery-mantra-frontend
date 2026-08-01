@@ -26,10 +26,6 @@ export function CategoryGrid() {
   return (
     <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
       {sorted.map((c) => {
-        const name = c.categoryName.toLowerCase();
-        const isCar = name.includes("car");
-        const isBike = name.includes("bike") || name.includes("two wheeler") || name.includes("2 wheeler");
-
         const rawSlug = c.categorySlug || toSlug(c.categoryName);
 
         const cardContent = (
@@ -62,28 +58,11 @@ export function CategoryGrid() {
           );
         }
 
-        if (isCar || isBike) {
-          const categorySlug = isCar
-            ? (rawSlug.includes("car") ? rawSlug : "car-batteries")
-            : (rawSlug.includes("bike") || rawSlug.includes("two-wheeler") ? rawSlug : "two-wheeler-batteries");
-
-          return (
-            <Link
-              key={c.categoryId}
-              to="/manufacturers/$categorySlug"
-              params={{ categorySlug }}
-              className={cardClassName}
-            >
-              {cardContent}
-            </Link>
-          );
-        }
-
         return (
           <Link
             key={c.categoryId}
-            to="/products"
-            search={{ categoryId: c.categoryId }}
+            to="/manufacturers/$categorySlug"
+            params={{ categorySlug: rawSlug }}
             className={cardClassName}
           >
             {cardContent}

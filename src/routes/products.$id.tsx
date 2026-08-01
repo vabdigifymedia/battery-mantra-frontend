@@ -20,6 +20,7 @@ import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
+import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -139,6 +140,8 @@ function PdpPage() {
   const [qty, setQty] = useState(1);
   const [isQuotationOpen, setIsQuotationOpen] = useState(false);
   const [isCorporateOpen, setIsCorporateOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
@@ -334,17 +337,48 @@ function PdpPage() {
     <div className="bg-muted/30 min-h-screen pb-24 sm:pb-16 pt-14 sm:pt-0">
       {/* Mobile Navbar */}
       <div className="sm:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b h-14 flex items-center justify-between px-3 shadow-sm">
-        <button onClick={() => window.history.back()} className="p-2 -ml-1 rounded-full hover:bg-muted text-foreground">
-          <ArrowLeft className="h-6 w-6" />
-        </button>
-        <div className="flex items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-muted text-foreground">
-            <Search className="h-5 w-5" />
-          </button>
-          <Link to="/checkout" className="p-2 rounded-full hover:bg-muted text-foreground relative">
-             <ShoppingCart className="h-5 w-5" />
-          </Link>
-        </div>
+        {isMobileSearchOpen ? (
+          <div className="flex items-center gap-2 w-full animate-in fade-in slide-in-from-top-1 duration-200">
+            <button
+              onClick={() => setIsMobileSearchOpen(false)}
+              className="p-2 -ml-1 rounded-full hover:bg-muted text-foreground shrink-0"
+              aria-label="Close Search"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+            <div className="flex-1">
+              <LiveSearchBox
+                value={mobileSearchQuery}
+                onChange={(e) => setMobileSearchQuery(e.target.value)}
+                onClear={() => setMobileSearchQuery("")}
+                onSubmit={() => {
+                  if (mobileSearchQuery.trim()) {
+                    navigate({ to: "/products", search: { q: mobileSearchQuery.trim() } });
+                    setIsMobileSearchOpen(false);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            <button onClick={() => window.history.back()} className="p-2 -ml-1 rounded-full hover:bg-muted text-foreground" aria-label="Go Back">
+              <ArrowLeft className="h-6 w-6" />
+            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setIsMobileSearchOpen(true)}
+                className="p-2 rounded-full hover:bg-muted text-foreground"
+                aria-label="Search Products"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+              <Link to="/cart" className="p-2 rounded-full hover:bg-muted text-foreground relative" aria-label="View Cart">
+                <ShoppingCart className="h-5 w-5" />
+              </Link>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Breadcrumb Header */}
@@ -1014,18 +1048,22 @@ function RelatedProducts({ currentProductId, currentProduct }: { currentProductI
         matched.sort(() => 0.5 - Math.random());
       }
       
-      setRelated(matched.slice(0, 4));
+      setRelated(matched.slice(0, 8));
     }
   }, [allProducts, currentProductId, currentProduct]);
 
   if (!related.length) return null;
 
   return (
-    <Container size="xl" className="mt-16 border-t pt-12">
-      <h2 className="text-2xl font-bold mb-8">More Products You Might Like</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {related.map(p => (
-          <ProductCard key={p.productId} product={p} />
+    <Container size="xl" className="mt-12 sm:mt-16 border-t pt-8 sm:pt-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">More Products You Might Like</h2>
+      </div>
+      <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory no-scrollbar scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        {related.map((p) => (
+          <div key={p.productId} className="min-w-[210px] w-[210px] sm:min-w-[240px] sm:w-[240px] shrink-0 snap-start">
+            <ProductCard product={p} />
+          </div>
         ))}
       </div>
     </Container>

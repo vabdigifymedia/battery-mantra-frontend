@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, LogOut, Menu, Package, Search, ShoppingCart, User } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
@@ -34,6 +34,8 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isProductDetailPage = pathname.match(/^\/products\/[^\/]+$/);
   const { status, user, signOut, hasRole } = useAuth();
   const isAdmin = hasRole("ADMIN");
   const isPartner = hasRole("PARTNER");
@@ -177,18 +179,20 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
         </nav>
       </Container>
 
-      <div className="border-t border-border lg:hidden">
-        <Container size="xl" className="py-2.5">
-          <form onSubmit={onSearch}>
-            <LiveSearchBox
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onClear={() => setQuery("")}
-              onSubmit={handleSearchSubmit}
-            />
-          </form>
-        </Container>
-      </div>
+      {!isProductDetailPage && (
+        <div className="border-t border-border lg:hidden">
+          <Container size="xl" className="py-2.5">
+            <form onSubmit={onSearch}>
+              <LiveSearchBox
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onClear={() => setQuery("")}
+                onSubmit={handleSearchSubmit}
+              />
+            </form>
+          </Container>
+        </div>
+      )}
 
       <MobileNav open={mobileOpen} onOpenChange={setMobileOpen} links={links} />
     </header>
