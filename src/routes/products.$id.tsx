@@ -410,6 +410,17 @@ function PdpPage() {
 
               {/* MAIN IMAGE (Clean borderless view, no box in box, no search icon) */}
               <div className="flex-1 w-full relative flex justify-center items-center aspect-[4/3] lg:aspect-square">
+                
+                {/* 100% Genuine Ribbon Overlay */}
+                <div className="absolute top-4 sm:top-6 -left-2 z-20 drop-shadow-md">
+                  <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-3 sm:px-4 py-1.5 shadow-lg shadow-emerald-500/30 rounded-r-lg flex items-center gap-1.5 border border-l-0 border-emerald-400/50">
+                    <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    100% Genuine
+                  </div>
+                  {/* Ribbon Fold effect */}
+                  <div className="absolute -bottom-1.5 left-0 w-2 h-1.5 bg-emerald-800" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}></div>
+                </div>
+
                 {activeImage ? (
                   <button 
                     onClick={() => {
@@ -486,13 +497,9 @@ function PdpPage() {
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-1">
                           <Award className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                           <span>Brand Warranty</span>
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 font-bold px-2 py-0.5 rounded flex items-center gap-1 border border-emerald-200 dark:border-emerald-800 shrink-0 shadow-sm shadow-emerald-500/10">
-                          <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 inline shrink-0" />
-                          <span>100% Genuine</span>
                         </span>
                       </div>
                       <p className="text-xs sm:text-base font-extrabold text-foreground leading-snug sm:leading-snug mt-0.5 truncate sm:whitespace-normal">
