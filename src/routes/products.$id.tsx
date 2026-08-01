@@ -433,7 +433,7 @@ function PdpPage() {
                     <img 
                       src={activeImage} 
                       alt={data.productName} 
-                      className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-xl" 
+                      className="max-w-full max-h-full object-contain mix-blend-multiply drop-shadow-xl" 
                     />
                   </button>
                 ) : (
