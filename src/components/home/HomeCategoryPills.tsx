@@ -8,8 +8,8 @@ export function HomeCategoryPills() {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-background border-b border-border/40 pb-3 pt-4 sm:hidden">
-        <div className="flex w-full items-start gap-4 overflow-x-auto no-scrollbar px-4">
+      <div className="w-full bg-background border-b border-border/40 pb-5 pt-4 sm:hidden">
+        <div className="flex w-full items-start gap-4 overflow-x-auto no-scrollbar scrollbar-hide px-4">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex flex-col items-center gap-2 min-w-[68px]">
               <Skeleton className="h-16 w-16 rounded-2xl" />
@@ -24,8 +24,8 @@ export function HomeCategoryPills() {
   if (!categories || categories.length === 0) return null;
 
   return (
-    <div className="w-full bg-background border-b border-border/40 pb-3 pt-4 sm:hidden">
-      <div className="flex w-full items-start gap-4 overflow-x-auto no-scrollbar px-4 snap-x">
+    <div className="w-full bg-background border-b border-border/40 pb-5 pt-4 sm:hidden">
+      <div className="flex w-full items-start gap-4 overflow-x-auto no-scrollbar scrollbar-hide px-4 snap-x">
         {categories.map((category) => (
           <Link
             key={category.categoryId}
