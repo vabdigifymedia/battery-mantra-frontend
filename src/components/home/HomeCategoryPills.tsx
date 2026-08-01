@@ -24,7 +24,7 @@ export function HomeCategoryPills() {
     );
   }
 
-  if (!categories || categories.length === 0) return null;
+  if (!categories || !Array.isArray(categories) || categories.length === 0) return null;
 
   const sorted = [...categories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 

@@ -8,7 +8,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function BannerCarousel() {
-  const { data: banners, isLoading } = useQuery(bannersListQuery());
+  const { data, isLoading } = useQuery(bannersListQuery());
+
+  const banners = Array.isArray(data) ? data : (data as any)?.content || [];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -32,7 +34,6 @@ export function BannerCarousel() {
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
     
-    // Simple autoplay since we don't have embla-carousel-autoplay installed
     const interval = setInterval(() => {
       if (emblaApi.canScrollNext()) {
         emblaApi.scrollNext();
@@ -48,7 +49,7 @@ export function BannerCarousel() {
     };
   }, [emblaApi, onSelect]);
 
-  if (isLoading || !banners || banners.length === 0) {
+  if (isLoading || !Array.isArray(banners) || banners.length === 0) {
     return null;
   }
 

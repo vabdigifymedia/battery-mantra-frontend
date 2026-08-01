@@ -25,7 +25,7 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
       </div>
     );
   }
-  if (isError || !data || data.length === 0) return null;
+  if (isError || !data || !Array.isArray(data) || data.length === 0) return null;
 
   const sorted = [...data]
     .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
@@ -57,4 +57,3 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
     </div>
   );
 }
-

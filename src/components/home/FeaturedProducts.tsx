@@ -7,7 +7,9 @@ export function FeaturedProducts({ limit = 8 }: { limit?: number }) {
 
   if (isError) return null;
 
-  const products = (data ?? []).slice(0, limit);
+  const rawList = Array.isArray(data) ? data : (data as any)?.content || [];
+  const products = Array.isArray(rawList) ? rawList.slice(0, limit) : [];
+
   if (!isLoading && products.length === 0) return null;
 
   return <ProductGrid products={products} loading={isLoading} skeletonCount={limit} />;

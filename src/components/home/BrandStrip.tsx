@@ -9,9 +9,12 @@ export function BrandStrip() {
   const featured = useQuery(featuredBrandsQuery());
   const all = useQuery(brandsQuery());
 
-  const hasFeatured = Boolean(featured.data && featured.data.length > 0);
+  const featuredList = Array.isArray(featured.data) ? featured.data : [];
+  const allList = Array.isArray(all.data) ? all.data : [];
+
+  const hasFeatured = featuredList.length > 0;
   const isLoading = featured.isLoading || (!hasFeatured && all.isLoading);
-  const data = hasFeatured ? featured.data! : all.data ?? [];
+  const data = hasFeatured ? featuredList : allList;
 
   if (isLoading) {
     return (
