@@ -247,8 +247,44 @@ export type ProductFilterParams = {
   sortDir?: "asc" | "desc";
 };
 
+// Coupon Types
+export type DiscountType = "PERCENTAGE" | "FLAT";
+
+export type CouponRequest = {
+  code: string;
+  discountType: DiscountType;
+  discountValue: number;
+  maxDiscountAmount?: number;
+  minOrderValue?: number;
+  startDate?: string;
+  expiryDate?: string;
+  usageLimit?: number;
+  isActive: boolean;
+};
+
+export type CouponResponse = CouponRequest & {
+  couponId: UUID;
+  usedCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ApplyCouponRequest = {
+  code: string;
+  cartTotal: number;
+};
+
+export type ApplyCouponResponse = {
+  isValid: boolean;
+  discountAmount: number;
+  message: string;
+  finalTotal: number;
+  code?: string;
+};
+
 /* ---------- Cart ---------- */
 export type AddToCartRequest = { 
+
   productId: UUID; 
   quantity: number;
   exchangeOldBattery?: boolean;
@@ -287,11 +323,13 @@ export type CheckoutRequest = {
   deliveryMethod: string;
   paymentMethod?: string;
   installationDate?: string;
+  couponCode?: string;
 };
 export type CreateRazorpayOrderRequest = {
   addressId: UUID;
   deliveryMethod: string;
   installationDate?: string;
+  couponCode?: string;
 };
 export type RazorpayOrderResponse = {
   razorpayOrderId: string;

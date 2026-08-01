@@ -159,10 +159,18 @@ export const endpoints = {
       units: "/api/admin/specs/units",
       template: (categoryId: string) => `/api/admin/specs/template/category/${encodeURIComponent(categoryId)}`,
     },
+    coupons: {
+      list: "/api/admin/coupons",
+      create: "/api/admin/coupons",
+      byId: (id: string) => `/api/admin/coupons/${encodeURIComponent(id)}`,
+    },
   },
   locations: {
     cities: "/api/locations/cities",
     checkPincode: (code: string) => `/api/locations/check-pincode?code=${encodeURIComponent(code)}`,
+  },
+  coupons: {
+    apply: "/api/coupons/apply",
   },
   seo: {
     pages: "/api/seo/pages",

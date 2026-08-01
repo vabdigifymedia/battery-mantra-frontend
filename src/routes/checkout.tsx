@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShieldCheck, Truck, Check } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { cartQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
+import { couponsService } from "@/services/coupons.service";
+import type { ApplyCouponResponse } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
 import { loadRazorpayScript } from "@/lib/razorpay";
 import { env } from "@/lib/utils/env";
@@ -62,12 +64,17 @@ function CheckoutPage() {
   const [installationDate, setInstallationDate] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
 
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
   const checkout = useMutation({
     mutationFn: () => ordersService.checkout({ 
       addressId: addressId as any, 
       deliveryMethod, 
       paymentMethod,
-      installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined 
+      installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
+      couponCode: appliedCoupon ? appliedCoupon.code : undefined
     }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
@@ -84,6 +91,7 @@ function CheckoutPage() {
       addressId: addressId as any,
       deliveryMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
+      couponCode: appliedCoupon ? appliedCoupon.code : undefined,
     }),
   });
 
@@ -164,8 +172,35 @@ function CheckoutPage() {
   const items = cart.data?.cartItems ?? [];
   const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
   const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
-  const totalAmount = cart.data?.totalAmount ?? subtotal;
+  const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
+  
+  const totalAmount = appliedCoupon ? appliedCoupon.finalTotal : baseTotalAmount;
 
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setIsApplyingCoupon(true);
+    try {
+      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: baseTotalAmount });
+      if (res.isValid) {
+        setAppliedCoupon({ ...res, code: couponInput.trim().toUpperCase() });
+        toast.success(res.message || "Coupon applied successfully");
+      } else {
+        toast.error(res.message || "Invalid coupon code");
+        setAppliedCoupon(null);
+      }
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Failed to apply coupon");
+      setAppliedCoupon(null);
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    toast.success("Coupon removed");
+  };
   if (!cart.isLoading && items.length === 0) {
     return (
       <Container size="lg" className="py-12">
@@ -397,6 +432,38 @@ function CheckoutPage() {
                 </div>
               )}
               
+              <div className="my-2 border-t border-dashed" />
+
+              {!appliedCoupon ? (
+                <div className="flex gap-2 mb-2">
+                  <Input 
+                    placeholder="Enter Coupon Code" 
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    className="uppercase h-9"
+                  />
+                  <Button variant="secondary" size="sm" className="h-9 shrink-0" onClick={handleApplyCoupon} disabled={!couponInput.trim() || isApplyingCoupon}>
+                    {isApplyingCoupon ? <Spinner size="sm" /> : "Apply"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{appliedCoupon.code}</span>
+                      <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium">Coupon Applied</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-success">-<Price value={appliedCoupon.discountAmount} size="sm" /></span>
+                    <button onClick={removeCoupon} className="text-muted-foreground hover:text-destructive">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="my-2 border-t border-dashed" />
               
               <div className="flex justify-between items-center text-lg font-bold">
