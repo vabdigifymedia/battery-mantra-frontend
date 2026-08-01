@@ -12,6 +12,7 @@ export type LoginResponse = {
   refreshToken: string; 
   id: UUID;
   role: string;
+  name?: string;
 };
 
 export type RefreshTokenRequest = {

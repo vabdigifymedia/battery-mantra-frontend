@@ -97,11 +97,12 @@ export function OtpLoginForm({ onSuccess }: { onSuccess?: () => void }) {
 
       setSession(res.token, res.refreshToken, {
         id: res.id,
-        username: phoneNumber,
+        username: res.name || phoneNumber,
         roles: [role as Role],
       });
       
-      toast.success("Login successful");
+      const userName = res.name || "User";
+      toast.success(`Welcome back to Battery Mantra, ${userName}! ⚡`);
       if (onSuccess) onSuccess();
     } catch (err: any) {
       toast.error(err.message || "Invalid OTP");
