@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import {
   productListQuery,
   productFilterQuery,
@@ -167,21 +167,21 @@ function ProductsPage() {
         <div className="min-w-0">
           <DynamicSearchBanner search={search} />
           <div className="mb-4 flex items-center justify-between gap-3">
-            <Sheet>
-              <SheetTrigger asChild>
+            <Drawer>
+              <DrawerTrigger asChild>
                 <Button variant="outline" size="sm" className="lg:hidden">
                   <Filter className="h-4 w-4" /> Filters
                 </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                </SheetHeader>
-                <div className="mt-4">
+              </DrawerTrigger>
+              <DrawerContent className="bg-white rounded-t-[24px] max-h-[85vh] outline-none">
+                <DrawerHeader>
+                  <DrawerTitle>Filters</DrawerTitle>
+                </DrawerHeader>
+                <div className="mt-4 overflow-y-auto px-4 pb-8">
                   <ProductFilters state={filters} onChange={setFilters} />
                 </div>
-              </SheetContent>
-            </Sheet>
+              </DrawerContent>
+            </Drawer>
 
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden text-sm text-muted-foreground sm:inline">Sort by</span>

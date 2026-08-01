@@ -673,11 +673,11 @@ function PdpPage() {
                   />
                 </div>
                 
-                <div className="flex-1 flex w-full gap-2 sm:gap-3">
+                <div className="flex-1 flex w-full gap-2 sm:gap-3 fixed bottom-0 left-0 right-0 z-[60] p-3 bg-background border-t border-border shadow-[0_-8px_16px_rgba(0,0,0,0.05)] sm:relative sm:z-auto sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none pb-safe sm:pb-0">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="flex-1 h-12 sm:h-14 text-sm sm:text-base font-semibold border-2 hover:bg-brand/5 px-2"
+                    className="flex-1 h-12 sm:h-14 text-sm sm:text-base font-semibold border-2 hover:bg-brand/5 px-2 bg-background sm:bg-transparent"
                     onClick={onAdd}
                     disabled={!inStock || addToCart.isPending || blockPurchase}
                   >

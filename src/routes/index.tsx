@@ -9,6 +9,7 @@ import { VehicleFinderWidget } from "@/components/home/VehicleFinderWidget";
 import { BannerCarousel } from "@/components/home/BannerCarousel";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { ManufacturerGrid } from "@/components/home/ManufacturerGrid";
+import { HomeCategoryPills } from "@/components/home/HomeCategoryPills";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
@@ -62,6 +63,10 @@ function HomePage() {
 
   return (
     <div className="flex flex-col">
+      <div className="order-1">
+        <HomeCategoryPills />
+      </div>
+
       <div className="order-3 lg:order-1">
         <HeroSection
           eyebrow={

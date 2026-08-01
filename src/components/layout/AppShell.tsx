@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer, type FooterGroup } from "./Footer";
 import { FeatureStrip } from "./FeatureStrip";
+import { MobileBottomNav } from "./MobileBottomNav";
+import { EmergencyFAB } from "./EmergencyFAB";
 
 const FOOTER_GROUPS: FooterGroup[] = [
   {
@@ -62,11 +64,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className={pathname.match(/^\/products\/[^\/]+$/) ? "hidden sm:block" : ""}>
         <Navbar />
       </div>
-      <main id="main" className="flex-1 flex flex-col">
+      <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">
         {children}
       </main>
       <FeatureStrip />
       <Footer groups={FOOTER_GROUPS} />
+      <MobileBottomNav />
+      <EmergencyFAB />
     </div>
   );
 }
