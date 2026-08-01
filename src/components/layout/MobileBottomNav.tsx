@@ -8,7 +8,7 @@ import { useAuth } from "@/providers/AuthProvider";
 const NAV_ITEMS = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Search, label: "Find Battery", to: "/vehicle-finder" },
-  { icon: Grid, label: "Categories", to: "/products" },
+  { icon: Grid, label: "Categories", to: "/categories" },
   { icon: ShoppingCart, label: "Cart", to: "/cart", badge: true },
   { icon: User, label: "Account", to: "/account" },
 ];
@@ -17,7 +17,7 @@ export function MobileBottomNav() {
   const { pathname } = useLocation();
   const { status } = useAuth();
   const { data: cart } = useQuery(cartQuery(status === "authenticated"));
-  const cartItemCount = cart?.items?.reduce((acc: number, item: any) => acc + item.quantity, 0) || 0;
+  const cartItemCount = cart?.cartItems?.reduce((acc: number, item: any) => acc + item.quantity, 0) || 0;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-t border-border/60 bg-background/80 px-2 pb-safe backdrop-blur-lg sm:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.2)]">
