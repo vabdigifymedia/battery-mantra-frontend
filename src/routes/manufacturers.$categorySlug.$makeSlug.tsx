@@ -43,7 +43,7 @@ function ManufacturerPage() {
     enabled: !!exactMake,
   });
 
-  const categoryName = categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const categoryName = categorySlug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
   const isBike = categorySlug.includes("bike") || categorySlug.includes("two-wheeler");
   const isCar = categorySlug.includes("car");

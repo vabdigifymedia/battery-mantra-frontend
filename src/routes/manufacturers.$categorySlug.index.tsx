@@ -42,7 +42,7 @@ function CategoryManufacturersPage() {
     category?.categoryName ||
     categorySlug
       .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
   // Load manufacturers for this categoryId (with fallback to all manufacturers)

@@ -47,7 +47,7 @@ const couponSchema = z.object({
   startDate: z.string().optional().nullable(),
   expiryDate: z.string().optional().nullable(),
   usageLimit: z.coerce.number().optional().nullable(),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 function AdminCoupons() {
