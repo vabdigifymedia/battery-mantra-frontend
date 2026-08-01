@@ -42,8 +42,9 @@ const FOOTER_GROUPS: FooterGroup[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const isDashboardPage = pathname.startsWith("/admin") || pathname.startsWith("/partner") || pathname.startsWith("/account");
+  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password");
 
-  if (isDashboardPage) {
+  if (isDashboardPage || isAuthPage) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <main id="main" className="flex-1 flex flex-col">
@@ -61,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <div className={pathname.match(/^\/products\/[^\/]+$/) ? "hidden sm:block" : ""}>
+      <div>
         <Navbar />
       </div>
       <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">

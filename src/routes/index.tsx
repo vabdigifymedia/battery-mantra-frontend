@@ -106,7 +106,7 @@ function HomePage() {
 
       <div className="order-2 lg:order-3 w-full bg-background pt-6 lg:pt-12">
         <Container size="xl">
-          <section aria-labelledby="categories">
+          <section aria-labelledby="categories" className="hidden sm:block">
             <SectionHeading
               eyebrow="Browse"
               title={<span id="categories">Shop by category</span>}
