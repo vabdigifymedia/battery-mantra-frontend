@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@/components/common/Image";
 import { Price } from "@/components/common/Price";
@@ -20,6 +21,34 @@ export function ProductCard({
   const exchangePrice = hasExchange
     ? Math.max(0, product.productPrice - (product.exchangeDiscount || 0))
     : product.productPrice;
+
+  // Determine capacity to display on card badge (e.g. "100 Ah" instead of DIN/RL code)
+  const displayCapacity = useMemo(() => {
+    // 1. Check specDetails for "Capacity" attribute or value containing "Ah"
+    if (product.specDetails && Array.isArray(product.specDetails)) {
+      const capSpec = product.specDetails.find(
+        (s) =>
+          (s.attributeName && /capacity/i.test(s.attributeName)) ||
+          (s.value && /\d+\s*Ah/i.test(s.value))
+      );
+      if (capSpec?.value) return capSpec.value;
+    }
+
+    // 2. Try extracting Ah rating from product name (e.g. "45Ah", "100 Ah", "150Ah")
+    const matchName = product.productName?.match(/\b(\d+\s*Ah)\b/i);
+    if (matchName) return matchName[1];
+
+    // 3. Fallback: if product.capacity does NOT look like a DIN/Layout code (e.g. "35Ah")
+    if (
+      product.capacity &&
+      !/din|car|truck|suv|lh|rh/i.test(product.capacity) &&
+      /\d/.test(product.capacity)
+    ) {
+      return product.capacity;
+    }
+
+    return null;
+  }, [product]);
 
   return (
     <Link
@@ -85,10 +114,10 @@ export function ProductCard({
                 {product.brandName}
               </span>
             )}
-            {product.capacity && (
+            {displayCapacity && (
               <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/15 shrink-0">
                 <Zap className="w-2.5 h-2.5 shrink-0 text-primary" />
-                {product.capacity}
+                {displayCapacity}
               </span>
             )}
           </div>
