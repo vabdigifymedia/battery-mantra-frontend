@@ -313,10 +313,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
               </div>
               {dbCapacities.length > 0 && (
                 <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity</Label>
+                  <Label htmlFor="capacity">R/L Code</Label>
                   <Select value={form.watch("capacity") || "none"} onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldDirty: true, shouldValidate: true })}>
                     <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Select a capacity (Optional)" />
+                      <SelectValue placeholder="Select an R/L code (Optional)" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">None (Leave Blank)</SelectItem>
@@ -325,7 +325,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+                  <p className="text-xs text-muted-foreground">Select the exact R/L code. Vehicles matching this code will automatically be listed as compatible.</p>
                 </div>
               )}
               <div className="space-y-2">

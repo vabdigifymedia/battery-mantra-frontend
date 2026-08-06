@@ -32,7 +32,7 @@ const navigation = [
   { name: "Specifications", href: "/admin/specifications", icon: ClipboardList },
   { name: "Vehicles", href: "/admin/vehicles", icon: Car },
   { name: "Fuels", href: "/admin/fuels", icon: Fuel },
-  { name: "Capacities (RL)", href: "/admin/capacities", icon: Battery },
+  { name: "R/L Codes", href: "/admin/capacities", icon: Battery },
   { name: "Manufacturers", href: "/admin/manufacturers", icon: Factory },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },

@@ -317,16 +317,16 @@ function AddProductPage() {
             <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Capacity (RL)</CardTitle>
-                  <CardDescription>Enter the capacity to automatically match vehicles.</CardDescription>
+                  <CardTitle>R/L Code</CardTitle>
+                  <CardDescription>Enter the R/L code to automatically match vehicles.</CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity Code</Label>
+                  <Label htmlFor="capacity">R/L Code</Label>
                   <Select onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldValidate: true })}>
                     <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Select a capacity (Optional)" />
+                      <SelectValue placeholder="Select an R/L code (Optional)" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">None (Leave Blank)</SelectItem>
@@ -335,7 +335,7 @@ function AddProductPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+                  <p className="text-xs text-muted-foreground">Select the exact R/L code. Vehicles matching this code will automatically be listed as compatible.</p>
                 </div>
               </CardContent>
             </Card>

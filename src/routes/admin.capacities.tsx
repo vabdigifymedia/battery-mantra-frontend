@@ -136,11 +136,11 @@ function AdminCapacities() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Capacities (Battery RL)</h1>
-          <p className="text-muted-foreground">Manage battery capacity levels (e.g. 35Ah, 65Ah, 150Ah).</p>
+          <h1 className="text-2xl font-bold tracking-tight">R/L Codes</h1>
+          <p className="text-muted-foreground">Manage battery R/L codes (e.g. 35L CAR, DIN65).</p>
         </div>
         <Button onClick={openAddModal} variant="brand">
-          <Plus className="mr-2 h-4 w-4" /> Add Capacity
+          <Plus className="mr-2 h-4 w-4" /> Add R/L
         </Button>
       </div>
 
@@ -149,7 +149,7 @@ function AdminCapacities() {
           <TableHeader>
             <TableRow>
               <TableHead>Category</TableHead>
-              <TableHead>Capacity Name (RL)</TableHead>
+              <TableHead>R/L Name</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -157,13 +157,13 @@ function AdminCapacities() {
             {isLoading || isLoadingCats ? (
               <TableRow>
                 <TableCell colSpan={3} className="h-24 text-center">
-                  <Spinner size="sm" className="inline-block mr-2" /> Loading capacities...
+                  <Spinner size="sm" className="inline-block mr-2" /> Loading R/L codes...
                 </TableCell>
               </TableRow>
             ) : !capacities?.length ? (
               <TableRow>
                 <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
-                  No capacities found.
+                  No R/L codes found.
                 </TableCell>
               </TableRow>
             ) : (
@@ -213,7 +213,7 @@ function AdminCapacities() {
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingCapacity ? "Edit Capacity" : "Add Capacity"}</DialogTitle>
+            <DialogTitle>{editingCapacity ? "Edit R/L" : "Add R/L"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
             
@@ -236,7 +236,7 @@ function AdminCapacities() {
               />
             </FormField>
 
-            <FormField label="Capacity Name (RL)" htmlFor="capacityName" required error={form.formState.errors.capacityName?.message}>
+            <FormField label="R/L Name" htmlFor="capacityName" required error={form.formState.errors.capacityName?.message}>
               <Input id="capacityName" {...form.register("capacityName")} placeholder="e.g. 35L CAR" />
             </FormField>
 

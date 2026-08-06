@@ -368,7 +368,7 @@ function AdminVehicles() {
                 <TableHead>Make</TableHead>
                 <TableHead>Model</TableHead>
                 <TableHead>Fuel Type</TableHead>
-                <TableHead>Capacity</TableHead>
+                <TableHead>R/L</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -685,7 +685,7 @@ function AdminVehicles() {
               if (options.length === 0) return null;
 
               return (
-                <FormField label="Capacity (RL)" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
+                <FormField label="R/L Codes" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2 min-h-[28px] p-2 border rounded-md bg-muted/20">
                       {(() => {
@@ -707,7 +707,7 @@ function AdminVehicles() {
                               </Badge>
                             ))}
                             {currentCapacities.length === 0 && (
-                              <span className="text-xs text-muted-foreground my-auto ml-1">No capacities added</span>
+                              <span className="text-xs text-muted-foreground my-auto ml-1">No R/L codes added</span>
                             )}
                           </>
                         );

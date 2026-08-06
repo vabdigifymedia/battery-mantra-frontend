@@ -132,7 +132,7 @@ function AdminProducts() {
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Brand</TableHead>
-              <TableHead>Capacity (RL)</TableHead>
+              <TableHead>R/L</TableHead>
               <TableHead>Price</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
