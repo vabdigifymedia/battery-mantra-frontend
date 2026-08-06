@@ -205,6 +205,7 @@ export type ProductDetailResponse = {
   highlightedSpecAttributeIds?: UUID[];
   specAttributeIcons?: Record<UUID, string>;
   specDetails?: Array<{
+    unitId?: string;
     attributeId: string;
     attributeName: string;
     categoryName: string;

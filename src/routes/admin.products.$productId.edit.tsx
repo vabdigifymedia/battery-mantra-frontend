@@ -100,6 +100,18 @@ function EditProductPage() {
     );
   }
 
+  // Build specUnitIds from specDetails so saved specs pre-fill in the edit form
+  // specDetails contains: { unitId, attributeId, value, ... }
+  // We need a map of { [attributeId]: unitId } for each saved spec
+  const savedSpecUnitIds: Record<string, string> = {};
+  if (product.specDetails && Array.isArray(product.specDetails)) {
+    for (const detail of product.specDetails) {
+      if (detail.attributeId && detail.unitId) {
+        savedSpecUnitIds[detail.attributeId] = detail.unitId;
+      }
+    }
+  }
+
   // Map product data to form default values
   const defaultValues: FormValues = {
     productName: product.productName,
@@ -113,7 +125,7 @@ function EditProductPage() {
     categoryId: product.categoryId || "",
     brandId: product.brandId || "",
     capacity: product.capacity || "",
-    specUnitIds: {},
+    specUnitIds: savedSpecUnitIds,
     highlightedSpecAttributeIds: product.highlightedSpecAttributeIds || [],
     specAttributeIcons: product.specAttributeIcons || {},
     isAutoAssignToPartner: product.isAutoAssignToPartner !== false,
