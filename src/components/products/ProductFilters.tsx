@@ -1,22 +1,38 @@
-import { useMemo, useState } from "react";
-import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { useMemo } from "react";
+import { SlidersHorizontal } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import { rootCategoriesQuery, brandsQuery } from "@/queries";
 import type { CategoryListResponse } from "@/types/dto";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 
 export type ProductFilterState = {
-  categoryId?: string;
-  brandId?: string;
+  categoryId?: string[];
+  brandId?: string[];
   minPrice?: number;
   maxPrice?: number;
+  capacity?: string[];
+  warranty?: string[];
 };
 
-export const emptyFilters: ProductFilterState = {};
+export const emptyFilters: ProductFilterState = {
+  categoryId: [],
+  brandId: [],
+  capacity: [],
+  warranty: [],
+};
+
+const COMMON_CAPACITIES = [
+  "35 Ah", "40 Ah", "45 Ah", "50 Ah", "55 Ah", "60 Ah", "65 Ah", "70 Ah", "80 Ah", "100 Ah", "135 Ah", "150 Ah", "160 Ah", "200 Ah", "220 Ah", "230 Ah"
+];
+
+const COMMON_WARRANTIES = [
+  "18 Months", "24 Months", "36 Months", "42 Months", "48 Months", "54 Months", "60 Months", "66 Months", "72 Months"
+];
 
 type Props = {
   state: ProductFilterState;
@@ -29,12 +45,23 @@ export function ProductFilters({ state, onChange }: Props) {
 
   const hasFilters = useMemo(
     () =>
-      !!state.categoryId ||
-      !!state.brandId ||
+      (state.categoryId && state.categoryId.length > 0) ||
+      (state.brandId && state.brandId.length > 0) ||
+      (state.capacity && state.capacity.length > 0) ||
+      (state.warranty && state.warranty.length > 0) ||
       state.minPrice != null ||
       state.maxPrice != null,
     [state],
   );
+
+  const toggleArrayItem = (key: keyof ProductFilterState, value: string) => {
+    const current = (state[key] as string[]) || [];
+    const updated = current.includes(value)
+      ? current.filter(item => item !== value)
+      : [...current, value];
+    
+    onChange({ ...state, [key]: updated });
+  };
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -54,27 +81,19 @@ export function ProductFilters({ state, onChange }: Props) {
         )}
       </div>
 
-      <Accordion type="multiple" defaultValue={["category", "brand", "price"]} className="w-full">
+      <Accordion type="multiple" defaultValue={["category", "brand", "capacity", "warranty", "price"]} className="w-full">
+        
         {/* CATEGORIES */}
         <AccordionItem value="category" className="border-b-0">
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
             Categories
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
-            <RadioGroup
-              value={state.categoryId ?? ""}
-              onValueChange={(v) => onChange({ ...state, categoryId: v || undefined })}
-              className="space-y-2"
-            >
-              <label className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
-                <RadioGroupItem value="" id="cat-all" className="scale-110" />
-                <span>All Categories</span>
-              </label>
-              {cats.data && <CategoryRadioTree categories={cats.data} />}
-            </RadioGroup>
+            <div className="space-y-2">
+              {cats.data && <CategoryCheckboxTree categories={cats.data} state={state} toggleArrayItem={toggleArrayItem} />}
+            </div>
           </AccordionContent>
         </AccordionItem>
-
         <div className="mx-4 h-px bg-border" />
 
         {/* BRANDS */}
@@ -82,26 +101,72 @@ export function ProductFilters({ state, onChange }: Props) {
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
             Brands
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <RadioGroup
-              value={state.brandId ?? ""}
-              onValueChange={(v) => onChange({ ...state, brandId: v || undefined })}
-              className="space-y-2"
-            >
-              <label className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
-                <RadioGroupItem value="" id="brand-all" className="scale-110" />
-                <span>All Brands</span>
-              </label>
-              {(brands.data ?? []).map((b) => (
-                <label key={b.brandId} className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
-                  <RadioGroupItem value={b.brandId} id={`brand-${b.brandId}`} className="scale-110" />
-                  <span>{b.brandName}</span>
-                </label>
-              ))}
-            </RadioGroup>
+          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto">
+            <div className="space-y-4 pt-1">
+              {(brands.data ?? []).map((b) => {
+                const isChecked = state.brandId?.includes(b.brandId) || false;
+                return (
+                  <label key={b.brandId} className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
+                    <Checkbox 
+                      checked={isChecked}
+                      onCheckedChange={() => toggleArrayItem("brandId", b.brandId)}
+                    />
+                    <span>{b.brandName}</span>
+                  </label>
+                );
+              })}
+            </div>
           </AccordionContent>
         </AccordionItem>
+        <div className="mx-4 h-px bg-border" />
 
+        {/* CAPACITY */}
+        <AccordionItem value="capacity" className="border-b-0">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
+            Capacity (Ah)
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto pt-1">
+            <div className="grid grid-cols-2 gap-3">
+              {COMMON_CAPACITIES.map((cap) => {
+                const isChecked = state.capacity?.includes(cap) || false;
+                return (
+                  <label key={cap} className="flex items-center gap-2 text-xs font-medium cursor-pointer group">
+                    <Checkbox 
+                      checked={isChecked}
+                      onCheckedChange={() => toggleArrayItem("capacity", cap)}
+                      className="w-4 h-4"
+                    />
+                    <span className="group-hover:text-primary transition-colors">{cap}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+        <div className="mx-4 h-px bg-border" />
+
+        {/* WARRANTY */}
+        <AccordionItem value="warranty" className="border-b-0">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
+            Warranty
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto pt-1">
+            <div className="space-y-4">
+              {COMMON_WARRANTIES.map((war) => {
+                const isChecked = state.warranty?.includes(war) || false;
+                return (
+                  <label key={war} className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
+                    <Checkbox 
+                      checked={isChecked}
+                      onCheckedChange={() => toggleArrayItem("warranty", war)}
+                    />
+                    <span>{war}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
         <div className="mx-4 h-px bg-border" />
 
         {/* PRICE */}
@@ -110,41 +175,52 @@ export function ProductFilters({ state, onChange }: Props) {
             Price Range
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">₹</span>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="Min"
-                  min={0}
-                  className="pl-7 h-9 text-sm rounded-md bg-muted/20"
-                  value={state.minPrice ?? ""}
-                  onChange={(e) =>
-                    onChange({
-                      ...state,
-                      minPrice: e.target.value === "" ? undefined : Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <span className="text-muted-foreground text-xs">to</span>
-              <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">₹</span>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="Max"
-                  min={0}
-                  className="pl-7 h-9 text-sm rounded-md bg-muted/20"
-                  value={state.maxPrice ?? ""}
-                  onChange={(e) =>
-                    onChange({
-                      ...state,
-                      maxPrice: e.target.value === "" ? undefined : Number(e.target.value),
-                    })
-                  }
-                />
+            <div className="space-y-6 mt-2">
+              <Slider
+                min={0}
+                max={50000}
+                step={500}
+                value={[state.minPrice || 0, state.maxPrice || 50000]}
+                onValueChange={(vals) => {
+                  onChange({
+                    ...state,
+                    minPrice: vals[0] > 0 ? vals[0] : undefined,
+                    maxPrice: vals[1] < 50000 ? vals[1] : undefined,
+                  });
+                }}
+              />
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">₹</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Min"
+                    min={0}
+                    value={state.minPrice || ""}
+                    onChange={(e) => {
+                      const val = e.target.value ? parseInt(e.target.value, 10) : undefined;
+                      onChange({ ...state, minPrice: val });
+                    }}
+                    className="pl-6 h-9 text-xs"
+                  />
+                </div>
+                <span className="text-muted-foreground text-xs font-medium">to</span>
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">₹</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Max"
+                    min={0}
+                    value={state.maxPrice || ""}
+                    onChange={(e) => {
+                      const val = e.target.value ? parseInt(e.target.value, 10) : undefined;
+                      onChange({ ...state, maxPrice: val });
+                    }}
+                    className="pl-6 h-9 text-xs"
+                  />
+                </div>
               </div>
             </div>
           </AccordionContent>
@@ -176,64 +252,39 @@ export function sortToApi(sort: ProductSort): { sortBy?: string; sortDir?: "asc"
   }
 }
 
-function CategoryNode({ c, depth = 0 }: { c: CategoryListResponse; depth?: number }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const hasChildren = c.subCategories && c.subCategories.length > 0;
-
+function CategoryCheckboxTree({
+  categories,
+  depth = 0,
+  state,
+  toggleArrayItem
+}: {
+  categories: CategoryListResponse[];
+  depth?: number;
+  state: ProductFilterState;
+  toggleArrayItem: (key: keyof ProductFilterState, value: string) => void;
+}) {
   return (
-    <div>
-      <label
-        className={cn(
-          "flex items-center justify-between text-sm cursor-pointer hover:text-primary transition-colors py-0.5",
-          depth > 0 && "text-muted-foreground"
-        )}
-        style={{ paddingLeft: `${depth * 16}px` }}
-        onClick={(e) => {
-          if ((e.target as HTMLElement).tagName.toLowerCase() === 'button') return;
-          setIsExpanded((prev) => !prev);
-        }}
-      >
-        <div className="flex items-center gap-3 flex-1">
-          <RadioGroupItem
-            value={c.categoryId}
-            id={`cat-${c.categoryId}`}
-            className="scale-110"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <span>{c.categoryName}</span>
-        </div>
-        {hasChildren && (
-          <button
-            type="button"
-            className="p-1 hover:bg-muted/50 rounded-md transition-colors"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsExpanded((prev) => !prev);
-            }}
-          >
-            <ChevronDown className={cn("h-4 w-4 transition-transform shrink-0", isExpanded ? "rotate-180" : "-rotate-90")} />
-          </button>
-        )}
-      </label>
-      {hasChildren && isExpanded && (
-        <div className="mt-2 space-y-2">
-          <CategoryRadioTree categories={c.subCategories || []} depth={depth + 1} />
-        </div>
-      )}
+    <div className={cn(depth > 0 && "ml-5 space-y-3 mt-3 border-l-2 border-border/50 pl-3")}>
+      {categories.map((c) => {
+        const isChecked = state.categoryId?.includes(c.categoryId) || false;
+        return (
+          <div key={c.categoryId} className={cn("space-y-3", depth === 0 && "mb-3")}>
+            <label className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors group pt-1">
+              <Checkbox 
+                checked={isChecked}
+                onCheckedChange={() => toggleArrayItem("categoryId", c.categoryId)}
+              />
+              <span className={cn(depth === 0 ? "font-medium" : "text-muted-foreground group-hover:text-primary")}>
+                {c.categoryName}
+              </span>
+            </label>
+            {c.subCategories && c.subCategories.length > 0 && (
+              <CategoryCheckboxTree categories={c.subCategories} depth={depth + 1} state={state} toggleArrayItem={toggleArrayItem} />
+            )}
+          </div>
+        );
+      })}
     </div>
-  );
-}
-
-function CategoryRadioTree({ categories, depth = 0 }: { categories: CategoryListResponse[]; depth?: number }) {
-  const sorted = [...categories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-
-  return (
-    <>
-      {sorted.map((c) => (
-        <CategoryNode key={c.categoryId} c={c} depth={depth} />
-      ))}
-    </>
   );
 }
 

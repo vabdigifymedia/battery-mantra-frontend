@@ -233,12 +233,13 @@ export type PageProductListResponse = {
 };
 
 export type ProductFilterParams = {
-  categoryId?: UUID;
-  brandId?: UUID;
+  categoryId?: string[];
+  brandId?: string[];
   vehicleId?: UUID;
   minPrice?: number;
   maxPrice?: number;
-  capacity?: string;
+  capacity?: string[];
+  warranty?: string[];
   specKey?: string;
   specValue?: string;
   keyword?: string;

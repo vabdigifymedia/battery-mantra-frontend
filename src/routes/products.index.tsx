@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductGrid } from "@/components/products/ProductGrid";
@@ -13,6 +13,7 @@ import {
 } from "@/components/products/ProductFilters";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -41,8 +42,10 @@ import { replaceSeoVariables } from "@/lib/seo-variables";
 
 const searchSchema = z.object({
   q: z.string().optional(),
-  categoryId: z.string().optional(),
-  brandId: z.string().optional(),
+  categoryId: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
+  brandId: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
+  capacity: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
+  warranty: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
   vehicleId: z.string().optional(),
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
@@ -87,6 +90,8 @@ function ProductsPage() {
   const filters: ProductFilterState = {
     categoryId: search.categoryId,
     brandId: search.brandId,
+    capacity: search.capacity,
+    warranty: search.warranty,
     minPrice: search.minPrice,
     maxPrice: search.maxPrice,
   };
@@ -106,8 +111,8 @@ function ProductsPage() {
   const { data: categories } = useQuery(categoriesQuery());
   const { data: vehicles } = useQuery(vehiclesListQuery());
   
-  const brand = search.brandId ? brands?.find((b: any) => b.brandId === search.brandId) : null;
-  const category = search.categoryId ? categories?.find((c: any) => c.categoryId === search.categoryId) : null;
+  const brand = (search.brandId && search.brandId.length > 0) ? brands?.find((b: any) => b.brandId === search.brandId?.[0]) : null;
+  const category = (search.categoryId && search.categoryId.length > 0) ? categories?.find((c: any) => c.categoryId === search.categoryId?.[0]) : null;
   const vehicle = search.vehicleId ? vehicles?.find((v: any) => v.vehicleId === search.vehicleId) : null;
 
   const { city } = useLocationStore();
@@ -133,6 +138,8 @@ function ProductsPage() {
         ...prev,
         categoryId: next.categoryId,
         brandId: next.brandId,
+        capacity: next.capacity,
+        warranty: next.warranty,
         minPrice: next.minPrice,
         maxPrice: next.maxPrice,
         page: 0,
@@ -208,6 +215,19 @@ function ProductsPage() {
             />
           ) : (
             <>
+              <ActiveFilterBadges 
+                filters={filters} 
+                onRemove={(key, value) => {
+                  if (key === 'minPrice' || key === 'maxPrice') {
+                    setFilters({ ...filters, [key]: undefined });
+                  } else {
+                    const current = (filters[key as keyof ProductFilterState] as string[]) || [];
+                    setFilters({ ...filters, [key]: current.filter(v => v !== value) });
+                  }
+                }}
+                brands={brands || []}
+                categories={categories || []}
+              />
               <ProductGrid products={products} loading={isLoading || isFetching} />
 
               {totalPages > 1 ? (
@@ -277,6 +297,80 @@ function ProductsPage() {
       </Container>
       
       <GlobalFaqSection pageType={pageType} context={context} />
+    </div>
+  );
+}
+
+function ActiveFilterBadges({ 
+  filters, 
+  onRemove, 
+  brands, 
+  categories 
+}: { 
+  filters: ProductFilterState; 
+  onRemove: (key: string, value: any) => void;
+  brands: any[];
+  categories: any[];
+}) {
+  const findCatName = (cats: any[], id: string): string | undefined => {
+    for (const c of cats) {
+      if (c.categoryId === id) return c.categoryName;
+      if (c.subCategories?.length) {
+        const found = findCatName(c.subCategories, id);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+
+  const activeFilters: { key: string; value: any; label: string }[] = [];
+
+  filters.categoryId?.forEach(id => {
+    activeFilters.push({ key: 'categoryId', value: id, label: findCatName(categories, id) || id });
+  });
+
+  filters.brandId?.forEach(id => {
+    const brand = brands.find(b => b.brandId === id);
+    activeFilters.push({ key: 'brandId', value: id, label: brand?.brandName || id });
+  });
+
+  filters.capacity?.forEach(val => {
+    activeFilters.push({ key: 'capacity', value: val, label: val });
+  });
+
+  filters.warranty?.forEach(val => {
+    activeFilters.push({ key: 'warranty', value: val, label: val });
+  });
+
+  if (filters.minPrice != null || filters.maxPrice != null) {
+    const min = filters.minPrice || 0;
+    const max = filters.maxPrice || 50000;
+    activeFilters.push({ key: 'price', value: null, label: `₹${min} - ₹${max}` });
+  }
+
+  if (activeFilters.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2 mb-4 items-center">
+      {activeFilters.map((af, i) => (
+        <Badge key={i} variant="secondary" className="flex items-center gap-1.5 px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20">
+          {af.label}
+          <button 
+            type="button" 
+            onClick={() => {
+              if (af.key === 'price') {
+                onRemove('minPrice', null);
+                onRemove('maxPrice', null);
+              } else {
+                onRemove(af.key, af.value);
+              }
+            }} 
+            className="hover:text-foreground p-0.5 rounded-full hover:bg-black/10 transition-colors"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </Badge>
+      ))}
     </div>
   );
 }
