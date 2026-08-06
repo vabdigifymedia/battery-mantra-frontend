@@ -22,9 +22,9 @@ export function ProductCard({
     ? Math.max(0, product.productPrice - (product.exchangeDiscount || 0))
     : product.productPrice;
 
-  // Determine capacity to display on card badge (e.g. "100 Ah" instead of DIN/RL code)
+  // Determine capacity to display on card badge (e.g. "100 Ah" instead of "DIN-100 CAR")
   const displayCapacity = useMemo(() => {
-    // 1. Check specDetails for "Capacity" attribute or value containing "Ah"
+    // 1. Check specDetails if present
     if (product.specDetails && Array.isArray(product.specDetails)) {
       const capSpec = product.specDetails.find(
         (s) =>
@@ -38,16 +38,21 @@ export function ProductCard({
     const matchName = product.productName?.match(/\b(\d+\s*Ah)\b/i);
     if (matchName) return matchName[1];
 
-    // 3. Fallback: if product.capacity does NOT look like a DIN/Layout code (e.g. "35Ah")
-    if (
-      product.capacity &&
-      !/din|car|truck|suv|lh|rh/i.test(product.capacity) &&
-      /\d/.test(product.capacity)
-    ) {
-      return product.capacity;
-    }
+    if (!product.capacity) return null;
 
-    return null;
+    // 3. If product.capacity already has Ah (e.g. "35Ah" or "100 Ah")
+    if (/Ah/i.test(product.capacity)) return product.capacity;
+
+    // 4. If product.capacity is like "DIN-100 CAR" or "DIN 100" -> "100 Ah"
+    const dinMatch = product.capacity.match(/DIN[- ]?(\d+)/i);
+    if (dinMatch) return `${dinMatch[1]} Ah`;
+
+    // 5. If product.capacity is like "35L CAR" or "65R" -> "35 Ah" / "65 Ah"
+    const numMatch = product.capacity.match(/^(\d+)[LR]?\b/i);
+    if (numMatch) return `${numMatch[1]} Ah`;
+
+    // 6. Direct fallback to product.capacity so badge NEVER disappears!
+    return product.capacity;
   }, [product]);
 
   return (
