@@ -116,6 +116,7 @@ function AdminSpecifications() {
     mutationFn: specService.createSpecCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "categories", selectedCategoryId] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Spec Category created");
       setIsAddModalOpen(false);
       categoryForm.reset();
@@ -127,6 +128,7 @@ function AdminSpecifications() {
     mutationFn: specService.deleteSpecCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "categories", selectedCategoryId] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Spec Category deleted");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete"),
@@ -136,6 +138,7 @@ function AdminSpecifications() {
     mutationFn: specService.createSpecAttribute,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "attributes", selectedSpecCategory?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Attribute created");
       setIsAddModalOpen(false);
       attributeForm.reset();
@@ -147,6 +150,7 @@ function AdminSpecifications() {
     mutationFn: specService.deleteSpecAttribute,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "attributes", selectedSpecCategory?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Attribute deleted");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete"),
@@ -156,6 +160,7 @@ function AdminSpecifications() {
     mutationFn: specService.createSpecUnit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "units", selectedAttribute?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Unit value created");
       setIsAddModalOpen(false);
       unitForm.reset();
@@ -167,6 +172,7 @@ function AdminSpecifications() {
     mutationFn: specService.deleteSpecUnit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["specs", "units", selectedAttribute?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Unit value deleted");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete"),
