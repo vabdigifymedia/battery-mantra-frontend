@@ -364,7 +364,7 @@ function PdpPage() {
   });
   const warrantySpec = freeReplacementSpec || genericWarrantySpec;
   const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
-  const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : "60 Months (36 Flat + 24 Pro-rata) Manufacturer Warranty");
+  const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : null);
 
   return (
     <div className="bg-muted/30 min-h-screen pb-24 sm:pb-16 pt-14 sm:pt-0">
@@ -553,32 +553,34 @@ function PdpPage() {
                 </div>
 
                 {/* 2. Premium Warranty Guarantee Card - Ultra Compact on Phone */}
-                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-2.5 sm:p-4 shadow-2xs sm:shadow-sm transition-all hover:shadow-md group">
-                  {/* Subtle Background Decorative Glow */}
-                  <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
-                  
-                  <div className="flex items-center sm:items-center gap-2.5 sm:gap-3.5 relative z-10">
-                    <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl shadow-sm sm:shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
-                      <ShieldCheck className="h-5 w-5 sm:h-7 sm:w-7 stroke-[2.2]" />
-                    </div>
+                {warrantyText && (
+                  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-2.5 sm:p-4 shadow-2xs sm:shadow-sm transition-all hover:shadow-md group">
+                    {/* Subtle Background Decorative Glow */}
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
                     
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-1">
-                          <Award className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                          <span>Brand Warranty</span>
-                        </span>
+                    <div className="flex items-center sm:items-center gap-2.5 sm:gap-3.5 relative z-10">
+                      <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl shadow-sm sm:shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
+                        <ShieldCheck className="h-5 w-5 sm:h-7 sm:w-7 stroke-[2.2]" />
                       </div>
-                      <p className="text-xs sm:text-base font-extrabold text-foreground leading-snug sm:leading-snug mt-0.5 truncate sm:whitespace-normal">
-                        {warrantyText}
-                      </p>
-                      <p className="hidden sm:flex text-xs text-muted-foreground mt-1 items-center gap-1.5 font-medium">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-success inline shrink-0" />
-                        <span><span className="font-bold text-success dark:text-emerald-400">100% Genuine</span> product with doorstep claim support</span>
-                      </p>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                            <Award className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                            <span>Brand Warranty</span>
+                          </span>
+                        </div>
+                        <p className="text-xs sm:text-base font-extrabold text-foreground leading-snug sm:leading-snug mt-0.5 truncate sm:whitespace-normal">
+                          {warrantyText}
+                        </p>
+                        <p className="hidden sm:flex text-xs text-muted-foreground mt-1 items-center gap-1.5 font-medium">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-success inline shrink-0" />
+                          <span><span className="font-bold text-success dark:text-emerald-400">100% Genuine</span> product with doorstep claim support</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Mobile-Only Compact Exchange Offer (below Brand Warranty, above Price) */}
                 {(data.exchangeDiscount ?? 0) > 0 && (

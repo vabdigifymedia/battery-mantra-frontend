@@ -201,6 +201,9 @@ function AddProductPage() {
   };
 
   const watchImageUrl = form.watch("productImage");
+  const watchedSpecUnitIds = form.watch("specUnitIds") || {};
+  const watchedSpecAttributeIcons = form.watch("specAttributeIcons") || {};
+  const watchedHighlightedIds = form.watch("highlightedSpecAttributeIds") || [];
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-24">
@@ -364,8 +367,8 @@ function AddProductPage() {
                     <h3 className="font-semibold text-sm border-b pb-1">{group.specCategoryName}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {group.attributes.map((attr: SpecAttributeDto) => {
-                        const isHighlighted = form.watch("highlightedSpecAttributeIds").includes(attr.attributeId);
-                        const highlightedCount = form.watch("highlightedSpecAttributeIds").length;
+                        const isHighlighted = watchedHighlightedIds.includes(attr.attributeId);
+                        const highlightedCount = watchedHighlightedIds.length;
                         return (
                         <div key={attr.attributeId} className="space-y-3 p-3 border rounded-lg bg-background">
                           <div className="flex items-center justify-between">
@@ -376,7 +379,7 @@ function AddProductPage() {
                                 id={`highlight-${attr.attributeId}`}
                                 checked={isHighlighted}
                                 onCheckedChange={(checked) => {
-                                  const current = form.getValues("highlightedSpecAttributeIds");
+                                  const current = form.getValues("highlightedSpecAttributeIds") || [];
                                   if (checked) {
                                     if (current.length >= 6) {
                                       toast.warning("Maximum 6 key features can be highlighted.");
@@ -398,7 +401,7 @@ function AddProductPage() {
                           <div className="flex gap-2 items-start">
                             <div className="flex-1">
                               <Select
-                                value={form.watch(`specUnitIds.${attr.attributeId}`) || ""}
+                                value={watchedSpecUnitIds[attr.attributeId] || ""}
                                 onValueChange={(val) => {
                                   const currentUnits = { ...form.getValues("specUnitIds") };
                                   if (val === "none") {
@@ -426,7 +429,7 @@ function AddProductPage() {
                             {isHighlighted && (
                               <div className="w-[110px]">
                                 <Select
-                                  value={form.watch(`specAttributeIcons.${attr.attributeId}`) || ""}
+                                  value={watchedSpecAttributeIcons[attr.attributeId] || ""}
                                   onValueChange={(val) => {
                                     const icons = { ...form.getValues("specAttributeIcons") };
                                     if (val === "none") {
