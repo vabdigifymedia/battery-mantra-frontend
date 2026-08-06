@@ -371,9 +371,9 @@ function AddProductPage() {
                         const highlightedCount = watchedHighlightedIds.length;
                         return (
                         <div key={attr.attributeId} className="space-y-3 p-3 border rounded-lg bg-background">
-                          <div className="flex items-center justify-between">
-                            <Label className="font-semibold text-sm">{attr.attributeName}</Label>
-                            <div className="flex items-center gap-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <Label className="font-semibold text-sm line-clamp-2 flex-1 leading-snug">{attr.attributeName}</Label>
+                            <div className="flex items-center gap-2 shrink-0">
                               <Label htmlFor={`highlight-${attr.attributeId}`} className="text-xs text-muted-foreground cursor-pointer">Highlight</Label>
                               <Checkbox 
                                 id={`highlight-${attr.attributeId}`}
@@ -399,7 +399,7 @@ function AddProductPage() {
                           </div>
                           
                           <div className="flex gap-2 items-start">
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <Select
                                 value={watchedSpecUnitIds[attr.attributeId] || ""}
                                 onValueChange={(val) => {
@@ -412,8 +412,10 @@ function AddProductPage() {
                                   form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
                                 }}
                               >
-                                <SelectTrigger>
-                                  <SelectValue placeholder={`Select ${attr.attributeName}`} />
+                                <SelectTrigger className="w-full">
+                                  <div className="truncate text-left w-full">
+                                    <SelectValue placeholder={`Select...`} />
+                                  </div>
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="none">-- None --</SelectItem>
@@ -427,7 +429,7 @@ function AddProductPage() {
                             </div>
                             
                             {isHighlighted && (
-                              <div className="w-[110px]">
+                              <div className="w-[90px] sm:w-[110px] shrink-0">
                                 <Select
                                   value={watchedSpecAttributeIcons[attr.attributeId] || ""}
                                   onValueChange={(val) => {
@@ -440,7 +442,7 @@ function AddProductPage() {
                                     form.setValue("specAttributeIcons", icons, { shouldDirty: true });
                                   }}
                                 >
-                                  <SelectTrigger className="px-2">
+                                  <SelectTrigger className="px-2 w-full">
                                     <SelectValue placeholder="Icon..." />
                                   </SelectTrigger>
                                   <SelectContent>
