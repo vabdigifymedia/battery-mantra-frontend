@@ -214,6 +214,8 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     mutationFn: (data: any) => adminService.updateProduct(productId, data),
     onSuccess: () => {
       toast.success("Product updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate({ to: "/admin/products" as any });
     },
     onError: (e: any) => {

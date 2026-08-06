@@ -143,6 +143,8 @@ function AddProductPage() {
     mutationFn: adminService.createProduct,
     onSuccess: () => {
       toast.success("Product created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate({ to: "/admin/products" as any });
     },
     onError: (e: any) => {
