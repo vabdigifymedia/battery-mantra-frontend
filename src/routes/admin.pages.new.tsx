@@ -11,6 +11,8 @@ import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
 
 export const Route = createFileRoute("/admin/pages/new")({
   component: NewPage,
@@ -20,7 +22,7 @@ function NewPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, control, formState: { errors }, watch } = useForm<CreateCmsPageRequest>({
+  const { register, handleSubmit, control, formState: { errors }, watch, reset } = useForm<CreateCmsPageRequest>({
     defaultValues: {
       title: "",
       subTitle: "",
@@ -38,10 +40,12 @@ function NewPage() {
   });
 
   const titleValue = watch("title");
+  const draft = useFormDraft("pages_new", watch(), (data) => reset(data));
 
   const mutation = useMutation({
     mutationFn: cmsService.createPage,
     onSuccess: () => {
+      draft.clearDraft();
       toast.success("Page created successfully");
       queryClient.invalidateQueries({ queryKey: ["admin", "cms-pages"] });
       navigate({ to: "/admin/pages" });
@@ -61,16 +65,23 @@ function NewPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto p-4">
+    <div className="mx-auto max-w-4xl space-y-6 pb-12">
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/pages" })}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="font-display text-3xl font-bold tracking-tight">Create New Page</h2>
-          <p className="text-muted-foreground">Add a new dynamic CMS page to your website.</p>
+          <h2 className="font-display text-2xl font-bold tracking-tight">Create CMS Page</h2>
+          <p className="text-muted-foreground text-sm mt-0.5">Build a custom dynamic page for your store</p>
         </div>
       </div>
+
+      <FormDraftBanner
+        hasDraft={draft.hasDraft}
+        draftTime={draft.draftTime}
+        onRestore={draft.restoreDraft}
+        onDiscard={draft.clearDraft}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <Card>

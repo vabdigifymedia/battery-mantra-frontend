@@ -21,6 +21,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 import { generateSlug } from "@/lib/utils";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
 
 const AVAILABLE_ICONS = [
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
@@ -143,6 +145,7 @@ function AddProductPage() {
   const createMutation = useMutation({
     mutationFn: adminService.createProduct,
     onSuccess: () => {
+      draft.clearDraft();
       toast.success("Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -208,6 +211,8 @@ function AddProductPage() {
   const watchedSpecAttributeIcons = form.watch("specAttributeIcons") || {};
   const watchedHighlightedIds = form.watch("highlightedSpecAttributeIds") || [];
 
+  const draft = useFormDraft("products_new", form.watch(), (data) => form.reset(data));
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-24">
       <div className="flex items-center gap-4">
@@ -219,6 +224,13 @@ function AddProductPage() {
           <p className="text-muted-foreground text-sm mt-0.5">Create a new battery listing in your store.</p>
         </div>
       </div>
+
+      <FormDraftBanner
+        hasDraft={draft.hasDraft}
+        draftTime={draft.draftTime}
+        onRestore={draft.restoreDraft}
+        onDiscard={draft.clearDraft}
+      />
 
       <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any, (errs) => {
         console.error("Validation Errors:", errs);

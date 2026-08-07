@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Spinner } from "@/components/feedback/Spinner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/admin/pages/$pageId/edit")({
@@ -28,7 +30,7 @@ function EditPage() {
     queryFn: () => cmsService.getPageById(pageId),
   });
 
-  const { register, handleSubmit, control, formState: { errors }, reset } = useForm<CreateCmsPageRequest>({
+  const { register, handleSubmit, control, formState: { errors }, reset, watch } = useForm<CreateCmsPageRequest>({
     defaultValues: {
       title: "",
       subTitle: "",
@@ -63,6 +65,7 @@ function EditPage() {
   const mutation = useMutation({
     mutationFn: (data: CreateCmsPageRequest) => cmsService.updatePage(pageId, data),
     onSuccess: () => {
+      draft.clearDraft();
       toast.success("Page updated successfully");
       queryClient.invalidateQueries({ queryKey: ["admin", "cms-pages"] });
       navigate({ to: "/admin/pages" });
@@ -88,6 +91,8 @@ function EditPage() {
     );
   }
 
+  const draft = useFormDraft(`pages_edit_${pageId}`, watch(), (data) => reset(data));
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4">
       <div className="flex items-center space-x-4">
@@ -96,9 +101,16 @@ function EditPage() {
         </Button>
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight">Edit Page</h2>
-          <p className="text-muted-foreground">Update your dynamic CMS page content.</p>
+          <p className="text-muted-foreground">Modify details for page "{page.title}"</p>
         </div>
       </div>
+
+      <FormDraftBanner
+        hasDraft={draft.hasDraft}
+        draftTime={draft.draftTime}
+        onRestore={draft.restoreDraft}
+        onDiscard={draft.clearDraft}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <Card>

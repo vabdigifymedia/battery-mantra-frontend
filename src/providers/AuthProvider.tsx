@@ -3,6 +3,7 @@ import { tokenStore } from "@/lib/auth/tokenStore";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
 import { ROLES, type Role } from "@/constants/roles";
 import { isBrowser } from "@/lib/utils/env";
+import { refreshAccessTokenSilently } from "@/lib/api/client";
 
 export type AuthUser = {
   id: string;
@@ -77,18 +78,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStatus("unauthenticated");
       return;
     }
-    const existing = tokenStore.get();
-    if (existing && !isJwtExpired(existing)) {
-      const stored = readStoredUser();
-      setToken(existing);
-      setUser(stored ?? userFromToken(existing));
-      setStatus("authenticated");
-    } else {
-      if (existing) tokenStore.clear();
-      writeStoredUser(null);
-      setStatus("unauthenticated");
-    }
+
+    const initAuth = async () => {
+      const existing = tokenStore.get();
+      if (existing && !isJwtExpired(existing)) {
+        const stored = readStoredUser();
+        setToken(existing);
+        setUser(stored ?? userFromToken(existing));
+        setStatus("authenticated");
+      } else if (tokenStore.getRefresh()) {
+        // Access token expired or missing, but refresh token exists: try silent refresh
+        const newToken = await refreshAccessTokenSilently();
+        if (newToken) {
+          const stored = readStoredUser();
+          setToken(newToken);
+          setUser(stored ?? userFromToken(newToken));
+          setStatus("authenticated");
+        } else {
+          writeStoredUser(null);
+          setStatus("unauthenticated");
+        }
+      } else {
+        if (existing) tokenStore.clear();
+        writeStoredUser(null);
+        setStatus("unauthenticated");
+      }
+    };
+
+    void initAuth();
   }, []);
+
+  const signOut = useCallback(() => {
+    tokenStore.clear();
+    writeStoredUser(null);
+    setToken(null);
+    setUser(null);
+    setStatus("unauthenticated");
+  }, []);
+
+  // Periodic Silent Heartbeat Refresh (Every 5 minutes) + Tab Focus Check
+  useEffect(() => {
+    if (!isBrowser || status !== "authenticated") return;
+
+    const HEARTBEAT_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+    const checkAndRefresh = async () => {
+      const currentToken = tokenStore.get();
+      if (!currentToken || isJwtExpired(currentToken)) {
+        const newToken = await refreshAccessTokenSilently();
+        if (newToken) {
+          setToken(newToken);
+          const resolved = readStoredUser() ?? userFromToken(newToken);
+          setUser(resolved);
+        } else {
+          signOut();
+        }
+      } else {
+        const payload = decodeJwt(currentToken);
+        // Proactively refresh if token has less than 10 mins remaining
+        if (payload?.exp && payload.exp * 1000 - Date.now() < 10 * 60 * 1000) {
+          const newToken = await refreshAccessTokenSilently();
+          if (newToken) {
+            setToken(newToken);
+          }
+        }
+      }
+    };
+
+    const interval = setInterval(checkAndRefresh, HEARTBEAT_INTERVAL);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void checkAndRefresh();
+      }
+    };
+
+    window.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("focus", onVisibilityChange);
+    };
+  }, [status, signOut]);
 
   const setSession = useCallback((newToken: string, newRefreshToken?: string, newUser?: AuthUser | null) => {
     tokenStore.set(newToken);
@@ -100,13 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStatus("authenticated");
   }, []);
 
-  const signOut = useCallback(() => {
-    tokenStore.clear();
-    writeStoredUser(null);
-    setToken(null);
-    setUser(null);
-    setStatus("unauthenticated");
-  }, []);
+
 
   const hasRole = useCallback((role: Role) => !!user?.roles.includes(role), [user]);
 

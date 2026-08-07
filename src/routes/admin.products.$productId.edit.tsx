@@ -19,6 +19,8 @@ import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, Chevron
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 import { applySeoTemplate } from "@/lib/utils";
 import { apiFetch } from "@/lib/api/client";
@@ -281,6 +283,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const updateMutation = useMutation({
     mutationFn: (data: any) => adminService.updateProduct(productId, data),
     onSuccess: () => {
+      draft.clearDraft();
       toast.success("Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -337,6 +340,8 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const watchedSpecAttributeIcons = form.watch("specAttributeIcons") || {};
   const watchedHighlightedIds = form.watch("highlightedSpecAttributeIds") || [];
 
+  const draft = useFormDraft(`products_edit_${productId}`, form.watch(), (data) => form.reset(data));
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-24">
       <div className="flex items-center gap-4">
@@ -345,9 +350,16 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         </Button>
         <div>
           <h2 className="font-display text-2xl font-bold tracking-tight">Edit Product</h2>
-          <p className="text-muted-foreground text-sm mt-0.5">Update details for {defaultValues.productName}</p>
+          <p className="text-muted-foreground text-sm mt-0.5">Update battery details, specifications, and SEO settings.</p>
         </div>
       </div>
+
+      <FormDraftBanner
+        hasDraft={draft.hasDraft}
+        draftTime={draft.draftTime}
+        onRestore={draft.restoreDraft}
+        onDiscard={draft.clearDraft}
+      />
 
       <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any, (errs) => {
         // Auto-recover from categoryId/brandId race condition
