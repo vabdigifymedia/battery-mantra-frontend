@@ -122,7 +122,7 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
   try {
     res = await fetch(buildUrl(path, query), {
       method,
-      headers,
+      headers: finalHeaders,
       body: payload,
       signal: controller.signal,
       credentials: "omit",
