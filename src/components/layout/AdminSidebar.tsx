@@ -118,7 +118,7 @@ export function AdminSidebar() {
   return (
     <Sidebar variant="inset">
       <SidebarHeader className="p-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-primary">
+        <Link to="/admin" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-primary">
           BatteryMantra
           <span className="text-xs font-normal text-muted-foreground uppercase tracking-widest ml-2">Admin</span>
         </Link>
