@@ -20,6 +20,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
+import { applySeoTemplate } from "@/lib/utils";
+import { apiFetch } from "@/lib/api/client";
 
 const AVAILABLE_ICONS = [
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
@@ -167,6 +169,11 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     return "";
   }, [rootCategories, defaultValues.categoryId]);
   
+  const { data: templates } = useQuery({
+    queryKey: ["seo", "templates"],
+    queryFn: () => apiFetch<any[]>("/api/seo/templates"),
+  });
+  
   const [selectedRootId, setSelectedRootId] = useState<string>("");
   const { data: dbCapacities = [] } = useQuery(capacitiesQuery(selectedRootId || undefined));
   
@@ -197,6 +204,67 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     syncField("categoryId");
     syncField("brandId");
   });
+
+  // Pre-fill SEO fields from global templates if they are empty
+  useEffect(() => {
+    if (templates && templates.length > 0 && brands.length > 0 && rootCategories.length > 0) {
+      const templateWithoutCity = templates.find((t: any) => t.templateType === "PRODUCT_WITHOUT_CITY");
+      const templateWithCity = templates.find((t: any) => t.templateType === "PRODUCT_WITH_CITY");
+      
+      const seoData = form.getValues("seo");
+      const context = {
+        product_name: defaultValues.productName || "",
+        brand_name: brands.find(b => b.brandId === defaultValues.brandId)?.brandName || "",
+        category_name: rootCategories.find(c => c.categoryId === defaultValues.categoryId)?.categoryName || "",
+        delivery_time: "2 Hours"
+      };
+      
+      let shouldUpdate = false;
+      const newSeo = { ...seoData };
+      
+      if (templateWithoutCity) {
+        if (!seoData.metaTitle && templateWithoutCity.seoTitleTemplate) {
+          newSeo.metaTitle = applySeoTemplate(templateWithoutCity.seoTitleTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.metaDescription && templateWithoutCity.seoDescriptionTemplate) {
+          newSeo.metaDescription = applySeoTemplate(templateWithoutCity.seoDescriptionTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.metaKeywords && templateWithoutCity.seoKeywordsTemplate) {
+          newSeo.metaKeywords = applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.ogTitle && templateWithoutCity.ogTitleTemplate) {
+          newSeo.ogTitle = applySeoTemplate(templateWithoutCity.ogTitleTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.ogDescription && templateWithoutCity.ogDescriptionTemplate) {
+          newSeo.ogDescription = applySeoTemplate(templateWithoutCity.ogDescriptionTemplate, context);
+          shouldUpdate = true;
+        }
+      }
+
+      if (templateWithCity) {
+        if (!seoData.metaTitleCity && templateWithCity.seoTitleTemplate) {
+          newSeo.metaTitleCity = applySeoTemplate(templateWithCity.seoTitleTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.metaDescriptionCity && templateWithCity.seoDescriptionTemplate) {
+          newSeo.metaDescriptionCity = applySeoTemplate(templateWithCity.seoDescriptionTemplate, context);
+          shouldUpdate = true;
+        }
+        if (!seoData.metaKeywordsCity && templateWithCity.seoKeywordsTemplate) {
+          newSeo.metaKeywordsCity = applySeoTemplate(templateWithCity.seoKeywordsTemplate, context);
+          shouldUpdate = true;
+        }
+      }
+      
+      if (shouldUpdate) {
+        form.setValue("seo", newSeo, { shouldDirty: false });
+      }
+    }
+  }, [templates, brands.length, rootCategories.length]);
 
   const categoryId = form.watch("categoryId");
   const { data: specTemplate, isLoading: isSpecLoading } = useQuery({

@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
+import { generateSlug } from "@/lib/utils";
 
 const AVAILABLE_ICONS = [
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
@@ -196,7 +197,7 @@ function AddProductPage() {
       highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : undefined,
       specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : undefined,
       isAutoAssignToPartner: data.isAutoAssignToPartner,
-      seo: data.seo
+      seo: { slug: generateSlug(data.productName) }
     };
 
     createMutation.mutate(payload);
@@ -584,59 +585,6 @@ function AddProductPage() {
             </CardContent>
           </Card>
 
-          {/* SEO Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">SEO Information</CardTitle>
-              <CardDescription>Configure search engine optimization for this product</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Product URL (Slug) <span className="text-muted-foreground font-normal ml-2">Leave blank to auto-generate from name</span></Label>
-                <Input placeholder="e.g., exide-mileage-ml38b20l-battery" {...form.register("seo.slug")} />
-              </div>
-              <div className="space-y-2">
-                <Label>SEO Title</Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery at Best Price | Batterymantra.com" {...form.register("seo.metaTitle")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Search / SEO Keywords</Label>
-                <Input placeholder="Exide Car Battery MI38B20L, Exide 35Ah Car battery..." {...form.register("seo.metaKeywords")} />
-              </div>
-              <div className="space-y-2">
-                <Label>SEO Description</Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
-              </div>
-              <div className="space-y-2 mt-4">
-                <Label>SEO Title City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
-                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery Price in city_name | Batterymantra.com" {...form.register("seo.metaTitleCity")} />
-              </div>
-              <div className="space-y-2">
-                <Label>SEO Keywords City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
-                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
-              </div>
-              <div className="space-y-2">
-                <Label>SEO Description City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name | 100% genuine..." {...form.register("seo.metaDescriptionCity")} />
-              </div>
-              <div className="space-y-2 mt-4">
-                <Label>OG Title</Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery at Best Price | Batterymantra.com" {...form.register("seo.ogTitle")} />
-              </div>
-              <div className="space-y-2">
-                <Label>OG Description</Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price | Cash On Delivery..." {...form.register("seo.ogDescription")} />
-              </div>
-              <div className="space-y-2 mt-4">
-                <Label>OG Title City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
-                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery Price in city_name | Batterymantra.com" {...form.register("seo.ogTitleCity")} />
-              </div>
-              <div className="space-y-2">
-                <Label>OG Description City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
-                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name | 100% genuine..." {...form.register("seo.ogDescriptionCity")} />
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </form>
 

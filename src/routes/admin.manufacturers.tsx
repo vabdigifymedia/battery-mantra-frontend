@@ -16,6 +16,8 @@ import { Trash2, Plus, Edit, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { generateSlug, applySeoTemplate } from "@/lib/utils";
+import { apiFetch } from "@/lib/api/client";
 import {
   Dialog,
   DialogContent,
@@ -74,6 +76,11 @@ function AdminManufacturers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingManufacturer, setEditingManufacturer] = useState<any>(null);
 
+  const { data: templates } = useQuery({
+    queryKey: ["seo", "templates"],
+    queryFn: () => apiFetch<any[]>("/api/seo/templates"),
+  });
+
   const form = useForm<ManufacturerFormValues>({
     resolver: zodResolver(manufacturerSchema) as any,
     defaultValues: {
@@ -127,26 +134,35 @@ function AdminManufacturers() {
 
   const openEditModal = (manufacturer: any) => {
     setEditingManufacturer(manufacturer);
+    
+    let newSeo = { ...(manufacturer.seo || {}) };
+    
+    if (templates && templates.length > 0) {
+      const templateWithoutCity = templates.find((t: any) => t.templateType === "MANUFACTURER_WITHOUT_CITY");
+      const templateWithCity = templates.find((t: any) => t.templateType === "MANUFACTURER_WITH_CITY");
+      const context = { manufacturer_name: manufacturer.name || "" };
+      
+      if (templateWithoutCity) {
+        if (!newSeo.metaTitle && templateWithoutCity.seoTitleTemplate) newSeo.metaTitle = applySeoTemplate(templateWithoutCity.seoTitleTemplate, context);
+        if (!newSeo.metaDescription && templateWithoutCity.seoDescriptionTemplate) newSeo.metaDescription = applySeoTemplate(templateWithoutCity.seoDescriptionTemplate, context);
+        if (!newSeo.metaKeywords && templateWithoutCity.seoKeywordsTemplate) newSeo.metaKeywords = applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context);
+        if (!newSeo.ogTitle && templateWithoutCity.ogTitleTemplate) newSeo.ogTitle = applySeoTemplate(templateWithoutCity.ogTitleTemplate, context);
+        if (!newSeo.ogDescription && templateWithoutCity.ogDescriptionTemplate) newSeo.ogDescription = applySeoTemplate(templateWithoutCity.ogDescriptionTemplate, context);
+      }
+      if (templateWithCity) {
+        if (!newSeo.metaTitleCity && templateWithCity.seoTitleTemplate) newSeo.metaTitleCity = applySeoTemplate(templateWithCity.seoTitleTemplate, context);
+        if (!newSeo.metaDescriptionCity && templateWithCity.seoDescriptionTemplate) newSeo.metaDescriptionCity = applySeoTemplate(templateWithCity.seoDescriptionTemplate, context);
+        if (!newSeo.metaKeywordsCity && templateWithCity.seoKeywordsTemplate) newSeo.metaKeywordsCity = applySeoTemplate(templateWithCity.seoKeywordsTemplate, context);
+      }
+    }
+
     form.reset({
       name: manufacturer.name,
       logoUrl: manufacturer.logoUrl ?? "",
       description: manufacturer.description ?? "",
       displayOrder: manufacturer.displayOrder ?? 0,
       categoryIds: manufacturer.categories?.map((c: any) => c.categoryId) ?? [],
-      seo: manufacturer.seo || {
-        slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
-        metaTitleCity: "",
-        metaDescriptionCity: "",
-        metaKeywordsCity: "",
-        ogTitle: "",
-        ogDescription: "",
-        ogTitleCity: "",
-        ogDescriptionCity: "",
-        canonicalUrl: "",
-      }
+      seo: newSeo
     });
     setIsModalOpen(true);
   };
@@ -194,7 +210,7 @@ function AdminManufacturers() {
       description: data.description,
       displayOrder: data.displayOrder || 0,
       categoryIds: data.categoryIds || [],
-      seo: data.seo,
+      seo: editingManufacturer ? data.seo : { slug: generateSlug(data.name) },
     };
 
     if (editingManufacturer) {
@@ -380,68 +396,70 @@ function AdminManufacturers() {
               />
             </div>
 
-            <div className="pt-6 pb-2">
-              <h3 className="text-lg font-semibold">SEO Information</h3>
-              <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this manufacturer</p>
-              
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Manufacturer URL (Slug)</Label>
-                    <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>SEO Title</Label>
-                    <Input placeholder="Buy Manufacturer at Best Price" {...form.register("seo.metaTitle")} />
-                  </div>
-                </div>
+            {editingManufacturer && (
+              <div className="pt-6 pb-2">
+                <h3 className="text-lg font-semibold">SEO Information</h3>
+                <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this manufacturer</p>
                 
-                <div className="space-y-2">
-                  <Label>Search / SEO Keywords</Label>
-                  <Input placeholder="Manufacturer price, buy manufacturer..." {...form.register("seo.metaKeywords")} />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>SEO Description</Label>
-                  <Input placeholder="Buy Manufacturer At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="space-y-2">
-                    <Label>SEO Title City</Label>
-                    <Input placeholder="Manufacturer Price in city_name" {...form.register("seo.metaTitleCity")} />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Manufacturer URL (Slug)</Label>
+                      <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>SEO Title</Label>
+                      <Input placeholder="Buy Manufacturer at Best Price" {...form.register("seo.metaTitle")} />
+                    </div>
                   </div>
+                  
                   <div className="space-y-2">
-                    <Label>SEO Keywords City</Label>
-                    <Input placeholder="Manufacturer At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                    <Label>Search / SEO Keywords</Label>
+                    <Input placeholder="Manufacturer price, buy manufacturer..." {...form.register("seo.metaKeywords")} />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>SEO Description City</Label>
-                  <Input placeholder="Buy Manufacturer At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
-                </div>
+                  
+                  <div className="space-y-2">
+                    <Label>SEO Description</Label>
+                    <Input placeholder="Buy Manufacturer At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label>SEO Title City</Label>
+                      <Input placeholder="Manufacturer Price in city_name" {...form.register("seo.metaTitleCity")} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>SEO Keywords City</Label>
+                      <Input placeholder="Manufacturer At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>SEO Description City</Label>
+                    <Input placeholder="Buy Manufacturer At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
-                  <div className="space-y-2 mt-4">
-                    <Label>OG Title</Label>
-                    <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
-                  </div>
-                  <div className="space-y-2 mt-4">
-                    <Label>OG Description</Label>
-                    <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>OG Title City</Label>
-                    <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>OG Description City</Label>
-                    <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
+                    <div className="space-y-2 mt-4">
+                      <Label>OG Title</Label>
+                      <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
+                    </div>
+                    <div className="space-y-2 mt-4">
+                      <Label>OG Description</Label>
+                      <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>OG Title City</Label>
+                      <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>OG Description City</Label>
+                      <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex justify-end gap-2 pt-6 border-t">
               <Button type="button" variant="outline" onClick={closeModal}>
