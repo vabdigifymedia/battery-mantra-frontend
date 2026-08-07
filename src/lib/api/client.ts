@@ -113,14 +113,14 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
             
             if (refreshRes.ok) {
               const refreshData = await refreshRes.json();
-              tokenStore.set(refreshData.token);
+              tokenStore.set(refreshData.accessToken);
               if (refreshData.refreshToken) {
                 tokenStore.setRefresh(refreshData.refreshToken);
               }
-              onRefreshed(refreshData.token);
+              onRefreshed(refreshData.accessToken);
               
               // Retry original request
-              finalHeaders.Authorization = `Bearer ${refreshData.token}`;
+              finalHeaders.Authorization = `Bearer ${refreshData.accessToken}`;
               const retryRes = await fetch(buildUrl(path, query), {
                 method,
                 headers: finalHeaders,
