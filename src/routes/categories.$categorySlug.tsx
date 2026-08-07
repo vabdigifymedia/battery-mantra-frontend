@@ -8,6 +8,8 @@ import { buildPageHead } from "@/lib/seo";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { ErrorState } from "@/components/feedback/ErrorState";
+import { applySeoTemplate } from "@/lib/utils";
+import { useLocationStore } from "@/store/useLocationStore";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -33,6 +35,7 @@ function SubcategoriesPage() {
   const { categorySlug } = Route.useParams();
   const { data, isLoading, isError, refetch } = useQuery(rootCategoriesQuery());
   const navigate = useNavigate();
+  const { city } = useLocationStore();
 
   if (isLoading) {
     return (
@@ -78,7 +81,10 @@ function SubcategoriesPage() {
     <div>
       <PageHeader
         title={category.categoryName}
-        description={category.categoryDescription || `Select a subcategory to view products.`}
+        description={applySeoTemplate(category.categoryDescription || "", { 
+          category_name: category.categoryName, 
+          city_name: city?.cityName || "your city" 
+        }) || `Select a subcategory to view products.`}
       />
       <Container size="xl" className="py-8">
         <div className="mb-8">

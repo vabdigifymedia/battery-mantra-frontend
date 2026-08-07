@@ -38,7 +38,7 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { useLocationStore } from "@/store/useLocationStore";
-import { replaceSeoVariables } from "@/lib/seo-variables";
+import { applySeoTemplate } from "@/lib/utils";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -262,11 +262,13 @@ function ProductsPage() {
                 <div 
                   className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground"
                   dangerouslySetInnerHTML={{ 
-                    __html: replaceSeoVariables(brand.description, {
+                    __html: applySeoTemplate(brand.description, {
                       city: city?.cityName || "Delhi / NCR",
-                      City: city?.cityName || "Delhi / NCR",
+                      city_name: city?.cityName || "Delhi / NCR",
                       brand: brand.brandName || "",
+                      brand_name: brand.brandName || "",
                       category: category?.categoryName || "Battery",
+                      category_name: category?.categoryName || "Battery",
                     }) 
                   }}
                 />

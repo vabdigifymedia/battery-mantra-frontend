@@ -243,11 +243,16 @@ function AddProductPage() {
                   name="productDescription"
                   control={form.control}
                   render={({ field }) => (
-                    <RichTextEditor
-                      value={field.value || ""}
-                      onChange={field.onChange}
-                      placeholder="Detailed product description..."
-                    />
+                    <div>
+                      <RichTextEditor
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder="Detailed product description..."
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>, <code className="bg-muted px-1 rounded">{`{manufacturer_name}`}</code> which will be automatically replaced on the frontend based on the user's location and product context.
+                      </p>
+                    </div>
                   )}
                 />
               </div>

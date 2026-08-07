@@ -7,6 +7,8 @@ import { APP } from "@/constants/app";
 
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
+import { applySeoTemplate } from "@/lib/utils";
+import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/$slug")({
   component: CmsPageRender,
@@ -52,6 +54,7 @@ export const Route = createFileRoute("/$slug")({
 
 function CmsPageRender() {
   const { slug } = Route.useParams();
+  const { city } = useLocationStore();
   
   // We use initialData from the loader, but this also handles client-side refetches
   const { data: page, isLoading, isError } = useQuery({
@@ -124,7 +127,10 @@ function CmsPageRender() {
         {page.content && (
           <div 
             className="prose prose-slate max-w-none dark:prose-invert prose-headings:font-display mb-12"
-            dangerouslySetInnerHTML={{ __html: page.content }}
+            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content, {
+              city_name: city?.cityName || "your city",
+              page_title: page.title || ""
+            }) }}
           />
         )}
 
@@ -139,7 +145,10 @@ function CmsPageRender() {
         {page.content2 && (
           <div 
             className="prose prose-slate max-w-none dark:prose-invert prose-headings:font-display mt-12"
-            dangerouslySetInnerHTML={{ __html: page.content2 }}
+            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content2, {
+              city_name: city?.cityName || "your city",
+              page_title: page.title || ""
+            }) }}
           />
         )}
       </Container>

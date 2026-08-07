@@ -392,8 +392,13 @@ function AdminBrands() {
               name="description"
               render={({ field }) => (
                 <FormField label="Brand Description (HTML / SEO Content)" htmlFor="description" error={form.formState.errors.description?.message}>
-                  <RichTextEditor value={field.value || ""} onChange={field.onChange} />
-                </FormField>
+                  <div>
+                      <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code> which will be automatically replaced on the frontend based on the user's location and brand context.
+                      </p>
+                    </div>
+                  </FormField>
               )}
             />
 

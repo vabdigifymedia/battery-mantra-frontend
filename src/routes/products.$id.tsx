@@ -21,7 +21,7 @@ import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
-import { cn } from "@/lib/utils";
+import { cn, applySeoTemplate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -365,6 +365,18 @@ function PdpPage() {
   const warrantySpec = freeReplacementSpec || genericWarrantySpec;
   const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
   const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : null);
+
+  const seoContext = {
+    product_name: data.productName,
+    brand_name: data.brandName || "Brand",
+    category_name: data.categoryName || "Battery",
+    city_name: city?.cityName || "your city",
+    warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
+    price_name: data.productPrice?.toString() || "",
+    mrp_name: ((data.productPrice || 0) * 1.2).toFixed(2),
+    capa_ct_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || ""),
+    manufacturer_name: data.brandName || "Manufacturer", // Fallback to brandName if manufacturerName not explicitly returned
+  };
 
   return (
     <div className="bg-muted/30 min-h-screen pb-24 sm:pb-16 pt-14 sm:pt-0">
@@ -930,7 +942,7 @@ function PdpPage() {
             {data.productDescription ? (
               <div 
                 className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: data.productDescription }}
+                dangerouslySetInnerHTML={{ __html: applySeoTemplate(data.productDescription, seoContext) }}
               />
             ) : (
               <EmptyState title="No Description" description="Description is not available for this product yet." />
@@ -995,16 +1007,7 @@ function PdpPage() {
       
       <GlobalFaqSection 
         pageType="PRODUCT" 
-        context={{
-          product_name: data.productName,
-          brand_name: data.brandName || "Brand",
-          category_name: data.categoryName || "Battery",
-          city_name: city?.cityName || "your city",
-          warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
-          price_name: data.productPrice?.toString() || "",
-          mrp_name: (data.productPrice * 1.2).toFixed(2),
-          capa_ct_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || ""),
-        }} 
+        context={seoContext} 
       />
 
       <RelatedProducts currentProductId={id} currentProduct={data} />

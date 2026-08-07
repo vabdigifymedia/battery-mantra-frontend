@@ -460,7 +460,12 @@ function AdminCategories() {
             </FormField>
             
             <FormField label="Description" htmlFor="categoryDescription" error={form.formState.errors.categoryDescription?.message}>
-              <Input id="categoryDescription" {...form.register("categoryDescription")} />
+              <div>
+                <Input id="categoryDescription" {...form.register("categoryDescription")} />
+                <p className="text-xs text-muted-foreground mt-2">
+                  You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
+                </p>
+              </div>
             </FormField>
 
             <Controller

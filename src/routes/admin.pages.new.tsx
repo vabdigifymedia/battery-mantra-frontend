@@ -130,11 +130,16 @@ function NewPage() {
                 control={control}
                 name="content"
                 render={({ field }) => (
-                  <RichTextEditor
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Write your main page content here..."
-                  />
+                  <div>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Write your main page content here..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{page_title}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
+                    </p>
+                  </div>
                 )}
               />
             </div>
@@ -145,11 +150,16 @@ function NewPage() {
                 control={control}
                 name="content2"
                 render={({ field }) => (
-                  <RichTextEditor
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                    placeholder="Write your secondary page content here (optional)..."
-                  />
+                  <div>
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="Write your secondary page content here (optional)..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{page_title}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
+                    </p>
+                  </div>
                 )}
               />
             </div>
