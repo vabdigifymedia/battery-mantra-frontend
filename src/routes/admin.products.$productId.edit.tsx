@@ -265,12 +265,15 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
           newSeo.metaKeywords = applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context);
           shouldUpdate = true;
         }
-        if (!seoData.ogTitle && templateWithoutCity.ogTitleTemplate) {
-          newSeo.ogTitle = applySeoTemplate(templateWithoutCity.ogTitleTemplate, context);
+        const ogTitleTpl = templateWithoutCity.ogTitleTemplate || templateWithoutCity.seoTitleTemplate;
+        if (!seoData.ogTitle && ogTitleTpl) {
+          newSeo.ogTitle = applySeoTemplate(ogTitleTpl, context);
           shouldUpdate = true;
         }
-        if (!seoData.ogDescription && templateWithoutCity.ogDescriptionTemplate) {
-          newSeo.ogDescription = applySeoTemplate(templateWithoutCity.ogDescriptionTemplate, context);
+        
+        const ogDescTpl = templateWithoutCity.ogDescriptionTemplate || templateWithoutCity.seoDescriptionTemplate;
+        if (!seoData.ogDescription && ogDescTpl) {
+          newSeo.ogDescription = applySeoTemplate(ogDescTpl, context);
           shouldUpdate = true;
         }
       }
@@ -286,6 +289,18 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         }
         if (!seoData.metaKeywordsCity && templateWithCity.seoKeywordsTemplate) {
           newSeo.metaKeywordsCity = applySeoTemplate(templateWithCity.seoKeywordsTemplate, context);
+          shouldUpdate = true;
+        }
+        
+        const ogTitleCityTpl = templateWithCity.ogTitleTemplate || templateWithCity.seoTitleTemplate;
+        if (!seoData.ogTitleCity && ogTitleCityTpl) {
+          newSeo.ogTitleCity = applySeoTemplate(ogTitleCityTpl, context);
+          shouldUpdate = true;
+        }
+        
+        const ogDescCityTpl = templateWithCity.ogDescriptionTemplate || templateWithCity.seoDescriptionTemplate;
+        if (!seoData.ogDescriptionCity && ogDescCityTpl) {
+          newSeo.ogDescriptionCity = applySeoTemplate(ogDescCityTpl, context);
           shouldUpdate = true;
         }
       }
