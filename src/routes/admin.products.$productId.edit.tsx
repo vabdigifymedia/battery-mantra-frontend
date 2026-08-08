@@ -249,64 +249,44 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
         delivery_time: "2 Hours"
       };
 
-      let shouldUpdate = false;
-      const newSeo = { ...seoData };
-
       if (templateWithoutCity) {
         if (!seoData.metaTitle && templateWithoutCity.seoTitleTemplate) {
-          newSeo.metaTitle = applySeoTemplate(templateWithoutCity.seoTitleTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaTitle", applySeoTemplate(templateWithoutCity.seoTitleTemplate, context));
         }
         if (!seoData.metaDescription && templateWithoutCity.seoDescriptionTemplate) {
-          newSeo.metaDescription = applySeoTemplate(templateWithoutCity.seoDescriptionTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaDescription", applySeoTemplate(templateWithoutCity.seoDescriptionTemplate, context));
         }
         if (!seoData.metaKeywords && templateWithoutCity.seoKeywordsTemplate) {
-          newSeo.metaKeywords = applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaKeywords", applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context));
         }
         const ogTitleTpl = templateWithoutCity.ogTitleTemplate || templateWithoutCity.seoTitleTemplate;
         if (!seoData.ogTitle && ogTitleTpl) {
-          newSeo.ogTitle = applySeoTemplate(ogTitleTpl, context);
-          shouldUpdate = true;
+          form.setValue("seo.ogTitle", applySeoTemplate(ogTitleTpl, context));
         }
-        
         const ogDescTpl = templateWithoutCity.ogDescriptionTemplate || templateWithoutCity.seoDescriptionTemplate;
         if (!seoData.ogDescription && ogDescTpl) {
-          newSeo.ogDescription = applySeoTemplate(ogDescTpl, context);
-          shouldUpdate = true;
+          form.setValue("seo.ogDescription", applySeoTemplate(ogDescTpl, context));
         }
       }
 
       if (templateWithCity) {
         if (!seoData.metaTitleCity && templateWithCity.seoTitleTemplate) {
-          newSeo.metaTitleCity = applySeoTemplate(templateWithCity.seoTitleTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaTitleCity", applySeoTemplate(templateWithCity.seoTitleTemplate, context));
         }
         if (!seoData.metaDescriptionCity && templateWithCity.seoDescriptionTemplate) {
-          newSeo.metaDescriptionCity = applySeoTemplate(templateWithCity.seoDescriptionTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaDescriptionCity", applySeoTemplate(templateWithCity.seoDescriptionTemplate, context));
         }
         if (!seoData.metaKeywordsCity && templateWithCity.seoKeywordsTemplate) {
-          newSeo.metaKeywordsCity = applySeoTemplate(templateWithCity.seoKeywordsTemplate, context);
-          shouldUpdate = true;
+          form.setValue("seo.metaKeywordsCity", applySeoTemplate(templateWithCity.seoKeywordsTemplate, context));
         }
-        
         const ogTitleCityTpl = templateWithCity.ogTitleTemplate || templateWithCity.seoTitleTemplate;
         if (!seoData.ogTitleCity && ogTitleCityTpl) {
-          newSeo.ogTitleCity = applySeoTemplate(ogTitleCityTpl, context);
-          shouldUpdate = true;
+          form.setValue("seo.ogTitleCity", applySeoTemplate(ogTitleCityTpl, context));
         }
-        
         const ogDescCityTpl = templateWithCity.ogDescriptionTemplate || templateWithCity.seoDescriptionTemplate;
         if (!seoData.ogDescriptionCity && ogDescCityTpl) {
-          newSeo.ogDescriptionCity = applySeoTemplate(ogDescCityTpl, context);
-          shouldUpdate = true;
+          form.setValue("seo.ogDescriptionCity", applySeoTemplate(ogDescCityTpl, context));
         }
-      }
-
-      if (shouldUpdate) {
-        form.setValue("seo", newSeo, { shouldDirty: false });
       }
     }
   }, [templates, brands.length, rootCategories.length]);
