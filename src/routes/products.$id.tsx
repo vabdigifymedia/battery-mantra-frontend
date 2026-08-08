@@ -355,16 +355,20 @@ function PdpPage() {
   const mockRating = (4.4 + (charCodeSum % 5) * 0.1).toFixed(1); // e.g., 4.4 to 4.8
   const mockSold = 150 + (charCodeSum % 250); // e.g., 150 to 399+ sold
 
-  // Extract Warranty for Banner — prioritize "Free Replacement" over generic/pro-rata
+  // Extract Warranty for Banner — prioritize EXACT "Warranty" over generic ones
+  const exactWarrantySpec = allFlatSpecs.find((s: any) => {
+    const key = String(s[0]).toLowerCase().trim();
+    return key === "warranty" || key === "warrenty" || key === "guarantee";
+  });
+  const genericWarrantySpec = allFlatSpecs.find((s: any) => {
+    const key = String(s[0]).toLowerCase();
+    return key.includes("warranty") || key.includes("warrenty") || key.includes("guarantee") || key.includes("period");
+  });
   const freeReplacementSpec = allFlatSpecs.find((s: any) => {
     const key = String(s[0]).toLowerCase();
     return key.includes("free replacement") || key.includes("free_replacement");
   });
-  const genericWarrantySpec = allFlatSpecs.find((s: any) => {
-    const key = String(s[0]).toLowerCase();
-    return key.includes("warranty") || key.includes("guarantee") || key.includes("period");
-  });
-  const warrantySpec = freeReplacementSpec || genericWarrantySpec;
+  const warrantySpec = exactWarrantySpec || genericWarrantySpec || freeReplacementSpec;
   const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
   const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : null);
 
