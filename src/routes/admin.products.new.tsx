@@ -236,7 +236,7 @@ function AddProductPage() {
         console.error("Validation Errors:", errs);
         toast.error("Please check the form for errors.");
       })} className="flex flex-col lg:flex-row gap-6">
-        
+
         {/* LEFT COLUMN - MAIN DETAILS (70%) */}
         <div className="flex-1 space-y-6">
           <Card className="shadow-sm">
@@ -390,101 +390,102 @@ function AddProductPage() {
                         const isHighlighted = watchedHighlightedIds.includes(attr.attributeId);
                         const highlightedCount = watchedHighlightedIds.length;
                         return (
-                        <div key={attr.attributeId} className="space-y-3 p-3 border rounded-lg bg-background">
-                          <div className="flex items-start justify-between gap-2">
-                            <Label className="font-semibold text-sm line-clamp-2 flex-1 leading-snug">{attr.attributeName}</Label>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <Label htmlFor={`highlight-${attr.attributeId}`} className="text-xs text-muted-foreground cursor-pointer">Highlight</Label>
-                              <Checkbox 
-                                id={`highlight-${attr.attributeId}`}
-                                checked={isHighlighted}
-                                onCheckedChange={(checked) => {
-                                  const current = form.getValues("highlightedSpecAttributeIds") || [];
-                                  if (checked) {
-                                    if (current.length >= 6) {
-                                      toast.warning("Maximum 6 key features can be highlighted.");
-                                      return;
-                                    }
-                                    form.setValue("highlightedSpecAttributeIds", [...current, attr.attributeId], { shouldDirty: true });
-                                  } else {
-                                    form.setValue("highlightedSpecAttributeIds", current.filter(id => id !== attr.attributeId), { shouldDirty: true });
-                                    const icons = { ...form.getValues("specAttributeIcons") };
-                                    delete icons[attr.attributeId];
-                                    form.setValue("specAttributeIcons", icons, { shouldDirty: true });
-                                  }
-                                }}
-                                disabled={!isHighlighted && highlightedCount >= 6}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="flex gap-2 items-start">
-                            <div className="flex-1 min-w-0">
-                              <Select
-                                value={watchedSpecUnitIds[attr.attributeId] || ""}
-                                onValueChange={(val) => {
-                                  const currentUnits = { ...form.getValues("specUnitIds") };
-                                  if (val === "none") {
-                                    delete currentUnits[attr.attributeId];
-                                  } else {
-                                    currentUnits[attr.attributeId] = val;
-                                  }
-                                  form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
-                                }}
-                              >
-                                <SelectTrigger className="w-full">
-                                  <div className="truncate text-left w-full">
-                                    <SelectValue placeholder={`Select...`} />
-                                  </div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="none">-- None --</SelectItem>
-                                  {attr.availableUnits.map((unit: SpecUnitDto) => (
-                                    <SelectItem key={unit.unitId} value={unit.unitId}>
-                                      {unit.unitValue}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            
-                            {isHighlighted && (
-                              <div className="w-[90px] sm:w-[110px] shrink-0">
-                                <Select
-                                  value={watchedSpecAttributeIcons[attr.attributeId] || ""}
-                                  onValueChange={(val) => {
-                                    const icons = { ...form.getValues("specAttributeIcons") };
-                                    if (val === "none") {
-                                      delete icons[attr.attributeId];
+                          <div key={attr.attributeId} className="space-y-3 p-3 border rounded-lg bg-background">
+                            <div className="flex items-start justify-between gap-2">
+                              <Label className="font-semibold text-sm line-clamp-2 flex-1 leading-snug">{attr.attributeName}</Label>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Label htmlFor={`highlight-${attr.attributeId}`} className="text-xs text-muted-foreground cursor-pointer">Highlight</Label>
+                                <Checkbox
+                                  id={`highlight-${attr.attributeId}`}
+                                  checked={isHighlighted}
+                                  onCheckedChange={(checked) => {
+                                    const current = form.getValues("highlightedSpecAttributeIds") || [];
+                                    if (checked) {
+                                      if (current.length >= 6) {
+                                        toast.warning("Maximum 6 key features can be highlighted.");
+                                        return;
+                                      }
+                                      form.setValue("highlightedSpecAttributeIds", [...current, attr.attributeId], { shouldDirty: true });
                                     } else {
-                                      icons[attr.attributeId] = val;
+                                      form.setValue("highlightedSpecAttributeIds", current.filter(id => id !== attr.attributeId), { shouldDirty: true });
+                                      const icons = { ...form.getValues("specAttributeIcons") };
+                                      delete icons[attr.attributeId];
+                                      form.setValue("specAttributeIcons", icons, { shouldDirty: true });
                                     }
-                                    form.setValue("specAttributeIcons", icons, { shouldDirty: true });
+                                  }}
+                                  disabled={!isHighlighted && highlightedCount >= 6}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2 items-start">
+                              <div className="flex-1 min-w-0">
+                                <Select
+                                  value={watchedSpecUnitIds[attr.attributeId] || ""}
+                                  onValueChange={(val) => {
+                                    const currentUnits = { ...form.getValues("specUnitIds") };
+                                    if (val === "none") {
+                                      delete currentUnits[attr.attributeId];
+                                    } else {
+                                      currentUnits[attr.attributeId] = val;
+                                    }
+                                    form.setValue("specUnitIds", currentUnits, { shouldDirty: true });
                                   }}
                                 >
-                                  <SelectTrigger className="px-2 w-full">
-                                    <SelectValue placeholder="Icon..." />
+                                  <SelectTrigger className="w-full">
+                                    <div className="truncate text-left w-full">
+                                      <SelectValue placeholder={`Select...`} />
+                                    </div>
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="none">Auto</SelectItem>
-                                    {AVAILABLE_ICONS.map((IconObj) => {
-                                      const IconComp = IconObj.icon;
-                                      return (
-                                        <SelectItem key={IconObj.id} value={IconObj.id}>
-                                          <div className="flex items-center gap-2">
-                                            <IconComp className="h-4 w-4" />
-                                            <span className="text-xs">{IconObj.label}</span>
-                                          </div>
-                                        </SelectItem>
-                                      );
-                                    })}
+                                    <SelectItem value="none">-- None --</SelectItem>
+                                    {attr.availableUnits.map((unit: SpecUnitDto) => (
+                                      <SelectItem key={unit.unitId} value={unit.unitId}>
+                                        {unit.unitValue}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </div>
-                            )}
+
+                              {isHighlighted && (
+                                <div className="w-[90px] sm:w-[110px] shrink-0">
+                                  <Select
+                                    value={watchedSpecAttributeIcons[attr.attributeId] || ""}
+                                    onValueChange={(val) => {
+                                      const icons = { ...form.getValues("specAttributeIcons") };
+                                      if (val === "none") {
+                                        delete icons[attr.attributeId];
+                                      } else {
+                                        icons[attr.attributeId] = val;
+                                      }
+                                      form.setValue("specAttributeIcons", icons, { shouldDirty: true });
+                                    }}
+                                  >
+                                    <SelectTrigger className="px-2 w-full">
+                                      <SelectValue placeholder="Icon..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="none">Auto</SelectItem>
+                                      {AVAILABLE_ICONS.map((IconObj) => {
+                                        const IconComp = IconObj.icon;
+                                        return (
+                                          <SelectItem key={IconObj.id} value={IconObj.id}>
+                                            <div className="flex items-center gap-2">
+                                              <IconComp className="h-4 w-4" />
+                                              <span className="text-xs">{IconObj.label}</span>
+                                            </div>
+                                          </SelectItem>
+                                        );
+                                      })}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )})}
+                        )
+                      })}
                     </div>
                   </div>
                 ))
@@ -550,8 +551,8 @@ function AddProductPage() {
               {subCategories.length > 0 && (
                 <div className="space-y-2">
                   <Label>Subcategory</Label>
-                  <Select 
-                    value={form.watch("categoryId") !== selectedRootId ? form.watch("categoryId") : ""} 
+                  <Select
+                    value={form.watch("categoryId") !== selectedRootId ? form.watch("categoryId") : ""}
                     onValueChange={(val) => form.setValue("categoryId", val, { shouldValidate: true })}
                   >
                     <SelectTrigger>
