@@ -178,7 +178,16 @@ function EditProductPage() {
     }
   };
 
-  return <EditProductForm productId={productId} defaultValues={defaultValues} />;
+  return (
+    <>
+      {/* DEBUG PREVIEW */}
+      <div className="mb-8 p-4 bg-gray-900 text-green-400 font-mono text-xs overflow-auto rounded-md border border-gray-700 max-h-96">
+        <h3 className="text-white mb-2 font-semibold">DEBUG: Raw Product API Response (from Database)</h3>
+        <pre>{JSON.stringify(product, null, 2)}</pre>
+      </div>
+      <EditProductForm productId={productId} defaultValues={defaultValues} />
+    </>
+  );
 }
 
 function EditProductForm({ productId, defaultValues }: { productId: string; defaultValues: FormValues }) {
