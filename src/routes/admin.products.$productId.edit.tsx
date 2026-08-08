@@ -116,12 +116,41 @@ function EditProductPage() {
     }
   }
 
+  const getProductMrp = (prod: any): number => {
+    if (!prod) return 0;
+    const direct = prod.originalPrice ?? prod.mrp ?? prod.specs?.originalPrice ?? prod.specs?.mrp ?? prod.specs?.MRP;
+    if (direct !== undefined && direct !== null && !isNaN(Number(direct)) && Number(direct) > 0) {
+      return Number(direct);
+    }
+    if (prod.specs && typeof prod.specs === "object") {
+      for (const [key, value] of Object.entries(prod.specs)) {
+        if (typeof value === "object" && value !== null) {
+          for (const [subKey, subVal] of Object.entries(value as Record<string, unknown>)) {
+            if (/mrp|original\s*price|list\s*price/i.test(subKey)) {
+              const num = Number(subVal);
+              if (!isNaN(num) && num > 0) return num;
+            }
+          }
+        }
+      }
+    }
+    if (prod.specDetails && Array.isArray(prod.specDetails)) {
+      for (const detail of prod.specDetails) {
+        if (detail.attributeName && /mrp|original\s*price|list\s*price/i.test(detail.attributeName)) {
+          const num = Number(detail.value);
+          if (!isNaN(num) && num > 0) return num;
+        }
+      }
+    }
+    return 0;
+  };
+
   // Map product data to form default values
   const defaultValues: FormValues = {
     productName: product.productName,
     productDescription: product.productDescription || "",
     productPrice: product.productPrice,
-    originalPrice: Number(product.specs?.originalPrice || 0),
+    originalPrice: getProductMrp(product),
     exchangeDiscount: product.exchangeDiscount || 0,
     productStock: product.productStock || 0,
     productImage: product.productImage || "",
