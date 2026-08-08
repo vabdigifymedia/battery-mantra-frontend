@@ -195,10 +195,12 @@ function PdpPage() {
   }, []);
 
   useEffect(() => {
-    if (data?.productImage && !activeImage) {
-      setActiveImage(data.productImage);
+    if (data?.productId) {
+      setActiveImage(data.productImage || null);
+      setExchange((data.exchangeDiscount ?? 0) > 0 ? "yes" : "no");
+      setQty(1);
     }
-  }, [data?.productImage, activeImage]);
+  }, [data?.productId, data?.productImage, data?.exchangeDiscount]);
 
   const galleryImages = [data?.productImage, ...(data?.additionalImages || [])].filter(Boolean) as string[];
 
