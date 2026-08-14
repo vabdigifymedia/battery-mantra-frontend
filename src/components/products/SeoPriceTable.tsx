@@ -34,6 +34,20 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 ? `₹${priceWithExchange.toLocaleString('en-IN')} - ₹${priceWithoutExchange.toLocaleString('en-IN')}`
                 : `₹${priceWithoutExchange.toLocaleString('en-IN')}`;
 
+              const extractCapacity = (name: string, backendCapacity?: string) => {
+                const specCap = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
+                if (specCap) return specCap;
+                
+                const match = name.match(/(\d+)\s*(Ah|AH|ah)/i);
+                if (match) return match[0].toUpperCase();
+                
+                if (backendCapacity && /^(R\/L|L\/R|R|L)$/i.test(backendCapacity.trim())) {
+                  return "N/A";
+                }
+                
+                return backendCapacity || "N/A";
+              };
+
               return (
                 <tr 
                   key={product.productId} 
@@ -41,7 +55,7 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 >
                   <td className="px-4 py-3 text-foreground font-medium">{product.productName}</td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {(product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value || product.capacity || "N/A"}
+                    {extractCapacity(product.productName, product.capacity)}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {(product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value || "Standard Warranty"}
