@@ -38,10 +38,16 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 const specCap = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
                 if (specCap) return specCap;
                 
-                const match = name.match(/(\d+)\s*(Ah|AH|ah)/i);
-                if (match) return match[0].toUpperCase();
+                // Try to find explicitly mentioned Ah
+                const ahMatch = name.match(/(\d+)\s*(Ah|AH|ah)/i);
+                if (ahMatch) return ahMatch[0].toUpperCase();
                 
-                if (backendCapacity && /^(R\/L|L\/R|R|L)$/i.test(backendCapacity.trim())) {
+                // Try to find DIN formats (e.g. DIN100, DIN-100)
+                const dinMatch = name.match(/DIN-?(\d+)/i);
+                if (dinMatch) return `${dinMatch[1]} AH`;
+                
+                // Hide layout-only values returned by backend
+                if (backendCapacity && /^(R\/L|L\/R|RL|LR|R|L)$/i.test(backendCapacity.trim())) {
                   return "N/A";
                 }
                 
