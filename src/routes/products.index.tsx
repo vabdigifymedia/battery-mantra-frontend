@@ -362,6 +362,7 @@ function ActiveFilterBadges({
 
   if (activeFilters.length === 0) return null;
 
+  return (
     <div className="flex flex-wrap gap-2 mb-4 items-center">
       {activeFilters.map((af, i) => (
         <Badge key={i} variant="secondary" className="flex items-center gap-1.5 px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20">
