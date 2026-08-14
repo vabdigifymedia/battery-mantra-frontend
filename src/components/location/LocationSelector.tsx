@@ -9,17 +9,12 @@ export const LocationSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { pincode, city, locationPermissionGranted } = useLocationStore();
   const { detectLocation, isLocating } = useGeolocation();
-  const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
-    setIsMounted(true);
     // Auto-detect location if not set, and user hasn't explicitly denied permission
     if (!pincode && locationPermissionGranted !== false) {
       detectLocation();
     }
   }, []);
-
-  if (!isMounted) return null;
 
   return (
     <>

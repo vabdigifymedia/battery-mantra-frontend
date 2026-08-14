@@ -130,6 +130,14 @@ export const Route = createFileRoute("/products/$id")({
       />
     </Container>
   ),
+  pendingComponent: () => (
+    <div className="min-h-[101vh] flex items-center justify-center bg-muted/30">
+      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+        <Battery className="h-8 w-8 animate-pulse opacity-50" />
+        <span className="text-sm font-medium">Loading product...</span>
+      </div>
+    </div>
+  ),
 });
 
 function PdpPage() {
