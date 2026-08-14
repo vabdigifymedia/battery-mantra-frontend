@@ -147,7 +147,7 @@ function PdpPage() {
   const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
   
-  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [activeImage, setActiveImage] = useState<string | null>(data?.productImage || null);
   const [isFullscreenGallery, setIsFullscreenGallery] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
 
