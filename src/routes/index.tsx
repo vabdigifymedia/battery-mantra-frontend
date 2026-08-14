@@ -60,6 +60,9 @@ function HomePage() {
     const name = c.categoryName.toLowerCase();
     return name.includes("bike") || name.includes("two wheeler");
   });
+  const inverterCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("inverter")
+  );
 
   return (
     <div className="flex flex-col">
@@ -176,11 +179,13 @@ function HomePage() {
               eyebrow="Best of"
               title={<span id="featured">Featured automotive batteries</span>}
               action={
-                <Button asChild variant="ghost-brand">
-                  <Link to="/products">
-                    View all <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                carCategory && (
+                  <Button asChild variant="ghost-brand">
+                    <Link to="/categories/$categorySlug" params={{ categorySlug: carCategory.categorySlug || "car-batteries" }}>
+                      View all <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )
               }
             />
             <div className="mt-6">
@@ -197,11 +202,13 @@ function HomePage() {
               title={<span id="inverter">Inverter & Tubular Batteries</span>}
               description="Heavy-duty tall tubular batteries for long power cuts."
               action={
-                <Button asChild variant="ghost-brand">
-                  <Link to="/products">
-                    View all <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                inverterCategory && (
+                  <Button asChild variant="ghost-brand">
+                    <Link to="/categories/$categorySlug" params={{ categorySlug: inverterCategory.categorySlug || "inverter-batteries" }}>
+                      View all <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )
               }
             />
             <div className="mt-6">
