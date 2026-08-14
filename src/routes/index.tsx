@@ -174,7 +174,7 @@ function HomePage() {
           <section aria-labelledby="featured">
             <SectionHeading
               eyebrow="Best of"
-              title={<span id="featured">Featured batteries</span>}
+              title={<span id="featured">Featured automotive batteries</span>}
               action={
                 <Button asChild variant="ghost-brand">
                   <Link to="/products">
@@ -184,7 +184,53 @@ function HomePage() {
               }
             />
             <div className="mt-6">
-              <FeaturedProducts limit={8} />
+              <FeaturedProducts 
+                limit={8} 
+                filterFn={(p) => !p.productCategory?.toLowerCase().includes("inverter") && !p.productName.toLowerCase().includes("inverter")}
+              />
+            </div>
+          </section>
+
+          <section aria-labelledby="inverter" className="mt-16">
+            <SectionHeading
+              eyebrow="Home Power"
+              title={<span id="inverter">Inverter & Tubular Batteries</span>}
+              description="Heavy-duty tall tubular batteries for long power cuts."
+              action={
+                <Button asChild variant="ghost-brand">
+                  <Link to="/products">
+                    View all <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              }
+            />
+            <div className="mt-6">
+              <FeaturedProducts 
+                limit={8} 
+                filterFn={(p) => Boolean(p.productCategory?.toLowerCase().includes("inverter") || p.productName.toLowerCase().includes("inverter") || p.productName.toLowerCase().includes("tubular"))}
+              />
+            </div>
+          </section>
+
+          <section aria-labelledby="deals" className="mt-16">
+            <SectionHeading
+              eyebrow="Mega Savings"
+              title={<span id="deals">Best Scrap Exchange Deals</span>}
+              description="Exchange your old scrap battery and get maximum discount instantly."
+              action={
+                <Button asChild variant="ghost-brand">
+                  <Link to="/products">
+                    View all <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              }
+            />
+            <div className="mt-6">
+              <FeaturedProducts 
+                limit={8} 
+                filterFn={(p) => Boolean(p.exchangeDiscount && p.exchangeDiscount > 0)}
+                sortFn={(a, b) => (b.exchangeDiscount || 0) - (a.exchangeDiscount || 0)}
+              />
             </div>
           </section>
 
