@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PartnerProfile } from "@/services/partner.service";
 
 export const Route = createFileRoute("/admin/partners/")({
   component: PartnersPage,
@@ -27,6 +29,7 @@ export const Route = createFileRoute("/admin/partners/")({
 
 function PartnersPage() {
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'inactive'
   const queryClient = useQueryClient();
 
   const { data: partners = [], isLoading } = useQuery({
@@ -34,20 +37,34 @@ function PartnersPage() {
     queryFn: partnerService.getAll,
   });
 
-  const filteredPartners = partners.filter(
-    (p) =>
-      p.businessName.toLowerCase().includes(search.toLowerCase()) ||
+  const filteredPartners = partners.filter((p) => {
+    const matchesSearch = p.businessName.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.phoneNumber.includes(search)
-  );
+      p.phoneNumber.includes(search);
+      
+    const matchesStatus = statusFilter === "all" ? true :
+      statusFilter === "active" ? p.isActive :
+      statusFilter === "inactive" ? !p.isActive : true;
+      
+    return matchesSearch && matchesStatus;
+  });
 
-  const handleDelete = async (id: string) => {
+  const handleToggleStatus = async (partner: PartnerProfile) => {
     try {
-      await partnerService.delete(id);
-      toast.success("Partner deleted successfully");
+      await partnerService.update(partner.id, {
+        businessName: partner.businessName,
+        contactPerson: partner.contactPerson,
+        email: partner.email,
+        phoneNumber: partner.phoneNumber,
+        alternatePhone: partner.alternatePhone || "",
+        address: partner.address || "",
+        isActive: !partner.isActive,
+        operatingCityIds: partner.operatingCities.map(c => c.cityId)
+      });
+      toast.success(`Partner ${partner.isActive ? 'deactivated' : 'reactivated'} successfully`);
       queryClient.invalidateQueries({ queryKey: ["admin", "partners"] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to delete partner");
+      toast.error(e.message || "Failed to update partner status");
     }
   };
 
@@ -65,8 +82,16 @@ function PartnersPage() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 sm:max-w-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+        <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full sm:w-auto">
+          <TabsList>
+            <TabsTrigger value="all">All Partners ({partners.length})</TabsTrigger>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="inactive">Deactivated</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
@@ -141,22 +166,34 @@ function PartnersPage() {
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
+                            {partner.isActive ? (
+                              <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" title="Deactivate">
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Deactivate</span>
+                              </Button>
+                            ) : (
+                              <Button variant="ghost" size="icon" className="text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-600" title="Reactivate">
+                                <Plus className="h-4 w-4" />
+                                <span className="sr-only">Reactivate</span>
+                              </Button>
+                            )}
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogTitle>{partner.isActive ? "Deactivate Partner?" : "Reactivate Partner?"}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will deactivate the partner account and prevent them from logging in.
+                                {partner.isActive 
+                                  ? "This will deactivate the partner account and prevent them from logging in." 
+                                  : "This will reactivate the partner account and allow them to log in and receive orders again."}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDelete(partner.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                Deactivate
+                              <AlertDialogAction 
+                                onClick={() => handleToggleStatus(partner)} 
+                                className={partner.isActive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-emerald-600 text-white hover:bg-emerald-700"}
+                              >
+                                {partner.isActive ? "Deactivate" : "Reactivate"}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>

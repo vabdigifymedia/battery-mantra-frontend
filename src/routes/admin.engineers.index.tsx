@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Badge } from "@/components/ui/badge";
-import { engineerService } from "@/services/engineer.service";
+import { engineerService, type EngineerProfile } from "@/services/engineer.service";
 import { partnerService } from "@/services/partner.service";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/admin/engineers/")({
 function EngineersPage() {
   const [search, setSearch] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'inactive'
   const queryClient = useQueryClient();
 
   const { data: engineers = [], isLoading: isLoadingEngineers } = useQuery({
@@ -53,22 +55,36 @@ function EngineersPage() {
   const filteredEngineers = tabFilteredEngineers.filter((e) => {
     const fullName = `${e.firstName || ""} ${e.lastName || ""} ${e.fullName || ""}`.toLowerCase();
     const query = search.toLowerCase();
-    return (
-      fullName.includes(query) ||
+    const matchesSearch = fullName.includes(query) ||
       e.email?.toLowerCase().includes(query) ||
       e.phoneNumber?.includes(query) ||
       (e.city && e.city.toLowerCase().includes(query)) ||
-      (e.partnerBusinessName && e.partnerBusinessName.toLowerCase().includes(query))
-    );
+      (e.partnerBusinessName && e.partnerBusinessName.toLowerCase().includes(query));
+      
+    const matchesStatus = statusFilter === "all" ? true :
+      statusFilter === "active" ? e.isActive :
+      statusFilter === "inactive" ? !e.isActive : true;
+      
+    return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = async (id: string) => {
+  const handleToggleStatus = async (engineer: EngineerProfile) => {
     try {
-      await engineerService.delete(id);
-      toast.success("Engineer status updated");
+      await engineerService.update(engineer.id, {
+        firstName: engineer.firstName || "",
+        lastName: engineer.lastName || "",
+        email: engineer.email,
+        phoneNumber: engineer.phoneNumber,
+        alternatePhone: engineer.alternatePhone || "",
+        address: engineer.address || "",
+        city: engineer.city || "",
+        isActive: !engineer.isActive,
+        partnerId: engineer.partnerId
+      });
+      toast.success(`Engineer ${engineer.isActive ? 'suspended' : 'reactivated'} successfully`);
       queryClient.invalidateQueries({ queryKey: ["admin", "engineers"] });
     } catch (e: any) {
-      toast.error(e.message || "Failed to update engineer");
+      toast.error(e.message || "Failed to update engineer status");
     }
   };
 
@@ -118,7 +134,7 @@ function EngineersPage() {
         </Tabs>
 
         {/* Search & Actions Bar */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="relative flex-1 sm:max-w-xs">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -129,6 +145,16 @@ function EngineersPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Suspended</SelectItem>
+            </SelectContent>
+          </Select>
           <span className="text-xs text-muted-foreground ml-auto">
             Showing <strong className="text-foreground">{filteredEngineers.length}</strong> engineers
           </span>
@@ -230,31 +256,46 @@ function EngineersPage() {
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
+                            {engineer.isActive ? (
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                title="Suspend"
                               >
                                 <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Delete</span>
+                                <span className="sr-only">Suspend</span>
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Deactivate Engineer?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will suspend <strong>{displayName}</strong> and prevent them from accepting jobs.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(engineer.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Deactivate
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-600"
+                                title="Reactivate"
+                              >
+                                <Plus className="h-4 w-4" />
+                                <span className="sr-only">Reactivate</span>
+                              </Button>
+                            )}
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{engineer.isActive ? "Suspend Engineer?" : "Reactivate Engineer?"}</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {engineer.isActive
+                                  ? <>This will suspend <strong>{displayName}</strong> and prevent them from accepting jobs.</>
+                                  : <>This will reactivate <strong>{displayName}</strong> and allow them to accept new jobs.</>}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleToggleStatus(engineer)}
+                                className={engineer.isActive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-emerald-600 text-white hover:bg-emerald-700"}
+                              >
+                                {engineer.isActive ? "Suspend" : "Reactivate"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
