@@ -61,10 +61,9 @@ function HomePage() {
     return name.includes("bike") || name.includes("two wheeler");
   });
   const inverterCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("inverter batter")
+  ) || categories?.find((c) =>
     c.categoryName.toLowerCase().includes("inverter")
-  );
-  const tubularCategory = categories?.find((c) =>
-    c.categoryName.toLowerCase().includes("tubular")
   );
 
   const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
@@ -199,7 +198,7 @@ function HomePage() {
                 filterFn={(p) => {
                   const cat = p.productCategory?.toLowerCase() || "";
                   const name = p.productName.toLowerCase();
-                  return !cat.includes("inverter") && !name.includes("inverter") && !cat.includes("tubular") && !name.includes("tubular");
+                  return !cat.includes("inverter") && !name.includes("inverter");
                 }}
               />
             </div>
@@ -223,30 +222,11 @@ function HomePage() {
             <div className="mt-6">
               <FeaturedProducts 
                 limit={8} 
-                filterFn={(p) => Boolean(p.productCategory?.toLowerCase().includes("inverter") || p.productName.toLowerCase().includes("inverter"))}
-              />
-            </div>
-          </section>
-
-          <section aria-labelledby="tubular" className="mt-16">
-            <SectionHeading
-              eyebrow="Heavy Duty"
-              title={<span id="tubular">Tubular Batteries</span>}
-              description="Heavy-duty tall tubular batteries for long power cuts."
-              action={
-                tubularCategory && (
-                  <Button asChild variant="ghost-brand">
-                    <Link to="/products" search={{ categoryId: [tubularCategory.categoryId] } as any}>
-                      View all <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                )
-              }
-            />
-            <div className="mt-6">
-              <FeaturedProducts 
-                limit={8} 
-                filterFn={(p) => Boolean(p.productCategory?.toLowerCase().includes("tubular") || p.productName.toLowerCase().includes("tubular"))}
+                filterFn={(p) => {
+                  const cat = p.productCategory?.toLowerCase() || "";
+                  const name = p.productName.toLowerCase();
+                  return cat.includes("inverter") || name.includes("inverter");
+                }}
               />
             </div>
           </section>
