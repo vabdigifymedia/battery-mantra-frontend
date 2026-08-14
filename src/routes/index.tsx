@@ -64,6 +64,8 @@ function HomePage() {
     c.categoryName.toLowerCase().includes("inverter")
   );
 
+  const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
+
   return (
     <div className="flex flex-col">
       <div className="order-1">
@@ -181,7 +183,7 @@ function HomePage() {
               action={
                 carCategory && (
                   <Button asChild variant="ghost-brand">
-                    <Link to="/categories/$categorySlug" params={{ categorySlug: carCategory.categorySlug || "car-batteries" }}>
+                    <Link to="/categories/$categorySlug" params={{ categorySlug: carCategory.categorySlug || toSlug(carCategory.categoryName) }}>
                       View all <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -204,7 +206,7 @@ function HomePage() {
               action={
                 inverterCategory && (
                   <Button asChild variant="ghost-brand">
-                    <Link to="/categories/$categorySlug" params={{ categorySlug: inverterCategory.categorySlug || "inverter-batteries" }}>
+                    <Link to="/categories/$categorySlug" params={{ categorySlug: inverterCategory.categorySlug || toSlug(inverterCategory.categoryName) }}>
                       View all <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
