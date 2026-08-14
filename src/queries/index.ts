@@ -69,6 +69,14 @@ export const capacitiesQuery = (categoryId?: string, fetchAllIfNoCategory = fals
     enabled: fetchAllIfNoCategory ? true : !!categoryId,
   });
 
+export const adminCapacitiesQuery = (categoryId?: string, fetchAllIfNoCategory = false) =>
+  queryOptions({
+    queryKey: ["admin", "capacities", categoryId],
+    queryFn: () => adminService.getAllCapacities(categoryId),
+    staleTime: 5 * 60_000,
+    enabled: fetchAllIfNoCategory ? true : !!categoryId,
+  });
+
 export const fuelsQuery = () =>
   queryOptions({
     queryKey: ["admin", "fuels"],

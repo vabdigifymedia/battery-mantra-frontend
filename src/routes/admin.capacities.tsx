@@ -47,7 +47,7 @@ type CapacityFormValues = z.infer<typeof capacitySchema>;
 
 function AdminCapacities() {
   const queryClient = useQueryClient();
-  const { data: capacities, isLoading } = useQuery(capacitiesQuery(undefined, true));
+  const { data: capacities, isLoading } = useQuery(adminCapacitiesQuery(undefined, true));
   const { data: rootCategories = [], isLoading: isLoadingCats } = useQuery(rootCategoriesQuery());
   
   const [isModalOpen, setIsModalOpen] = useState(false);

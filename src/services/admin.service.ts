@@ -72,7 +72,7 @@ export const adminService = {
 
   // Capacities
   getAllCapacities: (categoryId?: string) => 
-    apiFetch<CapacityResponse[]>(categoryId ? `${endpoints.vehicles.capacities}?categoryId=${categoryId}` : endpoints.vehicles.capacities, { method: "GET" }),
+    apiFetch<CapacityResponse[]>(categoryId ? `${endpoints.admin.capacities}?categoryId=${categoryId}` : endpoints.admin.capacities, { method: "GET" }),
   createCapacity: (body: CreateCapacityRequest) => 
     apiFetch<CapacityResponse>(endpoints.admin.capacities, { method: "POST", body }),
   updateCapacity: (id: UUID, body: CreateCapacityRequest) => 

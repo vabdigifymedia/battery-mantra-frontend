@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery, capacitiesQuery } from "@/queries";
+import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
@@ -205,7 +205,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   });
 
   const [selectedRootId, setSelectedRootId] = useState<string>("");
-  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(selectedRootId || undefined));
+  const { data: dbCapacities = [] } = useQuery(adminCapacitiesQuery(selectedRootId || undefined));
 
   useEffect(() => {
     if (initialRootId && !selectedRootId) {

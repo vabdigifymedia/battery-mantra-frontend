@@ -4,7 +4,7 @@ import { useForm, useFieldArray, Controller, UseFormReturn } from "react-hook-fo
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery, capacitiesQuery } from "@/queries";
+import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
@@ -91,7 +91,7 @@ function AddProductPage() {
   const queryClient = useQueryClient();
 
   const [selectedRootId, setSelectedRootId] = useState<string>("");
-  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(selectedRootId || undefined));
+  const { data: dbCapacities = [] } = useQuery(adminCapacitiesQuery(selectedRootId || undefined));
 
   const selectedRootCat = rootCategories.find(c => c.categoryId === selectedRootId);
   const subCategories = selectedRootCat?.subCategories || [];

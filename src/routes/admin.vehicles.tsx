@@ -15,7 +15,7 @@ import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
-import { rootCategoriesQuery, capacitiesQuery, manufacturersListQuery, fuelsQuery } from "@/queries";
+import { adminCapacitiesQuery, rootCategoriesQuery, manufacturersListQuery, fuelsQuery } from "@/queries";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -137,7 +137,7 @@ function AdminVehicles() {
   const queryClient = useQueryClient();
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
-  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(undefined, true));
+  const { data: dbCapacities = [] } = useQuery(adminCapacitiesQuery(undefined, true));
   const { data: manufacturers = [] } = useQuery(manufacturersListQuery());
   const { data: dbFuels = [] } = useQuery(fuelsQuery());
 
