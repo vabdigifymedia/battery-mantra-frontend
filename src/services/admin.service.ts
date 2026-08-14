@@ -72,13 +72,13 @@ export const adminService = {
 
   // Capacities
   getAllCapacities: (categoryId?: string) => 
-    apiFetch<CapacityResponse[]>(categoryId ? `${endpoints.admin.capacities}?categoryId=${categoryId}` : endpoints.admin.capacities, { method: "GET" }),
+    apiFetch<CapacityResponse[]>(categoryId ? `${endpoints.vehicles.capacities}?categoryId=${categoryId}` : endpoints.vehicles.capacities, { method: "GET" }),
   createCapacity: (body: CreateCapacityRequest) => 
-    apiFetch<CapacityResponse>(endpoints.admin.capacities, { method: "POST", body }),
-  updateCapacity: (id: UUID, body: CreateCapacityRequest) => 
-    apiFetch<CapacityResponse>(`${endpoints.admin.capacities}/${id}`, { method: "PUT", body }),
-  deleteCapacity: (id: UUID) => 
-    apiFetch<void>(`${endpoints.admin.capacities}/${id}`, { method: "DELETE" }),
+    apiFetch<CapacityResponse>(endpoints.vehicles.capacities, { method: "POST", body }),
+  updateCapacity: (id: string, body: CreateCapacityRequest) => 
+    apiFetch<CapacityResponse>(`${endpoints.vehicles.capacities}/${id}`, { method: "PUT", body }),
+  deleteCapacity: (id: string) => 
+    apiFetch<void>(`${endpoints.vehicles.capacities}/${id}`, { method: "DELETE" }),
 
   // Fuels
   getAllFuels: () => 

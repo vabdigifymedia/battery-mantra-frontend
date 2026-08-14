@@ -47,11 +47,12 @@ type CapacityFormValues = z.infer<typeof capacitySchema>;
 
 function AdminCapacities() {
   const queryClient = useQueryClient();
-  const { data: capacities, isLoading } = useQuery(adminCapacitiesQuery(undefined, true));
-  const { data: rootCategories = [], isLoading: isLoadingCats } = useQuery(rootCategoriesQuery());
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCapacity, setEditingCapacity] = useState<CapacityResponse | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+
+  const { data: rootCategories = [], isLoading: isLoadingCats } = useQuery(rootCategoriesQuery());
+  const { data: capacities, isLoading: isLoadingCapacities } = useQuery(adminCapacitiesQuery(selectedCategoryId || undefined));
 
   const form = useForm<CapacityFormValues>({
     resolver: zodResolver(capacitySchema),
@@ -144,6 +145,23 @@ function AdminCapacities() {
         </Button>
       </div>
 
+      <div className="flex items-center gap-4 bg-card p-4 rounded-xl border shadow-sm">
+        <div className="flex-1 max-w-sm">
+          <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Category to view R/L codes" />
+            </SelectTrigger>
+            <SelectContent>
+              {rootCategories.map((root) => (
+                <SelectItem key={root.categoryId} value={root.categoryId}>
+                  {root.categoryName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="rounded-xl border bg-card shadow-sm hidden md:block">
         <Table>
           <TableHeader>
@@ -154,16 +172,22 @@ function AdminCapacities() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading || isLoadingCats ? (
+            {isLoadingCapacities || isLoadingCats ? (
               <TableRow>
                 <TableCell colSpan={3} className="h-24 text-center">
                   <Spinner size="sm" className="inline-block mr-2" /> Loading R/L codes...
                 </TableCell>
               </TableRow>
+            ) : !selectedCategoryId ? (
+              <TableRow>
+                <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                  Please select a category to view R/L codes.
+                </TableCell>
+              </TableRow>
             ) : !capacities?.length ? (
               <TableRow>
                 <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
-                  No R/L codes found.
+                  No R/L codes found for this category.
                 </TableCell>
               </TableRow>
             ) : (

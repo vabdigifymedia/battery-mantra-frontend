@@ -333,8 +333,7 @@ function AddProductPage() {
             </CardContent>
           </Card>
 
-          {dbCapacities.length > 0 && (
-            <Card className="shadow-sm">
+          <Card className="shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>R/L Code</CardTitle>
@@ -359,7 +358,6 @@ function AddProductPage() {
                 </div>
               </CardContent>
             </Card>
-          )}
           <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
