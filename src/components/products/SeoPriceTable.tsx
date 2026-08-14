@@ -35,8 +35,13 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 : `₹${priceWithoutExchange.toLocaleString('en-IN')}`;
 
               const extractCapacity = (name: string, backendCapacity?: string) => {
-                const specCap = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
-                if (specCap) return specCap;
+                let specCap = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
+                if (!specCap && (product as any).specs) {
+                  const specsObj = (product as any).specs;
+                  const capKey = Object.keys(specsObj).find(k => k.toLowerCase().includes('capacity') || k.toLowerCase() === 'ah');
+                  if (capKey) specCap = specsObj[capKey];
+                }
+                if (specCap) return String(specCap);
                 
                 // Try to find explicitly mentioned Ah
                 const ahMatch = name.match(/(\d+)\s*(Ah|AH|ah)/i);
@@ -54,6 +59,16 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 return backendCapacity || "N/A";
               };
 
+              const extractWarranty = () => {
+                let specWar = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
+                if (!specWar && (product as any).specs) {
+                  const specsObj = (product as any).specs;
+                  const warKey = Object.keys(specsObj).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
+                  if (warKey) specWar = specsObj[warKey];
+                }
+                return specWar ? String(specWar) : "Standard Warranty";
+              };
+
               return (
                 <tr 
                   key={product.productId} 
@@ -64,7 +79,7 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                     {extractCapacity(product.productName, product.capacity)}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {(product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value || "Standard Warranty"}
+                    {extractWarranty()}
                   </td>
                   <td className="px-4 py-3 text-foreground font-medium">{priceRange}</td>
                 </tr>
