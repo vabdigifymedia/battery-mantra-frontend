@@ -40,8 +40,12 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                   className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
                 >
                   <td className="px-4 py-3 text-foreground font-medium">{product.productName}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{product.capacity || "N/A"}</td>
-                  <td className="px-4 py-3 text-muted-foreground">Standard Warranty</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {(product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value || product.capacity || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {(product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value || "Standard Warranty"}
+                  </td>
                   <td className="px-4 py-3 text-foreground font-medium">{priceRange}</td>
                 </tr>
               );
