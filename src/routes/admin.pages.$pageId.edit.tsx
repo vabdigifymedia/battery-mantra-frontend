@@ -83,6 +83,8 @@ function EditPage() {
     mutation.mutate(data);
   };
 
+  const draft = useFormDraft(`pages_edit_${pageId}`, watch(), (data) => reset(data));
+
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -91,7 +93,13 @@ function EditPage() {
     );
   }
 
-  const draft = useFormDraft(`pages_edit_${pageId}`, watch(), (data) => reset(data));
+  if (!page) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <p className="text-muted-foreground">Page not found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4">
