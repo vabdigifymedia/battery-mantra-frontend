@@ -61,12 +61,12 @@ export const brandsQuery = () =>
     staleTime: 5 * 60_000,
   });
 
-export const capacitiesQuery = (categoryId?: string) =>
+export const capacitiesQuery = (categoryId?: string, fetchAllIfNoCategory = false) =>
   queryOptions({
     queryKey: ["capacities", categoryId],
     queryFn: ({ signal }) => vehiclesService.capacities(categoryId, signal),
     staleTime: 5 * 60_000,
-    enabled: !!categoryId,
+    enabled: fetchAllIfNoCategory ? true : !!categoryId,
   });
 
 export const fuelsQuery = () =>

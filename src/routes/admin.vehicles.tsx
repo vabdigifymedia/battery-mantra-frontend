@@ -137,7 +137,7 @@ function AdminVehicles() {
   const queryClient = useQueryClient();
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
-  const { data: dbCapacities = [] } = useQuery(capacitiesQuery());
+  const { data: dbCapacities = [] } = useQuery(capacitiesQuery(undefined, true));
   const { data: manufacturers = [] } = useQuery(manufacturersListQuery());
   const { data: dbFuels = [] } = useQuery(fuelsQuery());
 
