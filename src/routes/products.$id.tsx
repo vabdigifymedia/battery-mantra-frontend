@@ -105,6 +105,9 @@ export const Route = createFileRoute("/products/$id")({
         { property: "og:description", content: ogDesc },
         { name: "robots", content: "index,follow" }
       ].filter(m => ('title' in m) || m.content),
+      links: loaderData?.productImage ? [
+        { rel: "preload", as: "image", href: loaderData.productImage, fetchpriority: "high" }
+      ] : [],
     };
   },
   component: PdpPage,
@@ -530,7 +533,7 @@ function PdpPage() {
                     <img 
                       src={activeImage} 
                       alt={data.productName} 
-                      className="max-w-full max-h-full object-contain mix-blend-multiply drop-shadow-xl" 
+                      className="max-w-full max-h-full object-contain mix-blend-multiply" 
                       fetchPriority="high"
                       loading="eager"
                     />
