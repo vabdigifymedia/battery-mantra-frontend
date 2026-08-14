@@ -5,7 +5,7 @@ import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
 import type { ProductListResponse } from "@/types/dto";
 import { useWishlist } from "@/providers/WishlistProvider";
-import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check } from "lucide-react";
+import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -206,7 +206,7 @@ export function ProductCard({
       <div className="px-4 pb-4 flex items-center gap-2 mt-auto">
         <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm flex-1 h-9 rounded-lg">
           <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
-            <span className="text-xs font-bold">🛒 Buy Now</span>
+            <span className="text-xs font-bold flex items-center"><ShoppingCart className="w-4 h-4 mr-1.5" /> Buy Now</span>
           </RouterLink>
         </Button>
         <Button asChild size="sm" variant="outline" className="border-border shadow-sm flex-1 h-9 rounded-lg hover:bg-slate-50">
