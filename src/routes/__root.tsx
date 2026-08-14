@@ -51,6 +51,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   const queryClient = router.options.context.queryClient as QueryClient;
 
+  useEffect(() => {
+    if (error?.message?.includes("Failed to fetch dynamically imported module") || error?.message?.includes("Importing a module script failed")) {
+      window.location.reload();
+    }
+  }, [error]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AppProviders>
@@ -60,8 +66,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               title="This page didn't load"
               description="Something went wrong on our end. You can try refreshing or head back home."
               onRetry={() => {
-                router.invalidate();
-                reset();
+                if (error?.message?.includes("Failed to fetch dynamically imported module") || error?.message?.includes("Importing a module script failed")) {
+                  window.location.reload();
+                } else {
+                  router.invalidate();
+                  reset();
+                }
               }}
             />
           </div>
