@@ -23,7 +23,7 @@ export function ProductGrid({
 }: Props) {
   if (loading) {
     return (
-      <div className={cn("grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4", className)}>
+      <div className={cn("grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", className)}>
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -34,7 +34,7 @@ export function ProductGrid({
     return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
   return (
-    <div className={cn("grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4", className)}>
+    <div className={cn("grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4", className)}>
       {products.map((p) => (
         <ProductCard key={p.productId} product={p} />
       ))}
