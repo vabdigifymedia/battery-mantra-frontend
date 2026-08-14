@@ -139,16 +139,16 @@ export function ProductCard({
 
           {/* Price Block */}
           <div className="mt-2 space-y-1">
-            <div className="flex items-center gap-2">
-              <Price value={exchangePrice} className="font-black text-red-600 text-lg sm:text-xl" />
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+              <Price value={exchangePrice} className="font-black text-red-600 text-base sm:text-lg lg:text-xl" />
               {hasExchange && (
-                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">
+                <span className="text-[9px] sm:text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">
                   With Exchange
                 </span>
               )}
             </div>
             
-            <div className="flex items-center gap-2 text-xs font-medium">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-[10px] sm:text-xs font-medium">
               <span className="text-muted-foreground">
                 MRP: <span className="line-through">₹{product.productPrice.toLocaleString()}</span>
               </span>
@@ -161,8 +161,8 @@ export function ProductCard({
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="px-4 py-3 mt-3 border-t border-border/50 grid grid-cols-4 gap-1">
+        {/* Features Grid - Hidden on Mobile */}
+        <div className="hidden sm:grid px-4 py-3 mt-3 border-t border-border/50 grid-cols-4 gap-1">
           <div className="flex flex-col items-center text-center gap-1">
             <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><Settings2 className="w-3 h-3" /></div>
             <span className="text-[9px] font-medium leading-tight text-slate-600">Maintenance<br/>Free</span>
@@ -181,8 +181,8 @@ export function ProductCard({
           </div>
         </div>
 
-        {/* Delivery & Stock Strip */}
-        <div className="mx-4 mb-3 bg-emerald-50/80 rounded-lg p-2.5 flex items-center justify-between border border-emerald-100/50">
+        {/* Delivery & Stock Strip - Hidden on Mobile */}
+        <div className="hidden sm:flex mx-4 mb-3 bg-emerald-50/80 rounded-lg p-2.5 items-center justify-between border border-emerald-100/50">
           <div className="flex items-start gap-1.5 w-1/2 border-r border-emerald-200/50 pr-2">
             <Truck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <div className="flex flex-col">
@@ -202,16 +202,16 @@ export function ProductCard({
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="px-4 pb-4 flex items-center gap-2 mt-auto">
-        <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm flex-1 h-9 rounded-lg">
+      {/* Action Buttons - Stack on mobile, side-by-side on sm+ */}
+      <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-0 flex flex-col sm:flex-row items-center gap-2 mt-auto">
+        <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg">
           <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
-            <span className="text-xs font-bold flex items-center"><ShoppingCart className="w-4 h-4 mr-1.5" /> Buy Now</span>
+            <span className="text-[10px] sm:text-xs font-bold flex items-center"><ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now</span>
           </RouterLink>
         </Button>
-        <Button asChild size="sm" variant="outline" className="border-border shadow-sm flex-1 h-9 rounded-lg hover:bg-slate-50">
+        <Button asChild size="sm" variant="outline" className="border-border shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-50">
           <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
-            <span className="text-xs font-bold text-slate-700 flex items-center">View Details <ArrowRight className="ml-1 w-3 h-3" /></span>
+            <span className="text-[10px] sm:text-xs font-bold text-slate-700 flex items-center justify-center">View Details <ArrowRight className="ml-1 w-3 h-3" /></span>
           </RouterLink>
         </Button>
       </div>
