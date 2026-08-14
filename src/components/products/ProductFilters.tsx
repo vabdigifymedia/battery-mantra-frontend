@@ -193,21 +193,8 @@ export function ProductFilters({ state, onChange, products }: Props) {
         )}
       </div>
 
-      <Accordion type="multiple" defaultValue={["category", "brand", "capacity", "warranty", "price"]} className="w-full">
+      <Accordion type="multiple" defaultValue={["brand", "capacity", "warranty", "price"]} className="w-full">
         
-        {/* CATEGORIES */}
-        <AccordionItem value="category" className="border-b-0">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
-            Categories
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="space-y-2">
-              {cats.data && <CategoryCheckboxTree categories={cats.data} state={state} toggleArrayItem={toggleArrayItem} />}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <div className="mx-4 h-px bg-border" />
-
         {/* BRANDS */}
         <AccordionItem value="brand" className="border-b-0">
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
