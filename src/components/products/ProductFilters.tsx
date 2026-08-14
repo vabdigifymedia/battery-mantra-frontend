@@ -1,11 +1,11 @@
-import { useMemo } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { useMemo, useState } from "react";
+import { SlidersHorizontal, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { rootCategoriesQuery, brandsQuery } from "@/queries";
+import { rootCategoriesQuery, brandsQuery, capacitiesQuery } from "@/queries";
 import type { CategoryListResponse } from "@/types/dto";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
@@ -37,11 +37,123 @@ const COMMON_WARRANTIES = [
 type Props = {
   state: ProductFilterState;
   onChange: (next: ProductFilterState) => void;
+  products?: any[];
 };
 
-export function ProductFilters({ state, onChange }: Props) {
+export function ProductFilters({ state, onChange, products }: Props) {
+  const [brandSearch, setBrandSearch] = useState("");
+  const [capSearch, setCapSearch] = useState("");
+
   const cats = useQuery(rootCategoriesQuery());
   const brands = useQuery(brandsQuery());
+  
+  const selectedCategoryId = state.categoryId?.[0];
+  const dynamicCapacities = useQuery(capacitiesQuery(selectedCategoryId));
+
+  // Dynamic Price Range
+  const priceRange = useMemo(() => {
+    if (!products || products.length === 0) return { min: 0, max: 50000 };
+    const prices = products.map(p => p.productPrice).filter(p => typeof p === 'number' && !isNaN(p));
+    if (prices.length === 0) return { min: 0, max: 50000 };
+    return {
+      min: Math.floor(Math.min(...prices) / 500) * 500,
+      max: Math.ceil(Math.max(...prices) / 500) * 500
+    };
+  }, [products]);
+
+  // Dynamic Capacities
+  const availableCapacities = useMemo(() => {
+    const caps = new Set<string>();
+    
+    if (dynamicCapacities.data && Array.isArray(dynamicCapacities.data)) {
+      dynamicCapacities.data.forEach((c: any) => caps.add(c.capacityName));
+    }
+    
+    if (products) {
+      products.forEach((p: any) => {
+        const specCap = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
+        if (specCap) caps.add(String(specCap));
+        else if (p.specs) {
+          const capKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('capacity') || k.toLowerCase() === 'ah');
+          if (capKey) caps.add(String(p.specs[capKey]));
+        } else {
+          const match = p.productName?.match(/(\d+)\s*(Ah|AH|ah)/i);
+          if (match) caps.add(match[0].toUpperCase());
+          else {
+            const dinMatch = p.productName?.match(/DIN-?(\d+)/i);
+            if (dinMatch) caps.add(`${dinMatch[1]} AH`);
+          }
+        }
+      });
+    }
+    
+    return Array.from(caps).length > 0 
+      ? Array.from(caps).sort((a, b) => {
+          const numA = parseInt(a);
+          const numB = parseInt(b);
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return a.localeCompare(b);
+        }) 
+      : COMMON_CAPACITIES;
+  }, [dynamicCapacities.data, products]);
+
+  // Dynamic Warranties
+  const availableWarranties = useMemo(() => {
+    const wars = new Set<string>();
+    if (products) {
+      products.forEach((p: any) => {
+        let specWar = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
+        if (!specWar && p.specs) {
+          const warKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
+          if (warKey) specWar = p.specs[warKey];
+        }
+        if (specWar) wars.add(String(specWar));
+      });
+    }
+    return Array.from(wars).length > 0 
+      ? Array.from(wars).sort((a, b) => {
+          const numA = parseInt(a);
+          const numB = parseInt(b);
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return a.localeCompare(b);
+        }) 
+      : COMMON_WARRANTIES;
+  }, [products]);
+
+  const getBrandCount = (brandId: string) => {
+    if (!products || products.length === 0) return 0;
+    const bName = brands.data?.find((b: any) => b.brandId === brandId)?.brandName;
+    return products.filter((p: any) => p.brandId === brandId || (bName && p.brandName === bName)).length;
+  };
+
+  const getCapCount = (cap: string) => {
+    if (!products || products.length === 0) return 0;
+    return products.filter((p: any) => {
+      const specCap = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
+      if (specCap && String(specCap) === cap) return true;
+      if (p.specs) {
+        const capKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('capacity') || k.toLowerCase() === 'ah');
+        if (capKey && String(p.specs[capKey]) === cap) return true;
+      }
+      const match = p.productName?.match(/(\d+)\s*(Ah|AH|ah)/i);
+      if (match && match[0].toUpperCase() === cap) return true;
+      const dinMatch = p.productName?.match(/DIN-?(\d+)/i);
+      if (dinMatch && `${dinMatch[1]} AH` === cap) return true;
+      return false;
+    }).length;
+  };
+
+  const getWarCount = (war: string) => {
+    if (!products || products.length === 0) return 0;
+    return products.filter((p: any) => {
+      let specWar = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
+      if (!specWar && p.specs) {
+        const warKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
+        if (warKey) specWar = p.specs[warKey];
+      }
+      return specWar && String(specWar) === war;
+    }).length;
+  };
 
   const hasFilters = useMemo(
     () =>
@@ -101,17 +213,33 @@ export function ProductFilters({ state, onChange }: Props) {
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
             Brands
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto">
-            <div className="space-y-4 pt-1">
-              {(brands.data ?? []).map((b) => {
+          <AccordionContent className="px-4 pb-4">
+            <div className="relative mb-3">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search brands..."
+                value={brandSearch}
+                onChange={(e) => setBrandSearch(e.target.value)}
+                className="pl-9 h-8 text-xs"
+              />
+            </div>
+            <div className="space-y-4 pt-1 max-h-[220px] overflow-y-auto">
+              {(brands.data ?? [])
+                .filter(b => b.brandName?.toLowerCase().includes(brandSearch.toLowerCase()))
+                .map((b) => {
                 const isChecked = state.brandId?.includes(b.brandId) || false;
+                const count = products ? getBrandCount(b.brandId) : null;
+                const isDisabled = count === 0 && !isChecked;
+                
                 return (
-                  <label key={b.brandId} className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
+                  <label key={b.brandId} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors", isDisabled && "opacity-50 cursor-not-allowed")}>
                     <Checkbox 
                       checked={isChecked}
+                      disabled={isDisabled}
                       onCheckedChange={() => toggleArrayItem("brandId", b.brandId)}
                     />
-                    <span>{b.brandName}</span>
+                    <span className="flex-1">{b.brandName}</span>
+                    {count !== null && <span className="text-xs text-muted-foreground">({count})</span>}
                   </label>
                 );
               })}
@@ -125,18 +253,34 @@ export function ProductFilters({ state, onChange }: Props) {
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
             Capacity (Ah)
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto pt-1">
-            <div className="grid grid-cols-2 gap-3">
-              {COMMON_CAPACITIES.map((cap) => {
+          <AccordionContent className="px-4 pb-4">
+            <div className="relative mb-3">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search capacity..."
+                value={capSearch}
+                onChange={(e) => setCapSearch(e.target.value)}
+                className="pl-9 h-8 text-xs"
+              />
+            </div>
+            <div className="space-y-4 pt-1 max-h-[220px] overflow-y-auto">
+              {availableCapacities
+                .filter(cap => cap.toLowerCase().includes(capSearch.toLowerCase()))
+                .map((cap) => {
                 const isChecked = state.capacity?.includes(cap) || false;
+                const count = products ? getCapCount(cap) : null;
+                const isDisabled = count === 0 && !isChecked;
+                
                 return (
-                  <label key={cap} className="flex items-center gap-2 text-xs font-medium cursor-pointer group">
+                  <label key={cap} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors group", isDisabled && "opacity-50 cursor-not-allowed")}>
                     <Checkbox 
                       checked={isChecked}
+                      disabled={isDisabled}
                       onCheckedChange={() => toggleArrayItem("capacity", cap)}
                       className="w-4 h-4"
                     />
-                    <span className="group-hover:text-primary transition-colors">{cap}</span>
+                    <span className="flex-1 group-hover:text-primary transition-colors">{cap}</span>
+                    {count !== null && <span className="text-xs text-muted-foreground">({count})</span>}
                   </label>
                 );
               })}
@@ -152,15 +296,20 @@ export function ProductFilters({ state, onChange }: Props) {
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto pt-1">
             <div className="space-y-4">
-              {COMMON_WARRANTIES.map((war) => {
+              {availableWarranties.map((war) => {
                 const isChecked = state.warranty?.includes(war) || false;
+                const count = products ? getWarCount(war) : null;
+                const isDisabled = count === 0 && !isChecked;
+                
                 return (
-                  <label key={war} className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors">
+                  <label key={war} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors", isDisabled && "opacity-50 cursor-not-allowed")}>
                     <Checkbox 
                       checked={isChecked}
+                      disabled={isDisabled}
                       onCheckedChange={() => toggleArrayItem("warranty", war)}
                     />
-                    <span>{war}</span>
+                    <span className="flex-1">{war}</span>
+                    {count !== null && <span className="text-xs text-muted-foreground">({count})</span>}
                   </label>
                 );
               })}
@@ -176,16 +325,20 @@ export function ProductFilters({ state, onChange }: Props) {
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="space-y-6 mt-2">
+              <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                <span>₹{priceRange.min.toLocaleString('en-IN')}</span>
+                <span>₹{priceRange.max.toLocaleString('en-IN')}</span>
+              </div>
               <Slider
-                min={0}
-                max={50000}
-                step={500}
-                value={[state.minPrice || 0, state.maxPrice || 50000]}
+                min={priceRange.min}
+                max={priceRange.max}
+                step={100}
+                value={[state.minPrice || priceRange.min, state.maxPrice || priceRange.max]}
                 onValueChange={(vals) => {
                   onChange({
                     ...state,
-                    minPrice: vals[0] > 0 ? vals[0] : undefined,
-                    maxPrice: vals[1] < 50000 ? vals[1] : undefined,
+                    minPrice: vals[0] > priceRange.min ? vals[0] : undefined,
+                    maxPrice: vals[1] < priceRange.max ? vals[1] : undefined,
                   });
                 }}
               />
@@ -195,8 +348,8 @@ export function ProductFilters({ state, onChange }: Props) {
                   <Input
                     type="number"
                     inputMode="numeric"
-                    placeholder="Min"
-                    min={0}
+                    placeholder={String(priceRange.min)}
+                    min={priceRange.min}
                     value={state.minPrice || ""}
                     onChange={(e) => {
                       const val = e.target.value ? parseInt(e.target.value, 10) : undefined;
@@ -211,8 +364,8 @@ export function ProductFilters({ state, onChange }: Props) {
                   <Input
                     type="number"
                     inputMode="numeric"
-                    placeholder="Max"
-                    min={0}
+                    placeholder={String(priceRange.max)}
+                    min={priceRange.min}
                     value={state.maxPrice || ""}
                     onChange={(e) => {
                       const val = e.target.value ? parseInt(e.target.value, 10) : undefined;

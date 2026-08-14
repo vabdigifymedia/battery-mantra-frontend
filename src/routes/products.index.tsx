@@ -168,7 +168,7 @@ function ProductsPage() {
       />
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden lg:block">
-          <ProductFilters state={filters} onChange={setFilters} />
+          <ProductFilters state={filters} onChange={setFilters} products={products} />
         </aside>
 
         <div className="min-w-0">
@@ -185,7 +185,7 @@ function ProductsPage() {
                   <DrawerTitle>Filters</DrawerTitle>
                 </DrawerHeader>
                 <div className="mt-4 overflow-y-auto px-4 pb-8">
-                  <ProductFilters state={filters} onChange={setFilters} />
+                  <ProductFilters state={filters} onChange={setFilters} products={products} />
                 </div>
               </DrawerContent>
             </Drawer>
@@ -225,6 +225,14 @@ function ProductsPage() {
                     setFilters({ ...filters, [key]: current.filter(v => v !== value) });
                   }
                 }}
+                onClearAll={() => setFilters({
+                  categoryId: [],
+                  brandId: [],
+                  capacity: [],
+                  warranty: [],
+                  minPrice: undefined,
+                  maxPrice: undefined
+                })}
                 brands={brands || []}
                 categories={categories || []}
               />
@@ -305,12 +313,14 @@ function ProductsPage() {
 
 function ActiveFilterBadges({ 
   filters, 
-  onRemove, 
+  onRemove,
+  onClearAll,
   brands, 
   categories 
 }: { 
   filters: ProductFilterState; 
   onRemove: (key: string, value: any) => void;
+  onClearAll: () => void;
   brands: any[];
   categories: any[];
 }) {
@@ -352,7 +362,6 @@ function ActiveFilterBadges({
 
   if (activeFilters.length === 0) return null;
 
-  return (
     <div className="flex flex-wrap gap-2 mb-4 items-center">
       {activeFilters.map((af, i) => (
         <Badge key={i} variant="secondary" className="flex items-center gap-1.5 px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20">
@@ -373,6 +382,14 @@ function ActiveFilterBadges({
           </button>
         </Badge>
       ))}
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={onClearAll}
+        className="h-7 px-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted"
+      >
+        Clear All
+      </Button>
     </div>
   );
 }
