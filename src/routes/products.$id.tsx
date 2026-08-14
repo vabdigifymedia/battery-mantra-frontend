@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { z } from "zod";
 import { 
   Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText, 
@@ -480,7 +480,11 @@ function PdpPage() {
                   {galleryImages.map((img, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setActiveImage(img)}
+                      onClick={() => {
+                        startTransition(() => {
+                          setActiveImage(img);
+                        });
+                      }}
                       className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${
                         activeImage === img 
                           ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white" 
@@ -519,6 +523,8 @@ function PdpPage() {
                       src={activeImage} 
                       alt={data.productName} 
                       className="max-w-full max-h-full object-contain mix-blend-multiply drop-shadow-xl" 
+                      fetchPriority="high"
+                      loading="eager"
                     />
                   </button>
                 ) : (
@@ -616,7 +622,11 @@ function PdpPage() {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => setExchange("no")}
+                        onClick={() => {
+                          startTransition(() => {
+                            setExchange("no");
+                          });
+                        }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
                           exchange === "no"
                             ? "border-brand bg-brand/5 ring-1 ring-brand/30"
@@ -639,7 +649,11 @@ function PdpPage() {
 
                       <button
                         type="button"
-                        onClick={() => setExchange("yes")}
+                        onClick={() => {
+                          startTransition(() => {
+                            setExchange("yes");
+                          });
+                        }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
                           exchange === "yes"
                             ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
@@ -702,7 +716,11 @@ function PdpPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => setExchange("no")}
+                    onClick={() => {
+                      startTransition(() => {
+                        setExchange("no");
+                      });
+                    }}
                     className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
                       exchange === "no" ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-muted hover:bg-muted/50"
                     }`}
@@ -723,7 +741,11 @@ function PdpPage() {
 
                   <button
                     type="button"
-                    onClick={() => setExchange("yes")}
+                    onClick={() => {
+                      startTransition(() => {
+                        setExchange("yes");
+                      });
+                    }}
                     className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
                       exchange === "yes" ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30" : "border-muted hover:bg-muted/50"
                     }`}
