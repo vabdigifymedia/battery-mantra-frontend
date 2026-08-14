@@ -64,8 +64,9 @@ export const brandsQuery = () =>
 export const capacitiesQuery = (categoryId?: string) =>
   queryOptions({
     queryKey: ["capacities", categoryId],
-    queryFn: () => adminService.getAllCapacities(categoryId),
+    queryFn: ({ signal }) => vehiclesService.capacities(categoryId, signal),
     staleTime: 5 * 60_000,
+    enabled: !!categoryId,
   });
 
 export const fuelsQuery = () =>

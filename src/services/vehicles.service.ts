@@ -13,4 +13,9 @@ export const vehiclesService = {
     }),
   byId: (id: string, signal?: AbortSignal) =>
     apiFetch<VehicleResponse>(endpoints.vehicles.byId(id), { signal, auth: false }),
+  capacities: (categoryId?: string, signal?: AbortSignal) =>
+    apiFetch<import("@/types/dto").CapacityResponse[]>(
+      categoryId ? `${endpoints.vehicles.capacities}?categoryId=${categoryId}` : endpoints.vehicles.capacities,
+      { signal, auth: false }
+    ).catch(() => []),
 };
