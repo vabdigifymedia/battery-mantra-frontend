@@ -183,7 +183,7 @@ function HomePage() {
               action={
                 carCategory && (
                   <Button asChild variant="ghost-brand">
-                    <Link to="/categories/$categorySlug" params={{ categorySlug: carCategory.categorySlug || toSlug(carCategory.categoryName) }}>
+                    <Link to="/products" search={{ categoryId: [carCategory.categoryId] } as any}>
                       View all <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -206,7 +206,7 @@ function HomePage() {
               action={
                 inverterCategory && (
                   <Button asChild variant="ghost-brand">
-                    <Link to="/categories/$categorySlug" params={{ categorySlug: inverterCategory.categorySlug || toSlug(inverterCategory.categoryName) }}>
+                    <Link to="/products" search={{ categoryId: [inverterCategory.categoryId] } as any}>
                       View all <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
