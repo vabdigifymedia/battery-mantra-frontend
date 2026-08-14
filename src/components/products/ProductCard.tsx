@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Link } from "@tanstack/react-query" ? "@tanstack/react-router" : "@tanstack/react-router"; // Keep original import
 import { Link as RouterLink } from "@tanstack/react-router";
 import { Image } from "@/components/common/Image";
 import { Price } from "@/components/common/Price";
@@ -28,9 +27,9 @@ export function ProductCard({
 
   // Determine capacity to display on card badge
   const displayCapacity = useMemo(() => {
-    if (product.specDetails && Array.isArray(product.specDetails)) {
-      const capSpec = product.specDetails.find(
-        (s) =>
+    if ('specDetails' in product && Array.isArray((product as any).specDetails)) {
+      const capSpec = (product as any).specDetails.find(
+        (s: any) =>
           (s.attributeName && /capacity/i.test(s.attributeName)) ||
           (s.value && /\d+\s*Ah/i.test(s.value))
       );
@@ -206,7 +205,7 @@ export function ProductCard({
       {/* Action Buttons */}
       <div className="px-4 pb-4 flex items-center gap-2 mt-auto">
         <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm flex-1 h-9 rounded-lg">
-          <RouterLink to="/checkout" search={{ product: product.productId }}>
+          <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
             <span className="text-xs font-bold">🛒 Buy Now</span>
           </RouterLink>
         </Button>
