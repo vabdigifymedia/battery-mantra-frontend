@@ -43,13 +43,19 @@ function AccountPage() {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [addressToEdit, setAddressToEdit] = useState<any>(null);
 
+  // Queries
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    ...userProfileQuery(true),
+    enabled: status === "authenticated",
+  });
+  const { data: addresses, isLoading: isLoadingAddresses } = useQuery({
+    ...addressesQuery(true),
+    enabled: status === "authenticated",
+  });
+
   if (status === "unauthenticated") {
     return <Navigate to="/login" search={{ redirect: "/account" }} />;
   }
-
-  // Queries
-  const { data: profile, isLoading: isLoadingProfile } = useQuery(userProfileQuery(true));
-  const { data: addresses, isLoading: isLoadingAddresses } = useQuery(addressesQuery(true));
 
   const isDummyName = (name?: string, phone?: string) => !name || name === phone || /^\d+$/.test(name);
   const isDummyEmail = (email?: string) => !email || email.endsWith("@batterymantra.com");
