@@ -64,6 +64,7 @@ import { Route as AdminPagesNewRouteImport } from './routes/admin.pages.new'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
 import { Route as AdminFaqsNewRouteImport } from './routes/admin.faqs.new'
 import { Route as AdminEngineersNewRouteImport } from './routes/admin.engineers.new'
+import { Route as BatteriesForCategorySlugMakeSlugModelSlugRouteImport } from './routes/batteries-for.$categorySlug.$makeSlug.$modelSlug'
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
 import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
@@ -350,6 +351,12 @@ const AdminEngineersNewRoute = AdminEngineersNewRouteImport.update({
   path: '/engineers/new',
   getParentRoute: () => AdminRoute,
 } as any)
+const BatteriesForCategorySlugMakeSlugModelSlugRoute =
+  BatteriesForCategorySlugMakeSlugModelSlugRouteImport.update({
+    id: '/batteries-for/$categorySlug/$makeSlug/$modelSlug',
+    path: '/batteries-for/$categorySlug/$makeSlug/$modelSlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminSeoQuickProductsRoute = AdminSeoQuickProductsRouteImport.update({
   id: '/seo/quick/products',
   path: '/seo/quick/products',
@@ -462,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
+  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -525,6 +533,7 @@ export interface FileRoutesByTo {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
+  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -592,6 +601,7 @@ export interface FileRoutesById {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
+  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -659,6 +669,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
+    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -722,6 +733,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
+    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
   id:
     | '__root__'
     | '/'
@@ -788,6 +800,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
+    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -811,6 +824,7 @@ export interface RootRouteChildren {
   ProductsIndexRoute: typeof ProductsIndexRoute
   ManufacturersCategorySlugMakeSlugRoute: typeof ManufacturersCategorySlugMakeSlugRoute
   ManufacturersCategorySlugIndexRoute: typeof ManufacturersCategorySlugIndexRoute
+  BatteriesForCategorySlugMakeSlugModelSlugRoute: typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1200,6 +1214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEngineersNewRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/batteries-for/$categorySlug/$makeSlug/$modelSlug': {
+      id: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+      path: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+      fullPath: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+      preLoaderRoute: typeof BatteriesForCategorySlugMakeSlugModelSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/seo/quick/products': {
       id: '/admin/seo/quick/products'
       path: '/seo/quick/products'
@@ -1401,6 +1422,8 @@ const rootRouteChildren: RootRouteChildren = {
   ManufacturersCategorySlugMakeSlugRoute:
     ManufacturersCategorySlugMakeSlugRoute,
   ManufacturersCategorySlugIndexRoute: ManufacturersCategorySlugIndexRoute,
+  BatteriesForCategorySlugMakeSlugModelSlugRoute:
+    BatteriesForCategorySlugMakeSlugModelSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

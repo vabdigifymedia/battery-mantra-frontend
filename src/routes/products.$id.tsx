@@ -992,7 +992,16 @@ function PdpPage() {
             {displayVehicles && displayVehicles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {displayVehicles.map((v) => (
-                  <div key={v.vehicleId} className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                  <Link 
+                    key={v.vehicleId} 
+                    to="/batteries-for/$categorySlug/$makeSlug/$modelSlug"
+                    params={{
+                      categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
+                      makeSlug: toSlug(v.make),
+                      modelSlug: toSlug(v.model)
+                    }}
+                    className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors"
+                  >
                     {v.imageUrl ? (
                       <div className="h-10 w-10 shrink-0 rounded bg-white p-1">
                         <img src={v.imageUrl} alt={v.model} className="h-full w-full object-contain" />
@@ -1008,7 +1017,7 @@ function PdpPage() {
                         {[v.fuelName].filter(Boolean).join(" • ")}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
