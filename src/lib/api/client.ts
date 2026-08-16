@@ -161,11 +161,8 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
 
         if (!retryRes.ok) throw parseApiError(retryRes.status, retryData);
         return retryData as T;
-      } else {
-        if (!window.location.pathname.includes("/login")) {
-          window.location.href = "/login";
-        }
       }
+      // If refresh fails, we just throw the error. The UI/Router will handle the 401.
     }
     throw parseApiError(res.status, data);
   }

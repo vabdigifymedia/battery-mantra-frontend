@@ -46,6 +46,14 @@ export const useLocationStore = create<LocationState>()(
     {
       name: "battery-mantra-location",
       storage: createJSONStorage(() => cookieStorage),
+      skipHydration: true,
     }
   )
 );
+
+if (typeof window !== "undefined") {
+  // Delay hydration until after the first render to match SSR
+  setTimeout(() => {
+    useLocationStore.persist.rehydrate();
+  }, 0);
+}
