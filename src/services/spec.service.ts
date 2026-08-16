@@ -17,6 +17,8 @@ export const specService = {
     apiFetch<SpecCategoryResponse[]>(`${endpoints.admin.specs.categories}?categoryId=${categoryId}`, { method: "GET" }),
   createSpecCategory: (body: SpecCategoryRequest) =>
     apiFetch<SpecCategoryResponse>(endpoints.admin.specs.categories, { method: "POST", body }),
+  updateSpecCategory: (id: UUID, body: SpecCategoryRequest) =>
+    apiFetch<SpecCategoryResponse>(`${endpoints.admin.specs.categories}/${id}`, { method: "PUT", body }),
   deleteSpecCategory: (id: UUID) =>
     apiFetch<void>(`${endpoints.admin.specs.categories}/${id}`, { method: "DELETE" }),
 
@@ -25,6 +27,8 @@ export const specService = {
     apiFetch<SpecAttributeResponse[]>(`${endpoints.admin.specs.attributes}?specCategoryId=${specCategoryId}`, { method: "GET" }),
   createSpecAttribute: (body: SpecAttributeRequest) =>
     apiFetch<SpecAttributeResponse>(endpoints.admin.specs.attributes, { method: "POST", body }),
+  updateSpecAttribute: (id: UUID, body: SpecAttributeRequest) =>
+    apiFetch<SpecAttributeResponse>(`${endpoints.admin.specs.attributes}/${id}`, { method: "PUT", body }),
   deleteSpecAttribute: (id: UUID) =>
     apiFetch<void>(`${endpoints.admin.specs.attributes}/${id}`, { method: "DELETE" }),
 
@@ -33,6 +37,8 @@ export const specService = {
     apiFetch<SpecUnitResponse[]>(`${endpoints.admin.specs.units}?attributeId=${attributeId}`, { method: "GET" }),
   createSpecUnit: (body: SpecUnitRequest) =>
     apiFetch<SpecUnitResponse>(endpoints.admin.specs.units, { method: "POST", body }),
+  updateSpecUnit: (id: UUID, body: SpecUnitRequest) =>
+    apiFetch<SpecUnitResponse>(`${endpoints.admin.specs.units}/${id}`, { method: "PUT", body }),
   deleteSpecUnit: (id: UUID) =>
     apiFetch<void>(`${endpoints.admin.specs.units}/${id}`, { method: "DELETE" }),
 

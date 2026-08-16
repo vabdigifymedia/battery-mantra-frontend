@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, ChevronRight, Layers, ClipboardList, Tag } from "lucide-react";
+import { Trash2, Plus, ChevronRight, Layers, ClipboardList, Tag, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import {
@@ -74,7 +74,9 @@ function AdminSpecifications() {
   const [selectedAttribute, setSelectedAttribute] = useState<SpecAttributeResponse | null>(null);
 
   // State: modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
+  const [editItemId, setEditItemId] = useState<string | null>(null);
 
   // ---------- Queries ----------
   const specCategoriesQuery = useQuery({
@@ -118,7 +120,7 @@ function AdminSpecifications() {
       queryClient.invalidateQueries({ queryKey: ["specs", "categories", selectedCategoryId] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Spec Category created");
-      setIsAddModalOpen(false);
+      setIsModalOpen(false);
       categoryForm.reset();
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to create"),
@@ -140,7 +142,7 @@ function AdminSpecifications() {
       queryClient.invalidateQueries({ queryKey: ["specs", "attributes", selectedSpecCategory?.id] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Attribute created");
-      setIsAddModalOpen(false);
+      setIsModalOpen(false);
       attributeForm.reset();
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to create"),
@@ -162,7 +164,7 @@ function AdminSpecifications() {
       queryClient.invalidateQueries({ queryKey: ["specs", "units", selectedAttribute?.id] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Unit value created");
-      setIsAddModalOpen(false);
+      setIsModalOpen(false);
       unitForm.reset();
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to create"),
@@ -176,6 +178,42 @@ function AdminSpecifications() {
       toast.success("Unit value deleted");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete"),
+  });
+
+  const updateSpecCategoryMutation = useMutation({
+    mutationFn: (data: { id: string; body: any }) => specService.updateSpecCategory(data.id, data.body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["specs", "categories", selectedCategoryId] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Spec Category updated");
+      setIsModalOpen(false);
+      categoryForm.reset();
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to update"),
+  });
+
+  const updateSpecAttributeMutation = useMutation({
+    mutationFn: (data: { id: string; body: any }) => specService.updateSpecAttribute(data.id, data.body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["specs", "attributes", selectedSpecCategory?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Attribute updated");
+      setIsModalOpen(false);
+      attributeForm.reset();
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to update"),
+  });
+
+  const updateSpecUnitMutation = useMutation({
+    mutationFn: (data: { id: string; body: any }) => specService.updateSpecUnit(data.id, data.body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["specs", "units", selectedAttribute?.id] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Unit value updated");
+      setIsModalOpen(false);
+      unitForm.reset();
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to update"),
   });
 
   // ---------- Handlers ----------
@@ -210,38 +248,73 @@ function AdminSpecifications() {
   };
 
   const openAddModal = () => {
+    setModalMode("add");
+    setEditItemId(null);
     if (drillLevel === "categories") categoryForm.reset({ name: "" });
     else if (drillLevel === "attributes") attributeForm.reset({ name: "" });
     else unitForm.reset({ value: "" });
-    setIsAddModalOpen(true);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (item: any) => {
+    setModalMode("edit");
+    setEditItemId(item.id);
+    if (drillLevel === "categories") categoryForm.reset({ name: item.name });
+    else if (drillLevel === "attributes") attributeForm.reset({ name: item.name });
+    else unitForm.reset({ value: item.value });
+    setIsModalOpen(true);
   };
 
   const handleAddSubmit = () => {
     if (drillLevel === "categories") {
       categoryForm.handleSubmit((data) => {
-        createSpecCategoryMutation.mutate({ name: data.name, categoryId: selectedCategoryId });
+        if (modalMode === "edit" && editItemId) {
+          updateSpecCategoryMutation.mutate({ id: editItemId, body: { name: data.name, categoryId: selectedCategoryId } });
+        } else {
+          createSpecCategoryMutation.mutate({ name: data.name, categoryId: selectedCategoryId });
+        }
       })();
     } else if (drillLevel === "attributes") {
       attributeForm.handleSubmit((data) => {
-        createSpecAttributeMutation.mutate({
-          name: data.name,
-          specCategoryId: selectedSpecCategory!.id,
-          categoryId: selectedCategoryId,
-        });
+        if (modalMode === "edit" && editItemId) {
+          updateSpecAttributeMutation.mutate({
+            id: editItemId,
+            body: { name: data.name, specCategoryId: selectedSpecCategory!.id, categoryId: selectedCategoryId },
+          });
+        } else {
+          createSpecAttributeMutation.mutate({
+            name: data.name,
+            specCategoryId: selectedSpecCategory!.id,
+            categoryId: selectedCategoryId,
+          });
+        }
       })();
     } else {
       unitForm.handleSubmit((data) => {
-        createSpecUnitMutation.mutate({
-          value: data.value,
-          specAttributeId: selectedAttribute!.id,
-          specCategoryId: selectedSpecCategory!.id,
-          categoryId: selectedCategoryId,
-        });
+        if (modalMode === "edit" && editItemId) {
+          updateSpecUnitMutation.mutate({
+            id: editItemId,
+            body: { value: data.value, specAttributeId: selectedAttribute!.id, specCategoryId: selectedSpecCategory!.id, categoryId: selectedCategoryId },
+          });
+        } else {
+          createSpecUnitMutation.mutate({
+            value: data.value,
+            specAttributeId: selectedAttribute!.id,
+            specCategoryId: selectedSpecCategory!.id,
+            categoryId: selectedCategoryId,
+          });
+        }
       })();
     }
   };
 
-  const isAddPending = createSpecCategoryMutation.isPending || createSpecAttributeMutation.isPending || createSpecUnitMutation.isPending;
+  const isAddPending = 
+    createSpecCategoryMutation.isPending || 
+    createSpecAttributeMutation.isPending || 
+    createSpecUnitMutation.isPending ||
+    updateSpecCategoryMutation.isPending ||
+    updateSpecAttributeMutation.isPending ||
+    updateSpecUnitMutation.isPending;
 
   // ---------- Computed ----------
   const currentData =
@@ -386,10 +459,15 @@ function AdminSpecifications() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground">{sc.categoryName}</TableCell>
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <DeleteButton
-                          itemName={sc.name}
-                          onDelete={() => deleteSpecCategoryMutation.mutate(sc.id)}
-                        />
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); openEditModal(sc); }} className="text-muted-foreground hover:text-foreground hover:bg-muted/80">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <DeleteButton
+                            itemName={sc.name}
+                            onDelete={() => deleteSpecCategoryMutation.mutate(sc.id)}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -409,10 +487,15 @@ function AdminSpecifications() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground">{attr.specCategoryName}</TableCell>
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <DeleteButton
-                          itemName={attr.name}
-                          onDelete={() => deleteSpecAttributeMutation.mutate(attr.id)}
-                        />
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); openEditModal(attr); }} className="text-muted-foreground hover:text-foreground hover:bg-muted/80">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <DeleteButton
+                            itemName={attr.name}
+                            onDelete={() => deleteSpecAttributeMutation.mutate(attr.id)}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -427,10 +510,15 @@ function AdminSpecifications() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground">{unit.specAttributeName}</TableCell>
                       <TableCell className="text-right">
-                        <DeleteButton
-                          itemName={unit.value}
-                          onDelete={() => deleteSpecUnitMutation.mutate(unit.id)}
-                        />
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); openEditModal(unit); }} className="text-muted-foreground hover:text-foreground hover:bg-muted/80">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <DeleteButton
+                            itemName={unit.value}
+                            onDelete={() => deleteSpecUnitMutation.mutate(unit.id)}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -441,11 +529,11 @@ function AdminSpecifications() {
         </>
       )}
 
-      {/* Add Modal */}
-      <Dialog open={isAddModalOpen} onOpenChange={(open) => !open && setIsAddModalOpen(false)}>
+      {/* Modal */}
+      <Dialog open={isModalOpen} onOpenChange={(open) => !open && setIsModalOpen(false)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add {currentLevel.singular}</DialogTitle>
+            <DialogTitle>{modalMode === "add" ? "Add" : "Edit"} {currentLevel.singular}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -493,7 +581,7 @@ function AdminSpecifications() {
               </>
             )}
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="ghost" onClick={() => setIsAddModalOpen(false)}>
+              <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" variant="brand" disabled={isAddPending}>
