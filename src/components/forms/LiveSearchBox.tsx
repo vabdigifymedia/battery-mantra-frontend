@@ -121,8 +121,8 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedCategories.map((cat: any) => (
                     <Link
                       key={cat.categoryId}
-                      to="/products"
-                      search={{ categoryId: cat.categoryId }}
+                      to="/shop/c/$categorySlug"
+                      params={{ categorySlug: toSlug(cat.categoryName) }}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >
@@ -143,8 +143,8 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedBrands.map((brand: any) => (
                     <Link
                       key={brand.brandId}
-                      to="/products"
-                      search={{ brandId: brand.brandId }}
+                      to="/shop/b/$brandSlug"
+                      params={{ brandSlug: toSlug(brand.brandName) }}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >

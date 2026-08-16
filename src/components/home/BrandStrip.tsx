@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { cn, toSlug } from "@/lib/utils";
 import { featuredBrandsQuery, brandsQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { Image } from "@/components/common/Image";
@@ -32,8 +33,8 @@ export function BrandStrip() {
       {data.map((b) => (
         <Link
           key={b.brandId}
-          to="/products"
-          search={{ brandId: b.brandId }}
+          to="/shop/b/$brandSlug"
+          params={{ brandSlug: toSlug(b.brandName) }}
           className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
         >
           {/* Subtle glow on hover */}

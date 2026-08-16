@@ -135,8 +135,8 @@ function SubcategoriesPage() {
             return (
               <Link
                 key={c.categoryId}
-                to="/products"
-                search={{ categoryId: c.categoryId }}
+                to="/shop/c/$categorySlug"
+                params={{ categorySlug: c.categorySlug || toSlug(c.categoryName) }}
                 className={cardClassName}
               >
                 {cardContent}

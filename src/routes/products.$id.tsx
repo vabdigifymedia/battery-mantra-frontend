@@ -21,7 +21,7 @@ import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
-import { cn, applySeoTemplate } from "@/lib/utils";
+import { cn, applySeoTemplate, toSlug } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
