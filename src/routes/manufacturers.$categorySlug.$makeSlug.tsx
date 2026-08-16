@@ -7,6 +7,7 @@ import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { useLocationStore } from "@/store/useLocationStore";
 import { applySeoTemplate } from "@/lib/utils";
+import { BannerLayout } from "@/components/products/DynamicSearchBanner";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
@@ -67,27 +68,14 @@ function ManufacturerPage() {
         </nav>
 
         {/* SEO Banner */}
-        <div className="mb-10 border-2 border-dashed border-gray-200 rounded-3xl overflow-hidden py-6 px-8 relative bg-white shadow-sm">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
-            {manufacturer?.logoUrl && (
-              <div className="shrink-0 bg-white p-2 rounded border shadow-sm">
-                <img 
-                  src={manufacturer.logoUrl} 
-                  alt={`${manufacturer.name} Logo`} 
-                  className="h-16 object-contain"
-                />
-              </div>
-            )}
-            <div className="flex flex-col items-center">
-              <h1 className="text-2xl md:text-3xl font-bold uppercase text-foreground">
-                {manufacturer?.name || exactMake} {categoryName}
-              </h1>
-              <p className="text-brand font-medium text-lg mt-2">
-                With Battery Mantra, get {manufacturer?.name || exactMake} {categoryName} at best price
-              </p>
-            </div>
-          </div>
-        </div>
+        <BannerLayout 
+          title={`${manufacturer?.name || exactMake} ${categoryName}`}
+          subtitle={`With Battery Mantra, get ${manufacturer?.name || exactMake} ${categoryName} at best price`}
+          imageUrl={manufacturer?.logoUrl || ""}
+          brandNameHeader={manufacturer?.name || exactMake}
+          brandLogoUrl={manufacturer?.logoUrl || ""}
+          theme={isBike ? "orange" : isCar ? "red" : "blue"}
+        />
 
 
 
