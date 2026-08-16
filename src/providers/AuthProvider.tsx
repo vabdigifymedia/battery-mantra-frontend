@@ -48,10 +48,11 @@ function userFromToken(token: string, fallbackId?: string): AuthUser | null {
   };
 }
 
+import { cookies } from "@/lib/storage/cookies";
+
 function readStoredUser(): AuthUser | null {
-  if (!isBrowser) return null;
   try {
-    const raw = window.localStorage.getItem(USER_KEY);
+    const raw = cookies.get(USER_KEY);
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   } catch {
     return null;
@@ -59,10 +60,9 @@ function readStoredUser(): AuthUser | null {
 }
 
 function writeStoredUser(user: AuthUser | null) {
-  if (!isBrowser) return;
   try {
-    if (user) window.localStorage.setItem(USER_KEY, JSON.stringify(user));
-    else window.localStorage.removeItem(USER_KEY);
+    if (user) cookies.set(USER_KEY, JSON.stringify(user), { days: 7, secure: true, sameSite: "Lax", path: "/" });
+    else cookies.remove(USER_KEY);
   } catch {
     /* ignore */
   }

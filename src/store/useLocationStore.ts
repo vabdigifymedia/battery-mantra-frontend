@@ -1,6 +1,19 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage, type StateStorage } from "zustand/middleware";
 import { CityDto } from "@/types/dto";
+import { cookies } from "@/lib/storage/cookies";
+
+const cookieStorage: StateStorage = {
+  getItem: (name: string): string | null => {
+    return cookies.get(name) || null;
+  },
+  setItem: (name: string, value: string): void => {
+    cookies.set(name, value, { days: 365, secure: true, sameSite: "Lax", path: "/" });
+  },
+  removeItem: (name: string): void => {
+    cookies.remove(name);
+  },
+};
 
 interface LocationState {
   pincode: string | null;
@@ -32,6 +45,7 @@ export const useLocationStore = create<LocationState>()(
     }),
     {
       name: "battery-mantra-location",
+      storage: createJSONStorage(() => cookieStorage),
     }
   )
 );
