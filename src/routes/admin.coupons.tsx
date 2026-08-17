@@ -48,6 +48,7 @@ const couponSchema = z.object({
   expiryDate: z.string().optional().nullable(),
   usageLimit: z.coerce.number().optional().nullable(),
   isActive: z.boolean(),
+  isForever: z.boolean(),
 });
 
 function AdminCoupons() {
@@ -72,8 +73,11 @@ function AdminCoupons() {
       usageLimit: null,
       startDate: null,
       expiryDate: null,
+      isForever: true,
     },
   });
+
+  const isForever = form.watch("isForever");
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -93,6 +97,7 @@ function AdminCoupons() {
       isActive: coupon.isActive,
       startDate: coupon.startDate ? coupon.startDate.split("T")[0] : null,
       expiryDate: coupon.expiryDate ? coupon.expiryDate.split("T")[0] : null,
+      isForever: !coupon.startDate && !coupon.expiryDate,
     });
     setIsModalOpen(true);
   };
@@ -109,6 +114,7 @@ function AdminCoupons() {
       usageLimit: null,
       startDate: null,
       expiryDate: null,
+      isForever: true,
     });
     setIsModalOpen(true);
   };
@@ -159,8 +165,8 @@ function AdminCoupons() {
       minOrderValue: values.minOrderValue || undefined,
       usageLimit: values.usageLimit || undefined,
       isActive: values.isActive,
-      startDate: values.startDate ? new Date(values.startDate).toISOString() : undefined,
-      expiryDate: values.expiryDate ? new Date(values.expiryDate).toISOString() : undefined,
+      startDate: (values.isForever || !values.startDate) ? undefined : new Date(values.startDate).toISOString(),
+      expiryDate: (values.isForever || !values.expiryDate) ? undefined : new Date(values.expiryDate).toISOString(),
     };
 
     if (editingCoupon) {
@@ -314,15 +320,22 @@ function AdminCoupons() {
               </FormField>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Start Date" htmlFor="startDate" error={form.formState.errors.startDate?.message}>
-                <Input id="startDate" type="date" {...form.register("startDate")} />
-              </FormField>
-              
-              <FormField label="Expiry Date" htmlFor="expiryDate" error={form.formState.errors.expiryDate?.message}>
-                <Input id="expiryDate" type="date" {...form.register("expiryDate")} />
-              </FormField>
+            <div className="flex items-center gap-2 pt-2 pb-2">
+              <input type="checkbox" id="isForever" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isForever")} />
+              <label htmlFor="isForever" className="text-sm font-medium text-foreground">Lifetime Coupon (No start or expiry date)</label>
             </div>
+
+            {!isForever && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="Start Date" htmlFor="startDate" error={form.formState.errors.startDate?.message}>
+                  <Input id="startDate" type="date" {...form.register("startDate")} />
+                </FormField>
+                
+                <FormField label="Expiry Date" htmlFor="expiryDate" error={form.formState.errors.expiryDate?.message}>
+                  <Input id="expiryDate" type="date" {...form.register("expiryDate")} />
+                </FormField>
+              </div>
+            )}
 
             <FormField label="Total Usage Limit" htmlFor="usageLimit" error={form.formState.errors.usageLimit?.message}>
               <Input id="usageLimit" type="number" {...form.register("usageLimit")} placeholder="Optional (e.g. 100 uses)" />
