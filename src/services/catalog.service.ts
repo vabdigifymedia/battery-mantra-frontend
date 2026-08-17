@@ -18,8 +18,10 @@ export const categoriesService = {
 };
 
 export const brandsService = {
-  list: (signal?: AbortSignal) =>
-    apiFetch<BrandResponse[]>(endpoints.brands.list, { signal, auth: false }),
+  list: (signal?: AbortSignal, categoryId?: string) => {
+    const query = categoryId ? `?categoryId=${categoryId}` : "";
+    return apiFetch<BrandResponse[]>(`${endpoints.brands.list}${query}`, { signal, auth: false });
+  },
   featured: (signal?: AbortSignal) =>
     apiFetch<BrandResponse[]>(endpoints.brands.featured, { signal, auth: false }),
 };

@@ -15,7 +15,7 @@ export function BrandStrip() {
 
   const hasFeatured = featuredList.length > 0;
   const isLoading = featured.isLoading || (!hasFeatured && all.isLoading);
-  const data = hasFeatured ? featuredList : allList;
+  const data = (hasFeatured ? featuredList : allList).filter(b => b.productCount === undefined || b.productCount > 0);
 
   if (isLoading) {
     return (

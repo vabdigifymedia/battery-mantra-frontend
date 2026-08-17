@@ -25,7 +25,7 @@ export const queryKeys = {
   },
   brands: {
     all: ["brands"] as const,
-    list: () => [...queryKeys.brands.all, "list"] as const,
+    list: (categoryId?: string) => [...queryKeys.brands.all, "list", categoryId] as const,
     featured: () => [...queryKeys.brands.all, "featured"] as const,
   },
   manufacturers: {

@@ -53,7 +53,10 @@ function CategoryManufacturersPage() {
   });
 
   // Load brands as fallback/alternative for non-vehicle categories
-  const { data: brands = [], isLoading: isLoadingBrands } = useQuery(brandsQuery());
+  const { data: brands = [], isLoading: isLoadingBrands } = useQuery({
+    ...brandsQuery(category?.categoryId),
+    enabled: !!category?.categoryId || !hasSpecificMfrs,
+  });
 
   const hasSpecificMfrs = categoryMfrs && categoryMfrs.length > 0;
   const isLoading = isLoadingCatMfrs || isLoadingBrands;
@@ -93,7 +96,6 @@ function CategoryManufacturersPage() {
         ) : hasSpecificMfrs ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {[...categoryMfrs]
-              .filter((m) => (m.vehicleCount ?? 0) > 0)
               .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
               .map((m) => (
                 <Link
@@ -121,7 +123,7 @@ function CategoryManufacturersPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {brands.filter((b) => (b.productCount ?? 0) > 0).map((b) => (
+            {brands.filter((b) => b.productCount === undefined || b.productCount > 0).map((b) => (
               <Link
                 key={b.brandId}
                 to="/shop/$categorySlug/$brandSlug"

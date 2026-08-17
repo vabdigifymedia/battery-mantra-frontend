@@ -78,7 +78,8 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery(productFilterQuery(params));
 
-  const { data: brands } = useQuery(brandsQuery());
+  const singleCategoryId = search.categoryId?.length === 1 ? search.categoryId[0] : undefined;
+  const { data: brands } = useQuery(brandsQuery(singleCategoryId));
   const { data: categories } = useQuery(categoriesQuery());
   const { data: vehicles } = useQuery(vehiclesListQuery());
   

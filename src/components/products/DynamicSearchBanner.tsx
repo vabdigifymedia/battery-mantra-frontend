@@ -7,13 +7,13 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   const { city } = useLocationStore();
   const locationName = city?.cityName || "Delhi"; // Fallback to Delhi if not set
 
-  const { data: brands } = useQuery(brandsQuery());
-  const { data: categories } = useQuery(categoriesQuery());
-  const { data: vehicles } = useQuery(vehiclesListQuery());
-
   // Handle categoryId arrays if present
   const catId = Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId;
   const brndId = Array.isArray(search.brandId) ? search.brandId[0] : search.brandId;
+
+  const { data: brands } = useQuery(brandsQuery(catId));
+  const { data: categories } = useQuery(categoriesQuery());
+  const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const brand = brndId ? brands?.find((b: any) => b.brandId === brndId) : null;
   const category = catId ? categories?.find((c: any) => c.categoryId === catId) : null;

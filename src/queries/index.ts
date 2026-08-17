@@ -54,10 +54,10 @@ export const rootCategoriesQuery = () =>
     staleTime: 5 * 60_000,
   });
 
-export const brandsQuery = () =>
+export const brandsQuery = (categoryId?: string) =>
   queryOptions({
-    queryKey: queryKeys.brands.list(),
-    queryFn: ({ signal }) => brandsService.list(signal),
+    queryKey: queryKeys.brands.list(categoryId),
+    queryFn: ({ signal }) => brandsService.list(signal, categoryId),
     staleTime: 5 * 60_000,
   });
 

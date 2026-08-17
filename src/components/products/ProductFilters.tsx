@@ -45,9 +45,8 @@ export function ProductFilters({ state, onChange, products }: Props) {
   const [capSearch, setCapSearch] = useState("");
 
   const cats = useQuery(rootCategoriesQuery());
-  const brands = useQuery(brandsQuery());
-  
   const selectedCategoryId = state.categoryId?.[0];
+  const brands = useQuery(brandsQuery(selectedCategoryId));
   const dynamicCapacities = useQuery(capacitiesQuery(selectedCategoryId));
 
   // Dynamic Price Range
@@ -212,6 +211,7 @@ export function ProductFilters({ state, onChange, products }: Props) {
             </div>
             <div className="space-y-4 pt-1 max-h-[220px] overflow-y-auto">
               {(brands.data ?? [])
+                .filter(b => b.productCount === undefined || b.productCount > 0)
                 .filter(b => b.brandName?.toLowerCase().includes(brandSearch.toLowerCase()))
                 .map((b) => {
                 const isChecked = state.brandId?.includes(b.brandId) || false;
