@@ -113,6 +113,7 @@ export type BrandResponse = {
   brandLogo?: string;
   description?: string;
   featured?: boolean;
+  productCount?: number;
 };
 export type BrandRequest = {
   brandName: string;

@@ -52,13 +52,14 @@ function CategoryManufacturersPage() {
     enabled: !!category?.categoryId,
   });
 
+  const hasSpecificMfrs = categoryMfrs && categoryMfrs.length > 0;
+
   // Load brands as fallback/alternative for non-vehicle categories
   const { data: brands = [], isLoading: isLoadingBrands } = useQuery({
     ...brandsQuery(category?.categoryId),
     enabled: !!category?.categoryId || !hasSpecificMfrs,
   });
 
-  const hasSpecificMfrs = categoryMfrs && categoryMfrs.length > 0;
   const isLoading = isLoadingCatMfrs || isLoadingBrands;
 
   const isBike =
