@@ -59,14 +59,27 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 return backendCapacity || "N/A";
               };
 
-              const extractWarranty = () => {
+              const extractWarranty = (name: string) => {
                 let specWar = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
                 if (!specWar && (product as any).specs) {
                   const specsObj = (product as any).specs;
                   const warKey = Object.keys(specsObj).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
                   if (warKey) specWar = specsObj[warKey];
                 }
-                return specWar ? String(specWar) : "Standard Warranty";
+                if (specWar) return String(specWar);
+                
+                // Try to extract from product name
+                const warrantyMatch = name.match(/(\d+)\s*(Month|Months|Year|Years)\s*(Warranty|Guarantee)?/i);
+                if (warrantyMatch) {
+                  let text = warrantyMatch[0].trim();
+                  // Normalize "Months" -> "Months Warranty" for better display if not present
+                  if (!/warranty|guarantee/i.test(text)) {
+                    text += " Warranty";
+                  }
+                  return text;
+                }
+                
+                return "Standard Warranty";
               };
 
               return (
@@ -79,7 +92,7 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                     {extractCapacity(product.productName, product.capacity)}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {extractWarranty()}
+                    {extractWarranty(product.productName)}
                   </td>
                   <td className="px-4 py-3 text-foreground font-medium">{priceRange}</td>
                 </tr>
