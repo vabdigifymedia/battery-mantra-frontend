@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/queries";
 import { ChevronRight, Car, Bike, Zap, Tag } from "lucide-react";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
+import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { buildPageHead } from "@/lib/seo";
 
 // Helper to format string to slug
@@ -80,21 +81,7 @@ function CategoryManufacturersPage() {
         </nav>
 
         {/* Header Banner */}
-        <div className="mb-10 border-2 border-dashed border-gray-200 rounded-3xl overflow-hidden py-8 px-8 relative bg-white shadow-sm text-center">
-          <div className="flex flex-col items-center">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-3">
-              <Zap className="h-3.5 w-3.5" /> {hasSpecificMfrs ? "Find by Make" : "Find by Brand"}
-            </span>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Shop by {categoryName} {hasSpecificMfrs ? "Manufacturer" : "Brand"}
-            </h1>
-            <p className="text-muted-foreground text-base mt-2 max-w-xl">
-              {hasSpecificMfrs
-                ? `Select your vehicle manufacturer below to find 100% compatible batteries with free doorstep installation.`
-                : `Select your preferred battery brand below to browse available ${categoryName} options at best prices.`}
-            </p>
-          </div>
-        </div>
+        <DynamicSearchBanner search={{ categoryId: category?.categoryId }} />
 
         {/* Manufacturers or Brands Grid */}
         {isLoading ? (
