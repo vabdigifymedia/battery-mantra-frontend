@@ -87,7 +87,7 @@ export const Route = createFileRoute("/products/$id")({
     const replacePlaceholders = (str: string | undefined | null) => {
       if (!str) return "";
       // E.g., assume 2-4 Hours if we don't have exact time synchronously
-      return str.replace(/city_name/gi, cityName || "India").replace(/delivery_time/gi, "2-4 Hours");
+      return str.replace(/\{?city_name\}?/gi, cityName || "India").replace(/\{?delivery_time\}?/gi, "2-4 Hours");
     };
 
     title = replacePlaceholders(title) || (loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra");

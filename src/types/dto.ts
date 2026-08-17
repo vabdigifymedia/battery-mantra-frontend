@@ -57,6 +57,7 @@ export type ManufacturerResponse = {
   description?: string;
   displayOrder?: number;
   categories?: { categoryId: UUID; categoryName: string }[];
+  vehicleCount?: number;
 };
 export type CreateManufacturerRequest = {
   name: string;
