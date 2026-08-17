@@ -124,10 +124,10 @@ export function BannerLayout({
     <div className={`mb-6 rounded-3xl overflow-hidden bg-gradient-to-br shadow-sm border border-border/40 ${currentTheme.bg}`}>
       
       {/* Top Section: Image + Content */}
-      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 p-4 md:p-8">
+      <div className="flex flex-row items-center gap-3 sm:gap-4 md:gap-6 p-4 md:p-8">
         {/* Left: Main Image */}
         {imageUrl && (
-          <div className="w-32 h-24 md:w-64 md:h-40 shrink-0 flex items-center justify-center p-2">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-64 md:h-40 shrink-0 flex items-center justify-center p-1 md:p-2">
             <img 
               src={imageUrl} 
               alt={title} 
@@ -137,57 +137,57 @@ export function BannerLayout({
         )}
         
         {/* Right: Text Content */}
-        <div className="flex flex-col items-center md:items-start text-center md:text-left flex-1">
+        <div className="flex flex-col items-start text-left flex-1">
           {brandNameHeader && (
-            <div className="flex items-center justify-center md:justify-start gap-2 mb-2 w-full">
+            <div className="flex items-center justify-start gap-1.5 md:gap-2 mb-1.5 md:mb-2 w-full">
               {brandLogoUrl && (
-                <img src={brandLogoUrl} alt={brandNameHeader} className="h-5 md:h-6 w-auto object-contain mix-blend-multiply" />
+                <img src={brandLogoUrl} alt={brandNameHeader} className="h-4 sm:h-5 md:h-6 w-auto object-contain mix-blend-multiply" />
               )}
-              <span className={`${currentTheme.text} font-extrabold tracking-wider uppercase text-xs md:text-sm`}>
+              <span className={`${currentTheme.text} font-extrabold tracking-wider uppercase text-[10px] sm:text-xs md:text-sm`}>
                 {brandNameHeader}
               </span>
             </div>
           )}
           
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase text-slate-900 leading-tight">
+          <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-black uppercase text-slate-900 leading-tight">
             {title}
           </h1>
-          <p className="text-slate-600 font-medium text-xs sm:text-sm md:text-base mt-2 max-w-2xl">
+          <p className="text-slate-600 font-medium text-[10px] sm:text-xs md:text-base mt-1 md:mt-2 max-w-2xl">
             {subtitle}
           </p>
         </div>
       </div>
 
       {/* Bottom Section: Trust Badges */}
-      <div className={`${currentTheme.stripBg} border-t p-4`}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+      <div className={`${currentTheme.stripBg} border-t p-3 md:p-4`}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4 max-w-5xl mx-auto">
           
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
-              <ShieldCheck className={`w-5 h-5 ${currentTheme.text}`} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
+              <ShieldCheck className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">100% Compatible<br/>Batteries</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">100% Compatible<br/>Batteries</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
-              <Award className={`w-5 h-5 ${currentTheme.text}`} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
+              <Award className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Genuine Quality<br/>Assured</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Genuine Quality<br/>Assured</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
-              <Truck className={`w-5 h-5 ${currentTheme.text}`} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
+              <Truck className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Free Installation<br/>at Doorstep</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Free Installation<br/>at Doorstep</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
-              <BadgeIndianRupee className={`w-5 h-5 ${currentTheme.text}`} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
+              <BadgeIndianRupee className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Best Price<br/>Guarantee</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Best Price<br/>Guarantee</span>
           </div>
 
         </div>
