@@ -22,29 +22,18 @@ export const LocationSelector = () => {
         variant="ghost" 
         size="sm" 
         onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-colors"
+        className="flex items-center gap-1 sm:gap-2 hover:bg-primary/10 hover:text-primary transition-colors px-1 sm:px-3"
         disabled={isLocating}
       >
-        {isLocating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
+        {isLocating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4 shrink-0 text-primary" />}
         <div className="flex flex-col items-start leading-none text-left">
-          <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+          <span className="text-[8px] sm:text-[10px] text-gray-500 font-medium uppercase tracking-wider">
             {isLocating ? "Detecting..." : (pincode ? "Delivering to" : "Select Location")}
           </span>
-          <span className="text-sm font-semibold truncate max-w-[150px]">
+          <span className="text-xs sm:text-sm font-semibold truncate max-w-[80px] sm:max-w-[150px]">
             {isLocating ? "Please wait" : (city?.cityName ? `${city.cityName}, ${pincode}` : pincode || "Enter Pincode")}
           </span>
         </div>
-      </Button>
-
-      {/* Mobile view - just icon */}
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={() => setIsOpen(true)}
-        className="md:hidden hover:bg-primary/10 hover:text-primary"
-        disabled={isLocating}
-      >
-        {isLocating ? <Loader2 className="h-5 w-5 animate-spin" /> : <MapPin className="h-5 w-5" />}
       </Button>
 
       <LocationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />

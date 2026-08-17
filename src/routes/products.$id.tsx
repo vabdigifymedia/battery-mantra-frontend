@@ -348,6 +348,12 @@ function PdpPage() {
     ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) 
     : data.productPrice;
 
+  const exchangePriceValue = Math.max(0, data.productPrice - (data.exchangeDiscount || 0));
+  const basePriceForSavings = data.originalPrice && data.originalPrice > data.productPrice 
+    ? data.originalPrice 
+    : data.productPrice;
+  const exchangeSavings = basePriceForSavings - exchangePriceValue;
+
   const productMrp = getMrpFromProduct(data);
 
   // Calculate dynamic strike price & discount based on selected exchange mode
@@ -626,7 +632,7 @@ function PdpPage() {
                         <span>Exchange Offer</span>
                       </span>
                       <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                        Save ₹{data.exchangeDiscount?.toLocaleString()}
+                        Save ₹{exchangeSavings.toLocaleString()}
                       </span>
                     </div>
 
@@ -768,7 +774,7 @@ function PdpPage() {
                         </div>
                         <span className="font-medium text-base text-emerald-700 dark:text-emerald-400">With Exchange</span>
                       </div>
-                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">Save ₹{data.exchangeDiscount?.toLocaleString()}</Badge>
+                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">Save ₹{exchangeSavings.toLocaleString()}</Badge>
                     </div>
                     <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 ml-6">
                       ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}

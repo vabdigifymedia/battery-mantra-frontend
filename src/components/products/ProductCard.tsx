@@ -25,6 +25,12 @@ export function ProductCard({
     ? Math.max(0, product.productPrice - (product.exchangeDiscount || 0))
     : product.productPrice;
 
+  const basePriceForSavings = product.originalPrice && product.originalPrice > product.productPrice 
+    ? product.originalPrice 
+    : product.productPrice;
+  const totalSavings = basePriceForSavings - exchangePrice;
+  const showSavings = totalSavings > 0;
+
   // Determine capacity to display on card badge
   const displayCapacity = useMemo(() => {
     if ('specDetails' in product && Array.isArray((product as any).specDetails)) {
@@ -67,9 +73,9 @@ export function ProductCard({
         {/* Top Badges Bar */}
         <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between pointer-events-none">
           <div className="flex flex-col gap-1 items-start">
-            {hasExchange ? (
+            {showSavings ? (
               <span className="bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                Save ₹{product.exchangeDiscount?.toLocaleString()}
+                Save ₹{totalSavings.toLocaleString()}
               </span>
             ) : (
               <span className="bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
@@ -150,11 +156,11 @@ export function ProductCard({
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-[10px] sm:text-xs font-medium">
               <span className="text-muted-foreground">
-                MRP: <span className="line-through">₹{product.productPrice.toLocaleString()}</span>
+                MRP: <span className="line-through">₹{basePriceForSavings.toLocaleString()}</span>
               </span>
-              {hasExchange && (
+              {showSavings && (
                 <span className="text-red-600 font-bold">
-                  You Save ₹{product.exchangeDiscount?.toLocaleString()}
+                  You Save ₹{totalSavings.toLocaleString()}
                 </span>
               )}
             </div>
