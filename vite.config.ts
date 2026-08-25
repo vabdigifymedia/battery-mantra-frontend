@@ -10,7 +10,10 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
     nitro({
-      preset: "vercel"
+      preset: "vercel",
+      routeRules: {
+        '/api/**': { proxy: 'https://200.97.165.54.nip.io/api/**' }
+      }
     }),
     viteReact(),
     VitePWA({
@@ -45,8 +48,9 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://200.97.165.54.nip.io',
         changeOrigin: true,
+        secure: false,
       }
     }
   },

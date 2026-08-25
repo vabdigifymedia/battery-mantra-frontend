@@ -1000,7 +1000,7 @@ export function PdpPage() {
                 {displayVehicles.map((v) => (
                   <Link 
                     key={v.vehicleId} 
-                    to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
+                    to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
                       makeSlug: toSlug(v.make),
