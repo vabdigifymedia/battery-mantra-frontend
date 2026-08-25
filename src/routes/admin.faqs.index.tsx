@@ -78,7 +78,7 @@ function AdminFaqsList() {
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild>
-                        <Link to="/admin/faqs/$id/edit" params={{ id: faq.faqId }}>
+                        <Link to="/admin/faqs/$id/edit" params={{ slug: faq.faqId }}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>

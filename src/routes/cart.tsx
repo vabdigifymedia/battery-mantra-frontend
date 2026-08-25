@@ -101,8 +101,8 @@ function CartPage() {
                   className="flex gap-4 rounded-xl border border-border bg-card p-3 sm:p-4"
                 >
                   <Link
-                    to="/products/$id"
-                    params={{ id: (it.product as any).seo?.slug || it.product.productId }}
+                    to="/product/$slug"
+                    params={{ slug: (it.product as any).seo?.slug || it.product.productId }}
                     className="shrink-0"
                   >
                     <Image
@@ -121,8 +121,8 @@ function CartPage() {
                           </p>
                         ) : null}
                         <Link
-                          to="/products/$id"
-                          params={{ id: (it.product as any).seo?.slug || it.product.productId }}
+                          to="/product/$slug"
+                          params={{ slug: (it.product as any).seo?.slug || it.product.productId }}
                           className="line-clamp-2 text-sm font-semibold hover:text-primary sm:text-base"
                         >
                           {it.product.productName}

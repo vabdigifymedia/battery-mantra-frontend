@@ -104,8 +104,8 @@ export function ProductCard({
 
         {/* Product Image Stage */}
         <RouterLink 
-          to="/products/$id" 
-          params={{ id: product.seo?.slug || product.productId }}
+          to="/product/$slug" 
+          params={{ slug: product.seo?.slug || product.productId }}
           className="relative pt-10 pb-4 px-4 flex items-center justify-center bg-slate-50/50 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 transition-colors"
         >
           <Image
@@ -130,7 +130,7 @@ export function ProductCard({
           </div>
 
           {/* Title */}
-          <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
             <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug">
               {product.productName}
             </h3>
@@ -211,12 +211,12 @@ export function ProductCard({
       {/* Action Buttons - Stack on mobile, side-by-side on sm+ */}
       <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-0 flex flex-col sm:flex-row items-center gap-2 mt-auto">
         <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg">
-          <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
             <span className="text-[10px] sm:text-xs font-bold flex items-center"><ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now</span>
           </RouterLink>
         </Button>
         <Button asChild size="sm" variant="outline" className="border-border shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-50">
-          <RouterLink to="/products/$id" params={{ id: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
             <span className="text-[10px] sm:text-xs font-bold text-slate-700 flex items-center justify-center">View Details <ArrowRight className="ml-1 w-3 h-3" /></span>
           </RouterLink>
         </Button>

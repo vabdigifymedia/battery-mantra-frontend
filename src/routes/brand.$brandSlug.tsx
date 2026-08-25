@@ -11,7 +11,7 @@ import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
-export const Route = createFileRoute("/shop/b/$brandSlug")({
+export const Route = createFileRoute("/brand/$brandSlug")({
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());

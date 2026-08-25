@@ -11,7 +11,7 @@ import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
-export const Route = createFileRoute("/batteries-for/$categorySlug/$makeSlug/$modelSlug")({
+export const Route = createFileRoute("/manufacturer-products/$categorySlug/$makeSlug/$modelSlug")({
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());

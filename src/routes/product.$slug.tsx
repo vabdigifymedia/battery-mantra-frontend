@@ -62,11 +62,11 @@ const searchSchema = z.object({
   autoBuy: z.enum(["true", "false"]).optional().catch(undefined),
 });
 
-export const Route = createFileRoute("/products/$id")({
+export const Route = createFileRoute("/product/$slug")({
   validateSearch: searchSchema,
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(productDetailQuery(params.id));
+      return await context.queryClient.ensureQueryData(productDetailQuery(params.slug));
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) throw notFound();
       throw e;
@@ -143,9 +143,9 @@ export const Route = createFileRoute("/products/$id")({
   ),
 });
 
-function PdpPage() {
-  const { id } = Route.useParams();
-  const { data } = useSuspenseQuery(productDetailQuery(id));
+export function PdpPage() {
+  const { slug } = Route.useParams();
+  const { data } = useSuspenseQuery(productDetailQuery(slug));
   const { status } = useAuth();
   const navigate = useNavigate({ from: Route.fullPath });
   const qc = useQueryClient();
@@ -247,7 +247,7 @@ function PdpPage() {
     if (blockPurchase) return;
     if (status !== "authenticated") {
       toast.info("Please sign in to add items to your cart.");
-      navigate({ to: "/login", search: { redirect: `/products/${id}?autoAdd=true` } });
+      navigate({ to: "/login", search: { redirect: `/product/${slug}?autoAdd=true` } });
       return;
     }
     addToCart.mutate();
@@ -256,7 +256,7 @@ function PdpPage() {
   const onBuyNow = () => {
     if (blockPurchase) return;
     if (status !== "authenticated") {
-      navigate({ to: "/login", search: { redirect: `/products/${id}?autoBuy=true` } });
+      navigate({ to: "/login", search: { redirect: `/product/${slug}?autoBuy=true` } });
       return;
     }
     addToCart.mutate(undefined, {
@@ -368,7 +368,7 @@ function PdpPage() {
     : 0;
 
   // Generate consistent mock rating & sales data based on product name/id
-  const charCodeSum = (data.productName || id || "").split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+  const charCodeSum = (data.productName || data.productId || "").split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
   const mockRating = (4.4 + (charCodeSum % 5) * 0.1).toFixed(1); // e.g., 4.4 to 4.8
   const mockSold = 150 + (charCodeSum % 250); // e.g., 150 to 399+ sold
 
@@ -1000,7 +1000,7 @@ function PdpPage() {
                 {displayVehicles.map((v) => (
                   <Link 
                     key={v.vehicleId} 
-                    to="/batteries-for/$categorySlug/$makeSlug/$modelSlug"
+                    to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
                       makeSlug: toSlug(v.make),
@@ -1064,7 +1064,7 @@ function PdpPage() {
         context={seoContext} 
       />
 
-      <RelatedProducts currentProductId={id} currentProduct={data} />
+      <RelatedProducts currentProductId={data.productId} currentProduct={data} />
       <Container size="xl" className="pb-8">
         <SeoCityLinks productName={data.productName} />
       </Container>

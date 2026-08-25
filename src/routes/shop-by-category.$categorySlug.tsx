@@ -13,7 +13,7 @@ import { useLocationStore } from "@/store/useLocationStore";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
-export const Route = createFileRoute("/categories/$categorySlug")({
+export const Route = createFileRoute("/shop-by-category/$categorySlug")({
   loader: async ({ context, params }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     try {

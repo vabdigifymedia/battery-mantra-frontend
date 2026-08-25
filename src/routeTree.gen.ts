@@ -24,13 +24,14 @@ import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ProductsIdRouteImport } from './routes/products.$id'
+import { Route as ShopByCategoryCategorySlugRouteImport } from './routes/shop-by-category.$categorySlug'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as PartnerLoginRouteImport } from './routes/partner_.login'
 import { Route as PartnerProductsRouteImport } from './routes/partner.products'
 import { Route as PartnerOrdersRouteImport } from './routes/partner.orders'
 import { Route as PartnerEngineersRouteImport } from './routes/partner.engineers'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
-import { Route as CategoriesCategorySlugRouteImport } from './routes/categories.$categorySlug'
+import { Route as BrandBrandSlugRouteImport } from './routes/brand.$brandSlug'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -57,9 +58,8 @@ import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.inde
 import { Route as AdminFaqsIndexRouteImport } from './routes/admin.faqs.index'
 import { Route as AdminEngineersIndexRouteImport } from './routes/admin.engineers.index'
 import { Route as ShopCCategorySlugRouteImport } from './routes/shop.c.$categorySlug'
-import { Route as ShopBBrandSlugRouteImport } from './routes/shop.b.$brandSlug'
-import { Route as ShopCategorySlugBrandSlugRouteImport } from './routes/shop.$categorySlug.$brandSlug'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
+import { Route as ManufacturersBrandSlugCategorySlugRouteImport } from './routes/manufacturers.$brandSlug.$categorySlug'
 import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminPartnersNewRouteImport } from './routes/admin.partners.new'
@@ -67,7 +67,7 @@ import { Route as AdminPagesNewRouteImport } from './routes/admin.pages.new'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
 import { Route as AdminFaqsNewRouteImport } from './routes/admin.faqs.new'
 import { Route as AdminEngineersNewRouteImport } from './routes/admin.engineers.new'
-import { Route as BatteriesForCategorySlugMakeSlugModelSlugRouteImport } from './routes/batteries-for.$categorySlug.$makeSlug.$modelSlug'
+import { Route as ManufacturerProductsCategorySlugMakeSlugModelSlugRouteImport } from './routes/manufacturer-products.$categorySlug.$makeSlug.$modelSlug'
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
 import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
@@ -152,9 +152,15 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const ProductsIdRoute = ProductsIdRouteImport.update({
-  id: '/products/$id',
-  path: '/products/$id',
+const ShopByCategoryCategorySlugRoute =
+  ShopByCategoryCategorySlugRouteImport.update({
+    id: '/shop-by-category/$categorySlug',
+    path: '/shop-by-category/$categorySlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerLoginRoute = PartnerLoginRouteImport.update({
@@ -182,9 +188,9 @@ const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
   path: '/orders/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoriesCategorySlugRoute = CategoriesCategorySlugRouteImport.update({
-  id: '/categories/$categorySlug',
-  path: '/categories/$categorySlug',
+const BrandBrandSlugRoute = BrandBrandSlugRouteImport.update({
+  id: '/brand/$brandSlug',
+  path: '/brand/$brandSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -318,21 +324,16 @@ const ShopCCategorySlugRoute = ShopCCategorySlugRouteImport.update({
   path: '/shop/c/$categorySlug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopBBrandSlugRoute = ShopBBrandSlugRouteImport.update({
-  id: '/shop/b/$brandSlug',
-  path: '/shop/b/$brandSlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopCategorySlugBrandSlugRoute =
-  ShopCategorySlugBrandSlugRouteImport.update({
-    id: '/shop/$categorySlug/$brandSlug',
-    path: '/shop/$categorySlug/$brandSlug',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ManufacturersCategorySlugMakeSlugRoute =
   ManufacturersCategorySlugMakeSlugRouteImport.update({
     id: '/manufacturers/$categorySlug/$makeSlug',
     path: '/manufacturers/$categorySlug/$makeSlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ManufacturersBrandSlugCategorySlugRoute =
+  ManufacturersBrandSlugCategorySlugRouteImport.update({
+    id: '/manufacturers/$brandSlug/$categorySlug',
+    path: '/manufacturers/$brandSlug/$categorySlug',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminSeoPagesRoute = AdminSeoPagesRouteImport.update({
@@ -370,10 +371,10 @@ const AdminEngineersNewRoute = AdminEngineersNewRouteImport.update({
   path: '/engineers/new',
   getParentRoute: () => AdminRoute,
 } as any)
-const BatteriesForCategorySlugMakeSlugModelSlugRoute =
-  BatteriesForCategorySlugMakeSlugModelSlugRouteImport.update({
-    id: '/batteries-for/$categorySlug/$makeSlug/$modelSlug',
-    path: '/batteries-for/$categorySlug/$makeSlug/$modelSlug',
+const ManufacturerProductsCategorySlugMakeSlugModelSlugRoute =
+  ManufacturerProductsCategorySlugMakeSlugModelSlugRouteImport.update({
+    id: '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug',
+    path: '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminSeoQuickProductsRoute = AdminSeoQuickProductsRouteImport.update({
@@ -452,13 +453,14 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
-  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
+  '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
-  '/products/$id': typeof ProductsIdRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/orders/': typeof OrdersIndexRoute
@@ -471,9 +473,8 @@ export interface FileRoutesByFullPath {
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
+  '/manufacturers/$brandSlug/$categorySlug': typeof ManufacturersBrandSlugCategorySlugRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
-  '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
-  '/shop/b/$brandSlug': typeof ShopBBrandSlugRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugRoute
   '/admin/engineers/': typeof AdminEngineersIndexRoute
   '/admin/faqs/': typeof AdminFaqsIndexRoute
@@ -491,7 +492,7 @@ export interface FileRoutesByFullPath {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
-  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
+  '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -519,13 +520,14 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
-  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
+  '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
-  '/products/$id': typeof ProductsIdRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin': typeof AdminIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/orders': typeof OrdersIndexRoute
@@ -538,9 +540,8 @@ export interface FileRoutesByTo {
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
+  '/manufacturers/$brandSlug/$categorySlug': typeof ManufacturersBrandSlugCategorySlugRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
-  '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
-  '/shop/b/$brandSlug': typeof ShopBBrandSlugRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugRoute
   '/admin/engineers': typeof AdminEngineersIndexRoute
   '/admin/faqs': typeof AdminFaqsIndexRoute
@@ -558,7 +559,7 @@ export interface FileRoutesByTo {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
-  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
+  '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -590,13 +591,14 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin_/login': typeof AdminLoginRoute
-  '/categories/$categorySlug': typeof CategoriesCategorySlugRoute
+  '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner_/login': typeof PartnerLoginRoute
-  '/products/$id': typeof ProductsIdRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/orders/': typeof OrdersIndexRoute
@@ -609,9 +611,8 @@ export interface FileRoutesById {
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
+  '/manufacturers/$brandSlug/$categorySlug': typeof ManufacturersBrandSlugCategorySlugRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
-  '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
-  '/shop/b/$brandSlug': typeof ShopBBrandSlugRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugRoute
   '/admin/engineers/': typeof AdminEngineersIndexRoute
   '/admin/faqs/': typeof AdminFaqsIndexRoute
@@ -629,7 +630,7 @@ export interface FileRoutesById {
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
-  '/batteries-for/$categorySlug/$makeSlug/$modelSlug': typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
+  '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -661,13 +662,14 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
-    | '/categories/$categorySlug'
+    | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
     | '/partner/products'
     | '/partner/login'
-    | '/products/$id'
+    | '/product/$slug'
+    | '/shop-by-category/$categorySlug'
     | '/admin/'
     | '/categories/'
     | '/orders/'
@@ -680,9 +682,8 @@ export interface FileRouteTypes {
     | '/admin/partners/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
+    | '/manufacturers/$brandSlug/$categorySlug'
     | '/manufacturers/$categorySlug/$makeSlug'
-    | '/shop/$categorySlug/$brandSlug'
-    | '/shop/b/$brandSlug'
     | '/shop/c/$categorySlug'
     | '/admin/engineers/'
     | '/admin/faqs/'
@@ -700,7 +701,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
-    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+    | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -728,13 +729,14 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
-    | '/categories/$categorySlug'
+    | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
     | '/partner/products'
     | '/partner/login'
-    | '/products/$id'
+    | '/product/$slug'
+    | '/shop-by-category/$categorySlug'
     | '/admin'
     | '/categories'
     | '/orders'
@@ -747,9 +749,8 @@ export interface FileRouteTypes {
     | '/admin/partners/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
+    | '/manufacturers/$brandSlug/$categorySlug'
     | '/manufacturers/$categorySlug/$makeSlug'
-    | '/shop/$categorySlug/$brandSlug'
-    | '/shop/b/$brandSlug'
     | '/shop/c/$categorySlug'
     | '/admin/engineers'
     | '/admin/faqs'
@@ -767,7 +768,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
-    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+    | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
   id:
     | '__root__'
     | '/'
@@ -798,13 +799,14 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin_/login'
-    | '/categories/$categorySlug'
+    | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
     | '/partner/orders'
     | '/partner/products'
     | '/partner_/login'
-    | '/products/$id'
+    | '/product/$slug'
+    | '/shop-by-category/$categorySlug'
     | '/admin/'
     | '/categories/'
     | '/orders/'
@@ -817,9 +819,8 @@ export interface FileRouteTypes {
     | '/admin/partners/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
+    | '/manufacturers/$brandSlug/$categorySlug'
     | '/manufacturers/$categorySlug/$makeSlug'
-    | '/shop/$categorySlug/$brandSlug'
-    | '/shop/b/$brandSlug'
     | '/shop/c/$categorySlug'
     | '/admin/engineers/'
     | '/admin/faqs/'
@@ -837,7 +838,7 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/categories'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
-    | '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
+    | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -852,19 +853,19 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRouteWithChildren
   VehicleFinderRoute: typeof VehicleFinderRoute
   AdminLoginRoute: typeof AdminLoginRoute
-  CategoriesCategorySlugRoute: typeof CategoriesCategorySlugRoute
+  BrandBrandSlugRoute: typeof BrandBrandSlugRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
-  ProductsIdRoute: typeof ProductsIdRoute
+  ProductSlugRoute: typeof ProductSlugRoute
+  ShopByCategoryCategorySlugRoute: typeof ShopByCategoryCategorySlugRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  ManufacturersBrandSlugCategorySlugRoute: typeof ManufacturersBrandSlugCategorySlugRoute
   ManufacturersCategorySlugMakeSlugRoute: typeof ManufacturersCategorySlugMakeSlugRoute
-  ShopCategorySlugBrandSlugRoute: typeof ShopCategorySlugBrandSlugRoute
-  ShopBBrandSlugRoute: typeof ShopBBrandSlugRoute
   ShopCCategorySlugRoute: typeof ShopCCategorySlugRoute
   ManufacturersCategorySlugIndexRoute: typeof ManufacturersCategorySlugIndexRoute
-  BatteriesForCategorySlugMakeSlugModelSlugRoute: typeof BatteriesForCategorySlugMakeSlugModelSlugRoute
+  ManufacturerProductsCategorySlugMakeSlugModelSlugRoute: typeof ManufacturerProductsCategorySlugMakeSlugModelSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -974,11 +975,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/products/$id': {
-      id: '/products/$id'
-      path: '/products/$id'
-      fullPath: '/products/$id'
-      preLoaderRoute: typeof ProductsIdRouteImport
+    '/shop-by-category/$categorySlug': {
+      id: '/shop-by-category/$categorySlug'
+      path: '/shop-by-category/$categorySlug'
+      fullPath: '/shop-by-category/$categorySlug'
+      preLoaderRoute: typeof ShopByCategoryCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner_/login': {
@@ -1016,11 +1024,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories/$categorySlug': {
-      id: '/categories/$categorySlug'
-      path: '/categories/$categorySlug'
-      fullPath: '/categories/$categorySlug'
-      preLoaderRoute: typeof CategoriesCategorySlugRouteImport
+    '/brand/$brandSlug': {
+      id: '/brand/$brandSlug'
+      path: '/brand/$brandSlug'
+      fullPath: '/brand/$brandSlug'
+      preLoaderRoute: typeof BrandBrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/login': {
@@ -1205,25 +1213,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopCCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop/b/$brandSlug': {
-      id: '/shop/b/$brandSlug'
-      path: '/shop/b/$brandSlug'
-      fullPath: '/shop/b/$brandSlug'
-      preLoaderRoute: typeof ShopBBrandSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop/$categorySlug/$brandSlug': {
-      id: '/shop/$categorySlug/$brandSlug'
-      path: '/shop/$categorySlug/$brandSlug'
-      fullPath: '/shop/$categorySlug/$brandSlug'
-      preLoaderRoute: typeof ShopCategorySlugBrandSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/manufacturers/$categorySlug/$makeSlug': {
       id: '/manufacturers/$categorySlug/$makeSlug'
       path: '/manufacturers/$categorySlug/$makeSlug'
       fullPath: '/manufacturers/$categorySlug/$makeSlug'
       preLoaderRoute: typeof ManufacturersCategorySlugMakeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manufacturers/$brandSlug/$categorySlug': {
+      id: '/manufacturers/$brandSlug/$categorySlug'
+      path: '/manufacturers/$brandSlug/$categorySlug'
+      fullPath: '/manufacturers/$brandSlug/$categorySlug'
+      preLoaderRoute: typeof ManufacturersBrandSlugCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/seo/pages': {
@@ -1275,11 +1276,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEngineersNewRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/batteries-for/$categorySlug/$makeSlug/$modelSlug': {
-      id: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
-      path: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
-      fullPath: '/batteries-for/$categorySlug/$makeSlug/$modelSlug'
-      preLoaderRoute: typeof BatteriesForCategorySlugMakeSlugModelSlugRouteImport
+    '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug': {
+      id: '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
+      path: '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
+      fullPath: '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug'
+      preLoaderRoute: typeof ManufacturerProductsCategorySlugMakeSlugModelSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/seo/quick/products': {
@@ -1473,21 +1474,22 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRouteWithChildren,
   VehicleFinderRoute: VehicleFinderRoute,
   AdminLoginRoute: AdminLoginRoute,
-  CategoriesCategorySlugRoute: CategoriesCategorySlugRoute,
+  BrandBrandSlugRoute: BrandBrandSlugRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PartnerLoginRoute: PartnerLoginRoute,
-  ProductsIdRoute: ProductsIdRoute,
+  ProductSlugRoute: ProductSlugRoute,
+  ShopByCategoryCategorySlugRoute: ShopByCategoryCategorySlugRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  ManufacturersBrandSlugCategorySlugRoute:
+    ManufacturersBrandSlugCategorySlugRoute,
   ManufacturersCategorySlugMakeSlugRoute:
     ManufacturersCategorySlugMakeSlugRoute,
-  ShopCategorySlugBrandSlugRoute: ShopCategorySlugBrandSlugRoute,
-  ShopBBrandSlugRoute: ShopBBrandSlugRoute,
   ShopCCategorySlugRoute: ShopCCategorySlugRoute,
   ManufacturersCategorySlugIndexRoute: ManufacturersCategorySlugIndexRoute,
-  BatteriesForCategorySlugMakeSlugModelSlugRoute:
-    BatteriesForCategorySlugMakeSlugModelSlugRoute,
+  ManufacturerProductsCategorySlugMakeSlugModelSlugRoute:
+    ManufacturerProductsCategorySlugMakeSlugModelSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

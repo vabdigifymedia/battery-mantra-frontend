@@ -189,8 +189,8 @@ function OrderDetailPage() {
                 <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
                   <div className="min-w-0">
                     <Link
-                      to="/products/$id"
-                      params={{ id: (it as any).productSeoSlug || it.productId }}
+                      to="/product/$slug"
+                      params={{ slug: (it as any).productSeoSlug || it.productId }}
                       className="line-clamp-2 text-sm font-semibold hover:text-primary"
                     >
                       {it.productName}
