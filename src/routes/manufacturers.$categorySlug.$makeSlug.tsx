@@ -91,7 +91,7 @@ function ManufacturerPage() {
             {filteredModels?.map(model => (
               <Link
                 key={model.vehicleId}
-                to="/batteries-for/$categorySlug/$makeSlug/$modelSlug"
+                to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                 params={{ categorySlug, makeSlug, modelSlug: toSlug(model.model) }}
                 className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
               >
