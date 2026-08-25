@@ -18,7 +18,7 @@ export function generateSlug(text: string): string {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
-export const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
+export const toSlug = (text?: string) => text ? text.toLowerCase().trim().replace(/\s+/g, "-") : "";
 
 export function applySeoTemplate(template: string, context: Record<string, string>): string {
   if (!template) return "";

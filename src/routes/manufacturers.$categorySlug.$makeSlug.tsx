@@ -10,7 +10,7 @@ import { applySeoTemplate } from "@/lib/utils";
 import { BannerLayout } from "@/components/products/DynamicSearchBanner";
 
 // Helper to format string to slug
-const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
+const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
 
 import { buildPageHead } from "@/lib/seo";
 
@@ -52,7 +52,8 @@ function ManufacturerPage() {
 
   const filteredModels = models?.filter(model => {
     if (!targetVehicleType) return true;
-    return model.vehicleType === targetVehicleType;
+    if (!model.vehicleType) return true; // Include models with missing vehicleType
+    return model.vehicleType.toUpperCase() === targetVehicleType;
   });
 
   return (
