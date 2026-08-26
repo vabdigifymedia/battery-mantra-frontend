@@ -89,7 +89,7 @@ function AdminCapacities() {
   const addMutation = useMutation({
     mutationFn: (data: CreateCapacityRequest) => adminService.createCapacity(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["capacities"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "capacities"] });
       toast.success("Capacity created successfully");
       closeModal();
     },
@@ -99,7 +99,7 @@ function AdminCapacities() {
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CreateCapacityRequest }) => adminService.updateCapacity(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["capacities"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "capacities"] });
       toast.success("Capacity updated successfully");
       closeModal();
     },
@@ -109,7 +109,7 @@ function AdminCapacities() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteCapacity(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["capacities"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "capacities"] });
       toast.success("Capacity deleted successfully");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete capacity"),
