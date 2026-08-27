@@ -708,3 +708,29 @@ export type SpecAttributeDto = {
   attributeName: string;
   availableUnits: SpecUnitDto[];
 };
+
+/* ---------- Engineer Leaves ---------- */
+export type LeaveStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export type LeaveRequestResponse = {
+  id: UUID;
+  engineer: {
+    id: UUID;
+    firstName: string;
+    lastName: string;
+    user?: {
+      username?: string;
+      email?: string;
+      phoneNumber?: string;
+    };
+  };
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: LeaveStatus;
+  appliedAt: string;
+};
+
+export type UpdateLeaveStatusRequest = {
+  status: LeaveStatus;
+};

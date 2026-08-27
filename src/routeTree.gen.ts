@@ -38,6 +38,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSpecificationsRouteImport } from './routes/admin.specifications'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
+import { Route as AdminLeavesRouteImport } from './routes/admin.leaves'
 import { Route as AdminFuelsRouteImport } from './routes/admin.fuels'
 import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
 import { Route as AdminDeliveryTimeRouteImport } from './routes/admin.delivery-time'
@@ -61,6 +62,7 @@ import { Route as ShopCCategorySlugRouteImport } from './routes/shop.c.$category
 import { Route as ShopCategorySlugBrandSlugRouteImport } from './routes/shop.$categorySlug.$brandSlug'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
 import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
+import { Route as AdminProductsPriorityRouteImport } from './routes/admin.products.priority'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminPartnersNewRouteImport } from './routes/admin.partners.new'
 import { Route as AdminPagesNewRouteImport } from './routes/admin.pages.new'
@@ -224,6 +226,11 @@ const AdminLocationsRoute = AdminLocationsRouteImport.update({
   path: '/locations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeavesRoute = AdminLeavesRouteImport.update({
+  id: '/leaves',
+  path: '/leaves',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFuelsRoute = AdminFuelsRouteImport.update({
   id: '/fuels',
   path: '/fuels',
@@ -342,6 +349,11 @@ const AdminSeoPagesRoute = AdminSeoPagesRouteImport.update({
   path: '/seo/pages',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProductsPriorityRoute = AdminProductsPriorityRouteImport.update({
+  id: '/products/priority',
+  path: '/products/priority',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   id: '/products/new',
   path: '/products/new',
@@ -454,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
+  '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
@@ -479,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/products/priority': typeof AdminProductsPriorityRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRouteWithChildren
   '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
@@ -522,6 +536,7 @@ export interface FileRoutesByTo {
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
+  '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
@@ -547,6 +562,7 @@ export interface FileRoutesByTo {
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/products/priority': typeof AdminProductsPriorityRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugRoute
@@ -593,6 +609,7 @@ export interface FileRoutesById {
   '/admin/delivery-time': typeof AdminDeliveryTimeRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/fuels': typeof AdminFuelsRoute
+  '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
@@ -618,6 +635,7 @@ export interface FileRoutesById {
   '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/partners/new': typeof AdminPartnersNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/products/priority': typeof AdminProductsPriorityRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRouteWithChildren
   '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugRoute
@@ -665,6 +683,7 @@ export interface FileRouteTypes {
     | '/admin/delivery-time'
     | '/admin/enquiries'
     | '/admin/fuels'
+    | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/specifications'
@@ -690,6 +709,7 @@ export interface FileRouteTypes {
     | '/admin/pages/new'
     | '/admin/partners/new'
     | '/admin/products/new'
+    | '/admin/products/priority'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/shop/$categorySlug/$brandSlug'
@@ -733,6 +753,7 @@ export interface FileRouteTypes {
     | '/admin/delivery-time'
     | '/admin/enquiries'
     | '/admin/fuels'
+    | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/specifications'
@@ -758,6 +779,7 @@ export interface FileRouteTypes {
     | '/admin/pages/new'
     | '/admin/partners/new'
     | '/admin/products/new'
+    | '/admin/products/priority'
     | '/admin/seo/pages'
     | '/shop/$categorySlug/$brandSlug'
     | '/shop/c/$categorySlug'
@@ -803,6 +825,7 @@ export interface FileRouteTypes {
     | '/admin/delivery-time'
     | '/admin/enquiries'
     | '/admin/fuels'
+    | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/specifications'
@@ -828,6 +851,7 @@ export interface FileRouteTypes {
     | '/admin/pages/new'
     | '/admin/partners/new'
     | '/admin/products/new'
+    | '/admin/products/priority'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/shop/$categorySlug/$brandSlug'
@@ -1084,6 +1108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLocationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/leaves': {
+      id: '/admin/leaves'
+      path: '/leaves'
+      fullPath: '/admin/leaves'
+      preLoaderRoute: typeof AdminLeavesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/fuels': {
       id: '/admin/fuels'
       path: '/fuels'
@@ -1245,6 +1276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoPagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/products/priority': {
+      id: '/admin/products/priority'
+      path: '/products/priority'
+      fullPath: '/admin/products/priority'
+      preLoaderRoute: typeof AdminProductsPriorityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/products/new': {
       id: '/admin/products/new'
       path: '/products/new'
@@ -1390,6 +1428,7 @@ interface AdminRouteChildren {
   AdminDeliveryTimeRoute: typeof AdminDeliveryTimeRoute
   AdminEnquiriesRoute: typeof AdminEnquiriesRoute
   AdminFuelsRoute: typeof AdminFuelsRoute
+  AdminLeavesRoute: typeof AdminLeavesRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
   AdminSpecificationsRoute: typeof AdminSpecificationsRoute
@@ -1402,6 +1441,7 @@ interface AdminRouteChildren {
   AdminPagesNewRoute: typeof AdminPagesNewRoute
   AdminPartnersNewRoute: typeof AdminPartnersNewRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
+  AdminProductsPriorityRoute: typeof AdminProductsPriorityRoute
   AdminSeoPagesRoute: typeof AdminSeoPagesRoute
   AdminEngineersIndexRoute: typeof AdminEngineersIndexRoute
   AdminFaqsIndexRoute: typeof AdminFaqsIndexRoute
@@ -1431,6 +1471,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDeliveryTimeRoute: AdminDeliveryTimeRoute,
   AdminEnquiriesRoute: AdminEnquiriesRoute,
   AdminFuelsRoute: AdminFuelsRoute,
+  AdminLeavesRoute: AdminLeavesRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
   AdminSpecificationsRoute: AdminSpecificationsRoute,
@@ -1443,6 +1484,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPagesNewRoute: AdminPagesNewRoute,
   AdminPartnersNewRoute: AdminPartnersNewRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
+  AdminProductsPriorityRoute: AdminProductsPriorityRoute,
   AdminSeoPagesRoute: AdminSeoPagesRoute,
   AdminEngineersIndexRoute: AdminEngineersIndexRoute,
   AdminFaqsIndexRoute: AdminFaqsIndexRoute,

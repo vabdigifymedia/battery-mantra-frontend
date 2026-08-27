@@ -30,6 +30,8 @@ import type {
   CategorySpecTemplateResponse,
   CategoryReorderRequest,
   ProductReorderRequest,
+  LeaveRequestResponse,
+  UpdateLeaveStatusRequest,
 } from "@/types/dto";
 
 export interface AdminCreateCustomerRequest {
@@ -166,8 +168,14 @@ export const adminService = {
   // Enquiries
   getAllEnquiries: (type?: string) =>
     apiFetch<EnquiryResponse[]>(endpoints.admin.enquiries.list(type), { method: "GET" }),
-updateEnquiryStatus: (id: string, body: UpdateEnquiryStatusRequest) =>
+  updateEnquiryStatus: (id: string, body: UpdateEnquiryStatusRequest) =>
     apiFetch<EnquiryResponse>(endpoints.admin.enquiries.updateStatus(id), { method: "PATCH", body }),
+
+  // Leaves
+  getAllLeaveRequests: () =>
+    apiFetch<LeaveRequestResponse[]>("/api/admin/leaves", { method: "GET" }),
+  updateLeaveStatus: (id: string, body: UpdateLeaveStatusRequest) =>
+    apiFetch<LeaveRequestResponse>(`/api/admin/leaves/${id}/status`, { method: "PUT", body }),
 
   getCategorySpecTemplate: (categoryId: string) =>
     apiFetch<CategorySpecTemplateResponse>(`/api/admin/specs/template/category/${categoryId}`, { method: "GET" }),
