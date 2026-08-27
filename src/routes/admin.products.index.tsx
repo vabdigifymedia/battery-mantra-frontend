@@ -6,8 +6,9 @@ import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, CheckCircle, Clock } from "lucide-react";
+import { Trash2, Plus, Edit, CheckCircle, Clock, Search } from "lucide-react";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
@@ -39,6 +40,7 @@ function AdminProducts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeBrand, setActiveBrand] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
   const PAGE_SIZE = 15;
 
   const categoryFilteredProducts = activeCategory === "ALL"
@@ -47,9 +49,17 @@ function AdminProducts() {
 
   const availableBrands = Array.from(new Set(categoryFilteredProducts?.map(p => p.brandName).filter(Boolean) as string[])).sort();
 
-  const filteredProducts = activeBrand === "ALL"
+  const brandFilteredProducts = activeBrand === "ALL"
     ? categoryFilteredProducts
     : categoryFilteredProducts?.filter(p => p.brandName === activeBrand);
+
+  const filteredProducts = searchQuery.trim() === ""
+    ? brandFilteredProducts
+    : brandFilteredProducts?.filter(p => 
+        p.productName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (p.capacity && p.capacity.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.brandName && p.brandName.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
 
   const totalPages = Math.ceil((filteredProducts?.length || 0) / PAGE_SIZE);
   const paginatedProducts = filteredProducts?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -80,7 +90,20 @@ function AdminProducts() {
           <p className="text-muted-foreground">Manage your product catalog.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="pl-8 h-9 w-[200px] lg:w-[300px]"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+          <Button asChild size="sm" className="h-9">
             <Link to="/admin/products/new">
               <Plus className="mr-2 h-4 w-4" /> Add Product
             </Link>
@@ -195,7 +218,7 @@ function AdminProducts() {
                       </Button>
                     )}
                     <Button asChild variant="ghost" size="icon">
-                      <Link to={`/admin/products/${product.productId}/edit`}>
+                      <Link to="/admin/products/$productId/edit" params={{ productId: product.productId }}>
                         <Edit className="h-4 w-4" />
                       </Link>
                     </Button>
@@ -264,7 +287,7 @@ function AdminProducts() {
               </div>
               <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t">
                 <Button asChild variant="outline" size="sm" className="h-8 text-xs">
-                  <Link to={`/admin/products/${product.productId}/edit`}>
+                  <Link to="/admin/products/$productId/edit" params={{ productId: product.productId }}>
                     <Edit className="h-3.5 w-3.5 mr-1.5" /> Edit
                   </Link>
                 </Button>
