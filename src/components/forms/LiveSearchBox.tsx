@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, Search, ArrowRight, Layers, Bookmark, Factory } from "lucide-react";
+import { Loader2, Search, ArrowRight, Layers, Bookmark, Factory, Car } from "lucide-react";
 import { SearchBox } from "./SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
-import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery } from "@/queries";
+import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery, vehiclesListQuery } from "@/queries";
 import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +32,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
   const { data: categories } = useQuery(rootCategoriesQuery());
   const { data: brands } = useQuery(brandsQuery());
   const { data: manufacturers } = useQuery(manufacturersListQuery());
+  const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const products = data?.content || [];
   const q = debouncedQuery.toLowerCase();
@@ -39,10 +40,26 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
   const matchedCategories = q.length > 1 ? categories?.filter((c: any) => c.categoryName.toLowerCase().includes(q)).slice(0, 2) || [] : [];
   const matchedBrands = q.length > 1 ? brands?.filter((b: any) => b.brandName.toLowerCase().includes(q)).slice(0, 3) || [] : [];
   const matchedManufacturers = q.length > 1 ? manufacturers?.filter((m: any) => m.name.toLowerCase().includes(q)).slice(0, 3) || [] : [];
+  const matchedVehicles = q.length > 1 ? vehicles?.filter((v: any) => {
+    const fullName = `${v.make} ${v.model} ${v.fuelName || ''}`.toLowerCase();
+    return fullName.includes(q);
+  }).slice(0, 4) || [] : [];
 
-  const hasResults = products.length > 0 || matchedCategories.length > 0 || matchedBrands.length > 0 || matchedManufacturers.length > 0;
+  const hasResults = products.length > 0 || matchedCategories.length > 0 || matchedBrands.length > 0 || matchedManufacturers.length > 0 || matchedVehicles.length > 0;
   
   const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
+
+  const getVehicleCategorySlug = (categoryId?: string) => {
+    if (!categoryId || !categories) return "car-battery";
+    for (const cat of categories) {
+      if (cat.categoryId === categoryId) return toSlug(cat.categoryName);
+      if (cat.subCategories) {
+        const sub = cat.subCategories.find((s: any) => s.categoryId === categoryId);
+        if (sub) return toSlug(sub.categoryName);
+      }
+    }
+    return "car-battery";
+  };
 
   useEffect(() => {
     if (value.length > 1) {
@@ -143,7 +160,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedBrands.map((brand: any) => (
                     <Link
                       key={brand.brandId}
-                      to="/shop/b/$brandSlug"
+                      to="/brand/$brandSlug"
                       params={{ brandSlug: toSlug(brand.brandName) }}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
@@ -179,6 +196,34 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       </Link>
                     );
                   })}
+                </div>
+              )}
+
+              {matchedVehicles.length > 0 && (
+                <div className="border-b">
+                  <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
+                    <Car className="h-3 w-3 mr-1" /> Vehicles
+                  </div>
+                  {matchedVehicles.map((v: any) => (
+                    <Link
+                      key={v.vehicleId}
+                      to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
+                      params={{ 
+                        categorySlug: getVehicleCategorySlug(v.categoryId), 
+                        makeSlug: toSlug(v.make), 
+                        modelSlug: toSlug(v.model) 
+                      }}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
+                    >
+                      <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
+                        {v.imageUrl ? <img src={v.imageUrl} alt={`${v.make} ${v.model}`} className="h-full w-full object-contain" /> : <Car className="h-4 w-4 text-muted-foreground/50" />}
+                      </div>
+                      <span className="text-sm font-medium text-foreground">
+                        {v.make} {v.model} {v.fuelName ? <span className="text-muted-foreground text-xs ml-1">({v.fuelName})</span> : null}
+                      </span>
+                    </Link>
+                  ))}
                 </div>
               )}
 
