@@ -30,13 +30,21 @@ type Props = {
 export function VehicleStepper({ value, onChange, compact, showSearch = false }: Props) {
   const vehicles = useQuery(vehiclesListQuery());
 
-  const types = Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).sort();
-  const makesForType = value.vehicleType
-    ? Array.from(new Set((vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType).map((v) => v.make))).sort()
-    : [];
-  const modelsForMake = value.vehicleType && value.make
-    ? (vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType && v.make === value.make)
-    : [];
+  const types = useMemo(() => {
+    return Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).sort();
+  }, [vehicles.data]);
+
+  const makesForType = useMemo(() => {
+    return value.vehicleType
+      ? Array.from(new Set((vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType).map((v) => v.make))).sort()
+      : [];
+  }, [vehicles.data, value.vehicleType]);
+
+  const modelsForMake = useMemo(() => {
+    return value.vehicleType && value.make
+      ? (vehicles.data ?? []).filter((v) => (v.vehicleType || "CAR") === value.vehicleType && v.make === value.make)
+      : [];
+  }, [vehicles.data, value.vehicleType, value.make]);
 
   const formatType = (type: string) => {
     switch (type) {

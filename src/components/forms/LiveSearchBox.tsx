@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, KeyboardEvent, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Loader2, Search, ArrowRight, Layers, Bookmark, Factory, Car } from "lucide-react";
@@ -37,13 +37,25 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
   const products = data?.content || [];
   const q = debouncedQuery.toLowerCase();
   
-  const matchedCategories = q.length > 1 ? categories?.filter((c: any) => c.categoryName.toLowerCase().includes(q)).slice(0, 2) || [] : [];
-  const matchedBrands = q.length > 1 ? brands?.filter((b: any) => b.brandName.toLowerCase().includes(q)).slice(0, 3) || [] : [];
-  const matchedManufacturers = q.length > 1 ? manufacturers?.filter((m: any) => m.name.toLowerCase().includes(q)).slice(0, 3) || [] : [];
-  const matchedVehicles = q.length > 1 ? vehicles?.filter((v: any) => {
-    const fullName = `${v.make} ${v.model} ${v.fuelName || ''}`.toLowerCase();
-    return fullName.includes(q);
-  }).slice(0, 4) || [] : [];
+  const matchedCategories = useMemo(() => {
+    return q.length > 1 && categories ? categories.filter((c: any) => c.categoryName.toLowerCase().includes(q)).slice(0, 2) : [];
+  }, [q, categories]);
+
+  const matchedBrands = useMemo(() => {
+    return q.length > 1 && brands ? brands.filter((b: any) => b.brandName.toLowerCase().includes(q)).slice(0, 3) : [];
+  }, [q, brands]);
+
+  const matchedManufacturers = useMemo(() => {
+    return q.length > 1 && manufacturers ? manufacturers.filter((m: any) => m.name.toLowerCase().includes(q)).slice(0, 3) : [];
+  }, [q, manufacturers]);
+
+  const matchedVehicles = useMemo(() => {
+    if (q.length <= 1 || !vehicles) return [];
+    return vehicles.filter((v: any) => {
+      const fullName = `${v.make} ${v.model} ${v.fuelName || ''}`.toLowerCase();
+      return fullName.includes(q);
+    }).slice(0, 4);
+  }, [q, vehicles]);
 
   const hasResults = products.length > 0 || matchedCategories.length > 0 || matchedBrands.length > 0 || matchedManufacturers.length > 0 || matchedVehicles.length > 0;
   
