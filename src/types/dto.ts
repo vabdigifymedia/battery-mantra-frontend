@@ -164,6 +164,11 @@ export type CreateCategoryRequest = {
 };
 export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;
 
+export type CategoryReorderRequest = {
+  categoryId: UUID;
+  displayOrder: number;
+};
+
 /* ---------- Products ---------- */
 export type ProductListResponse = {
   productId: UUID;
@@ -176,6 +181,7 @@ export type ProductListResponse = {
   additionalImages?: string[];
   productCategory?: string;
   capacity?: string;
+  displayOrder?: number;
   isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
   createdByPartnerId?: UUID;
@@ -430,10 +436,16 @@ export type CreateProductRequest = {
   compatibleVehicleIds?: string[];
   specs?: Record<string, unknown>;
   capacity?: string;
+  displayOrder?: number;
   cityPrices?: CityPricingDto[];
 };
 
 export type UpdateProductRequest = Partial<CreateProductRequest>;
+
+export type ProductReorderRequest = {
+  productId: UUID;
+  displayOrder: number;
+};
 
 export type OrderStatusUpdateRequest = {
   orderStatus: OrderStatus;

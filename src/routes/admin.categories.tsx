@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Layers, CornerDownRight } from "lucide-react";
+import { Trash2, Plus, Edit, Layers, CornerDownRight, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import { generateSlug, applySeoTemplate } from "@/lib/utils";
@@ -34,6 +34,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { CategoryReorderModal } from "@/components/admin/CategoryReorderModal";
 import type { CategoryListResponse, CreateCategoryRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
@@ -70,6 +71,7 @@ function AdminCategories() {
   const { data: categories, isLoading } = useQuery(rootCategoriesQuery());
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryListResponse | null>(null);
 
   const { data: templates } = useQuery({
@@ -301,9 +303,14 @@ function AdminCategories() {
           <h2 className="font-display text-3xl font-bold tracking-tight">Categories</h2>
           <p className="text-muted-foreground">Manage your product categories and subcategories.</p>
         </div>
-        <Button onClick={() => openAddModal(null)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Root Category
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsReorderModalOpen(true)}>
+            <ArrowUpDown className="mr-2 h-4 w-4" /> Reorder
+          </Button>
+          <Button onClick={() => openAddModal(null)}>
+            <Plus className="mr-2 h-4 w-4" /> Add Root Category
+          </Button>
+        </div>
       </div>
 
       {/* Desktop Table */}
@@ -563,6 +570,14 @@ function AdminCategories() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {categories && (
+        <CategoryReorderModal 
+          isOpen={isReorderModalOpen} 
+          onClose={() => setIsReorderModalOpen(false)} 
+          categories={categories} 
+        />
+      )}
     </div>
   );
 }

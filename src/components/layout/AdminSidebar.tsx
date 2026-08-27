@@ -2,7 +2,7 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +27,7 @@ const navigation = [
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Coupons", href: "/admin/coupons", icon: Ticket },
   { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Product Priority", href: "/admin/products/priority", icon: ArrowUpDown },
   { name: "Categories", href: "/admin/categories", icon: Layers },
   { name: "Brands", href: "/admin/brands", icon: Tag },
   { name: "Specifications", href: "/admin/specifications", icon: ClipboardList },

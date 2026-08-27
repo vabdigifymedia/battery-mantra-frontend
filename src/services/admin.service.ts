@@ -28,6 +28,8 @@ import type {
   EnquiryResponse,
   UpdateEnquiryStatusRequest,
   CategorySpecTemplateResponse,
+  CategoryReorderRequest,
+  ProductReorderRequest,
 } from "@/types/dto";
 
 export interface AdminCreateCustomerRequest {
@@ -117,6 +119,8 @@ export const adminService = {
     apiFetch<ProductListResponse[]>("/api/admin/products/pending-approvals", { method: "GET" }),
   approveProduct: (id: UUID) =>
     apiFetch<ProductDetailResponse>(`/api/admin/products/${id}/approve`, { method: "PATCH" }),
+  reorderProducts: (body: ProductReorderRequest[]) =>
+    apiFetch<void>("/api/admin/products/reorder", { method: "PUT", body }),
 
   // Categories
   createCategory: (body: CreateCategoryRequest) => 
@@ -125,6 +129,8 @@ export const adminService = {
     apiFetch<CategoryDetailResponse>(endpoints.admin.categories.update(id), { method: "PATCH", body }),
   deleteCategory: (id: UUID) => 
     apiFetch<void>(endpoints.admin.categories.delete(id), { method: "DELETE" }),
+  reorderCategories: (body: CategoryReorderRequest[]) =>
+    apiFetch<void>("/api/admin/categories/reorder", { method: "PUT", body }),
 
   // Brands
   createBrand: (body: BrandRequest) => 
