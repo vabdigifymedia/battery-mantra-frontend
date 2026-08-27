@@ -57,7 +57,7 @@ export function BannerCarousel() {
     <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-12 mb-4 group">
       <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
         <div className="flex touch-pan-y touch-pinch-zoom">
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <div key={banner.bannerId} className="flex-[0_0_100%] min-w-0 relative">
               {banner.linkUrl ? (
                 <Link to={banner.linkUrl as any} className="block w-full h-[150px] sm:h-[250px] md:h-[500px] lg:h-[600px]">
@@ -65,6 +65,8 @@ export function BannerCarousel() {
                     src={banner.imageUrl}
                     alt={banner.title || "Promotional Banner"}
                     className="w-full h-full object-cover"
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
                 </Link>
               ) : (
@@ -73,6 +75,8 @@ export function BannerCarousel() {
                     src={banner.imageUrl}
                     alt={banner.title || "Promotional Banner"}
                     className="w-full h-full object-cover"
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
                 </div>
               )}
