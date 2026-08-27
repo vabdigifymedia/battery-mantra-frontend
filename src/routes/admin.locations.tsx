@@ -262,6 +262,11 @@ function AdminLocations() {
                       ) : (
                         <Badge variant="outline" className="text-red-500 border-red-200 bg-red-50">Exchange No</Badge>
                       )}
+                      {city.pincodeCount === 0 ? (
+                        <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50 font-semibold">Full City</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Area Specific</Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -350,6 +355,11 @@ function AdminLocations() {
                   <Badge variant="outline" className="text-[10px] py-0 h-5 text-blue-600 border-blue-200 bg-blue-50">Exchange Yes</Badge>
                 ) : (
                   <Badge variant="outline" className="text-[10px] py-0 h-5 text-red-500 border-red-200 bg-red-50">Exchange No</Badge>
+                )}
+                {city.pincodeCount === 0 ? (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-purple-600 border-purple-200 bg-purple-50 font-semibold">Full City</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-amber-600 border-amber-200 bg-amber-50">Area Specific</Badge>
                 )}
               </div>
               
@@ -528,8 +538,14 @@ function AdminLocations() {
               {isLoadingPincodes ? (
                 <div className="flex justify-center py-8"><Spinner /></div>
               ) : pincodes?.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
-                  No pincodes added yet for this city.
+                <div className="text-center py-8">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-3">
+                    <MapPin className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Full City Delivery is Active</h4>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-[320px] mx-auto">
+                    Currently, any valid pincode from this city is serviceable. Adding pincodes below will restrict delivery to ONLY those specific areas.
+                  </p>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
