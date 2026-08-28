@@ -2,7 +2,7 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,7 +50,7 @@ const productNavigation = [
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Product Priority", href: "/admin/products/priority", icon: ArrowUpDown },
   { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
-  { name: "Price Value", href: "/admin/quick-edit", icon: Percent },
+  { name: "Price Value", href: "/admin/quick-edit", icon: IndianRupee },
 ];
 
 const seoNavigation = [
