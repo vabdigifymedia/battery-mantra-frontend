@@ -151,7 +151,6 @@ function BulkPricingPage() {
               <th className="px-4 py-3 font-semibold w-[130px]">MRP (₹)</th>
               <th className="px-4 py-3 font-semibold w-[130px]">Base Price (₹)<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Without Exch.)</span></th>
               <th className="px-4 py-3 font-semibold w-[130px]">Old Battery (₹)<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Exchange Value)</span></th>
-              <th className="px-4 py-3 font-semibold w-[120px]">Final Price (₹)<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Auto calculated)</span></th>
               <th className="px-4 py-3 font-semibold min-w-[200px]">Highlights<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Comma separated tags)</span></th>
             </tr>
           </thead>
@@ -170,10 +169,6 @@ function BulkPricingPage() {
               </tr>
             ) : (
               products.map((p) => {
-                const currentMrp = Number(getFieldValue(p, "originalPrice")) || 0;
-                const currentBase = Number(getFieldValue(p, "productPrice")) || 0;
-                const currentOld = Number(getFieldValue(p, "exchangeDiscount")) || 0;
-                const finalPrice = Math.max(0, currentBase - currentOld);
                 const isEdited = !!editedProducts[p.productId];
 
                 return (
@@ -214,11 +209,6 @@ function BulkPricingPage() {
                         value={getFieldValue(p, "exchangeDiscount")}
                         onChange={(e) => handleEdit(p.productId, "exchangeDiscount", e.target.value === "" ? "" : Number(e.target.value))}
                       />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center h-9 px-3 rounded-md border bg-muted/30 text-emerald-600 font-bold font-mono">
-                        ₹{finalPrice}
-                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <Input 
