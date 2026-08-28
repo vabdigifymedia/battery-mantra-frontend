@@ -26,19 +26,8 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Coupons", href: "/admin/coupons", icon: Ticket },
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Product Priority", href: "/admin/products/priority", icon: ArrowUpDown },
-  { name: "Categories", href: "/admin/categories", icon: Layers },
-  { name: "Brands", href: "/admin/brands", icon: Tag },
-  { name: "Specifications", href: "/admin/specifications", icon: ClipboardList },
-  { name: "Vehicles", href: "/admin/vehicles", icon: Car },
-  { name: "Fuels", href: "/admin/fuels", icon: Fuel },
-  { name: "R/L Codes", href: "/admin/capacities", icon: Battery },
-  { name: "Manufacturers", href: "/admin/manufacturers", icon: Factory },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
-  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
-  { name: "Quick Edit", href: "/admin/quick-edit", icon: Percent },
   { name: "CMS Pages", href: "/admin/pages", icon: FileText },
   { name: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { name: "Users", href: "/admin/users", icon: Users },
@@ -48,6 +37,20 @@ const navigation = [
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
   { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
+];
+
+const productNavigation = [
+  { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Product Priority", href: "/admin/products/priority", icon: ArrowUpDown },
+  { name: "Categories", href: "/admin/categories", icon: Layers },
+  { name: "Brands", href: "/admin/brands", icon: Tag },
+  { name: "Specifications", href: "/admin/specifications", icon: ClipboardList },
+  { name: "Vehicles", href: "/admin/vehicles", icon: Car },
+  { name: "Fuels", href: "/admin/fuels", icon: Fuel },
+  { name: "R/L Codes", href: "/admin/capacities", icon: Battery },
+  { name: "Manufacturers", href: "/admin/manufacturers", icon: Factory },
+  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
+  { name: "Price Value", href: "/admin/quick-edit", icon: Percent },
 ];
 
 const seoNavigation = [
@@ -152,6 +155,48 @@ export function AdminSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Catalog</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Collapsible defaultOpen className="group/collapsible-catalog">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Catalog">
+                      <Package />
+                      <span>Product Management</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible-catalog:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {productNavigation.map((item) => {
+                        const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                        const badgeCount = getBadgeCount(item.href);
+                        return (
+                          <SidebarMenuSubItem key={item.name}>
+                            <SidebarMenuSubButton asChild isActive={isActive}>
+                              <Link to={item.href}>
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.name}</span>
+                                {badgeCount > 0 && (
+                                  <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground shadow-sm">
+                                    {badgeCount > 99 ? "99+" : badgeCount}
+                                  </span>
+                                )}
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

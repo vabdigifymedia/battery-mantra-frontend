@@ -95,7 +95,7 @@ function BulkPricingPage() {
     <div className="space-y-6 pb-24 relative min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Quick Edit (Prices & Highlights)</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Price Value (Prices & Highlights)</h1>
           <p className="text-muted-foreground mt-2">Quickly edit MRP, Selling Price, Exchange Value, and Product Badges/Highlights.</p>
         </div>
       </div>
