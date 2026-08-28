@@ -36,6 +36,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSpecificationsRouteImport } from './routes/admin.specifications'
+import { Route as AdminQuickEditRouteImport } from './routes/admin.quick-edit'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminLeavesRouteImport } from './routes/admin.leaves'
@@ -214,6 +215,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminSpecificationsRoute = AdminSpecificationsRouteImport.update({
   id: '/specifications',
   path: '/specifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminQuickEditRoute = AdminQuickEditRouteImport.update({
+  id: '/quick-edit',
+  path: '/quick-edit',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminManufacturersRoute = AdminManufacturersRouteImport.update({
@@ -469,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/quick-edit': typeof AdminQuickEditRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -539,6 +546,7 @@ export interface FileRoutesByTo {
   '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/quick-edit': typeof AdminQuickEditRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -612,6 +620,7 @@ export interface FileRoutesById {
   '/admin/leaves': typeof AdminLeavesRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
+  '/admin/quick-edit': typeof AdminQuickEditRoute
   '/admin/specifications': typeof AdminSpecificationsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -686,6 +695,7 @@ export interface FileRouteTypes {
     | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/quick-edit'
     | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
@@ -756,6 +766,7 @@ export interface FileRouteTypes {
     | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/quick-edit'
     | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
@@ -828,6 +839,7 @@ export interface FileRouteTypes {
     | '/admin/leaves'
     | '/admin/locations'
     | '/admin/manufacturers'
+    | '/admin/quick-edit'
     | '/admin/specifications'
     | '/admin/users'
     | '/admin/vehicles'
@@ -1092,6 +1104,13 @@ declare module '@tanstack/react-router' {
       path: '/specifications'
       fullPath: '/admin/specifications'
       preLoaderRoute: typeof AdminSpecificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/quick-edit': {
+      id: '/admin/quick-edit'
+      path: '/quick-edit'
+      fullPath: '/admin/quick-edit'
+      preLoaderRoute: typeof AdminQuickEditRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/manufacturers': {
@@ -1431,6 +1450,7 @@ interface AdminRouteChildren {
   AdminLeavesRoute: typeof AdminLeavesRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
+  AdminQuickEditRoute: typeof AdminQuickEditRoute
   AdminSpecificationsRoute: typeof AdminSpecificationsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
@@ -1474,6 +1494,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeavesRoute: AdminLeavesRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
+  AdminQuickEditRoute: AdminQuickEditRoute,
   AdminSpecificationsRoute: AdminSpecificationsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,

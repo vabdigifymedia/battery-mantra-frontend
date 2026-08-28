@@ -30,6 +30,7 @@ import type {
   CategorySpecTemplateResponse,
   CategoryReorderRequest,
   ProductReorderRequest,
+  BulkProductUpdateRequest,
   LeaveRequestResponse,
   UpdateLeaveStatusRequest,
 } from "@/types/dto";
@@ -123,6 +124,8 @@ export const adminService = {
     apiFetch<ProductDetailResponse>(`/api/admin/products/${id}/approve`, { method: "PATCH" }),
   reorderProducts: (body: ProductReorderRequest[]) =>
     apiFetch<void>("/api/admin/products/reorder", { method: "PUT", body }),
+  bulkUpdateProducts: (body: BulkProductUpdateRequest[]) =>
+    apiFetch<void>("/api/admin/products/bulk-update", { method: "PUT", body }),
 
   // Categories
   createCategory: (body: CreateCategoryRequest) => 

@@ -38,6 +38,7 @@ const navigation = [
   { name: "Locations", href: "/admin/locations", icon: MapPin },
   { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
   { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
+  { name: "Quick Edit", href: "/admin/quick-edit", icon: Percent },
   { name: "CMS Pages", href: "/admin/pages", icon: FileText },
   { name: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { name: "Users", href: "/admin/users", icon: Users },

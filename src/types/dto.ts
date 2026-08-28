@@ -182,6 +182,7 @@ export type ProductListResponse = {
   productCategory?: string;
   capacity?: string;
   displayOrder?: number;
+  highlights?: string;
   isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
   createdByPartnerId?: UUID;
@@ -221,6 +222,7 @@ export type ProductDetailResponse = {
   }>;
   compatibleVehicles?: VehicleResponse[];
   cityPrices?: CityPricingDto[];
+  highlights?: string;
   isApproved?: boolean;
   isAutoAssignToPartner?: boolean;
   createdByPartnerId?: UUID;
@@ -445,6 +447,14 @@ export type UpdateProductRequest = Partial<CreateProductRequest>;
 export type ProductReorderRequest = {
   productId: UUID;
   displayOrder: number;
+};
+
+export type BulkProductUpdateRequest = {
+  productId: UUID;
+  productPrice?: number;
+  originalPrice?: number;
+  exchangeDiscount?: number;
+  highlights?: string;
 };
 
 export type OrderStatusUpdateRequest = {
