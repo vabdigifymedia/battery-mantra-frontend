@@ -476,6 +476,8 @@ export type AddressRequest = {
   postalCode: string;
   country: string;
   isDefault: boolean;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type AddressResponse = AddressRequest & {

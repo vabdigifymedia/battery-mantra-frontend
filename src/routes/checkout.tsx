@@ -10,13 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddressSelector } from "@/components/checkout/AddressSelector";
-import { LocationPicker } from "@/components/checkout/LocationPicker";
 import { Price } from "@/components/common/Price";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { Spinner } from "@/components/feedback/Spinner";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { useAuth } from "@/providers/AuthProvider";
-import { cartQuery } from "@/queries";
+import { cartQuery, addressesQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
@@ -64,7 +63,9 @@ function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState<string>("STANDARD_DELIVERY");
   const [installationDate, setInstallationDate] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
-  const [deliveryCoords, setDeliveryCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  const { data: addresses } = useQuery(addressesQuery(status === "authenticated"));
+  const selectedAddress = addresses?.find((a) => a.addressId === addressId);
 
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
@@ -77,8 +78,8 @@ function CheckoutPage() {
       paymentMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-      latitude: deliveryCoords?.lat,
-      longitude: deliveryCoords?.lng,
+      latitude: selectedAddress?.latitude,
+      longitude: selectedAddress?.longitude,
     }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
@@ -96,8 +97,8 @@ function CheckoutPage() {
       deliveryMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-      latitude: deliveryCoords?.lat,
-      longitude: deliveryCoords?.lng,
+      latitude: selectedAddress?.latitude,
+      longitude: selectedAddress?.longitude,
     }),
   });
 
@@ -259,7 +260,6 @@ function CheckoutPage() {
             summary={hasValidAddress ? "Address selected" : ""}
           >
             <AddressSelector value={addressId} onChange={setAddressId} />
-            <LocationPicker value={deliveryCoords} onChange={setDeliveryCoords} />
             <div className="mt-6">
               <Button 
                 variant="brand" 

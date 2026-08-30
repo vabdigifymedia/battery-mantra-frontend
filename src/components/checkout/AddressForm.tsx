@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormField } from "@/components/forms/FormField";
 import { Spinner } from "@/components/feedback/Spinner";
+import { LocationPicker } from "./LocationPicker";
 import type { AddressRequest, AddressResponse } from "@/types/dto";
 
 const addressSchema = z.object({
@@ -18,7 +19,9 @@ const addressSchema = z.object({
   state: z.string().trim().min(1, "State is required"),
   postalCode: z.string().trim().min(1, "Postal code is required"),
   country: z.string().trim().min(1, "Country is required"),
-  isDefault: z.boolean().default(false),
+  isDefault: z.boolean(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 export type AddressFormValues = z.infer<typeof addressSchema>;
@@ -53,8 +56,24 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
       postalCode: initialData?.postalCode ?? "",
       country: initialData?.country ?? "India",
       isDefault: (initialData as any)?.default ?? initialData?.isDefault ?? false,
+      latitude: initialData?.latitude,
+      longitude: initialData?.longitude,
     },
   });
+
+  const latitude = form.watch("latitude");
+  const longitude = form.watch("longitude");
+  const deliveryCoords = latitude && longitude ? { lat: latitude, lng: longitude } : null;
+
+  const handleLocationChange = (coords: { lat: number; lng: number } | null) => {
+    if (coords) {
+      form.setValue("latitude", coords.lat, { shouldDirty: true });
+      form.setValue("longitude", coords.lng, { shouldDirty: true });
+    } else {
+      form.setValue("latitude", undefined, { shouldDirty: true });
+      form.setValue("longitude", undefined, { shouldDirty: true });
+    }
+  };
 
   const handleSubmit = form.handleSubmit(async (values) => {
     await onSubmit(values);
@@ -141,6 +160,11 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
           )}
         />
         <label htmlFor="isDefault" className="text-sm font-medium text-foreground cursor-pointer">Make this my default address</label>
+      </div>
+
+      <div className="pt-2">
+        <label className="text-sm font-medium text-foreground mb-2 block">Pin Exact Location (Optional but recommended)</label>
+        <LocationPicker value={deliveryCoords} onChange={handleLocationChange} />
       </div>
 
       <div className="flex justify-end gap-3 pt-4">
