@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddressSelector } from "@/components/checkout/AddressSelector";
+import { LocationPicker } from "@/components/checkout/LocationPicker";
 import { Price } from "@/components/common/Price";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { Spinner } from "@/components/feedback/Spinner";
@@ -63,6 +64,7 @@ function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState<string>("STANDARD_DELIVERY");
   const [installationDate, setInstallationDate] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
+  const [deliveryCoords, setDeliveryCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
@@ -74,7 +76,9 @@ function CheckoutPage() {
       deliveryMethod, 
       paymentMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
-      couponCode: appliedCoupon ? appliedCoupon.code : undefined
+      couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+      latitude: deliveryCoords?.lat,
+      longitude: deliveryCoords?.lng,
     }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
@@ -92,6 +96,8 @@ function CheckoutPage() {
       deliveryMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+      latitude: deliveryCoords?.lat,
+      longitude: deliveryCoords?.lng,
     }),
   });
 
@@ -253,6 +259,7 @@ function CheckoutPage() {
             summary={hasValidAddress ? "Address selected" : ""}
           >
             <AddressSelector value={addressId} onChange={setAddressId} />
+            <LocationPicker value={deliveryCoords} onChange={setDeliveryCoords} />
             <div className="mt-6">
               <Button 
                 variant="brand" 

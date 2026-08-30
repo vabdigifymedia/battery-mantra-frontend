@@ -336,12 +336,16 @@ export type CheckoutRequest = {
   paymentMethod?: string;
   installationDate?: string;
   couponCode?: string;
+  latitude?: number;
+  longitude?: number;
 };
 export type CreateRazorpayOrderRequest = {
   addressId: UUID;
   deliveryMethod: string;
   installationDate?: string;
   couponCode?: string;
+  latitude?: number;
+  longitude?: number;
 };
 export type RazorpayOrderResponse = {
   razorpayOrderId: string;
