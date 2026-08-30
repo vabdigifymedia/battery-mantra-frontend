@@ -62,7 +62,8 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     async function initMap() {
       if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-      const L = await import("leaflet");
+      const leafletModule = await import("leaflet");
+      const L = leafletModule.default || leafletModule;
 
       if (!isMounted || !mapContainerRef.current) return;
 
