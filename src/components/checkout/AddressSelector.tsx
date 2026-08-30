@@ -176,7 +176,7 @@ export function AddressSelector({ value, onChange }: AddressSelectorProps) {
       )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] lg:max-w-[900px]">
           <DialogHeader>
             <DialogTitle>{editingAddress ? "Edit Address" : "Add New Address"}</DialogTitle>
           </DialogHeader>

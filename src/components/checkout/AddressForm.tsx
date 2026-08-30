@@ -80,94 +80,102 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
   });
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Full Name" htmlFor="fullName" required error={form.formState.errors.fullName?.message}>
-          <Input id="fullName" {...form.register("fullName")} />
-        </FormField>
-        <FormField label="Phone Number" htmlFor="phoneNumber" required error={form.formState.errors.phoneNumber?.message}>
-          <Input id="phoneNumber" type="tel" {...form.register("phoneNumber")} />
-        </FormField>
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Left Side: Form Fields */}
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Full Name" htmlFor="fullName" required error={form.formState.errors.fullName?.message}>
+              <Input id="fullName" {...form.register("fullName")} />
+            </FormField>
+            <FormField label="Phone Number" htmlFor="phoneNumber" required error={form.formState.errors.phoneNumber?.message}>
+              <Input id="phoneNumber" type="tel" {...form.register("phoneNumber")} />
+            </FormField>
+          </div>
 
-      <FormField label="Address Line 1" htmlFor="addressLine1" required error={form.formState.errors.addressLine1?.message}>
-        <Input id="addressLine1" {...form.register("addressLine1")} />
-      </FormField>
+          <FormField label="Address Line 1" htmlFor="addressLine1" required error={form.formState.errors.addressLine1?.message}>
+            <Input id="addressLine1" {...form.register("addressLine1")} />
+          </FormField>
 
-      <FormField label="Address Line 2" htmlFor="addressLine2" error={form.formState.errors.addressLine2?.message}>
-        <Input id="addressLine2" {...form.register("addressLine2")} />
-      </FormField>
+          <FormField label="Address Line 2" htmlFor="addressLine2" error={form.formState.errors.addressLine2?.message}>
+            <Input id="addressLine2" {...form.register("addressLine2")} />
+          </FormField>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="City" htmlFor="city" required error={form.formState.errors.city?.message}>
-          <Input id="city" {...form.register("city")} />
-        </FormField>
-        <FormField label="State" htmlFor="state" required error={form.formState.errors.state?.message}>
-          <Controller
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                <SelectTrigger id="state">
-                  <SelectValue placeholder="Select a state" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INDIAN_STATES.map((state) => (
-                    <SelectItem key={state} value={state}>
-                      {state}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </FormField>
-      </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="City" htmlFor="city" required error={form.formState.errors.city?.message}>
+              <Input id="city" {...form.register("city")} />
+            </FormField>
+            <FormField label="State" htmlFor="state" required error={form.formState.errors.state?.message}>
+              <Controller
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                    <SelectTrigger id="state">
+                      <SelectValue placeholder="Select a state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INDIAN_STATES.map((state) => (
+                        <SelectItem key={state} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </FormField>
+          </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Postal Code" htmlFor="postalCode" required error={form.formState.errors.postalCode?.message}>
-          <Input id="postalCode" {...form.register("postalCode")} />
-        </FormField>
-        <FormField label="Country" htmlFor="country" required error={form.formState.errors.country?.message}>
-          <Controller
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                <SelectTrigger id="country">
-                  <SelectValue placeholder="Select a country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="India">India</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </FormField>
-      </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Postal Code" htmlFor="postalCode" required error={form.formState.errors.postalCode?.message}>
+              <Input id="postalCode" {...form.register("postalCode")} />
+            </FormField>
+            <FormField label="Country" htmlFor="country" required error={form.formState.errors.country?.message}>
+              <Controller
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                    <SelectTrigger id="country">
+                      <SelectValue placeholder="Select a country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="India">India</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </FormField>
+          </div>
 
-      <div className="flex items-center gap-2 pt-2">
-        <Controller
-          control={form.control}
-          name="isDefault"
-          render={({ field }) => (
-            <Checkbox 
-              id="isDefault" 
-              checked={field.value} 
-              onCheckedChange={field.onChange}
-              className="text-primary focus:ring-primary"
+          <div className="flex items-center gap-2 pt-2">
+            <Controller
+              control={form.control}
+              name="isDefault"
+              render={({ field }) => (
+                <Checkbox 
+                  id="isDefault" 
+                  checked={field.value} 
+                  onCheckedChange={field.onChange}
+                  className="text-primary focus:ring-primary"
+                />
+              )}
             />
-          )}
-        />
-        <label htmlFor="isDefault" className="text-sm font-medium text-foreground cursor-pointer">Make this my default address</label>
+            <label htmlFor="isDefault" className="text-sm font-medium text-foreground cursor-pointer">Make this my default address</label>
+          </div>
+        </div>
+
+        {/* Right Side: Map */}
+        <div className="flex flex-col h-full min-h-[300px]">
+          <label className="text-sm font-medium text-foreground mb-2 block">Pin Exact Location (Optional but recommended)</label>
+          <div className="flex-1 w-full h-full">
+            <LocationPicker value={deliveryCoords} onChange={handleLocationChange} />
+          </div>
+        </div>
       </div>
 
-      <div className="pt-2">
-        <label className="text-sm font-medium text-foreground mb-2 block">Pin Exact Location (Optional but recommended)</label>
-        <LocationPicker value={deliveryCoords} onChange={handleLocationChange} />
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex justify-end gap-3 pt-4 border-t mt-4">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>

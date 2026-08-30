@@ -163,8 +163,8 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       {/* Map container */}
       <div
         ref={mapContainerRef}
-        className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm"
-        style={{ height: 300, width: "100%" }}
+        className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm w-full h-full min-h-[300px]"
+        style={{ width: "100%" }}
       />
 
       {/* Coordinates display */}
