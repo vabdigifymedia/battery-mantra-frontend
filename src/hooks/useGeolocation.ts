@@ -57,10 +57,17 @@ export const useGeolocation = () => {
 
       // Check if city is serviceable by finding it in public cities list
       const publicCities = await locationService.getPublicCities();
-      const matchedCity = publicCities.find(c => 
-        c.cityName.toLowerCase() === cityName.toLowerCase() || 
-        cityName.toLowerCase().includes(c.cityName.toLowerCase())
-      );
+      console.log("[Geolocation] Detected city from GPS:", cityName, "| Available cities:", publicCities.map(c => c.cityName));
+      
+      const normalizedDetected = cityName.toLowerCase().trim();
+      const matchedCity = publicCities.find(c => {
+        const normalizedCity = c.cityName.toLowerCase().trim();
+        return (
+          normalizedCity === normalizedDetected ||
+          normalizedDetected.includes(normalizedCity) ||
+          normalizedCity.includes(normalizedDetected)
+        );
+      });
       
       if (matchedCity) {
         setLocation("", true, matchedCity);

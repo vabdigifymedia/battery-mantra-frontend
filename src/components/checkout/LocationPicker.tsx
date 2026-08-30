@@ -16,6 +16,8 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const [coords, setCoords] = useState(value ?? DEFAULT_CENTER);
   const [isLocating, setIsLocating] = useState(false);
@@ -23,10 +25,10 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
 
   const updateCoordinates = useCallback((newCoords: { lat: number; lng: number }) => {
     setCoords(newCoords);
-    onChange(newCoords);
-  }, [onChange]);
+    onChangeRef.current(newCoords);
+  }, []);
 
-  // Request GPS position
+  // Request GPS position — always fresh, no cache
   const requestCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setGeoError("Geolocation is not supported by your browser");
@@ -40,18 +42,26 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       (pos) => {
         const newCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         updateCoordinates(newCoords);
-        if (mapInstanceRef.current && markerRef.current) {
-          mapInstanceRef.current.flyTo([newCoords.lat, newCoords.lng], 16, { animate: true });
-          markerRef.current.setLatLng([newCoords.lat, newCoords.lng]);
+
+        const map = mapInstanceRef.current;
+        const marker = markerRef.current;
+        if (map && marker) {
+          // Ensure tile layout is correct before flying
+          map.invalidateSize();
+          marker.setLatLng([newCoords.lat, newCoords.lng]);
+          map.flyTo([newCoords.lat, newCoords.lng], 17, { animate: true, duration: 1.2 });
         }
         setIsLocating(false);
       },
       (err) => {
-        console.warn("Geolocation error:", err.message);
-        setGeoError("Location access denied. Please drag the pin on map.");
+        console.warn("Geolocation error:", err.code, err.message);
+        let msg = "Location access denied. Please drag the pin on map.";
+        if (err.code === 2) msg = "Location unavailable. Please drag the pin on map.";
+        if (err.code === 3) msg = "Location request timed out. Try again.";
+        setGeoError(msg);
         setIsLocating(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }, [updateCoordinates]);
 
@@ -115,6 +125,20 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       mapInstanceRef.current = map;
       markerRef.current = marker;
 
+      // Fix Leaflet's classic modal/dialog rendering bug:
+      // Container may have zero size during dialog open animation.
+      // invalidateSize forces Leaflet to recalculate after animation completes.
+      setTimeout(() => {
+        if (map && isMounted) {
+          map.invalidateSize();
+        }
+      }, 300);
+      setTimeout(() => {
+        if (map && isMounted) {
+          map.invalidateSize();
+        }
+      }, 600);
+
       // Auto-locate if no pre-existing value
       if (!value) {
         requestCurrentLocation();
@@ -133,9 +157,9 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
   }, []); // Run once on mount
 
   return (
-    <div className="mt-4 space-y-3">
+    <div className="space-y-3">
       {/* Header + locate button */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 text-sm font-medium text-foreground">
           <MapPin className="h-4 w-4 text-primary" />
           <span>Pin Delivery Location</span>
@@ -150,7 +174,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           disabled={isLocating}
         >
           <Navigation className={`h-3.5 w-3.5 text-primary ${isLocating ? "animate-pulse" : ""}`} />
-          {isLocating ? "Locating…" : "Use My Current Location"}
+          {isLocating ? "Locating…" : "Use My Location"}
         </Button>
       </div>
 
@@ -160,11 +184,11 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </p>
       )}
 
-      {/* Map container */}
+      {/* Map container — explicit height is REQUIRED for Leaflet */}
       <div
         ref={mapContainerRef}
-        className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm w-full h-full min-h-[300px]"
-        style={{ width: "100%" }}
+        className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm w-full"
+        style={{ height: 350, width: "100%" }}
       />
 
       {/* Coordinates display */}

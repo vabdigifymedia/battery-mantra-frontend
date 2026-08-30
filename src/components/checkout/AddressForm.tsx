@@ -81,7 +81,7 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2">
         {/* Left Side: Form Fields */}
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">

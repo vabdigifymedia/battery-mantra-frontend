@@ -7,6 +7,10 @@ export interface GeocodingResponse {
     town?: string;
     village?: string;
     county?: string;
+    city_district?: string;
+    state_district?: string;
+    suburb?: string;
+    municipality?: string;
   };
   city?: string;
   error?: string;
@@ -16,7 +20,7 @@ export const geocodingService = {
   reverseGeocodeCity: async (lat: number, lon: number): Promise<string | null> => {
     try {
       // Using OpenStreetMap Nominatim API (Free, no key required)
-      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`;
       
       const response = await fetch(url, {
         headers: {
@@ -28,10 +32,25 @@ export const geocodingService = {
 
       if (response.ok) {
         const data: GeocodingResponse = await response.json();
-        // Nominatim might return city, town, or village
-        const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
-        if (cityName) {
-          return cityName;
+        const addr = data.address;
+        if (addr) {
+          // For Indian satellite cities (Noida, Gurgaon, etc.), Nominatim often puts
+          // the actual city name in state_district, city_district, or suburb instead of city.
+          // We check the most specific field first, then fall back to broader ones.
+          const cityName = 
+            addr.city ||
+            addr.town ||
+            addr.city_district ||
+            addr.state_district ||
+            addr.municipality ||
+            addr.village ||
+            addr.suburb ||
+            addr.county;
+
+          if (cityName) {
+            // Clean up common suffixes like " district", " tahsil"
+            return cityName.replace(/\s+(district|tahsil)$/i, "").trim();
+          }
         }
       }
       
