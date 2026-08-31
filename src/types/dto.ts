@@ -155,13 +155,23 @@ export type CategoryDetailResponse = CategoryListResponse & {
   parentId?: UUID;
   children?: CategoryListResponse[];
 };
+
+export type CategorySeoRequest = {
+  slug?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+};
+
 export type CreateCategoryRequest = {
   categoryName: string;
   categoryDescription?: string;
   iconUrl?: string;
   displayOrder?: number;
-  parentId?: UUID;
+  parentId?: string | null;
+  removeParent?: boolean;
+  seo?: CategorySeoRequest;
 };
+
 export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;
 
 export type CategoryReorderRequest = {

@@ -214,7 +214,8 @@ function AdminCategories() {
       categoryDescription: values.categoryDescription,
       iconUrl: values.iconUrl,
       displayOrder: values.displayOrder,
-      parentId: values.parentId || null, // Send null instead of undefined to detach from parent
+      parentId: values.parentId || null,
+      removeParent: !values.parentId, // Tell backend explicitly to detach
       seo: editingCategory ? values.seo : { slug: generateSlug(values.categoryName) },
     } as any;
 
