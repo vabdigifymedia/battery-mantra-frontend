@@ -238,7 +238,7 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.brands.includes(b.brandName) || aggregations.brands.includes(b.brandId);
+                  const isAvailable = aggregations.brands?.includes(b.brandName) || aggregations.brands?.includes(b.brandId);
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getBrandCount(b.brandId) : null;
@@ -286,7 +286,7 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.capacities.includes(cap);
+                  const isAvailable = aggregations.capacities?.includes(cap);
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getCapCount(cap) : null;
@@ -324,7 +324,7 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.warranties.includes(war);
+                  const isAvailable = aggregations.warranties?.includes(war);
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getWarCount(war) : null;

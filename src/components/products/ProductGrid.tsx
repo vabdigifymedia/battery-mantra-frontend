@@ -25,7 +25,6 @@ export function ProductGrid({
 }: Props) {
   const [isMounted, setIsMounted] = useState(false);
   const [cols, setCols] = useState(2);
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -63,11 +62,16 @@ export function ProductGrid({
     );
   }
 
+  return <VirtualizedGrid products={products} cols={cols} className={className} />;
+}
+
+function VirtualizedGrid({ products, cols, className }: { products: ProductListResponse[], cols: number, className?: string }) {
+  const gridRef = useRef<HTMLDivElement>(null);
   const rowCount = Math.ceil(products.length / cols);
   
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    estimateSize: () => 450, // Initial estimate
+    estimateSize: () => 450,
     overscan: 3,
   });
 
