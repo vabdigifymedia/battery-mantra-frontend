@@ -39,9 +39,10 @@ type Props = {
   onChange: (next: ProductFilterState) => void;
   products?: any[];
   aggregations?: import("@/types/dto").ProductAggregationsResponse;
+  hideCategoryFilter?: boolean;
 };
 
-export function ProductFilters({ state, onChange, products, aggregations }: Props) {
+export function ProductFilters({ state, onChange, products, aggregations, hideCategoryFilter }: Props) {
   const [brandSearch, setBrandSearch] = useState("");
   const [capSearch, setCapSearch] = useState("");
 
@@ -213,8 +214,25 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
         )}
       </div>
 
-      <Accordion type="multiple" defaultValue={["brand", "capacity", "warranty", "price"]} className="w-full">
+      <Accordion type="multiple" defaultValue={["category", "brand", "capacity", "warranty", "price"]} className="w-full">
         
+        {/* CATEGORIES */}
+        {!hideCategoryFilter && (cats.data && cats.data.length > 0) && (
+          <>
+            <AccordionItem value="category" className="border-b-0">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
+                Categories
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="max-h-[220px] overflow-y-auto">
+                  <CategoryCheckboxTree categories={cats.data} state={state} toggleArrayItem={toggleArrayItem} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <div className="mx-4 h-px bg-border" />
+          </>
+        )}
+
         {/* BRANDS */}
         <AccordionItem value="brand" className="border-b-0">
           <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">

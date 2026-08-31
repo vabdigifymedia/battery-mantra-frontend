@@ -73,6 +73,7 @@ function CategoryBrandProductsPage() {
           navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } });
         }
       }}
+      hideCategoryFilter={true}
     />
   );
 }

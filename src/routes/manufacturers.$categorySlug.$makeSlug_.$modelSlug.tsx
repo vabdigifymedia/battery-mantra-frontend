@@ -34,7 +34,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug_/$m
 function VehicleProductsPage() {
   const { makeSlug, modelSlug } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: Route.id });
+  const navigate = useNavigate({ from: "/manufacturers/$categorySlug/$makeSlug/$modelSlug" });
 
   // Load all vehicles to find the matching one
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
@@ -57,6 +57,7 @@ function VehicleProductsPage() {
     <ProductsPageLayout 
       search={search}
       onSearchChange={(newSearch) => navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } })}
+      hideCategoryFilter={true}
       vehicleIdOverride={vehicleIdOverride}
     />
   );

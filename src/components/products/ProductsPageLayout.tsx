@@ -49,6 +49,7 @@ export interface ProductsPageLayoutProps {
   search: ProductSearchState;
   onSearchChange: (newSearch: Partial<ProductSearchState>) => void;
   vehicleIdOverride?: string;
+  hideCategoryFilter?: boolean;
 }
 
 const SORTS: { value: ProductSort; label: string }[] = [
@@ -59,7 +60,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
   { value: "name-desc", label: "Name (Z–A)" },
 ];
 
-export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }: ProductsPageLayoutProps) {
+export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter }: ProductsPageLayoutProps) {
 
   const filters: ProductFilterState = {
     categoryId: search.categoryId,
@@ -142,7 +143,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
       />
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden lg:block">
-          <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} />
+          <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
         </aside>
 
         <div className="min-w-0">
@@ -159,7 +160,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
                   <DrawerTitle>Filters</DrawerTitle>
                 </DrawerHeader>
                 <div className="mt-4 overflow-y-auto px-4 pb-8">
-                  <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} />
+                  <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
                 </div>
               </DrawerContent>
             </Drawer>
