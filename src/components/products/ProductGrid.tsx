@@ -23,10 +23,12 @@ export function ProductGrid({
   skeletonCount = 8,
   className,
 }: Props) {
+  const [isMounted, setIsMounted] = useState(false);
   const [cols, setCols] = useState(2);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
     const updateCols = () => {
       const w = window.innerWidth;
       if (w >= 1280) setCols(4);
@@ -51,28 +53,39 @@ export function ProductGrid({
     return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
 
+  if (!isMounted) {
+    return (
+      <div className={cn("grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4", className)}>
+        {products.slice(0, 12).map((p) => (
+          <ProductCard key={p.productId} product={p} />
+        ))}
+      </div>
+    );
+  }
+
   const rowCount = Math.ceil(products.length / cols);
   
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    estimateSize: () => 400, // Estimated card height + gap
+    estimateSize: () => 450, // Initial estimate
     overscan: 3,
   });
 
   return (
-    <div ref={gridRef} className={className} style={{ position: 'relative', height: `${virtualizer.getTotalSize()}px` }}>
+    <div ref={gridRef} className={className} style={{ position: 'relative', height: `${virtualizer.getTotalSize()}px`, width: '100%' }}>
       {virtualizer.getVirtualItems().map((virtualRow) => {
         const rowProducts = products.slice(virtualRow.index * cols, (virtualRow.index + 1) * cols);
         
         return (
           <div
             key={virtualRow.index}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
-              height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start}px)`,
             }}
             className={cn(

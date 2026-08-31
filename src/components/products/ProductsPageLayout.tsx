@@ -126,7 +126,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
     context = { category_name: category.categoryName };
   }
 
-  const products = data?.pages.flatMap((page) => page.content) ?? [];
+  const products = data?.pages.flatMap((page) => page.content || []) ?? [];
   const total = data?.pages[0]?.totalElements ?? 0;
   const totalPages = data?.pages[0]?.totalPages ?? 0;
 

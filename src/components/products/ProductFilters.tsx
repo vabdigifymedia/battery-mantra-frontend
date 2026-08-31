@@ -64,7 +64,7 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
   // Dynamic Capacities
   const availableCapacities = useMemo(() => {
     if (aggregations?.capacities?.length) {
-      return aggregations.capacities.sort((a, b) => {
+      return [...aggregations.capacities].sort((a, b) => {
         const numA = parseInt(a);
         const numB = parseInt(b);
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
@@ -109,7 +109,7 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
   // Dynamic Warranties
   const availableWarranties = useMemo(() => {
     if (aggregations?.warranties?.length) {
-      return aggregations.warranties.sort((a, b) => {
+      return [...aggregations.warranties].sort((a, b) => {
         const numA = parseInt(a);
         const numB = parseInt(b);
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
