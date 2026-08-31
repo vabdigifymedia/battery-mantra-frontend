@@ -241,10 +241,15 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
 
                 if (aggregations) {
                   const aggBrands = aggregations.brands || (aggregations as any).brand || (aggregations as any).brandNames || (aggregations as any).brandIds || [];
-                  const isAvailable = aggBrands.some((ab: any) => 
-                    (typeof ab === 'string' && typeof b.brandName === 'string' && ab.toLowerCase() === b.brandName.toLowerCase()) || 
-                    ab === b.brandId
-                  );
+                  const isAvailable = aggBrands.some((ab: any) => {
+                    if (typeof ab === 'string') {
+                      return ab === b.brandId || (typeof b.brandName === 'string' && ab.toLowerCase() === b.brandName.toLowerCase());
+                    }
+                    if (typeof ab === 'object' && ab !== null) {
+                      return ab.brandId === b.brandId || ab.brandName === b.brandName;
+                    }
+                    return false;
+                  });
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getBrandCount(b.brandId) : null;
