@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/queryKeys";
 import { productsService } from "@/services/products.service";
 import { categoriesService, brandsService, bannersService, seoService } from "@/services/catalog.service";
@@ -28,6 +28,28 @@ export const productFilterQuery = (params: ProductFilterParams) => {
     queryKey: queryKeys.products.filter({ ...params, cityId }),
     queryFn: ({ signal }) => productsService.filter({ ...params, cityId }, signal),
     staleTime: 30_000,
+  });
+};
+
+export const productFilterInfiniteQuery = (params: ProductFilterParams) => {
+  const cityId = useLocationStore.getState().city?.cityId;
+  return infiniteQueryOptions({
+    queryKey: [...queryKeys.products.filter({ ...params, cityId }), "infinite"],
+    queryFn: ({ pageParam = 0, signal }) => 
+      productsService.filter({ ...params, cityId, page: pageParam }, signal),
+    staleTime: 30_000,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => 
+      !lastPage.last ? lastPage.number + 1 : undefined,
+  });
+};
+
+export const productFilterAggregationsQuery = (params: ProductFilterParams) => {
+  const cityId = useLocationStore.getState().city?.cityId;
+  return queryOptions({
+    queryKey: [...queryKeys.products.filter({ ...params, cityId }), "aggregations"],
+    queryFn: ({ signal }) => productsService.aggregations({ ...params, cityId }, signal),
+    staleTime: 60_000,
   });
 };
 

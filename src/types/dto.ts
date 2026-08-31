@@ -259,6 +259,12 @@ export type ProductFilterParams = {
   sortDir?: "asc" | "desc";
 };
 
+export type ProductAggregationsResponse = {
+  brands: string[];
+  capacities: string[];
+  warranties: string[];
+};
+
 // Coupon Types
 export type DiscountType = "PERCENTAGE" | "FLAT";
 

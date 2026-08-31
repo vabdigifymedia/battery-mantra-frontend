@@ -38,9 +38,10 @@ type Props = {
   state: ProductFilterState;
   onChange: (next: ProductFilterState) => void;
   products?: any[];
+  aggregations?: import("@/types/dto").ProductAggregationsResponse;
 };
 
-export function ProductFilters({ state, onChange, products }: Props) {
+export function ProductFilters({ state, onChange, products, aggregations }: Props) {
   const [brandSearch, setBrandSearch] = useState("");
   const [capSearch, setCapSearch] = useState("");
 
@@ -62,6 +63,15 @@ export function ProductFilters({ state, onChange, products }: Props) {
 
   // Dynamic Capacities
   const availableCapacities = useMemo(() => {
+    if (aggregations?.capacities?.length) {
+      return aggregations.capacities.sort((a, b) => {
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        return a.localeCompare(b);
+      });
+    }
+
     const caps = new Set<string>();
     
     if (dynamicCapacities.data && Array.isArray(dynamicCapacities.data)) {
@@ -94,10 +104,19 @@ export function ProductFilters({ state, onChange, products }: Props) {
           return a.localeCompare(b);
         }) 
       : COMMON_CAPACITIES;
-  }, [dynamicCapacities.data, products]);
+  }, [dynamicCapacities.data, products, aggregations]);
 
   // Dynamic Warranties
   const availableWarranties = useMemo(() => {
+    if (aggregations?.warranties?.length) {
+      return aggregations.warranties.sort((a, b) => {
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        return a.localeCompare(b);
+      });
+    }
+
     const wars = new Set<string>();
     if (products) {
       products.forEach((p: any) => {
@@ -117,7 +136,7 @@ export function ProductFilters({ state, onChange, products }: Props) {
           return a.localeCompare(b);
         }) 
       : COMMON_WARRANTIES;
-  }, [products]);
+  }, [products, aggregations]);
 
   const getBrandCount = (brandId: string) => {
     if (!products || products.length === 0) return 0;
@@ -215,8 +234,16 @@ export function ProductFilters({ state, onChange, products }: Props) {
                 .filter(b => b.brandName?.toLowerCase().includes(brandSearch.toLowerCase()))
                 .map((b) => {
                 const isChecked = state.brandId?.includes(b.brandId) || false;
-                const count = products ? getBrandCount(b.brandId) : null;
-                const isDisabled = count === 0 && !isChecked;
+                let count = null;
+                let isDisabled = false;
+
+                if (aggregations) {
+                  const isAvailable = aggregations.brands.includes(b.brandName) || aggregations.brands.includes(b.brandId);
+                  isDisabled = !isAvailable && !isChecked;
+                } else {
+                  count = products ? getBrandCount(b.brandId) : null;
+                  isDisabled = count === 0 && !isChecked;
+                }
                 
                 return (
                   <label key={b.brandId} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors", isDisabled && "opacity-50 cursor-not-allowed")}>
@@ -255,8 +282,16 @@ export function ProductFilters({ state, onChange, products }: Props) {
                 .filter(cap => cap.toLowerCase().includes(capSearch.toLowerCase()))
                 .map((cap) => {
                 const isChecked = state.capacity?.includes(cap) || false;
-                const count = products ? getCapCount(cap) : null;
-                const isDisabled = count === 0 && !isChecked;
+                let count = null;
+                let isDisabled = false;
+
+                if (aggregations) {
+                  const isAvailable = aggregations.capacities.includes(cap);
+                  isDisabled = !isAvailable && !isChecked;
+                } else {
+                  count = products ? getCapCount(cap) : null;
+                  isDisabled = count === 0 && !isChecked;
+                }
                 
                 return (
                   <label key={cap} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors group", isDisabled && "opacity-50 cursor-not-allowed")}>
@@ -285,8 +320,16 @@ export function ProductFilters({ state, onChange, products }: Props) {
             <div className="space-y-4">
               {availableWarranties.map((war) => {
                 const isChecked = state.warranty?.includes(war) || false;
-                const count = products ? getWarCount(war) : null;
-                const isDisabled = count === 0 && !isChecked;
+                let count = null;
+                let isDisabled = false;
+
+                if (aggregations) {
+                  const isAvailable = aggregations.warranties.includes(war);
+                  isDisabled = !isAvailable && !isChecked;
+                } else {
+                  count = products ? getWarCount(war) : null;
+                  isDisabled = count === 0 && !isChecked;
+                }
                 
                 return (
                   <label key={war} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors", isDisabled && "opacity-50 cursor-not-allowed")}>

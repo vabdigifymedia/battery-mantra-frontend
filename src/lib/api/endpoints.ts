@@ -33,6 +33,7 @@ export const endpoints = {
   products: {
     list: "/api/products",
     filter: "/api/products/filter",
+    aggregations: "/api/products/aggregations",
     byId: (id: string) => `/api/products/id/${encodeURIComponent(id)}`,
     byName: (name: string) => `/api/products/name/${encodeURIComponent(name)}`,
   },

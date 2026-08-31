@@ -5,6 +5,7 @@ import type {
   ProductDetailResponse,
   ProductFilterParams,
   ProductListResponse,
+  ProductAggregationsResponse,
 } from "@/types/dto";
 
 export const productsService = {
@@ -16,6 +17,12 @@ export const productsService = {
     }),
   filter: (params: ProductFilterParams & { cityId?: string }, signal?: AbortSignal) =>
     apiFetch<PageProductListResponse>(endpoints.products.filter, {
+      query: params as Record<string, string | number | undefined>,
+      signal,
+      auth: false,
+    }),
+  aggregations: (params: ProductFilterParams & { cityId?: string }, signal?: AbortSignal) =>
+    apiFetch<ProductAggregationsResponse>(endpoints.products.aggregations, {
       query: params as Record<string, string | number | undefined>,
       signal,
       auth: false,

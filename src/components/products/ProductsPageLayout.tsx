@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 import { z } from "zod";
 import { Filter, X } from "lucide-react";
 import { Container } from "@/components/layout/Container";
@@ -24,7 +26,8 @@ import {
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import {
   productListQuery,
-  productFilterQuery,
+  productFilterInfiniteQuery,
+  productFilterAggregationsQuery,
   rootCategoriesQuery,
   brandsQuery,
   pageSeoQuery,
@@ -76,7 +79,26 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
     ...sortToApi(search.sort),
   };
 
-  const { data, isLoading, isError, refetch, isFetching } = useQuery(productFilterQuery(params));
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    refetch, 
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery(productFilterInfiniteQuery(params));
+
+  const { data: aggregations } = useQuery(productFilterAggregationsQuery(params));
+
+  const { ref, inView } = useInView();
+  
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const singleCategoryId = search.categoryId?.length === 1 ? search.categoryId[0] : undefined;
   const { data: brands } = useQuery(brandsQuery(singleCategoryId));
@@ -104,9 +126,9 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
     context = { category_name: category.categoryName };
   }
 
-  const products = data?.content ?? [];
-  const total = data?.totalElements ?? 0;
-  const totalPages = data?.totalPages ?? 0;
+  const products = data?.pages.flatMap((page) => page.content) ?? [];
+  const total = data?.pages[0]?.totalElements ?? 0;
+  const totalPages = data?.pages[0]?.totalPages ?? 0;
 
   return (
     <div>
@@ -120,7 +142,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
       />
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden lg:block">
-          <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} />
+          <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} />
         </aside>
 
         <div className="min-w-0">
@@ -137,7 +159,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
                   <DrawerTitle>Filters</DrawerTitle>
                 </DrawerHeader>
                 <div className="mt-4 overflow-y-auto px-4 pb-8">
-                  <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} />
+                  <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} />
                 </div>
               </DrawerContent>
             </Drawer>
@@ -191,29 +213,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride }
               />
               <ProductGrid products={products} loading={isLoading || isFetching} />
 
-              {totalPages > 1 ? (
-                <div className="mt-8 flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={search.page <= 0}
-                    onClick={() => onSearchChange({ page: search.page - 1 })}
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {search.page + 1} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={search.page >= totalPages - 1}
-                    onClick={() => onSearchChange({ page: search.page + 1 })}
-                  >
-                    Next
-                  </Button>
-                </div>
-              ) : null}
+              
+              {/* Infinite Scroll trigger element */}
+              <div ref={ref} className="h-10 w-full flex items-center justify-center mt-8">
+                {isFetchingNextPage && <div className="text-muted-foreground text-sm">Loading more...</div>}
+              </div>
             </>
           )}
           
