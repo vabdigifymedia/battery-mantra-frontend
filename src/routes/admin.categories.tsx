@@ -214,7 +214,7 @@ function AdminCategories() {
       categoryDescription: values.categoryDescription,
       iconUrl: values.iconUrl,
       displayOrder: values.displayOrder,
-      parentId: values.parentId || undefined, // Convert empty string or null to undefined
+      parentId: values.parentId || null, // Send null instead of undefined to detach from parent
       seo: editingCategory ? values.seo : { slug: generateSlug(values.categoryName) },
     } as any;
 
