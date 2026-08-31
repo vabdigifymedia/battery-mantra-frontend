@@ -63,12 +63,13 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
 
   // Dynamic Capacities
   const availableCapacities = useMemo(() => {
-    if (aggregations?.capacities?.length) {
-      return [...aggregations.capacities].sort((a, b) => {
-        const numA = parseInt(a);
-        const numB = parseInt(b);
+    const aggCaps = aggregations?.capacities || (aggregations as any)?.capacity || [];
+    if (aggCaps.length) {
+      return [...aggCaps].sort((a, b) => {
+        const numA = parseInt(String(a));
+        const numB = parseInt(String(b));
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-        return a.localeCompare(b);
+        return String(a).localeCompare(String(b));
       });
     }
 
@@ -108,12 +109,13 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
 
   // Dynamic Warranties
   const availableWarranties = useMemo(() => {
-    if (aggregations?.warranties?.length) {
-      return [...aggregations.warranties].sort((a, b) => {
-        const numA = parseInt(a);
-        const numB = parseInt(b);
+    const aggWars = aggregations?.warranties || (aggregations as any)?.warranty || [];
+    if (aggWars.length) {
+      return [...aggWars].sort((a, b) => {
+        const numA = parseInt(String(a));
+        const numB = parseInt(String(b));
         if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-        return a.localeCompare(b);
+        return String(a).localeCompare(String(b));
       });
     }
 
@@ -238,7 +240,11 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.brands?.includes(b.brandName) || aggregations.brands?.includes(b.brandId);
+                  const aggBrands = aggregations.brands || (aggregations as any).brand || (aggregations as any).brandNames || (aggregations as any).brandIds || [];
+                  const isAvailable = aggBrands.some((ab: any) => 
+                    (typeof ab === 'string' && typeof b.brandName === 'string' && ab.toLowerCase() === b.brandName.toLowerCase()) || 
+                    ab === b.brandId
+                  );
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getBrandCount(b.brandId) : null;
@@ -286,7 +292,8 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.capacities?.includes(cap);
+                  const aggCaps = aggregations.capacities || (aggregations as any).capacity || [];
+                  const isAvailable = aggCaps.some((ac: any) => typeof ac === 'string' && typeof cap === 'string' && ac.toLowerCase() === cap.toLowerCase());
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getCapCount(cap) : null;
@@ -324,7 +331,8 @@ export function ProductFilters({ state, onChange, products, aggregations }: Prop
                 let isDisabled = false;
 
                 if (aggregations) {
-                  const isAvailable = aggregations.warranties?.includes(war);
+                  const aggWars = aggregations.warranties || (aggregations as any).warranty || [];
+                  const isAvailable = aggWars.some((aw: any) => typeof aw === 'string' && typeof war === 'string' && aw.toLowerCase() === war.toLowerCase());
                   isDisabled = !isAvailable && !isChecked;
                 } else {
                   count = products ? getWarCount(war) : null;
