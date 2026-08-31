@@ -1,10 +1,10 @@
-import { createFileRoute, redirect, Navigate, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Navigate, Link, useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { LogOut, User, MapPin, Save, Trash2, LayoutDashboard, Package, Heart, Car, Plus, AlertCircle } from "lucide-react";
+import { LogOut, User, MapPin, Save, Trash2, LayoutDashboard, Package, Heart, Car, Plus, AlertCircle, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { userProfileQuery, addressesQuery } from "@/queries";
@@ -37,6 +37,7 @@ const profileSchema = z.object({
 });
 
 function AccountPage() {
+  const router = useRouter();
   const { status, signOut } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
@@ -111,6 +112,12 @@ function AccountPage() {
 
   return (
     <Container className="py-6 md:py-10">
+      <div className="mb-4">
+        <Button variant="ghost" size="sm" onClick={() => router.history.back()} className="-ml-3 text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
       <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
         
         {/* Mobile Header (Hidden on Desktop) */}
