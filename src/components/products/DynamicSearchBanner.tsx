@@ -9,12 +9,27 @@ export function DynamicSearchBanner({ search }: { search: any }) {
 
   // Handle categoryId arrays if present
   // If multiple categories are passed, it's a general search (e.g. all batteries), so we don't pin the banner to just the first category
-  const isMultiCat = Array.isArray(search.categoryId) && search.categoryId.length > 1;
-  const catId = isMultiCat ? null : (Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId);
-  const brndId = Array.isArray(search.brandId) ? search.brandId[0] : search.brandId;
+  const isMultiCat = Array.isArray(search.categoryId) 
+    ? search.categoryId.length > 1 
+    : typeof search.category === 'string' && search.category.includes(',');
+    
+  let catId = isMultiCat ? null : (Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId);
+  let brndId = Array.isArray(search.brandId) ? search.brandId[0] : search.brandId;
+
+  const { data: categories } = useQuery(categoriesQuery());
+  const { data: allBrands } = useQuery(brandsQuery()); // Fetch all to resolve slug
+  
+  if (!catId && search.category && typeof search.category === 'string' && !isMultiCat) {
+    const match = categories?.find((c: any) => (c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')) === search.category);
+    if (match) catId = match.categoryId;
+  }
+
+  if (!brndId && search.brand && typeof search.brand === 'string' && !search.brand.includes(',')) {
+    const match = allBrands?.find((b: any) => b.brandName.toLowerCase().replace(/\s+/g, '-') === search.brand);
+    if (match) brndId = match.brandId;
+  }
 
   const { data: brands } = useQuery(brandsQuery(catId));
-  const { data: categories } = useQuery(categoriesQuery());
   const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const brand = brndId ? brands?.find((b: any) => b.brandId === brndId) : null;
