@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const productSearchSchema = z.object({
   q: z.string().optional(),
-  categoryId: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
-  brandId: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
+  category: z.string().optional(),
+  brand: z.string().optional(),
   capacity: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
   warranty: z.union([z.string(), z.array(z.string())]).optional().transform(v => Array.isArray(v) ? v : v ? [v] : undefined),
   vehicleId: z.string().optional(),

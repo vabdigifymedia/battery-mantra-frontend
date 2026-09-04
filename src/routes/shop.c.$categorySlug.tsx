@@ -44,10 +44,10 @@ function CategoryProductsPage() {
   const matchingCategory = categories?.find(c => toSlug(c.categoryName) === categorySlug);
   const activeCategoryId = matchingCategory?.categoryId;
 
-  // We inject the categoryId into the search context
+  // We inject the category into the search context
   const activeSearch = {
     ...search,
-    categoryId: activeCategoryId ? [activeCategoryId] : undefined,
+    category: categorySlug,
   };
 
   return (
@@ -57,15 +57,15 @@ function CategoryProductsPage() {
         // If the user selects a DIFFERENT category in the sidebar, or adds a brand, 
         // we navigate to the generic /products route to handle complex filters seamlessly
         if (
-          (newSearch.categoryId && newSearch.categoryId.length > 0 && newSearch.categoryId[0] !== activeCategoryId) ||
-          (newSearch.brandId && newSearch.brandId.length > 0)
+          (newSearch.category && newSearch.category.split(',').length > 0 && !newSearch.category.split(',').includes(categorySlug)) ||
+          (newSearch.brand && newSearch.brand.length > 0)
         ) {
           navigate({ 
             to: "/products", 
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
           });
         } else {
-          const { categoryId, ...cleanSearch } = newSearch;
+          const { category, ...cleanSearch } = newSearch;
           navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
         }
       }}

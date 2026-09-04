@@ -52,8 +52,8 @@ function CategoryBrandProductsPage() {
   // We inject both into the search context
   const activeSearch = {
     ...search,
-    categoryId: activeCategoryId ? [activeCategoryId] : undefined,
-    brandId: activeBrandId ? [activeBrandId] : undefined,
+    category: categorySlug,
+    brand: brandSlug,
   };
 
   return (
@@ -62,15 +62,15 @@ function CategoryBrandProductsPage() {
       onSearchChange={(newSearch) => {
         // If the user selects DIFFERENT categories or brands, navigate to generic route
         if (
-          (newSearch.categoryId && newSearch.categoryId.length > 0 && newSearch.categoryId[0] !== activeCategoryId) ||
-          (newSearch.brandId && newSearch.brandId.length > 0 && newSearch.brandId[0] !== activeBrandId)
+          (newSearch.category && newSearch.category.split(',').length > 0 && !newSearch.category.split(',').includes(categorySlug)) ||
+          (newSearch.brand && newSearch.brand.split(',').length > 0 && !newSearch.brand.split(',').includes(brandSlug))
         ) {
           navigate({ 
             to: "/products", 
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
           });
         } else {
-          const { categoryId, brandId, ...cleanSearch } = newSearch;
+          const { category, brand, ...cleanSearch } = newSearch;
           navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
         }
       }}

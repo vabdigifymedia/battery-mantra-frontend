@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { z } from "zod";
 import { Filter, X } from "lucide-react";
 import { Container } from "@/components/layout/Container";
@@ -61,32 +61,43 @@ const SORTS: { value: ProductSort; label: string }[] = [
 ];
 
 export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter }: ProductsPageLayoutProps) {
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const categoriesList = useQuery(rootCategoriesQuery()).data || [];
+  const brandsList = useQuery(brandsQuery(undefined)).data || [];
+
+  const effectiveCategoryIds = useMemo(() => {
+    if (!search.category) return undefined;
+    const slugs = search.category.split(',');
+    const ids: string[] = [];
+    
+    const findId = (cats: any[]) => {
+      for (const cat of cats) {
+        const catSlug = cat.categorySlug || cat.categoryName.toLowerCase().replace(/\s+/g, '-');
+        if (slugs.includes(catSlug)) ids.push(cat.categoryId);
+        if (cat.subCategories) findId(cat.subCategories);
+      }
+    };
+    findId(categoriesList);
+    return ids.length > 0 ? ids : undefined;
+  }, [search.category, categoriesList]);
+
+  const effectiveBrandIds = useMemo(() => {
+    if (!search.brand) return undefined;
+    const slugs = search.brand.split(',');
+    return brandsList
+      .filter(b => slugs.includes(b.brandName.toLowerCase().replace(/\s+/g, '-')))
+      .map(b => b.brandId);
+  }, [search.brand, brandsList]);
 
   const filters: ProductFilterState = {
-    categoryId: search.categoryId,
-    brandId: search.brandId,
+    category: search.category,
+    brand: search.brand,
     capacity: search.capacity,
     warranty: search.warranty,
     minPrice: search.minPrice,
     maxPrice: search.maxPrice,
   };
 
-  const { data: rootCategories } = useQuery(rootCategoriesQuery());
-
-  let effectiveCategoryIds = filters.categoryId;
-  if (search.productType === "battery" && (!filters.categoryId || filters.categoryId.length === 0)) {
-    const batteryCatIds = rootCategories
-      ?.filter((c: any) => {
-        const name = c.categoryName.toLowerCase();
-        if (name === "inverter" || name === "inverters" || name === "solar") return false;
-        return true;
-      })
-      .map((c: any) => c.categoryId);
-    
-    if (batteryCatIds && batteryCatIds.length > 0) {
-      effectiveCategoryIds = batteryCatIds;
-    }
-  }
 
   const params: ProductFilterParams = {
     ...filters,
@@ -95,7 +106,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     vehicleId: vehicleIdOverride ?? search.vehicleId,
     page: search.page,
     size: search.size,
-    ...sortToApi(search.sort),
+    ...sortToApi((search.sort as ProductSort) || "relevance"),
   };
 
   const { 
@@ -119,13 +130,13 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const singleCategoryId = search.categoryId?.length === 1 ? search.categoryId[0] : undefined;
+  const singleCategoryId = search.category && !search.category.includes(',') ? effectiveCategoryIds?.[0] : undefined;
   const { data: brands } = useQuery(brandsQuery(singleCategoryId));
   const { data: categories } = useQuery(categoriesQuery());
   const { data: vehicles } = useQuery(vehiclesListQuery());
   
-  const brand = (search.brandId && search.brandId.length > 0) ? brands?.find((b: any) => b.brandId === search.brandId?.[0]) : null;
-  const category = (search.categoryId && search.categoryId.length > 0) ? categories?.find((c: any) => c.categoryId === search.categoryId?.[0]) : null;
+  const brand = (effectiveBrandIds && effectiveBrandIds.length > 0) ? brands?.find((b: any) => b.brandId === effectiveBrandIds[0]) : null;
+  const category = (effectiveCategoryIds && effectiveCategoryIds.length > 0) ? categories?.find((c: any) => c.categoryId === effectiveCategoryIds[0]) : null;
   const activeVehicleId = vehicleIdOverride ?? search.vehicleId;
   const vehicle = activeVehicleId ? vehicles?.find((v: any) => v.vehicleId === activeVehicleId) : null;
 
@@ -226,14 +237,20 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                 onRemove={(key, value) => {
                   if (key === 'minPrice' || key === 'maxPrice') {
                     onSearchChange({ [key]: undefined, page: 0 });
+                  } else if (key === 'category' || key === 'brand') {
+                    const currentStr = filters[key as keyof ProductFilterState] as string;
+                    if (currentStr) {
+                      const updated = currentStr.split(',').filter(v => v !== value);
+                      onSearchChange({ [key]: updated.length > 0 ? updated.join(',') : undefined, page: 0 });
+                    }
                   } else {
                     const current = (filters[key as keyof ProductFilterState] as string[]) || [];
                     onSearchChange({ [key]: current.filter(v => v !== value), page: 0 });
                   }
                 }}
                 onClearAll={() => onSearchChange({
-                  categoryId: undefined,
-                  brandId: undefined,
+                  category: undefined,
+                  brand: undefined,
                   capacity: undefined,
                   warranty: undefined,
                   minPrice: undefined,
@@ -354,14 +371,31 @@ function ActiveFilterBadges({
 
   const activeFilters: { key: string; value: any; label: string }[] = [];
 
-  filters.categoryId?.forEach(id => {
-    activeFilters.push({ key: 'categoryId', value: id, label: findCatName(categories, id) || id });
-  });
+  if (filters.category) {
+    const slugs = filters.category.split(',');
+    slugs.forEach(slug => {
+      // Find category by slug or formatted name
+      let foundName = slug;
+      const findName = (cats: any[]) => {
+        for (const c of cats) {
+          const cSlug = c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-');
+          if (cSlug === slug) { foundName = c.categoryName; return true; }
+          if (c.subCategories?.length && findName(c.subCategories)) return true;
+        }
+        return false;
+      };
+      findName(categories);
+      activeFilters.push({ key: 'category', value: slug, label: foundName });
+    });
+  }
 
-  filters.brandId?.forEach(id => {
-    const brand = brands.find(b => b.brandId === id);
-    activeFilters.push({ key: 'brandId', value: id, label: brand?.brandName || id });
-  });
+  if (filters.brand) {
+    const slugs = filters.brand.split(',');
+    slugs.forEach(slug => {
+      const brand = brands.find(b => (b.brandName.toLowerCase().replace(/\s+/g, '-')) === slug);
+      activeFilters.push({ key: 'brand', value: slug, label: brand?.brandName || slug });
+    });
+  }
 
   filters.capacity?.forEach(val => {
     activeFilters.push({ key: 'capacity', value: val, label: val });

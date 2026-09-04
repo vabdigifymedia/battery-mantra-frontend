@@ -11,8 +11,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { cn } from "@/lib/utils";
 
 export type ProductFilterState = {
-  categoryId?: string[];
-  brandId?: string[];
+  category?: string;
+  brand?: string;
   minPrice?: number;
   maxPrice?: number;
   capacity?: string[];
@@ -20,8 +20,8 @@ export type ProductFilterState = {
 };
 
 export const emptyFilters: ProductFilterState = {
-  categoryId: [],
-  brandId: [],
+  category: undefined,
+  brand: undefined,
   capacity: [],
   warranty: [],
 };
@@ -47,7 +47,8 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
   const [capSearch, setCapSearch] = useState("");
 
   const cats = useQuery(rootCategoriesQuery());
-  const selectedCategoryId = state.categoryId?.[0];
+  const selectedCategorySlugs = state.category ? state.category.split(',') : [];
+  const selectedCategoryId = cats.data?.find((c: CategoryListResponse) => selectedCategorySlugs.includes(c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')))?.categoryId;
   const brands = useQuery(brandsQuery(selectedCategoryId));
   const dynamicCapacities = useQuery(capacitiesQuery(selectedCategoryId));
 
@@ -178,8 +179,8 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
 
   const hasFilters = useMemo(
     () =>
-      (state.categoryId && state.categoryId.length > 0) ||
-      (state.brandId && state.brandId.length > 0) ||
+      (state.category && state.category.length > 0) ||
+      (state.brand && state.brand.length > 0) ||
       (state.capacity && state.capacity.length > 0) ||
       (state.warranty && state.warranty.length > 0) ||
       state.minPrice != null ||
@@ -187,13 +188,23 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
     [state],
   );
 
-  const toggleArrayItem = (key: keyof ProductFilterState, value: string) => {
+  const toggleArrayItem = (key: 'capacity' | 'warranty', value: string) => {
     const current = (state[key] as string[]) || [];
     const updated = current.includes(value)
       ? current.filter(item => item !== value)
       : [...current, value];
     
     onChange({ ...state, [key]: updated });
+  };
+
+  const toggleSlugString = (key: 'category' | 'brand', value: string) => {
+    const currentStr = state[key] || "";
+    const current = currentStr ? currentStr.split(',') : [];
+    const updated = current.includes(value)
+      ? current.filter(item => item !== value)
+      : [...current, value];
+    
+    onChange({ ...state, [key]: updated.length > 0 ? updated.join(',') : undefined });
   };
 
   return (
@@ -225,7 +236,7 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4">
                 <div className="max-h-[220px] overflow-y-auto">
-                  <CategoryCheckboxTree categories={cats.data} state={state} toggleArrayItem={toggleArrayItem} />
+                  <CategoryCheckboxTree categories={cats.data} state={state} toggleSlugString={toggleSlugString} />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -253,7 +264,8 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
                 .filter(b => b.productCount === undefined || b.productCount > 0)
                 .filter(b => b.brandName?.toLowerCase().includes(brandSearch.toLowerCase()))
                 .map((b) => {
-                const isChecked = state.brandId?.includes(b.brandId) || false;
+                const brandSlug = b.brandName.toLowerCase().replace(/\s+/g, '-');
+                const isChecked = state.brand?.split(',').includes(brandSlug) || false;
                 let count = null;
                 let isDisabled = false;
 
@@ -279,7 +291,7 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
                     <Checkbox 
                       checked={isChecked}
                       disabled={isDisabled}
-                      onCheckedChange={() => toggleArrayItem("brandId", b.brandId)}
+                      onCheckedChange={() => toggleSlugString("brand", brandSlug)}
                     />
                     <span className="flex-1">{b.brandName}</span>
                     {count !== null && <span className="text-xs text-muted-foreground">({count})</span>}
@@ -470,30 +482,31 @@ function CategoryCheckboxTree({
   categories,
   depth = 0,
   state,
-  toggleArrayItem
+  toggleSlugString
 }: {
   categories: CategoryListResponse[];
   depth?: number;
   state: ProductFilterState;
-  toggleArrayItem: (key: keyof ProductFilterState, value: string) => void;
+  toggleSlugString: (key: 'category' | 'brand', value: string) => void;
 }) {
   return (
     <div className={cn(depth > 0 && "ml-5 space-y-3 mt-3 border-l-2 border-border/50 pl-3")}>
       {categories.map((c) => {
-        const isChecked = state.categoryId?.includes(c.categoryId) || false;
+        const catSlug = c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-');
+        const isChecked = state.category?.split(',').includes(catSlug) || false;
         return (
           <div key={c.categoryId} className={cn("space-y-3", depth === 0 && "mb-3")}>
             <label className="flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors group pt-1">
               <Checkbox 
                 checked={isChecked}
-                onCheckedChange={() => toggleArrayItem("categoryId", c.categoryId)}
+                onCheckedChange={() => toggleSlugString("category", catSlug)}
               />
               <span className={cn(depth === 0 ? "font-medium" : "text-muted-foreground group-hover:text-primary")}>
                 {c.categoryName}
               </span>
             </label>
             {c.subCategories && c.subCategories.length > 0 && (
-              <CategoryCheckboxTree categories={c.subCategories} depth={depth + 1} state={state} toggleArrayItem={toggleArrayItem} />
+              <CategoryCheckboxTree categories={c.subCategories} depth={depth + 1} state={state} toggleSlugString={toggleSlugString} />
             )}
           </div>
         );

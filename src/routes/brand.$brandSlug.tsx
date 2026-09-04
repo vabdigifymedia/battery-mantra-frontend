@@ -44,10 +44,10 @@ function BrandProductsPage() {
   const matchingBrand = brands?.find(b => toSlug(b.brandName) === brandSlug);
   const activeBrandId = matchingBrand?.brandId;
 
-  // We inject the brandId into the search context
+  // We inject the brand slug into the search context
   const activeSearch = {
     ...search,
-    brandId: activeBrandId ? [activeBrandId] : undefined,
+    brand: brandSlug,
   };
 
   return (
@@ -55,14 +55,17 @@ function BrandProductsPage() {
       search={activeSearch}
       onSearchChange={(newSearch) => {
         // If the user selects a DIFFERENT brand in the sidebar, we navigate to the generic /products route
-        if (newSearch.brandId && newSearch.brandId.length > 0 && newSearch.brandId[0] !== activeBrandId) {
+        if (
+          (newSearch.brand && newSearch.brand.split(',').length > 0 && !newSearch.brand.split(',').includes(brandSlug)) ||
+          (newSearch.category && newSearch.category.length > 0)
+        ) {
           navigate({ 
             to: "/products", 
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
           });
         } else {
-          // Remove brandId from newSearch if it's the same, so it doesn't pollute the URL
-          const { brandId, ...cleanSearch } = newSearch;
+          // Remove brand from newSearch if it's the same, so it doesn't pollute the URL
+          const { brand, ...cleanSearch } = newSearch;
           navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
         }
       }}
