@@ -113,7 +113,10 @@ function AdminProductPriority() {
       let orderA = a.globalDisplayOrder ?? a.displayOrder ?? 999999;
       let orderB = b.globalDisplayOrder ?? b.displayOrder ?? 999999;
       
-      if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
+      if (activeCategoryId !== "ALL" && activeBrandId !== "ALL") {
+        orderA = a.categoryBrandDisplayOrder ?? 999999;
+        orderB = b.categoryBrandDisplayOrder ?? 999999;
+      } else if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
         orderA = a.categoryDisplayOrder ?? 999999;
         orderB = b.categoryDisplayOrder ?? 999999;
       } else if (activeBrandId !== "ALL" && activeCategoryId === "ALL") {
@@ -153,13 +156,14 @@ function AdminProductPriority() {
     }
   };
 
-  // Since we now auto-clear the other filter, this will always be false, but kept for safety.
-  const isInvalidMode = activeCategoryId !== "ALL" && activeBrandId !== "ALL";
+  const isInvalidMode = false;
 
   const reorderMutation = useMutation({
     mutationFn: async () => {
-      let context: "GLOBAL" | "CATEGORY" | "BRAND" = "GLOBAL";
-      if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
+      let context: "GLOBAL" | "CATEGORY" | "BRAND" | "CATEGORY_BRAND" = "GLOBAL";
+      if (activeCategoryId !== "ALL" && activeBrandId !== "ALL") {
+        context = "CATEGORY_BRAND";
+      } else if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
         context = "CATEGORY";
       } else if (activeBrandId !== "ALL" && activeCategoryId === "ALL") {
         context = "BRAND";
@@ -210,10 +214,7 @@ function AdminProductPriority() {
           <label className="text-xs font-semibold text-muted-foreground uppercase">Filter by Category</label>
           <Select 
             value={activeCategoryId} 
-            onValueChange={(val) => {
-              setActiveCategoryId(val);
-              if (val !== "ALL") setActiveBrandId("ALL");
-            }}
+            onValueChange={setActiveCategoryId}
           >
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="All Categories" />
@@ -233,10 +234,7 @@ function AdminProductPriority() {
           <label className="text-xs font-semibold text-muted-foreground uppercase">Filter by Brand</label>
           <Select 
             value={activeBrandId} 
-            onValueChange={(val) => {
-              setActiveBrandId(val);
-              if (val !== "ALL") setActiveCategoryId("ALL");
-            }}
+            onValueChange={setActiveBrandId}
           >
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="All Brands" />

@@ -194,6 +194,7 @@ export type ProductListResponse = {
   globalDisplayOrder?: number;
   categoryDisplayOrder?: number;
   brandDisplayOrder?: number;
+  categoryBrandDisplayOrder?: number;
   displayOrder?: number; // legacy
   highlights?: string;
   isAutoAssignToPartner?: boolean;
@@ -469,10 +470,10 @@ export type CreateProductRequest = {
 
 export type UpdateProductRequest = Partial<CreateProductRequest>;
 
-export type ProductReorderRequest = {
-  productId: UUID;
+export interface ProductReorderRequest {
+  productId: string;
   orderValue: number;
-  orderContext: "GLOBAL" | "CATEGORY" | "BRAND";
+  orderContext: "GLOBAL" | "CATEGORY" | "BRAND" | "CATEGORY_BRAND";
 };
 
 export type BulkProductUpdateRequest = {
