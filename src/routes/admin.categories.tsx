@@ -34,6 +34,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CategoryReorderModal } from "@/components/admin/CategoryReorderModal";
 import type { CategoryListResponse, CreateCategoryRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
@@ -467,14 +468,20 @@ function AdminCategories() {
               <Input id="categoryName" {...form.register("categoryName")} placeholder="e.g. Car Batteries" />
             </FormField>
             
-            <FormField label="Description" htmlFor="categoryDescription" error={form.formState.errors.categoryDescription?.message}>
-              <div>
-                <Input id="categoryDescription" {...form.register("categoryDescription")} />
-                <p className="text-xs text-muted-foreground mt-2">
-                  You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
-                </p>
-              </div>
-            </FormField>
+            <Controller
+              control={form.control}
+              name="categoryDescription"
+              render={({ field }) => (
+                <FormField label="Description (HTML / SEO Content)" htmlFor="categoryDescription" error={form.formState.errors.categoryDescription?.message}>
+                  <div>
+                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
+                    </p>
+                  </div>
+                </FormField>
+              )}
+            />
 
             <Controller
               control={form.control}

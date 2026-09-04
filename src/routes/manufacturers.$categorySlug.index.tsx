@@ -5,6 +5,9 @@ import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/quer
 import { ChevronRight, Car, Bike, Zap, Tag } from "lucide-react";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
+import { applySeoTemplate } from "@/lib/utils";
+import { useLocationStore } from "@/store/useLocationStore";
 import { buildPageHead } from "@/lib/seo";
 
 // Helper to format string to slug
@@ -27,6 +30,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/")({
 
 function CategoryManufacturersPage() {
   const { categorySlug } = Route.useParams();
+  const { city } = useLocationStore();
 
   // Load root categories to find categoryId by slug
   const { data: categories } = useQuery(rootCategoriesQuery());
@@ -149,6 +153,22 @@ function CategoryManufacturersPage() {
             ))}
           </div>
         )}
+
+        {category?.categoryDescription && (
+          <div 
+            className="prose prose-sm md:prose-base max-w-none mt-12 mb-8 text-muted-foreground"
+            dangerouslySetInnerHTML={{ 
+              __html: applySeoTemplate(category.categoryDescription, {
+                city: city?.cityName || "Delhi / NCR",
+                city_name: city?.cityName || "Delhi / NCR",
+                category: categoryName,
+                category_name: categoryName,
+              }) 
+            }}
+          />
+        )}
+
+        <SeoCityLinks productName={categoryName} />
       </Container>
 
       <GlobalFaqSection

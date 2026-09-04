@@ -330,6 +330,20 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             </div>
           )}
 
+          {category?.categoryDescription && pageType === "CATEGORY" && (
+            <div 
+              className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8"
+              dangerouslySetInnerHTML={{ 
+                __html: applySeoTemplate(category.categoryDescription, {
+                  city: city?.cityName || "Delhi / NCR",
+                  city_name: city?.cityName || "Delhi / NCR",
+                  category: category.categoryName || "Battery",
+                  category_name: category.categoryName || "Battery",
+                }) 
+              }}
+            />
+          )}
+
           {products.length > 0 && (
             <>
               <SeoPriceTable 
