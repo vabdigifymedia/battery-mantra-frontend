@@ -54,12 +54,8 @@ function BrandProductsPage() {
     <ProductsPageLayout 
       search={activeSearch}
       onSearchChange={(newSearch) => {
-        // If the user selects a DIFFERENT brand in the sidebar, or adds a category, 
-        // we navigate to the generic /products route to handle complex filters seamlessly
-        if (
-          (newSearch.brandId && newSearch.brandId.length > 0 && newSearch.brandId[0] !== activeBrandId) ||
-          (newSearch.categoryId && newSearch.categoryId.length > 0)
-        ) {
+        // If the user selects a DIFFERENT brand in the sidebar, we navigate to the generic /products route
+        if (newSearch.brandId && newSearch.brandId.length > 0 && newSearch.brandId[0] !== activeBrandId) {
           navigate({ 
             to: "/products", 
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
@@ -68,7 +64,6 @@ function BrandProductsPage() {
           navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } });
         }
       }}
-      hideCategoryFilter={true}
     />
   );
 }
