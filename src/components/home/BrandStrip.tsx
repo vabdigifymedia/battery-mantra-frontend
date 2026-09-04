@@ -27,14 +27,6 @@ export function BrandStrip() {
       </div>
     );
   }
-  const batteryCatIds = cats.data
-    ?.filter(c => {
-      const name = c.categoryName.toLowerCase();
-      if (name === "inverter" || name === "inverters" || name === "solar") return false;
-      return true;
-    })
-    .map(c => c.categoryId) || [];
-
   if (data.length === 0) return null;
 
   return (
@@ -44,7 +36,7 @@ export function BrandStrip() {
           key={b.brandId}
           to="/brand/$brandSlug"
           params={{ brandSlug: toSlug(b.brandName) }}
-          search={batteryCatIds.length > 0 ? { categoryId: batteryCatIds } : undefined}
+          search={{ productType: "battery" }}
           className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
         >
           {/* Subtle glow on hover */}

@@ -71,8 +71,26 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     maxPrice: search.maxPrice,
   };
 
+  const { data: rootCategories } = useQuery(rootCategoriesQuery());
+
+  let effectiveCategoryIds = filters.categoryId;
+  if (search.productType === "battery" && (!filters.categoryId || filters.categoryId.length === 0)) {
+    const batteryCatIds = rootCategories
+      ?.filter((c: any) => {
+        const name = c.categoryName.toLowerCase();
+        if (name === "inverter" || name === "inverters" || name === "solar") return false;
+        return true;
+      })
+      .map((c: any) => c.categoryId);
+    
+    if (batteryCatIds && batteryCatIds.length > 0) {
+      effectiveCategoryIds = batteryCatIds;
+    }
+  }
+
   const params: ProductFilterParams = {
     ...filters,
+    categoryId: effectiveCategoryIds,
     keyword: search.q,
     vehicleId: vehicleIdOverride ?? search.vehicleId,
     page: search.page,

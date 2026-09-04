@@ -12,6 +12,7 @@ export const productSearchSchema = z.object({
   page: z.coerce.number().int().min(0).optional().default(0),
   size: z.coerce.number().int().min(1).max(60).optional().default(20),
   sort: z.enum(["relevance", "price-asc", "price-desc", "name-asc", "name-desc"]).optional().default("relevance"),
+  productType: z.enum(["battery"]).optional(),
 });
 
 export type ProductSearchState = z.infer<typeof productSearchSchema>;
