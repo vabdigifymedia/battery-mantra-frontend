@@ -9,9 +9,9 @@ export const productSearchSchema = z.object({
   vehicleId: z.string().optional(),
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
-  page: z.coerce.number().int().min(0).optional().default(0),
-  size: z.coerce.number().int().min(1).max(60).optional().default(20),
-  sort: z.enum(["relevance", "price-asc", "price-desc", "name-asc", "name-desc"]).optional().default("relevance"),
+  page: z.coerce.number().int().min(0).optional(),
+  size: z.coerce.number().int().min(1).max(60).optional(),
+  sort: z.enum(["relevance", "price-asc", "price-desc", "name-asc", "name-desc"]).optional(),
   productType: z.enum(["battery"]).optional(),
 });
 
