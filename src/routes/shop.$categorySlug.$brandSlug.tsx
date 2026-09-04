@@ -7,6 +7,7 @@ import {
   categoriesQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -16,16 +17,34 @@ export const Route = createFileRoute("/shop/$categorySlug/$brandSlug")({
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
-    return {};
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+
+    const [brands, categories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(brandsQuery()),
+      context.queryClient.ensureQueryData(categoriesQuery()),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    ]);
+    return { brands, categories, templates };
   },
-  head: ({ params }) => {
+  head: ({ loaderData, params }) => {
     const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    
-    return buildPageHead(undefined, {
-      title: `${brandName} ${categoryName} Online | Buy 100% Genuine Battery`,
-      description: `Buy 100% Genuine ${brandName} ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
-    });
+    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
+    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    // Try brand SEO first (more specific), then category
+    const seo = resolveTemplateSeo(
+      "BRAND",
+      loaderData?.templates,
+      { brand_name: brand?.brandName || brandName, category_name: category?.categoryName || categoryName },
+      (brand as any)?.seo,
+      {
+        title: `${brandName} ${categoryName} Online | Buy 100% Genuine Battery`,
+        description: `Buy 100% Genuine ${brandName} ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      }
+    );
+
+    return buildPageHead(seo);
   },
   validateSearch: productSearchSchema,
   component: CategoryBrandProductsPage,

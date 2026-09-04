@@ -7,6 +7,7 @@ import {
   categoriesQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -16,15 +17,30 @@ export const Route = createFileRoute("/shop/c/$categorySlug")({
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
-    return {};
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+
+    const [categories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(categoriesQuery()),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    ]);
+    return { categories, templates };
   },
-  head: ({ params }) => {
+  head: ({ loaderData, params }) => {
     const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    
-    return buildPageHead(undefined, {
-      title: `${categoryName} Online | Buy 100% Genuine Battery`,
-      description: `Buy 100% Genuine ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
-    });
+    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    const seo = resolveTemplateSeo(
+      "CATEGORY",
+      loaderData?.templates,
+      { category_name: category?.categoryName || categoryName },
+      (category as any)?.seo,
+      {
+        title: `${categoryName} Online | Buy 100% Genuine Battery`,
+        description: `Buy 100% Genuine ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      }
+    );
+
+    return buildPageHead(seo);
   },
   validateSearch: productSearchSchema,
   component: CategoryProductsPage,

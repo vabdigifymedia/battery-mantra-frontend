@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
-import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery } from "@/queries";
+import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery, rootCategoriesQuery } from "@/queries";
 import { ChevronRight } from "lucide-react";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { useLocationStore } from "@/store/useLocationStore";
 import { applySeoTemplate } from "@/lib/utils";
 import { BannerLayout } from "@/components/products/DynamicSearchBanner";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
 // Helper to format string to slug
 const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
@@ -15,14 +16,40 @@ const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-')
 import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug/")({
-  head: ({ params }) => {
+  loader: async ({ context }) => {
+    void context.queryClient.prefetchQuery(manufacturersListQuery());
+    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+
+    const [manufacturers, categories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(manufacturersListQuery()),
+      context.queryClient.ensureQueryData(rootCategoriesQuery()),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    ]);
+    return { manufacturers, categories, templates };
+  },
+  head: ({ loaderData, params }) => {
     const makeName = params.makeSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     
-    return buildPageHead(null, {
-      title: `Buy ${makeName} ${categoryName} Online at Best Price | Battery Mantra`,
-      description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
-    });
+    const manufacturer = loaderData?.manufacturers?.find((m: any) => toSlug(m.name) === params.makeSlug);
+    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    const seo = resolveTemplateSeo(
+      "MANUFACTURER",
+      loaderData?.templates,
+      { 
+        manufacturer_name: manufacturer?.name || makeName, 
+        category_name: category?.categoryName || categoryName 
+      },
+      (manufacturer as any)?.seo,
+      {
+        title: `Buy ${makeName} ${categoryName} Online at Best Price | Battery Mantra`,
+        description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
+      }
+    );
+
+    return buildPageHead(seo);
   },
   component: ManufacturerPage,
 });

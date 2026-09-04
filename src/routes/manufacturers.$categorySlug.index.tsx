@@ -9,21 +9,42 @@ import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { buildPageHead } from "@/lib/seo";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
 
 export const Route = createFileRoute("/manufacturers/$categorySlug/")({
-  head: ({ params }) => {
+  loader: async ({ context }) => {
+    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+
+    const [categories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(rootCategoriesQuery()),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    ]);
+    return { categories, templates };
+  },
+  head: ({ loaderData, params }) => {
     const categoryName = params.categorySlug
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-    return buildPageHead(null, {
-      title: `Shop by ${categoryName} | Battery Mantra`,
-      description: `Select your ${categoryName} manufacturer or brand to find compatible batteries at best prices with free installation.`,
-    });
+    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    const seo = resolveTemplateSeo(
+      "MANUFACTURER", // Or CATEGORY, depending on preference. Let's use CATEGORY as fallback if MANUFACTURER doesn't exist, but resolveTemplateSeo supports MANUFACTURER.
+      loaderData?.templates,
+      { category_name: category?.categoryName || categoryName },
+      (category as any)?.seo, // The category's own SEO
+      {
+        title: `Shop by ${categoryName} | Battery Mantra`,
+        description: `Select your ${categoryName} manufacturer or brand to find compatible batteries at best prices with free installation.`,
+      }
+    );
+
+    return buildPageHead(seo);
   },
   component: CategoryManufacturersPage,
 });

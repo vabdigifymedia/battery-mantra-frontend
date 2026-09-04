@@ -57,6 +57,8 @@ import { useLocationStore } from "@/store/useLocationStore";
 
 import { deliveryTimeService } from "@/services/delivery-time.service";
 
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+
 const searchSchema = z.object({
   autoAdd: z.enum(["true", "false"]).optional().catch(undefined),
   autoBuy: z.enum(["true", "false"]).optional().catch(undefined),
@@ -66,47 +68,51 @@ export const Route = createFileRoute("/product/$slug")({
   validateSearch: searchSchema,
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(productDetailQuery(params.slug));
+      void context.queryClient.prefetchQuery(seoTemplatesQuery());
+      const product = await context.queryClient.ensureQueryData(productDetailQuery(params.slug));
+      const templates = await context.queryClient.ensureQueryData(seoTemplatesQuery());
+      return { product, templates };
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) throw notFound();
       throw e;
     }
   },
   head: ({ loaderData }) => {
-    const seo = (loaderData?.specs?.seo as any) || loaderData?.seo;
-    const city = useLocationStore.getState().city;
-    const cityName = city?.cityName || "";
+    const { product, templates } = loaderData || {};
+    const seo = (product?.specs?.seo as any) || product?.seo;
     
-    // Fallback logic: Use city fields if city is selected AND city field exists, otherwise use default fields.
-    let title = (city && seo?.metaTitleCity) ? seo.metaTitleCity : seo?.metaTitle;
-    let desc = (city && seo?.metaDescriptionCity) ? seo.metaDescriptionCity : seo?.metaDescription;
-    let keywords = (city && seo?.metaKeywordsCity) ? seo.metaKeywordsCity : seo?.metaKeywords;
-    let ogTitle = (city && seo?.ogTitleCity) ? seo.ogTitleCity : seo?.ogTitle;
-    let ogDesc = (city && seo?.ogDescriptionCity) ? seo.ogDescriptionCity : seo?.ogDescription;
-
-    const replacePlaceholders = (str: string | undefined | null) => {
-      if (!str) return "";
-      // E.g., assume 2-4 Hours if we don't have exact time synchronously
-      return str.replace(/\{?city_name\}?/gi, cityName || "India").replace(/\{?delivery_time\}?/gi, "2-4 Hours");
-    };
-
-    title = replacePlaceholders(title) || (loaderData ? `${loaderData.productName} · BatteryMantra` : "Product · BatteryMantra");
-    desc = replacePlaceholders(desc) || (loaderData ? `Buy ${loaderData.productName} at best price on BatteryMantra.` : "Buy batteries at best price.");
-    keywords = replacePlaceholders(keywords);
-    ogTitle = replacePlaceholders(ogTitle);
-    ogDesc = replacePlaceholders(ogDesc);
+    const brandName = product?.brandName || "";
+    const categoryName = product?.categoryName || "";
+    const productName = product?.productName || "";
+    const deliveryTime = "2-4 Hours"; // default assumed time
+    
+    const resolvedSeo = resolveTemplateSeo(
+      "PRODUCT",
+      templates,
+      {
+        product_name: productName,
+        brand_name: brandName,
+        category_name: categoryName,
+        delivery_time: deliveryTime
+      },
+      seo,
+      {
+        title: product ? `${productName} · BatteryMantra` : "Product · BatteryMantra",
+        description: product ? `Buy ${productName} at best price on BatteryMantra.` : "Buy batteries at best price.",
+      }
+    );
 
     return {
       meta: [
-        { title },
-        { name: "description", content: desc },
-        { name: "keywords", content: keywords },
-        { property: "og:title", content: ogTitle },
-        { property: "og:description", content: ogDesc },
+        { title: resolvedSeo.metaTitle },
+        { name: "description", content: resolvedSeo.metaDescription },
+        { name: "keywords", content: resolvedSeo.metaKeywords },
+        { property: "og:title", content: resolvedSeo.ogTitle },
+        { property: "og:description", content: resolvedSeo.ogDescription },
         { name: "robots", content: "index,follow" }
       ].filter(m => ('title' in m) || m.content),
-      links: loaderData?.productImage ? [
-        { rel: "preload", as: "image", href: loaderData.productImage, fetchpriority: "high" }
+      links: product?.productImage ? [
+        { rel: "preload", as: "image", href: product.productImage, fetchpriority: "high" }
       ] : [],
     };
   },
