@@ -34,7 +34,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/")({
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
 
     const seo = resolveTemplateSeo(
-      "MANUFACTURER", // Or CATEGORY, depending on preference. Let's use CATEGORY as fallback if MANUFACTURER doesn't exist, but resolveTemplateSeo supports MANUFACTURER.
+      "CATEGORY",
       loaderData?.templates,
       { category_name: category?.categoryName || categoryName },
       (category as any)?.seo, // The category's own SEO
