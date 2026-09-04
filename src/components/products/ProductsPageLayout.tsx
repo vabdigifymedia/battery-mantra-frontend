@@ -65,7 +65,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const categoriesList = useQuery(rootCategoriesQuery()).data || [];
   const brandsList = useQuery(brandsQuery(undefined)).data || [];
 
-  const effectiveCategoryIds = useMemo(() => {
+  let effectiveCategoryIds = useMemo(() => {
     if (!search.category) return undefined;
     const slugs = search.category.split(',');
     const ids: string[] = [];
@@ -80,6 +80,22 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     findId(categoriesList);
     return ids.length > 0 ? ids : undefined;
   }, [search.category, categoriesList]);
+
+  if (search.productType && (!effectiveCategoryIds || effectiveCategoryIds.length === 0)) {
+    const pTypeIds = categoriesList
+      ?.filter((c: any) => {
+        const name = c.categoryName.toLowerCase();
+        if (search.productType === "battery") return name !== "inverter" && name !== "inverters" && name !== "solar";
+        if (search.productType === "inverter") return name === "inverter" || name === "inverters";
+        if (search.productType === "solar") return name === "solar";
+        return true;
+      })
+      .map((c: any) => c.categoryId);
+    
+    if (pTypeIds && pTypeIds.length > 0) {
+      effectiveCategoryIds = pTypeIds;
+    }
+  }
 
   const effectiveBrandIds = useMemo(() => {
     if (!search.brand) return undefined;
@@ -102,6 +118,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const params: ProductFilterParams = {
     ...filters,
     categoryId: effectiveCategoryIds,
+    brandId: effectiveBrandIds,
     keyword: search.q,
     vehicleId: vehicleIdOverride ?? search.vehicleId,
     page: search.page,
