@@ -35,6 +35,9 @@ export function SeoPriceTable({ products, title }: SeoPriceTableProps) {
                 : `₹${priceWithoutExchange.toLocaleString('en-IN')}`;
 
               const extractCapacity = (name: string, backendCapacity?: string) => {
+                if ('capacityAh' in product && (product as any).capacityAh) {
+                  return (product as any).capacityAh;
+                }
                 let specCap = (product as any).specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
                 if (!specCap && (product as any).specs) {
                   const specsObj = (product as any).specs;
