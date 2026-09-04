@@ -8,7 +8,9 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   const locationName = city?.cityName || "Delhi"; // Fallback to Delhi if not set
 
   // Handle categoryId arrays if present
-  const catId = Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId;
+  // If multiple categories are passed, it's a general search (e.g. all batteries), so we don't pin the banner to just the first category
+  const isMultiCat = Array.isArray(search.categoryId) && search.categoryId.length > 1;
+  const catId = isMultiCat ? null : (Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId);
   const brndId = Array.isArray(search.brandId) ? search.brandId[0] : search.brandId;
 
   const { data: brands } = useQuery(brandsQuery(catId));
