@@ -153,6 +153,7 @@ function AdminProductPriority() {
     }
   };
 
+  // Since we now auto-clear the other filter, this will always be false, but kept for safety.
   const isInvalidMode = activeCategoryId !== "ALL" && activeBrandId !== "ALL";
 
   const reorderMutation = useMutation({
@@ -204,16 +205,16 @@ function AdminProductPriority() {
         </Button>
       </div>
 
-      {isInvalidMode && (
-        <div className="text-sm text-destructive font-medium p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-center gap-2">
-          Priority set karne ke liye sirf koi 1 filter select karein (Category ya Brand), ya Global order ke liye dono clear karein.
-        </div>
-      )}
-
       <div className="flex flex-col sm:flex-row items-center gap-4 bg-muted/50 p-4 rounded-xl">
         <div className="space-y-1 w-full sm:w-auto">
           <label className="text-xs font-semibold text-muted-foreground uppercase">Filter by Category</label>
-          <Select value={activeCategoryId} onValueChange={setActiveCategoryId}>
+          <Select 
+            value={activeCategoryId} 
+            onValueChange={(val) => {
+              setActiveCategoryId(val);
+              if (val !== "ALL") setActiveBrandId("ALL");
+            }}
+          >
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
@@ -230,7 +231,13 @@ function AdminProductPriority() {
 
         <div className="space-y-1 w-full sm:w-auto">
           <label className="text-xs font-semibold text-muted-foreground uppercase">Filter by Brand</label>
-          <Select value={activeBrandId} onValueChange={setActiveBrandId}>
+          <Select 
+            value={activeBrandId} 
+            onValueChange={(val) => {
+              setActiveBrandId(val);
+              if (val !== "ALL") setActiveCategoryId("ALL");
+            }}
+          >
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="All Brands" />
             </SelectTrigger>
