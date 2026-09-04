@@ -191,7 +191,10 @@ export type ProductListResponse = {
   additionalImages?: string[];
   productCategory?: string;
   capacity?: string;
-  displayOrder?: number;
+  globalDisplayOrder?: number;
+  categoryDisplayOrder?: number;
+  brandDisplayOrder?: number;
+  displayOrder?: number; // legacy
   highlights?: string;
   isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
@@ -458,7 +461,9 @@ export type CreateProductRequest = {
   compatibleVehicleIds?: string[];
   specs?: Record<string, unknown>;
   capacity?: string;
-  displayOrder?: number;
+  globalDisplayOrder?: number;
+  categoryDisplayOrder?: number;
+  brandDisplayOrder?: number;
   cityPrices?: CityPricingDto[];
 };
 
@@ -466,7 +471,8 @@ export type UpdateProductRequest = Partial<CreateProductRequest>;
 
 export type ProductReorderRequest = {
   productId: UUID;
-  displayOrder: number;
+  orderValue: number;
+  orderContext: "GLOBAL" | "CATEGORY" | "BRAND";
 };
 
 export type BulkProductUpdateRequest = {

@@ -108,8 +108,21 @@ function AdminProductPriority() {
       }
     }
     
-    // Sort by existing display order, then fallback to current array order
-    filtered.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    // Sort by the appropriate display order based on context
+    filtered.sort((a, b) => {
+      let orderA = a.globalDisplayOrder ?? a.displayOrder ?? 999999;
+      let orderB = b.globalDisplayOrder ?? b.displayOrder ?? 999999;
+      
+      if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
+        orderA = a.categoryDisplayOrder ?? 999999;
+        orderB = b.categoryDisplayOrder ?? 999999;
+      } else if (activeBrandId !== "ALL" && activeCategoryId === "ALL") {
+        orderA = a.brandDisplayOrder ?? 999999;
+        orderB = b.brandDisplayOrder ?? 999999;
+      }
+      
+      return orderA - orderB;
+    });
     
     setItems(filtered);
     setHasChanges(false);
@@ -140,11 +153,21 @@ function AdminProductPriority() {
     }
   };
 
+  const isInvalidMode = activeCategoryId !== "ALL" && activeBrandId !== "ALL";
+
   const reorderMutation = useMutation({
     mutationFn: async () => {
+      let context: "GLOBAL" | "CATEGORY" | "BRAND" = "GLOBAL";
+      if (activeCategoryId !== "ALL" && activeBrandId === "ALL") {
+        context = "CATEGORY";
+      } else if (activeBrandId !== "ALL" && activeCategoryId === "ALL") {
+        context = "BRAND";
+      }
+
       const payload = items.map((item, index) => ({
         productId: item.productId,
-        displayOrder: index
+        orderValue: index,
+        orderContext: context
       }));
       return adminService.reorderProducts(payload);
     },
@@ -173,13 +196,19 @@ function AdminProductPriority() {
         </div>
         <Button 
           onClick={() => reorderMutation.mutate()} 
-          disabled={!hasChanges || reorderMutation.isPending}
+          disabled={!hasChanges || reorderMutation.isPending || isInvalidMode}
           variant="brand"
         >
           {reorderMutation.isPending ? <Spinner size="sm" className="mr-2" /> : null}
           Save Order
         </Button>
       </div>
+
+      {isInvalidMode && (
+        <div className="text-sm text-destructive font-medium p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-center gap-2">
+          Priority set karne ke liye sirf koi 1 filter select karein (Category ya Brand), ya Global order ke liye dono clear karein.
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row items-center gap-4 bg-muted/50 p-4 rounded-xl">
         <div className="space-y-1 w-full sm:w-auto">
