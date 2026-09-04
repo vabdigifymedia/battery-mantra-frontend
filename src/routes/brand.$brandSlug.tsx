@@ -61,7 +61,9 @@ function BrandProductsPage() {
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
           });
         } else {
-          navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } });
+          // Remove brandId from newSearch if it's the same, so it doesn't pollute the URL
+          const { brandId, ...cleanSearch } = newSearch;
+          navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
         }
       }}
     />

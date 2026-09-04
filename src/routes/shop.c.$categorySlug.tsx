@@ -65,7 +65,8 @@ function CategoryProductsPage() {
             search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
           });
         } else {
-          navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } });
+          const { categoryId, ...cleanSearch } = newSearch;
+          navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
         }
       }}
       hideCategoryFilter={true}

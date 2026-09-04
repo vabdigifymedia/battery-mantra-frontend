@@ -149,6 +149,19 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const total = data?.pages[0]?.totalElements ?? 0;
   const totalPages = data?.pages[0]?.totalPages ?? 0;
 
+  const handleFilterChange = (newFilters: ProductFilterState) => {
+    const cleanFilters: Partial<ProductFilterState> = {};
+    (Object.keys(newFilters) as Array<keyof ProductFilterState>).forEach(key => {
+      const val = newFilters[key];
+      if (Array.isArray(val) && val.length === 0) {
+        cleanFilters[key] = undefined;
+      } else {
+        (cleanFilters as any)[key] = val;
+      }
+    });
+    onSearchChange({ ...cleanFilters, page: undefined });
+  };
+
   return (
     <div>
       <PageHeader
@@ -161,7 +174,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
       />
       <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="hidden lg:block">
-          <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
+          <ProductFilters state={filters} onChange={handleFilterChange} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
         </aside>
 
         <div className="min-w-0">
@@ -178,7 +191,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                   <DrawerTitle>Filters</DrawerTitle>
                 </DrawerHeader>
                 <div className="mt-4 overflow-y-auto px-4 pb-8">
-                  <ProductFilters state={filters} onChange={(newFilters) => onSearchChange({ ...newFilters, page: 0 })} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
+                  <ProductFilters state={filters} onChange={handleFilterChange} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
                 </div>
               </DrawerContent>
             </Drawer>
@@ -219,13 +232,13 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                   }
                 }}
                 onClearAll={() => onSearchChange({
-                  categoryId: [],
-                  brandId: [],
-                  capacity: [],
-                  warranty: [],
+                  categoryId: undefined,
+                  brandId: undefined,
+                  capacity: undefined,
+                  warranty: undefined,
                   minPrice: undefined,
                   maxPrice: undefined,
-                  page: 0
+                  page: undefined
                 })}
                 brands={brands || []}
                 categories={categories || []}
