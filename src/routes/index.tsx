@@ -225,7 +225,9 @@ function HomePage() {
                 filterFn={(p) => {
                   const cat = p.productCategory?.toLowerCase() || "";
                   const name = p.productName.toLowerCase();
-                  return cat.includes("inverter") || name.includes("inverter");
+                  // It must be an inverter battery, not a machine.
+                  // If category or name implies it's an inverter, ensure it also implies it's a battery
+                  return (cat.includes("inverter") || name.includes("inverter")) && (cat.includes("batter") || name.includes("batter"));
                 }}
               />
             </div>

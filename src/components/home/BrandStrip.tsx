@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { cn, toSlug } from "@/lib/utils";
-import { featuredBrandsQuery, brandsQuery } from "@/queries";
+import { featuredBrandsQuery, brandsQuery, rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { Image } from "@/components/common/Image";
 import { ArrowRight } from "lucide-react";
@@ -9,6 +9,7 @@ import { ArrowRight } from "lucide-react";
 export function BrandStrip() {
   const featured = useQuery(featuredBrandsQuery());
   const all = useQuery(brandsQuery());
+  const cats = useQuery(rootCategoriesQuery());
 
   const featuredList = Array.isArray(featured.data) ? featured.data : [];
   const allList = Array.isArray(all.data) ? all.data : [];
@@ -26,6 +27,14 @@ export function BrandStrip() {
       </div>
     );
   }
+  const batteryCatIds = cats.data
+    ?.filter(c => {
+      const name = c.categoryName.toLowerCase();
+      if (name === "inverter" || name === "inverters" || name === "solar") return false;
+      return true;
+    })
+    .map(c => c.categoryId) || [];
+
   if (data.length === 0) return null;
 
   return (
@@ -33,8 +42,9 @@ export function BrandStrip() {
       {data.map((b) => (
         <Link
           key={b.brandId}
-          to="/shop/b/$brandSlug"
+          to="/brand/$brandSlug"
           params={{ brandSlug: toSlug(b.brandName) }}
+          search={batteryCatIds.length > 0 ? { categoryId: batteryCatIds } : undefined}
           className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
         >
           {/* Subtle glow on hover */}
