@@ -48,7 +48,7 @@ function SeoQuickCategoriesPage() {
         title="Categories (without city)" 
         templateType="CATEGORY_WITHOUT_CITY" 
         data={templates?.find((t: any) => t.templateType === "CATEGORY_WITHOUT_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "CATEGORY_WITHOUT_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "CATEGORY_WITHOUT_CITY" })}
         isPending={saveMutation.isPending}
       />
 
@@ -56,7 +56,7 @@ function SeoQuickCategoriesPage() {
         title="Categories (with city)" 
         templateType="CATEGORY_WITH_CITY" 
         data={templates?.find((t: any) => t.templateType === "CATEGORY_WITH_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "CATEGORY_WITH_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "CATEGORY_WITH_CITY" })}
         isPending={saveMutation.isPending}
       />
     </div>

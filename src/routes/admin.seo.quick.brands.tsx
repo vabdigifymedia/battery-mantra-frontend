@@ -48,7 +48,7 @@ function SeoQuickBrandsPage() {
         title="Brands (without city)" 
         templateType="BRAND_WITHOUT_CITY" 
         data={templates?.find((t: any) => t.templateType === "BRAND_WITHOUT_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "BRAND_WITHOUT_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "BRAND_WITHOUT_CITY" })}
         isPending={saveMutation.isPending}
       />
 
@@ -56,7 +56,7 @@ function SeoQuickBrandsPage() {
         title="Brands (with city)" 
         templateType="BRAND_WITH_CITY" 
         data={templates?.find((t: any) => t.templateType === "BRAND_WITH_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "BRAND_WITH_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "BRAND_WITH_CITY" })}
         isPending={saveMutation.isPending}
       />
     </div>

@@ -48,7 +48,7 @@ function SeoQuickManufacturersPage() {
         title="Manufacturers (without city)" 
         templateType="MANUFACTURER_WITHOUT_CITY" 
         data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITHOUT_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITHOUT_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITHOUT_CITY" })}
         isPending={saveMutation.isPending}
       />
 
@@ -56,7 +56,7 @@ function SeoQuickManufacturersPage() {
         title="Manufacturers (with city)" 
         templateType="MANUFACTURER_WITH_CITY" 
         data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITH_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITH_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITH_CITY" })}
         isPending={saveMutation.isPending}
       />
     </div>

@@ -48,7 +48,7 @@ function SeoQuickProductsPage() {
         title="Products (without city)" 
         templateType="PRODUCT_WITHOUT_CITY" 
         data={templates?.find((t: any) => t.templateType === "PRODUCT_WITHOUT_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "PRODUCT_WITHOUT_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "PRODUCT_WITHOUT_CITY" })}
         isPending={saveMutation.isPending}
       />
 
@@ -56,7 +56,7 @@ function SeoQuickProductsPage() {
         title="Products (with city)" 
         templateType="PRODUCT_WITH_CITY" 
         data={templates?.find((t: any) => t.templateType === "PRODUCT_WITH_CITY")} 
-        onSave={(data) => saveMutation.mutate({ ...data, templateType: "PRODUCT_WITH_CITY" })}
+        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "PRODUCT_WITH_CITY" })}
         isPending={saveMutation.isPending}
       />
     </div>

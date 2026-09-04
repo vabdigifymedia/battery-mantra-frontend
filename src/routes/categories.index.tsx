@@ -55,7 +55,7 @@ function CategoriesPage() {
                   return (
                     <Link
                       key={c.categoryId}
-                      to="/categories/$categorySlug"
+                      to="/shop/c/$categorySlug"
                       params={{ categorySlug: rawSlug }}
                       className={cardClassName}
                     >

@@ -68,9 +68,9 @@ function OrdersPage() {
                   </div>
                   <p className="mt-1 text-sm">
                     <span className="font-medium">
-                      {o.orderItems.length} item{o.orderItems.length === 1 ? "" : "s"}
+                      {o.orderItems?.length || 0} item{(o.orderItems?.length || 0) === 1 ? "" : "s"}
                     </span>{" "}
-                    · placed {formatDate(o.placedAt)}
+                    · placed {formatDate(o.placedAt || "")}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

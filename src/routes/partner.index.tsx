@@ -28,9 +28,8 @@ function PartnerOverviewDashboard() {
     .filter((o) => o.orderStatus !== "CANCELLED")
     .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-  // Take top 5 recent orders
   const recentOrders = [...orders]
-    .sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime())
+    .sort((a, b) => new Date(b.placedAt || 0).getTime() - new Date(a.placedAt || 0).getTime())
     .slice(0, 5);
 
   const getStatusColor = (status: string) => {
@@ -184,7 +183,7 @@ function PartnerOverviewDashboard() {
                       {order.orderId.split("-")[0]}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {new Date(order.placedAt).toLocaleDateString()}
+                      {new Date(order.placedAt || 0).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-sm">
                       <div className="font-medium">{order.customerName}</div>
