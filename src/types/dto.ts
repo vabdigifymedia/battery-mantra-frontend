@@ -191,6 +191,7 @@ export type ProductListResponse = {
   additionalImages?: string[];
   productCategory?: string;
   capacity?: string;
+  capacityAh?: string;
   globalDisplayOrder?: number;
   categoryDisplayOrder?: number;
   brandDisplayOrder?: number;

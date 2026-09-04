@@ -33,6 +33,9 @@ export function ProductCard({
 
   // Determine capacity to display on card badge
   const displayCapacity = useMemo(() => {
+    if ('capacityAh' in product && (product as any).capacityAh) {
+      return (product as any).capacityAh;
+    }
     if ('specDetails' in product && Array.isArray((product as any).specDetails)) {
       const capSpec = (product as any).specDetails.find(
         (s: any) =>
