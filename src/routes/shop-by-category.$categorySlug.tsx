@@ -10,6 +10,8 @@ import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
+import { LithiumMainPage } from "@/components/lithium/LithiumMainPage";
+import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -76,6 +78,14 @@ function SubcategoriesPage() {
 
   const subCategories = category.subCategories || [];
   const sorted = [...subCategories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+
+  if (categorySlug === "lithium-power-solutions") {
+    return <LithiumMainPage category={category} subcategories={sorted} />;
+  }
+
+  if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery") {
+    return <LithiumSubCategoryPage category={category} type={categorySlug} />;
+  }
 
   return (
     <div>
