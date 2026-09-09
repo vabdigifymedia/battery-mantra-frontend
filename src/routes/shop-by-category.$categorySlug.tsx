@@ -64,7 +64,20 @@ function SubcategoriesPage() {
     );
   }
 
-  const category = data.find((c) => (c.categorySlug || toSlug(c.categoryName)) === categorySlug);
+  let category: any = undefined;
+  const searchCategory = (cats: any[]) => {
+    for (const c of cats) {
+      if ((c.categorySlug || toSlug(c.categoryName)) === categorySlug) {
+        category = c;
+        return true;
+      }
+      if (c.subCategories && searchCategory(c.subCategories)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  searchCategory(data);
 
   if (!category) {
     return (
@@ -79,12 +92,18 @@ function SubcategoriesPage() {
   const subCategories = category.subCategories || [];
   const sorted = [...subCategories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
-  if (categorySlug === "lithium-power-solutions") {
+  const isLithiumRoot = category.categoryName.toLowerCase().includes("lithium power solutions") || categorySlug === "lithium-power-solutions";
+  if (isLithiumRoot) {
     return <LithiumMainPage category={category} subcategories={sorted} />;
   }
 
-  if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery") {
-    return <LithiumSubCategoryPage category={category} type={categorySlug} />;
+  const catName = category.categoryName.toLowerCase();
+  const isLithiumIntegrated = catName.includes("integrated") && (catName.includes("lithium") || catName.includes("inverter"));
+  const isLithiumSolar = catName.includes("solar") && (catName.includes("lithium") || catName.includes("inbuilt"));
+
+  if (isLithiumIntegrated || isLithiumSolar) {
+    const type = isLithiumSolar ? "lithium-inbuilt-solar-inverter-battery" : "lithium-integrated-inverter-battery";
+    return <LithiumSubCategoryPage category={category} type={type} />;
   }
 
   return (

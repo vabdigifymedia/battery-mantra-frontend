@@ -102,8 +102,14 @@ export function LithiumMainPage({
                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
               </div>
               <Link
-                to="/shop-by-category/$categorySlug"
-                params={{ categorySlug: "lithium-battery-for-inverter" }}
+                to="/shop/c/$categorySlug"
+                params={{ 
+                  categorySlug: subcategories.find(c => 
+                    (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && 
+                    !c.categoryName.toLowerCase().includes("integrated") && 
+                    !c.categoryName.toLowerCase().includes("solar")
+                  )?.categorySlug || "lithium-battery-for-inverter" 
+                }}
                 className="w-full mt-auto py-3 px-4 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
               >
                 Shop Lithium Batteries <ArrowRight className="w-4 h-4" />
@@ -134,7 +140,9 @@ export function LithiumMainPage({
               </div>
               <Link
                 to="/shop-by-category/$categorySlug"
-                params={{ categorySlug: "lithium-integrated-inverter-battery" }}
+                params={{ 
+                  categorySlug: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery"
+                }}
                 className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
               >
                 Shop Integrated Inverters <ArrowRight className="w-4 h-4" />
@@ -165,7 +173,9 @@ export function LithiumMainPage({
               </div>
               <Link
                 to="/shop-by-category/$categorySlug"
-                params={{ categorySlug: "lithium-inbuilt-solar-inverter-battery" }}
+                params={{ 
+                  categorySlug: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery"
+                }}
                 className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
               >
                 Shop Solar Inverters <ArrowRight className="w-4 h-4" />
