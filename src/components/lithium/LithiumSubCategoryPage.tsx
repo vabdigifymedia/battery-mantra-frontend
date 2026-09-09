@@ -64,45 +64,43 @@ export function LithiumSubCategoryPage({
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
       
       {/* Hero Banner Area */}
-      <div className={`bg-slate-900 text-white overflow-hidden relative pb-16 pt-12`}>
-        {/* Abstract Background Elements */}
-        <div className={`absolute top-0 right-0 w-96 h-96 bg-${config.theme}-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3`}></div>
-        <div className={`absolute bottom-0 left-0 w-64 h-64 bg-${config.theme}-500/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3`}></div>
+      <div 
+        className="relative min-h-[500px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
+        style={{
+          backgroundImage: `url('/images/lithium/${isSolar ? 'solar-battery-banner.png' : 'integrated-battery-banner.png'}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        {/* Gradient Overlay to ensure text readability */}
+        <div className={`absolute inset-0 bg-gradient-to-${isSolar ? 'l' : 'r'} from-white/90 via-white/70 to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
         
-        <Container size="xl" className="relative z-10">
-          <div className={`flex flex-col lg:flex-row${isSolar ? '-reverse' : ''} items-center gap-12`}>
-            <div className={`flex-1 text-center lg:text-${isSolar ? 'right' : 'left'}`}>
-              <span className={`text-${config.theme}-400 font-bold tracking-widest text-sm uppercase mb-3 block`}>
+        <Container size="xl" className="relative z-10 w-full py-16">
+          <div className={`flex flex-col lg:flex-row ${isSolar ? 'justify-end' : 'justify-start'}`}>
+            <div className={`w-full lg:w-1/2 ${isSolar ? 'text-right' : 'text-left'}`}>
+              <span className={`text-${config.theme}-600 font-extrabold tracking-widest text-sm uppercase mb-4 block drop-shadow-sm`}>
                 {config.subtitle}
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-slate-900 drop-shadow-md">
                 Lithium {config.titleHighlight} <br/>Inverter Battery
               </h1>
-              <p className="text-lg text-slate-300 font-medium mb-10 max-w-xl mx-auto lg:mx-0">
+              <p className={`text-lg text-slate-700 font-semibold mb-10 max-w-xl drop-shadow-sm ${isSolar ? 'ml-auto' : 'mr-auto'}`}>
                 {config.desc}
               </p>
 
-              <div className={`flex flex-wrap justify-center lg:justify-${isSolar ? 'end' : 'start'} gap-8`}>
+              <div className={`flex flex-wrap gap-6 ${isSolar ? 'justify-end' : 'justify-start'}`}>
                 {config.features.map((f, i) => (
-                  <div key={i} className={`flex flex-col items-center lg:items-${isSolar ? 'end' : 'start'} gap-2`}>
-                    <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                      <f.icon className={`w-6 h-6 text-${config.theme}-400`} />
+                  <div key={i} className={`flex flex-col gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
+                    <div className={`w-14 h-14 rounded-full bg-${config.theme}-100 flex items-center justify-center shadow-md`}>
+                      <f.icon className={`w-7 h-7 text-${config.theme}-600`} />
                     </div>
-                    <div className={`text-center lg:text-${isSolar ? 'right' : 'left'}`}>
-                      <div className="font-bold text-sm text-white leading-tight">{f.label}</div>
-                      <div className="text-xs text-slate-400">{f.desc}</div>
+                    <div className={isSolar ? 'text-right' : 'text-left'}>
+                      <div className="font-bold text-sm text-slate-900 leading-tight">{f.label}</div>
+                      <div className="text-xs font-semibold text-slate-600">{f.desc}</div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
-            
-            <div className="flex-1 flex justify-center lg:justify-end relative">
-               {isSolar ? (
-                 <img src="/images/lithium/solar-battery-banner.png" alt="Solar Inverter Battery" className="w-full max-w-[500px] h-auto object-contain drop-shadow-2xl z-10" />
-               ) : (
-                 <img src="/images/lithium/integrated-battery-banner.png" alt="Integrated Inverter Battery" className="w-full max-w-[500px] h-auto object-contain drop-shadow-2xl z-10" />
-               )}
             </div>
           </div>
         </Container>
