@@ -55,14 +55,25 @@ function CategoryBrandsPage() {
 
   // Load root categories to find categoryId by slug
   const { data: categories } = useQuery(rootCategoriesQuery());
-  const category = categories?.find(
-    (c) =>
-      c.categorySlug === categorySlug ||
-      toSlug(c.categoryName) === categorySlug ||
-      (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car")) ||
-      ((categorySlug.includes("bike") || categorySlug.includes("two-wheeler")) &&
-        (c.categoryName.toLowerCase().includes("bike") || c.categoryName.toLowerCase().includes("two wheeler")))
-  );
+  const findCategory = (cats: any[]): any => {
+    for (const c of cats) {
+      if (
+        c.categorySlug === categorySlug ||
+        toSlug(c.categoryName) === categorySlug ||
+        (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car")) ||
+        ((categorySlug.includes("bike") || categorySlug.includes("two-wheeler")) &&
+          (c.categoryName.toLowerCase().includes("bike") || c.categoryName.toLowerCase().includes("two wheeler")))
+      ) {
+        return c;
+      }
+      if (c.subCategories && c.subCategories.length > 0) {
+        const found = findCategory(c.subCategories);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+  const category = categories ? findCategory(categories) : undefined;
 
   const categoryName =
     category?.categoryName ||
