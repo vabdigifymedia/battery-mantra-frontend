@@ -222,7 +222,12 @@ function AdminCategories() {
       clickAction: values.clickAction,
       parentId: values.parentId || null,
       removeParent: !values.parentId, // Tell backend explicitly to detach
-      seo: editingCategory ? values.seo : { slug: generateSlug(values.categoryName) },
+      seo: editingCategory 
+        ? { 
+            ...values.seo, 
+            slug: values.seo?.slug ? values.seo.slug : generateSlug(values.categoryName) 
+          } 
+        : { slug: generateSlug(values.categoryName) },
     } as any;
 
     if (editingCategory) {
