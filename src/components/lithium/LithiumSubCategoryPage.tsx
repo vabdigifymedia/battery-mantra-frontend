@@ -70,8 +70,8 @@ export function LithiumSubCategoryPage({
         <div className={`absolute bottom-0 left-0 w-64 h-64 bg-${config.theme}-500/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3`}></div>
         
         <Container size="xl" className="relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="flex-1 text-center lg:text-left">
+          <div className={`flex flex-col lg:flex-row${isSolar ? '-reverse' : ''} items-center gap-12`}>
+            <div className={`flex-1 text-center lg:text-${isSolar ? 'right' : 'left'}`}>
               <span className={`text-${config.theme}-400 font-bold tracking-widest text-sm uppercase mb-3 block`}>
                 {config.subtitle}
               </span>
@@ -82,13 +82,13 @@ export function LithiumSubCategoryPage({
                 {config.desc}
               </p>
 
-              <div className="flex flex-wrap justify-center lg:justify-start gap-8">
+              <div className={`flex flex-wrap justify-center lg:justify-${isSolar ? 'end' : 'start'} gap-8`}>
                 {config.features.map((f, i) => (
-                  <div key={i} className="flex flex-col items-center lg:items-start gap-2">
+                  <div key={i} className={`flex flex-col items-center lg:items-${isSolar ? 'end' : 'start'} gap-2`}>
                     <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
                       <f.icon className={`w-6 h-6 text-${config.theme}-400`} />
                     </div>
-                    <div className="text-center lg:text-left">
+                    <div className={`text-center lg:text-${isSolar ? 'right' : 'left'}`}>
                       <div className="font-bold text-sm text-white leading-tight">{f.label}</div>
                       <div className="text-xs text-slate-400">{f.desc}</div>
                     </div>

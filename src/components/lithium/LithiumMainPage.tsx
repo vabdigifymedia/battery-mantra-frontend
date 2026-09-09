@@ -22,39 +22,56 @@ export function LithiumMainPage({
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
 
       {/* Hero Banner Area */}
-      <div className="bg-slate-900 text-white pb-24 pt-12">
-        <Container size="xl">
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <span className="text-emerald-400 font-bold tracking-widest text-sm uppercase mb-3">
-              Smart Power Solutions
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight">
-              Choose Your <span className="text-emerald-400">Lithium Power Solution</span>
-            </h1>
-            <p className="text-lg text-slate-300 font-medium mb-10 max-w-2xl">
-              Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office.
-            </p>
+      <div className="bg-[#f8fafc] pb-24 pt-16 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-green-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        
+        <Container size="xl" className="relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            
+            {/* Left Side: Text */}
+            <div className="flex-1 text-center md:text-left">
+              <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase mb-4 block">
+                SMART POWER SOLUTIONS
+              </span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight text-slate-900">
+                Choose Your <br/>
+                <span className="text-emerald-600">Lithium Power Solution</span>
+              </h1>
+              <p className="text-lg text-slate-600 font-medium max-w-xl mx-auto md:mx-0">
+                Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office.
+              </p>
+            </div>
 
-            <div className="flex items-center gap-6 text-sm font-semibold text-slate-200">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                  <BatteryCharging className="w-6 h-6 text-emerald-400" />
-                </div>
-                <span>Longer Backup</span>
+            {/* Right Side: Features */}
+            <div className="flex-1 flex flex-col items-center md:items-end w-full">
+              <div className="mb-6 mr-12 -rotate-6">
+                <span className="font-serif italic text-2xl text-slate-800 font-bold">
+                  Same Trust<br/>More Possibilities
+                </span>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                  <BadgeIndianRupee className="w-6 h-6 text-emerald-400" />
+              <div className="flex items-center gap-6 text-sm font-semibold text-slate-700 bg-white p-6 rounded-2xl shadow-xl border border-slate-100/50 w-full md:w-auto justify-center">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
+                    <BatteryCharging className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <span className="text-center text-xs">Longer<br/>Backup</span>
                 </div>
-                <span>Lower Running Cost</span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                  <Sun className="w-6 h-6 text-emerald-400" />
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
+                    <BadgeIndianRupee className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <span className="text-center text-xs">Lower<br/>Running Cost</span>
                 </div>
-                <span>Cleaner & Greener</span>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
+                    <Leaf className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <span className="text-center text-xs">Cleaner<br/>& Greener</span>
+                </div>
               </div>
             </div>
+
           </div>
         </Container>
       </div>
