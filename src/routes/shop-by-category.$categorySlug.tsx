@@ -112,6 +112,44 @@ function SubcategoriesPage() {
 
             const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product";
 
+            if (c.clickAction === 'SHOW_BRANDS') {
+              return (
+                <Link key={c.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                  {cardContent}
+                </Link>
+              );
+            }
+            if (c.clickAction === 'SHOW_MANUFACTURERS') {
+              return (
+                <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                  {cardContent}
+                </Link>
+              );
+            }
+            if (c.clickAction === 'SHOW_PRODUCTS') {
+              return (
+                <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                  {cardContent}
+                </Link>
+              );
+            }
+            if (c.clickAction === 'SHOW_SUBCATEGORIES') {
+              return (
+                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                  {cardContent}
+                </Link>
+              );
+            }
+
+            // AUTO or undefined fallback
+            if (c.subCategories && c.subCategories.length > 0) {
+              return (
+                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                  {cardContent}
+                </Link>
+              );
+            }
+
             if (isCar || isBike) {
               const catSlug = isCar
                 ? (rawSlug.includes("car") ? rawSlug : "car-batteries")
