@@ -92,7 +92,7 @@ export function HomeCategoryPills() {
           return (
             <Link
               key={category.categoryId}
-              to="/shop/c/$categorySlug"
+              to="/brands/$categorySlug"
               params={{ categorySlug: rawSlug }}
               className={linkClass}
             >

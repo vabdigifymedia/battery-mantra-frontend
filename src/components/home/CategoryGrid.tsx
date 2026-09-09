@@ -79,7 +79,7 @@ export function CategoryGrid() {
         return (
           <Link
             key={c.categoryId}
-            to="/shop/c/$categorySlug"
+            to="/brands/$categorySlug"
             params={{ categorySlug: rawSlug }}
             className={cardClassName}
           >
