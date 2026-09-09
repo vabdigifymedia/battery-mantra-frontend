@@ -74,7 +74,7 @@ export function LithiumMainPage({
             </div>
             <div className="p-6 flex-1 flex flex-col items-center justify-center bg-white relative">
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-100/50 rounded-full blur-2xl"></div>
-               <Battery className="w-24 h-24 text-blue-500 drop-shadow-xl z-10" />
+               <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full max-w-[200px] h-auto object-contain drop-shadow-xl z-10 hover:scale-105 transition-transform duration-300" />
             </div>
             <div className="p-6 bg-white border-t border-slate-100">
                <div className="grid grid-cols-3 gap-2 mb-6 text-center text-xs font-semibold text-slate-700">
@@ -103,7 +103,7 @@ export function LithiumMainPage({
             </div>
             <div className="p-6 flex-1 flex flex-col items-center justify-center bg-white relative">
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-emerald-100/50 rounded-full blur-2xl"></div>
-               <BatteryCharging className="w-24 h-24 text-emerald-500 drop-shadow-xl z-10" />
+               <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full max-w-[200px] h-auto object-contain drop-shadow-xl z-10 hover:scale-105 transition-transform duration-300" />
             </div>
             <div className="p-6 bg-white border-t border-slate-100">
                <div className="grid grid-cols-3 gap-2 mb-6 text-center text-xs font-semibold text-slate-700">
@@ -132,7 +132,7 @@ export function LithiumMainPage({
             </div>
             <div className="p-6 flex-1 flex flex-col items-center justify-center bg-white relative">
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-orange-100/50 rounded-full blur-2xl"></div>
-               <Sun className="w-24 h-24 text-orange-500 drop-shadow-xl z-10" />
+               <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full max-w-[200px] h-auto object-contain drop-shadow-xl z-10 hover:scale-105 transition-transform duration-300" />
             </div>
             <div className="p-6 bg-white border-t border-slate-100">
                <div className="grid grid-cols-3 gap-2 mb-6 text-center text-xs font-semibold text-slate-700">

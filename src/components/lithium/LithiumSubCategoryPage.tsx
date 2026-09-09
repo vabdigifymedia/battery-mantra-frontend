@@ -98,14 +98,11 @@ export function LithiumSubCategoryPage({
             </div>
             
             <div className="flex-1 flex justify-center lg:justify-end relative">
-               <div className="w-64 h-64 md:w-80 md:h-80 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 flex items-center justify-center relative shadow-2xl">
-                 <div className={`absolute inset-0 bg-gradient-to-tr from-${config.theme}-500/20 to-transparent rounded-full animate-pulse`}></div>
-                 {isSolar ? (
-                   <Sun className={`w-32 h-32 text-${config.theme}-400 drop-shadow-xl`} />
-                 ) : (
-                   <BatteryCharging className={`w-32 h-32 text-${config.theme}-400 drop-shadow-xl`} />
-                 )}
-               </div>
+               {isSolar ? (
+                 <img src="/images/lithium/solar-battery-banner.png" alt="Solar Inverter Battery" className="w-full max-w-[500px] h-auto object-contain drop-shadow-2xl z-10" />
+               ) : (
+                 <img src="/images/lithium/integrated-battery-banner.png" alt="Integrated Inverter Battery" className="w-full max-w-[500px] h-auto object-contain drop-shadow-2xl z-10" />
+               )}
             </div>
           </div>
         </Container>
