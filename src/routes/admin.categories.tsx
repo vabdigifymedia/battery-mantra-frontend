@@ -145,7 +145,10 @@ function AdminCategories() {
   const openEditModal = (category: any) => {
     setEditingCategory(category);
     
-    let newSeo = { ...(category.seo || {}) };
+    let newSeo = { 
+      slug: category.categorySlug || "",
+      ...(category.seo || {}) 
+    };
     
     if (templates && templates.length > 0) {
       const templateWithoutCity = templates.find((t: any) => t.templateType === "CATEGORY_WITHOUT_CITY");
