@@ -150,6 +150,7 @@ export type CategoryListResponse = {
   displayOrder?: number;
   parentId?: UUID | null;
   subCategories?: CategoryListResponse[];
+  clickAction?: 'AUTO' | 'SHOW_BRANDS' | 'SHOW_MANUFACTURERS' | 'SHOW_PRODUCTS' | 'SHOW_SUBCATEGORIES';
 };
 export type CategoryDetailResponse = CategoryListResponse & {
   parentId?: UUID;
@@ -170,6 +171,7 @@ export type CreateCategoryRequest = {
   parentId?: string | null;
   removeParent?: boolean;
   seo?: CategorySeoRequest;
+  clickAction?: 'AUTO' | 'SHOW_BRANDS' | 'SHOW_MANUFACTURERS' | 'SHOW_PRODUCTS' | 'SHOW_SUBCATEGORIES';
 };
 
 export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;

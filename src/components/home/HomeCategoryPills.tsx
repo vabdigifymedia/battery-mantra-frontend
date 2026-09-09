@@ -58,6 +58,36 @@ export function HomeCategoryPills() {
 
           const linkClass = "flex flex-col items-center gap-2 min-w-[68px] snap-start active:scale-95 transition-transform duration-200";
 
+          if (category.clickAction === 'SHOW_BRANDS') {
+            return (
+              <Link key={category.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+                {cardContent}
+              </Link>
+            );
+          }
+          if (category.clickAction === 'SHOW_MANUFACTURERS') {
+            return (
+              <Link key={category.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+                {cardContent}
+              </Link>
+            );
+          }
+          if (category.clickAction === 'SHOW_PRODUCTS') {
+            return (
+              <Link key={category.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+                {cardContent}
+              </Link>
+            );
+          }
+          if (category.clickAction === 'SHOW_SUBCATEGORIES') {
+            return (
+              <Link key={category.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+                {cardContent}
+              </Link>
+            );
+          }
+
+          // AUTO or undefined fallback
           if (category.subCategories && category.subCategories.length > 0) {
             return (
               <Link

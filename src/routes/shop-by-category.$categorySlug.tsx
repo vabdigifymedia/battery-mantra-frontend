@@ -81,10 +81,20 @@ function SubcategoriesPage() {
     <div>
       <PageHeader
         title={category.categoryName}
-        description={applySeoTemplate(category.categoryDescription || "", { 
-          category_name: category.categoryName, 
-          city_name: city?.cityName || "your city" 
-        }) || `Select a subcategory to view products.`}
+        description={
+          category.categoryDescription ? (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: applySeoTemplate(category.categoryDescription, {
+                  category_name: category.categoryName,
+                  city_name: city?.cityName || "Delhi / NCR",
+                }),
+              }}
+            />
+          ) : (
+            `Select a subcategory to view products.`
+          )
+        }
       />
       <Container size="xl" className="py-8">
         <div className="mb-8">

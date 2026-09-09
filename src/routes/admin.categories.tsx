@@ -48,6 +48,7 @@ const categorySchema = z.object({
   categoryDescription: z.string().trim().optional(),
   iconUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
+  clickAction: z.enum(['AUTO', 'SHOW_BRANDS', 'SHOW_MANUFACTURERS', 'SHOW_PRODUCTS', 'SHOW_SUBCATEGORIES']).optional().default('AUTO'),
   parentId: z.string().uuid().optional().nullable().or(z.literal("")),
   seo: z.object({
     slug: z.string().optional(),
@@ -109,6 +110,7 @@ function AdminCategories() {
       categoryDescription: "",
       iconUrl: "",
       displayOrder: 0,
+      clickAction: "AUTO",
       parentId: null,
     },
   });
@@ -120,6 +122,7 @@ function AdminCategories() {
       categoryDescription: "",
       iconUrl: "",
       displayOrder: 0,
+      clickAction: "AUTO",
       parentId,
       seo: {
         slug: "",
@@ -168,6 +171,7 @@ function AdminCategories() {
       categoryDescription: category.categoryDescription ?? "",
       iconUrl: category.iconUrl ?? "",
       displayOrder: category.displayOrder ?? 0,
+      clickAction: category.clickAction ?? "AUTO",
       parentId: category.parentId ?? null,
       seo: newSeo
     });
@@ -215,6 +219,7 @@ function AdminCategories() {
       categoryDescription: values.categoryDescription,
       iconUrl: values.iconUrl,
       displayOrder: values.displayOrder,
+      clickAction: values.clickAction,
       parentId: values.parentId || null,
       removeParent: !values.parentId, // Tell backend explicitly to detach
       seo: editingCategory ? values.seo : { slug: generateSlug(values.categoryName) },
@@ -499,6 +504,20 @@ function AdminCategories() {
 
             <FormField label="Display Order" htmlFor="displayOrder" error={form.formState.errors.displayOrder?.message}>
               <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
+            </FormField>
+
+            <FormField label="On-Click Action" htmlFor="clickAction" error={form.formState.errors.clickAction?.message}>
+              <select
+                id="clickAction"
+                {...form.register("clickAction")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="AUTO">Auto (Smart Routing)</option>
+                <option value="SHOW_BRANDS">Show Brands Grid</option>
+                <option value="SHOW_MANUFACTURERS">Show Manufacturers Grid</option>
+                <option value="SHOW_PRODUCTS">Show Products List Directly</option>
+                <option value="SHOW_SUBCATEGORIES">Show Subcategories</option>
+              </select>
             </FormField>
 
             {editingCategory && (
