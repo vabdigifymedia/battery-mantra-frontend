@@ -49,7 +49,25 @@ export function CategoryGrid() {
           return (
             <Link
               key={c.categoryId}
-              to="/categories/$categorySlug"
+              to="/shop-by-category/$categorySlug"
+              params={{ categorySlug: rawSlug }}
+              className={cardClassName}
+            >
+              {cardContent}
+            </Link>
+          );
+        }
+
+        const isVehicle = (() => {
+          const n = c.categoryName.toLowerCase();
+          return n.includes("car") || n.includes("bike") || n.includes("two wheeler") || n.includes("2 wheeler") || n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
+        })();
+
+        if (isVehicle) {
+          return (
+            <Link
+              key={c.categoryId}
+              to="/manufacturers/$categorySlug"
               params={{ categorySlug: rawSlug }}
               className={cardClassName}
             >
@@ -61,7 +79,7 @@ export function CategoryGrid() {
         return (
           <Link
             key={c.categoryId}
-            to="/manufacturers/$categorySlug"
+            to="/shop/c/$categorySlug"
             params={{ categorySlug: rawSlug }}
             className={cardClassName}
           >

@@ -71,10 +71,28 @@ export function HomeCategoryPills() {
             );
           }
 
+          const isVehicle = (() => {
+            const n = category.categoryName.toLowerCase();
+            return n.includes("car") || n.includes("bike") || n.includes("two wheeler") || n.includes("2 wheeler") || n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
+          })();
+
+          if (isVehicle) {
+            return (
+              <Link
+                key={category.categoryId}
+                to="/manufacturers/$categorySlug"
+                params={{ categorySlug: rawSlug }}
+                className={linkClass}
+              >
+                {cardContent}
+              </Link>
+            );
+          }
+
           return (
             <Link
               key={category.categoryId}
-              to="/manufacturers/$categorySlug"
+              to="/shop/c/$categorySlug"
               params={{ categorySlug: rawSlug }}
               className={linkClass}
             >
