@@ -81,20 +81,7 @@ function SubcategoriesPage() {
     <div>
       <PageHeader
         title={category.categoryName}
-        description={
-          category.categoryDescription ? (
-            <span
-              dangerouslySetInnerHTML={{
-                __html: applySeoTemplate(category.categoryDescription, {
-                  category_name: category.categoryName,
-                  city_name: city?.cityName || "Delhi / NCR",
-                }),
-              }}
-            />
-          ) : (
-            `Select a subcategory to view products.`
-          )
-        }
+        description="Select a subcategory to view products."
       />
       <Container size="xl" className="py-8">
         <div className="mb-8">
@@ -154,6 +141,18 @@ function SubcategoriesPage() {
             );
           })}
         </div>
+        
+        {category.categoryDescription && (
+          <div 
+            className="prose prose-sm md:prose-base max-w-none mt-12 mb-8 text-muted-foreground"
+            dangerouslySetInnerHTML={{ 
+              __html: applySeoTemplate(category.categoryDescription, {
+                category_name: category.categoryName,
+                city_name: city?.cityName || "Delhi / NCR",
+              }) 
+            }} 
+          />
+        )}
       </Container>
     </div>
   );
