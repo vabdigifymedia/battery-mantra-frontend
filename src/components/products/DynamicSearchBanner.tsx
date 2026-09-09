@@ -19,8 +19,19 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   const { data: categories } = useQuery(categoriesQuery());
   const { data: allBrands } = useQuery(brandsQuery()); // Fetch all to resolve slug
   
-  if (!catId && search.category && typeof search.category === 'string' && !isMultiCat) {
-    const match = categories?.find((c: any) => (c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')) === search.category);
+  if (!catId && search.category && typeof search.category === 'string' && !isMultiCat && categories) {
+    const searchSlug = search.category;
+    const findCatBySlug = (cats: any[]): any => {
+      for (const c of cats) {
+        if ((c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')) === searchSlug) return c;
+        if (c.subCategories && c.subCategories.length > 0) {
+          const found = findCatBySlug(c.subCategories);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    const match = findCatBySlug(categories);
     if (match) catId = match.categoryId;
   }
 
@@ -33,7 +44,22 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const brand = brndId ? brands?.find((b: any) => b.brandId === brndId) : null;
-  const category = catId ? categories?.find((c: any) => c.categoryId === catId) : null;
+  
+  // Recursively search for category in case it's a subcategory
+  let category: any = null;
+  if (catId && categories) {
+    const findCat = (cats: any[]): any => {
+      for (const c of cats) {
+        if (c.categoryId === catId) return c;
+        if (c.subCategories && c.subCategories.length > 0) {
+          const found = findCat(c.subCategories);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    category = findCat(categories);
+  }
   const vehicle = search.vehicleId ? vehicles?.find((v: any) => v.vehicleId === search.vehicleId) : null;
 
   // We only show this banner if at least one filter is active.
