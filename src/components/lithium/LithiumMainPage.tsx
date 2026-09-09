@@ -8,11 +8,11 @@ import { CategoryListResponse } from "@/types/dto";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
-export function LithiumMainPage({ 
-  category, 
-  subcategories 
-}: { 
-  category: CategoryListResponse; 
+export function LithiumMainPage({
+  category,
+  subcategories
+}: {
+  category: CategoryListResponse;
   subcategories: CategoryListResponse[];
 }) {
   const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 4 }));
@@ -20,7 +20,7 @@ export function LithiumMainPage({
 
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
-      
+
       {/* Hero Banner Area */}
       <div className="bg-slate-900 text-white pb-24 pt-12">
         <Container size="xl">
@@ -62,35 +62,35 @@ export function LithiumMainPage({
       {/* Options Cards */}
       <Container size="xl" className="-mt-16 relative z-10 mb-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Card 1: Lithium Battery for Inverter */}
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
             <div className="p-6 bg-[#ebf4ff] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#1e40af] text-white font-bold flex items-center justify-center shrink-0">1</div>
-                <h3 className="text-xl font-bold text-[#1e40af] leading-tight">Lithium Battery<br/>for Inverter</h3>
+                <h3 className="text-xl font-bold text-[#1e40af] leading-tight">Lithium Battery<br />for Inverter</h3>
               </div>
               <p className="text-sm text-[#1e3a8a] h-12 leading-snug">
                 Upgrade your existing inverter with lithium. Enjoy longer backup, faster charging and zero maintenance.
               </p>
             </div>
             <div className="w-full bg-white relative border-y border-white">
-               <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-5 bg-[#ebf4ff] flex-1 flex flex-col">
-               <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#1e3a8a]">
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#2563eb]" /></div>Longer<br/>Life</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><BatteryCharging className="w-4 h-4 text-[#2563eb]" /></div>Fast<br/>Charging</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#2563eb]" /></div>Zero<br/>Maintenance</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br/>& Compact</div>
-               </div>
-               <Link 
-                 to="/shop-by-category/$categorySlug" 
-                 params={{ categorySlug: "lithium-battery-for-inverter" }}
-                 className="w-full mt-auto py-3 px-4 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-               >
-                 Shop Lithium Batteries <ArrowRight className="w-4 h-4" />
-               </Link>
+              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#1e3a8a]">
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#2563eb]" /></div>Longer<br />Life</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><BatteryCharging className="w-4 h-4 text-[#2563eb]" /></div>Fast<br />Charging</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#2563eb]" /></div>Zero<br />Maintenance</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
+              </div>
+              <Link
+                to="/shop-by-category/$categorySlug"
+                params={{ categorySlug: "lithium-battery-for-inverter" }}
+                className="w-full mt-auto py-3 px-4 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+              >
+                Shop Lithium Batteries <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
@@ -99,29 +99,29 @@ export function LithiumMainPage({
             <div className="p-6 bg-[#ecfdf5] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#065f46] text-white font-bold flex items-center justify-center shrink-0">2</div>
-                <h3 className="text-xl font-bold text-[#065f46] leading-tight">Lithium Integrated<br/>Inverter Battery</h3>
+                <h3 className="text-xl font-bold text-[#065f46] leading-tight">Lithium Integrated<br />Inverter Battery</h3>
               </div>
               <p className="text-sm text-[#064e3b] h-12 leading-snug">
                 Inverter + Lithium Battery + BMS All-in-One Smart Solution for your home and office.
               </p>
             </div>
             <div className="w-full bg-white relative border-y border-white">
-               <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-5 bg-[#ecfdf5] flex-1 flex flex-col">
-               <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#064e3b]">
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Zap className="w-4 h-4 text-[#059669]" /></div>Plug & Play<br/>Installation</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#059669]" /></div>Smart BMS<br/>Protection</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#059669]" /></div>Compact<br/>Design</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Award className="w-4 h-4 text-[#059669]" /></div>Ideal for<br/>Homes</div>
-               </div>
-               <Link 
-                 to="/shop-by-category/$categorySlug" 
-                 params={{ categorySlug: "lithium-integrated-inverter-battery" }}
-                 className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-               >
-                 Shop Integrated Inverters <ArrowRight className="w-4 h-4" />
-               </Link>
+              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#064e3b]">
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Zap className="w-4 h-4 text-[#059669]" /></div>Plug & Play<br />Installation</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#059669]" /></div>Smart BMS<br />Protection</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#059669]" /></div>Compact<br />Design</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Award className="w-4 h-4 text-[#059669]" /></div>Ideal for<br />Homes</div>
+              </div>
+              <Link
+                to="/shop-by-category/$categorySlug"
+                params={{ categorySlug: "lithium-integrated-inverter-battery" }}
+                className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+              >
+                Shop Integrated Inverters <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
@@ -130,29 +130,29 @@ export function LithiumMainPage({
             <div className="p-6 bg-[#fff7ed] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#9a3412] text-white font-bold flex items-center justify-center shrink-0">3</div>
-                <h3 className="text-xl font-bold text-[#9a3412] leading-tight">Lithium Inbuilt<br/>Solar Inverter</h3>
+                <h3 className="text-xl font-bold text-[#9a3412] leading-tight">Lithium Inbuilt<br />Solar Inverter</h3>
               </div>
               <p className="text-sm text-[#7c2d12] h-12 leading-snug">
                 Solar Inverter + Lithium Battery + Solar Charge Controller. Harness the power of the sun.
               </p>
             </div>
             <div className="w-full bg-white relative border-y border-white">
-               <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-5 bg-[#fff7ed] flex-1 flex flex-col">
-               <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#7c2d12]">
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Inbuilt Solar<br/>Controller</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Solar<br/>Charging</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#ea580c]" /></div>Zero<br/>Maintenance</div>
-                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#ea580c]" /></div>Clean<br/>Energy</div>
-               </div>
-               <Link 
-                 to="/shop-by-category/$categorySlug" 
-                 params={{ categorySlug: "lithium-inbuilt-solar-inverter-battery" }}
-                 className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-               >
-                 Shop Solar Inverters <ArrowRight className="w-4 h-4" />
-               </Link>
+              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#7c2d12]">
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Inbuilt Solar<br />Controller</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Solar<br />Charging</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#ea580c]" /></div>Zero<br />Maintenance</div>
+                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#ea580c]" /></div>Clean<br />Energy</div>
+              </div>
+              <Link
+                to="/shop-by-category/$categorySlug"
+                params={{ categorySlug: "lithium-inbuilt-solar-inverter-battery" }}
+                className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+              >
+                Shop Solar Inverters <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
@@ -214,7 +214,7 @@ export function LithiumMainPage({
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product: any) => (
             <ProductCard key={product.productId} product={product} />
@@ -226,35 +226,35 @@ export function LithiumMainPage({
           </div>
         )}
       </Container>
-      
+
       {/* Promotional Footer */}
       <div className="bg-emerald-900 py-12 text-white">
-         <Container size="xl">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-               <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-800 flex items-center justify-center">
-                     <Sun className="w-8 h-8 text-emerald-400" />
-                  </div>
-                  <div>
-                     <div className="text-2xl font-black mb-1">Switch to Lithium.</div>
-                     <div className="text-emerald-400 font-medium">Power a Cleaner Tomorrow.</div>
-                  </div>
-               </div>
-               
-               <div className="flex gap-8 opacity-60">
-                 <div className="text-center"><div className="font-bold text-lg">🏠</div><div className="text-xs mt-1">For Home</div></div>
-                 <div className="text-center"><div className="font-bold text-lg">🏢</div><div className="text-xs mt-1">For Office</div></div>
-                 <div className="text-center"><div className="font-bold text-lg">🏪</div><div className="text-xs mt-1">For Shops</div></div>
-               </div>
-               
-               <Link 
-                 to={`/shop/c/${category.categorySlug || toSlug(category.categoryName)}`} 
-                 className="px-6 py-3 bg-white text-emerald-900 font-bold rounded-full hover:bg-emerald-50 transition-colors"
-               >
-                 Explore All Lithium Solutions →
-               </Link>
+        <Container size="xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-800 flex items-center justify-center">
+                <Sun className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-2xl font-black mb-1">Switch to Lithium.</div>
+                <div className="text-emerald-400 font-medium">Power a Cleaner Tomorrow.</div>
+              </div>
             </div>
-         </Container>
+
+            <div className="flex gap-8 opacity-60">
+              <div className="text-center"><div className="font-bold text-lg">🏠</div><div className="text-xs mt-1">For Home</div></div>
+              <div className="text-center"><div className="font-bold text-lg">🏢</div><div className="text-xs mt-1">For Office</div></div>
+              <div className="text-center"><div className="font-bold text-lg">🏪</div><div className="text-xs mt-1">For Shops</div></div>
+            </div>
+
+            <Link
+              to={`/shop/c/${category.categorySlug || toSlug(category.categoryName)}`}
+              className="px-6 py-3 bg-white text-emerald-900 font-bold rounded-full hover:bg-emerald-50 transition-colors"
+            >
+              Explore All Lithium Solutions →
+            </Link>
+          </div>
+        </Container>
       </div>
 
     </div>
