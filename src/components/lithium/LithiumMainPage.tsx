@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { productFilterQuery } from "@/queries";
 import { ProductCard } from "@/components/products/ProductCard";
-import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight } from "lucide-react";
+import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight, Leaf, Zap } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
