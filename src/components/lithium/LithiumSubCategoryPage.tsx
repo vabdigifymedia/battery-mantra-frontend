@@ -56,9 +56,10 @@ export function LithiumSubCategoryPage({
     ]
   };
 
-  const IconBg = `bg-${config.theme}-100`;
-  const IconText = `text-${config.theme}-600`;
-  const BadgeBg = `bg-${config.theme}-600`;
+  const isEmerald = config.theme === "emerald";
+  const IconBg = isEmerald ? "bg-emerald-100" : "bg-blue-100";
+  const IconText = isEmerald ? "text-emerald-600" : "text-blue-600";
+  const BadgeBg = isEmerald ? "bg-emerald-600" : "bg-blue-600";
 
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
@@ -73,12 +74,12 @@ export function LithiumSubCategoryPage({
         }}
       >
         {/* Gradient Overlay to ensure text readability */}
-        <div className={`absolute inset-0 bg-gradient-to-${isSolar ? 'l' : 'r'} from-white/90 via-white/70 to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
+        <div className={`absolute inset-0 ${isSolar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-white/90 via-white/70 to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
 
         <Container size="xl" className="relative z-10 w-full py-16">
           <div className={`flex flex-col lg:flex-row ${isSolar ? 'justify-end' : 'justify-start'}`}>
             <div className={`w-full lg:w-1/2 ${isSolar ? 'text-right' : 'text-left'}`}>
-              <span className={`text-${config.theme}-600 font-extrabold tracking-widest text-sm uppercase mb-4 block drop-shadow-sm`}>
+              <span className={`${IconText} font-extrabold tracking-widest text-sm uppercase mb-4 block drop-shadow-sm`}>
                 {config.subtitle}
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-slate-900 drop-shadow-md">
@@ -91,8 +92,8 @@ export function LithiumSubCategoryPage({
               <div className={`flex flex-wrap gap-6 ${isSolar ? 'justify-end' : 'justify-start'}`}>
                 {config.features.map((f, i) => (
                   <div key={i} className={`flex flex-col gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
-                    <div className={`w-14 h-14 rounded-full bg-${config.theme}-100 flex items-center justify-center shadow-md`}>
-                      <f.icon className={`w-7 h-7 text-${config.theme}-600`} />
+                    <div className={`w-14 h-14 rounded-full ${IconBg} flex items-center justify-center shadow-md`}>
+                      <f.icon className={`w-7 h-7 ${IconText}`} />
                     </div>
                     <div className={isSolar ? 'text-right' : 'text-left'}>
                       <div className="font-bold text-sm text-slate-900 leading-tight">{f.label}</div>
