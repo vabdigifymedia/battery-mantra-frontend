@@ -316,49 +316,4 @@
   }
 }
 
-@keyframes border-spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
 
-.magic-border-hover {
-  position: relative;
-  overflow: hidden;
-  border-color: transparent !important;
-}
-
-.magic-border-hover::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 250%;
-  height: 250%;
-  /* Tailwind primary color */
-  background: conic-gradient(from 0deg, transparent 60%, var(--primary) 100%);
-  transform-origin: center;
-  transform: translate(-50%, -50%) rotate(0deg);
-  animation: border-spin 2s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 0;
-}
-
-.magic-border-hover:hover::before {
-  opacity: 1;
-}
-
-.magic-border-hover::after {
-  content: "";
-  position: absolute;
-  inset: 1.5px;
-  background: var(--card);
-  border-radius: inherit;
-  z-index: 1;
-}
-
-.magic-border-hover > * {
-  position: relative;
-  z-index: 2;
-}

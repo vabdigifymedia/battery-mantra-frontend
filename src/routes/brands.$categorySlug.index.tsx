@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/queries";
-import { ChevronRight, Car, Zap, Tag } from "lucide-react";
+import { ArrowLeft, Tag, Info, ShieldCheck, Battery, ChevronRight, Car } from "lucide-react";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
@@ -119,22 +120,24 @@ function CategoryBrandsPage() {
                 key={b.brandId}
                 to="/shop/$categorySlug/$brandSlug"
                 params={{ categorySlug, brandSlug: toSlug(b.brandName) }}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-product"
+                className="snap-start"
               >
-                <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
-                  {b.brandLogo ? (
-                    <img
-                      src={b.brandLogo}
-                      alt={b.brandName}
-                      className="h-full w-full object-contain mix-blend-multiply"
-                    />
-                  ) : (
-                    <Tag className="h-8 w-8 text-muted-foreground" />
-                  )}
-                </span>
-                <span className="text-sm font-semibold text-foreground line-clamp-2">
-                  {b.brandName}
-                </span>
+                <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
+                  <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+                    {b.brandLogo ? (
+                      <img
+                        src={b.brandLogo}
+                        alt={b.brandName}
+                        className="h-full w-full object-contain mix-blend-multiply"
+                      />
+                    ) : (
+                      <Tag className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </span>
+                  <span className="text-sm font-semibold text-foreground line-clamp-2">
+                    {b.brandName}
+                  </span>
+                </GradientBlobCard>
               </Link>
             ))}
           </div>
