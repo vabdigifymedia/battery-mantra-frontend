@@ -15,26 +15,30 @@ import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryP
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
-export const Route = createFileRoute("/shop-by-category/$categorySlug")({
+export const Route = createFileRoute("/shop-by-category/$")({
   loader: async ({ context, params }) => {
+    const splat = (params as any)._splat || "";
+    const [categorySlug, citySlug] = splat.split("/");
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     try {
-      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery(`/categories/${params.categorySlug}`));
-      return { pageSeo };
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery(`/categories/${categorySlug}`));
+      return { pageSeo, categorySlug, citySlug };
     } catch {
-      return { pageSeo: null };
+      return { pageSeo: null, categorySlug, citySlug };
     }
   },
-  head: ({ loaderData, params }) =>
-    buildPageHead(loaderData?.pageSeo?.seo, {
-      title: `Shop ${params.categorySlug.replace(/-/g, " ")} — BatteryMantra`,
-      description: `Browse premium subcategories for ${params.categorySlug.replace(/-/g, " ")} from trusted brands.`,
-    }),
+  head: ({ loaderData }) => {
+    const { pageSeo, categorySlug } = loaderData || { categorySlug: "category" };
+    return buildPageHead(pageSeo?.seo, {
+      title: `Shop ${categorySlug.replace(/-/g, " ")} — BatteryMantra`,
+      description: `Browse premium subcategories for ${categorySlug.replace(/-/g, " ")} from trusted brands.`,
+    });
+  },
   component: SubcategoriesPage,
 });
 
 function SubcategoriesPage() {
-  const { categorySlug } = Route.useParams();
+  const { categorySlug, citySlug } = Route.useLoaderData();
   const { data, isLoading, isError, refetch } = useQuery(rootCategoriesQuery());
   const navigate = useNavigate();
   const { city } = useLocationStore();

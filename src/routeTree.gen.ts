@@ -51,7 +51,7 @@ import { Route as PartnerProductsRouteImport } from './routes/partner.products'
 import { Route as PartnerLoginRouteImport } from './routes/partner_.login'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
-import { Route as ShopByCategoryCategorySlugRouteImport } from './routes/shop-by-category.$categorySlug'
+import { Route as ShopByCategorySplatRouteImport } from './routes/shop-by-category.$'
 import { Route as AdminEngineersIndexRouteImport } from './routes/admin.engineers.index'
 import { Route as AdminEngineersNewRouteImport } from './routes/admin.engineers.new'
 import { Route as AdminFaqsIndexRouteImport } from './routes/admin.faqs.index'
@@ -292,12 +292,11 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopByCategoryCategorySlugRoute =
-  ShopByCategoryCategorySlugRouteImport.update({
-    id: '/shop-by-category/$categorySlug',
-    path: '/shop-by-category/$categorySlug',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const ShopByCategorySplatRoute = ShopByCategorySplatRouteImport.update({
+  id: '/shop-by-category/$',
+  path: '/shop-by-category/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEngineersIndexRoute = AdminEngineersIndexRouteImport.update({
   id: '/engineers/',
   path: '/engineers/',
@@ -493,7 +492,7 @@ export interface FileRoutesByFullPath {
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
   '/product/$': typeof ProductSplatRoute
-  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
+  '/shop-by-category/$': typeof ShopByCategorySplatRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/orders/': typeof OrdersIndexRoute
@@ -565,7 +564,7 @@ export interface FileRoutesByTo {
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
   '/product/$': typeof ProductSplatRoute
-  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
+  '/shop-by-category/$': typeof ShopByCategorySplatRoute
   '/admin': typeof AdminIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/orders': typeof OrdersIndexRoute
@@ -640,7 +639,7 @@ export interface FileRoutesById {
   '/partner/products': typeof PartnerProductsRoute
   '/partner_/login': typeof PartnerLoginRoute
   '/product/$': typeof ProductSplatRoute
-  '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
+  '/shop-by-category/$': typeof ShopByCategorySplatRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/orders/': typeof OrdersIndexRoute
@@ -716,7 +715,7 @@ export interface FileRouteTypes {
     | '/partner/products'
     | '/partner/login'
     | '/product/$'
-    | '/shop-by-category/$categorySlug'
+    | '/shop-by-category/$'
     | '/admin/'
     | '/categories/'
     | '/orders/'
@@ -788,7 +787,7 @@ export interface FileRouteTypes {
     | '/partner/products'
     | '/partner/login'
     | '/product/$'
-    | '/shop-by-category/$categorySlug'
+    | '/shop-by-category/$'
     | '/admin'
     | '/categories'
     | '/orders'
@@ -862,7 +861,7 @@ export interface FileRouteTypes {
     | '/partner/products'
     | '/partner_/login'
     | '/product/$'
-    | '/shop-by-category/$categorySlug'
+    | '/shop-by-category/$'
     | '/admin/'
     | '/categories/'
     | '/orders/'
@@ -916,7 +915,7 @@ export interface RootRouteChildren {
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
   ProductSplatRoute: typeof ProductSplatRoute
-  ShopByCategoryCategorySlugRoute: typeof ShopByCategoryCategorySlugRoute
+  ShopByCategorySplatRoute: typeof ShopByCategorySplatRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
@@ -1224,11 +1223,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop-by-category/$categorySlug': {
-      id: '/shop-by-category/$categorySlug'
-      path: '/shop-by-category/$categorySlug'
-      fullPath: '/shop-by-category/$categorySlug'
-      preLoaderRoute: typeof ShopByCategoryCategorySlugRouteImport
+    '/shop-by-category/$': {
+      id: '/shop-by-category/$'
+      path: '/shop-by-category/$'
+      fullPath: '/shop-by-category/$'
+      preLoaderRoute: typeof ShopByCategorySplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/engineers/': {
@@ -1594,7 +1593,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PartnerLoginRoute: PartnerLoginRoute,
   ProductSplatRoute: ProductSplatRoute,
-  ShopByCategoryCategorySlugRoute: ShopByCategoryCategorySlugRoute,
+  ShopByCategorySplatRoute: ShopByCategorySplatRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
