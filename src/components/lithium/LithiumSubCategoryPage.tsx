@@ -19,47 +19,73 @@ export function LithiumSubCategoryPage({
   const products = data?.content || [];
 
   const isSolar = type === "lithium-inbuilt-solar-inverter-battery";
-
-  const config = isSolar ? {
-    theme: "emerald",
-    subtitle: "SOLAR POWER. SMARTER LIVING.",
-    titleHighlight: "Solar",
-    desc: "Solar Inverter + Lithium Battery + Solar Charge Controller All-in-One. Smarter. Cleaner. Greener.",
-    features: [
-      { icon: Sun, label: "Inbuilt Solar Controller", desc: "Direct Solar Charging" },
-      { icon: Battery, label: "High-Capacity Battery", desc: "Longer Life (10+ Years)" },
-      { icon: ShieldCheck, label: "Smart BMS Protection", desc: "Safe & Reliable" },
-      { icon: Zap, label: "Plug & Play Installation", desc: "Easy to Set Up" }
-    ],
-    highlights: [
-      { icon: Sun, label: "Use Solar Energy", desc: "Reduce Electricity Bills" },
-      { icon: BatteryCharging, label: "Stores Solar Power", desc: "For Day & Night Use" },
-      { icon: Leaf, label: "Eco-Friendly", desc: "Clean & Sustainable" },
-      { icon: Zap, label: "Integrated Solution", desc: "Inverter + Battery + Solar" }
-    ]
-  } : {
-    theme: "blue",
-    subtitle: "NEXT-GEN POWER SOLUTION",
-    titleHighlight: "Integrated",
-    desc: "Inverter + Lithium Battery + BMS All-in-One Smart Solution. Smarter Power for a Brighter Tomorrow.",
-    features: [
-      { icon: Zap, label: "Plug & Play", desc: "Hassle-Free Installation" },
-      { icon: BatteryCharging, label: "Longer Backup", desc: "Reliable Power for Years" },
-      { icon: ShieldCheck, label: "Smart BMS Protection", desc: "Safe & Efficient" },
-      { icon: Battery, label: "Compact & Space Saving", desc: "Modern Design" }
-    ],
-    highlights: [
-      { icon: Zap, label: "Fast Charging", desc: "Charges up to 3x Faster" },
-      { icon: Battery, label: "Long Life", desc: "Up to 10+ Years" },
-      { icon: ShieldCheck, label: "Zero Maintenance", desc: "No Water, No Hassle" },
-      { icon: Leaf, label: "Eco Friendly", desc: "Cleaner & Greener Tomorrow" }
-    ]
-  };
+  const isIntegrated = type === "lithium-integrated-inverter-battery";
+  
+  let config;
+  if (isSolar) {
+    config = {
+      theme: "emerald",
+      subtitle: "SOLAR POWER. SMARTER LIVING.",
+      titleHighlight: "Solar",
+      desc: "Solar Inverter + Lithium Battery + Solar Charge Controller All-in-One. Smarter. Cleaner. Greener.",
+      features: [
+        { icon: Sun, label: "Inbuilt Solar Controller", desc: "Direct Solar Charging" },
+        { icon: Battery, label: "High-Capacity Battery", desc: "Longer Life (10+ Years)" },
+        { icon: ShieldCheck, label: "Smart BMS Protection", desc: "Safe & Reliable" },
+        { icon: Zap, label: "Plug & Play Installation", desc: "Easy to Set Up" }
+      ],
+      highlights: [
+        { icon: Sun, label: "Use Solar Energy", desc: "Reduce Electricity Bills" },
+        { icon: BatteryCharging, label: "Stores Solar Power", desc: "For Day & Night Use" },
+        { icon: Leaf, label: "Eco-Friendly", desc: "Clean & Sustainable" },
+        { icon: Zap, label: "Integrated Solution", desc: "Inverter + Battery + Solar" }
+      ]
+    };
+  } else if (isIntegrated) {
+    config = {
+      theme: "blue",
+      subtitle: "NEXT-GEN POWER SOLUTION",
+      titleHighlight: "Integrated",
+      desc: "Inverter + Lithium Battery + BMS All-in-One Smart Solution. Smarter Power for a Brighter Tomorrow.",
+      features: [
+        { icon: Zap, label: "Plug & Play", desc: "Hassle-Free Installation" },
+        { icon: BatteryCharging, label: "Longer Backup", desc: "Reliable Power for Years" },
+        { icon: ShieldCheck, label: "Smart BMS Protection", desc: "Safe & Efficient" },
+        { icon: Battery, label: "Compact & Space Saving", desc: "Modern Design" }
+      ],
+      highlights: [
+        { icon: Zap, label: "Fast Charging", desc: "Charges up to 3x Faster" },
+        { icon: Battery, label: "Long Life", desc: "Up to 10+ Years" },
+        { icon: ShieldCheck, label: "Zero Maintenance", desc: "No Water, No Hassle" },
+        { icon: Leaf, label: "Eco Friendly", desc: "Cleaner & Greener Tomorrow" }
+      ]
+    };
+  } else {
+    config = {
+      theme: "indigo",
+      subtitle: "UPGRADE YOUR INVERTER",
+      titleHighlight: "Battery",
+      desc: "Upgrade your existing inverter with lithium. Enjoy longer backup, faster charging and zero maintenance.",
+      features: [
+        { icon: Battery, label: "Longer Life", desc: "Up to 10+ Years" },
+        { icon: BatteryCharging, label: "Fast Charging", desc: "Charges in 2-3 Hours" },
+        { icon: ShieldCheck, label: "Zero Maintenance", desc: "No Water Top-up" },
+        { icon: Leaf, label: "Lightweight & Compact", desc: "Easy to Move" }
+      ],
+      highlights: [
+        { icon: Battery, label: "High Energy Density", desc: "More Power, Less Space" },
+        { icon: Zap, label: "High Efficiency", desc: "Minimal Power Loss" },
+        { icon: ShieldCheck, label: "Advanced BMS", desc: "Total Safety" },
+        { icon: Leaf, label: "Eco Friendly", desc: "Cleaner & Greener Tomorrow" }
+      ]
+    };
+  }
 
   const isEmerald = config.theme === "emerald";
-  const IconBg = isEmerald ? "bg-emerald-100" : "bg-blue-100";
-  const IconText = isEmerald ? "text-emerald-600" : "text-blue-600";
-  const BadgeBg = isEmerald ? "bg-emerald-600" : "bg-blue-600";
+  const isIndigo = config.theme === "indigo";
+  const IconBg = isEmerald ? "bg-emerald-100" : isIndigo ? "bg-indigo-100" : "bg-blue-100";
+  const IconText = isEmerald ? "text-emerald-600" : isIndigo ? "text-indigo-600" : "text-blue-600";
+  const BadgeBg = isEmerald ? "bg-emerald-600" : isIndigo ? "bg-indigo-600" : "bg-blue-600";
 
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
@@ -68,7 +94,7 @@ export function LithiumSubCategoryPage({
       <div
         className="relative min-h-[500px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
         style={{
-          backgroundImage: `url('/images/lithium/${isSolar ? 'solar-battery-banner.png' : 'integrated-battery-banner.png'}')`,
+          backgroundImage: `url('/images/lithium/${isSolar ? 'solar-battery-banner.png' : isIntegrated ? 'integrated-battery-banner.png' : 'inverter-battery.png'}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

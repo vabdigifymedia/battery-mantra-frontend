@@ -102,7 +102,7 @@ export function LithiumMainPage({
                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
               </div>
               <Link
-                to="/shop/c/$categorySlug"
+                to="/shop-by-category/$categorySlug"
                 params={{ 
                   categorySlug: subcategories.find(c => 
                     (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && 

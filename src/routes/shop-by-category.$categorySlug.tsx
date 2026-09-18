@@ -80,14 +80,16 @@ function SubcategoriesPage() {
   searchCategory(data);
 
   if (!category) {
-    if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery") {
+    if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery" || categorySlug === "lithium-battery-for-inverter") {
       const rootLithium = data.find((c: any) => c.categoryName.toLowerCase().includes("lithium power solutions") || (c.categorySlug || toSlug(c.categoryName)) === "lithium-power-solutions");
       if (rootLithium) {
+        let name = "Lithium Battery for Inverter";
+        if (categorySlug === "lithium-integrated-inverter-battery") name = "Lithium Integrated Inverter Battery";
+        if (categorySlug === "lithium-inbuilt-solar-inverter-battery") name = "Lithium Inbuilt Solar Inverter Battery";
+        
         category = {
           ...rootLithium,
-          categoryName: categorySlug === "lithium-integrated-inverter-battery" 
-            ? "Lithium Integrated Inverter Battery" 
-            : "Lithium Inbuilt Solar Inverter Battery",
+          categoryName: name,
           categorySlug: categorySlug,
           subCategories: []
         };
@@ -116,9 +118,12 @@ function SubcategoriesPage() {
   const catName = category.categoryName.toLowerCase();
   const isLithiumIntegrated = catName.includes("integrated") && (catName.includes("lithium") || catName.includes("inverter"));
   const isLithiumSolar = catName.includes("solar") && (catName.includes("lithium") || catName.includes("inbuilt"));
+  const isLithiumBattery = (catName.includes("battery for inverter") || catName.includes("inverter battery")) && !isLithiumIntegrated && !isLithiumSolar;
 
-  if (isLithiumIntegrated || isLithiumSolar) {
-    const type = isLithiumSolar ? "lithium-inbuilt-solar-inverter-battery" : "lithium-integrated-inverter-battery";
+  if (isLithiumIntegrated || isLithiumSolar || isLithiumBattery) {
+    let type = "lithium-battery-for-inverter";
+    if (isLithiumSolar) type = "lithium-inbuilt-solar-inverter-battery";
+    if (isLithiumIntegrated) type = "lithium-integrated-inverter-battery";
     return <LithiumSubCategoryPage category={category} type={type} />;
   }
 
