@@ -11,7 +11,9 @@ import { ErrorState } from "@/components/feedback/ErrorState";
 import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { LithiumMainPage } from "@/components/lithium/LithiumMainPage";
-import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage";
+import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage"-+
+  ``
+  ;
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -110,7 +112,7 @@ function SubcategoriesPage() {
           let name = "Lithium Battery for Inverter";
           if (categorySlug === "lithium-integrated-inverter-battery") name = "Lithium Integrated Inverter Battery";
           if (categorySlug === "lithium-inbuilt-solar-inverter-battery") name = "Lithium Inbuilt Solar Inverter Battery";
-          
+
           category = {
             ...rootLithium,
             categoryName: name,
@@ -254,16 +256,16 @@ function SubcategoriesPage() {
             );
           })}
         </div>
-        
+
         {category.categoryDescription && (
-          <div 
+          <div
             className="prose prose-sm md:prose-base max-w-none mt-12 mb-8 text-muted-foreground"
-            dangerouslySetInnerHTML={{ 
+            dangerouslySetInnerHTML={{
               __html: applySeoTemplate(category.categoryDescription, {
                 category_name: category.categoryName,
                 city_name: city?.cityName || "Delhi / NCR",
-              }) 
-            }} 
+              })
+            }}
           />
         )}
       </Container>

@@ -49,7 +49,7 @@ import { Route as PartnerEngineersRouteImport } from './routes/partner.engineers
 import { Route as PartnerOrdersRouteImport } from './routes/partner.orders'
 import { Route as PartnerProductsRouteImport } from './routes/partner.products'
 import { Route as PartnerLoginRouteImport } from './routes/partner_.login'
-import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as ProductSplatRouteImport } from './routes/product.$'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ShopByCategoryCategorySlugRouteImport } from './routes/shop-by-category.$categorySlug'
 import { Route as AdminEngineersIndexRouteImport } from './routes/admin.engineers.index'
@@ -282,9 +282,9 @@ const PartnerLoginRoute = PartnerLoginRouteImport.update({
   path: '/partner/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductSlugRoute = ProductSlugRouteImport.update({
-  id: '/product/$slug',
-  path: '/product/$slug',
+const ProductSplatRoute = ProductSplatRouteImport.update({
+  id: '/product/$',
+  path: '/product/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
@@ -492,7 +492,7 @@ export interface FileRoutesByFullPath {
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/product/$': typeof ProductSplatRoute
   '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -564,7 +564,7 @@ export interface FileRoutesByTo {
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner/login': typeof PartnerLoginRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/product/$': typeof ProductSplatRoute
   '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin': typeof AdminIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -639,7 +639,7 @@ export interface FileRoutesById {
   '/partner/orders': typeof PartnerOrdersRoute
   '/partner/products': typeof PartnerProductsRoute
   '/partner_/login': typeof PartnerLoginRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/product/$': typeof ProductSplatRoute
   '/shop-by-category/$categorySlug': typeof ShopByCategoryCategorySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -715,7 +715,7 @@ export interface FileRouteTypes {
     | '/partner/orders'
     | '/partner/products'
     | '/partner/login'
-    | '/product/$slug'
+    | '/product/$'
     | '/shop-by-category/$categorySlug'
     | '/admin/'
     | '/categories/'
@@ -787,7 +787,7 @@ export interface FileRouteTypes {
     | '/partner/orders'
     | '/partner/products'
     | '/partner/login'
-    | '/product/$slug'
+    | '/product/$'
     | '/shop-by-category/$categorySlug'
     | '/admin'
     | '/categories'
@@ -861,7 +861,7 @@ export interface FileRouteTypes {
     | '/partner/orders'
     | '/partner/products'
     | '/partner_/login'
-    | '/product/$slug'
+    | '/product/$'
     | '/shop-by-category/$categorySlug'
     | '/admin/'
     | '/categories/'
@@ -915,7 +915,7 @@ export interface RootRouteChildren {
   BrandBrandSlugRoute: typeof BrandBrandSlugRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
-  ProductSlugRoute: typeof ProductSlugRoute
+  ProductSplatRoute: typeof ProductSplatRoute
   ShopByCategoryCategorySlugRoute: typeof ShopByCategoryCategorySlugRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
@@ -1210,11 +1210,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnerLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/product/$slug': {
-      id: '/product/$slug'
-      path: '/product/$slug'
-      fullPath: '/product/$slug'
-      preLoaderRoute: typeof ProductSlugRouteImport
+    '/product/$': {
+      id: '/product/$'
+      path: '/product/$'
+      fullPath: '/product/$'
+      preLoaderRoute: typeof ProductSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products/': {
@@ -1593,7 +1593,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandBrandSlugRoute: BrandBrandSlugRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PartnerLoginRoute: PartnerLoginRoute,
-  ProductSlugRoute: ProductSlugRoute,
+  ProductSplatRoute: ProductSplatRoute,
   ShopByCategoryCategorySlugRoute: ShopByCategoryCategorySlugRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
