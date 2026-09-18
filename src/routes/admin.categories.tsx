@@ -47,6 +47,7 @@ const categorySchema = z.object({
   categoryName: z.string().trim().min(1, "Name is required"),
   categoryDescription: z.string().trim().optional(),
   iconUrl: z.string().trim().optional(),
+  bannerUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
   clickAction: z.enum(['AUTO', 'SHOW_BRANDS', 'SHOW_MANUFACTURERS', 'SHOW_PRODUCTS', 'SHOW_SUBCATEGORIES']).optional().default('AUTO'),
   parentId: z.string().uuid().optional().nullable().or(z.literal("")),
@@ -109,6 +110,7 @@ function AdminCategories() {
       categoryName: "",
       categoryDescription: "",
       iconUrl: "",
+      bannerUrl: "",
       displayOrder: 0,
       clickAction: "AUTO",
       parentId: null,
@@ -121,6 +123,7 @@ function AdminCategories() {
       categoryName: "",
       categoryDescription: "",
       iconUrl: "",
+      bannerUrl: "",
       displayOrder: 0,
       clickAction: "AUTO",
       parentId,
@@ -173,6 +176,7 @@ function AdminCategories() {
       categoryName: category.categoryName,
       categoryDescription: category.categoryDescription ?? "",
       iconUrl: category.iconUrl ?? "",
+      bannerUrl: category.bannerUrl ?? "",
       displayOrder: category.displayOrder ?? 0,
       clickAction: category.clickAction ?? "AUTO",
       parentId: category.parentId ?? null,
@@ -221,6 +225,7 @@ function AdminCategories() {
       categoryName: values.categoryName,
       categoryDescription: values.categoryDescription,
       iconUrl: values.iconUrl,
+      bannerUrl: values.bannerUrl,
       displayOrder: values.displayOrder,
       clickAction: values.clickAction,
       parentId: values.parentId || null,
@@ -506,6 +511,20 @@ function AdminCategories() {
                   folder="battery-mantra/categories"
                   label="Icon URL (Optional)"
                   error={form.formState.errors.iconUrl?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="bannerUrl"
+              render={({ field }) => (
+                <CloudinaryUpload
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  folder="battery-mantra/categories/banners"
+                  label="Banner URL (Optional, for category hero banners)"
+                  error={form.formState.errors.bannerUrl?.message}
                 />
               )}
             />
