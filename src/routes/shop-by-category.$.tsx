@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { rootCategoriesQuery, pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -188,33 +189,42 @@ function SubcategoriesPage() {
               </>
             );
 
-            const cardClassName = "group flex flex-col h-full items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-product";
+            const cardClassName = "flex flex-col h-full items-center justify-between gap-4 p-6 text-center";
+            const linkClassName = "snap-start h-full";
 
             if (c.clickAction === 'SHOW_BRANDS') {
               return (
-                <Link key={c.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
-                  {cardContent}
+                <Link key={c.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClassName}>
+                  <GradientBlobCard className={cardClassName}>
+                    {cardContent}
+                  </GradientBlobCard>
                 </Link>
               );
             }
             if (c.clickAction === 'SHOW_MANUFACTURERS') {
               return (
-                <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
-                  {cardContent}
+                <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClassName}>
+                  <GradientBlobCard className={cardClassName}>
+                    {cardContent}
+                  </GradientBlobCard>
                 </Link>
               );
             }
             if (c.clickAction === 'SHOW_PRODUCTS') {
               return (
-                <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
-                  {cardContent}
+                <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClassName}>
+                  <GradientBlobCard className={cardClassName}>
+                    {cardContent}
+                  </GradientBlobCard>
                 </Link>
               );
             }
             if (c.clickAction === 'SHOW_SUBCATEGORIES') {
               return (
-                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
-                  {cardContent}
+                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClassName}>
+                  <GradientBlobCard className={cardClassName}>
+                    {cardContent}
+                  </GradientBlobCard>
                 </Link>
               );
             }

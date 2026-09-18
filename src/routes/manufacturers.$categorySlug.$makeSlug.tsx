@@ -2,7 +2,8 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery } from "@/queries";
-import { ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, Zap } from "lucide-react";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { useLocationStore } from "@/store/useLocationStore";
@@ -93,24 +94,26 @@ function ManufacturerPage() {
                 key={model.vehicleId}
                 to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                 params={{ categorySlug, makeSlug, modelSlug: toSlug(model.model) }}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-lg"
+                className="snap-start"
               >
-                <div className="h-24 w-full flex items-center justify-center p-2">
-                  {model.imageUrl ? (
-                    <img 
-                      src={model.imageUrl} 
-                      alt={model.model} 
-                      className="h-full object-contain transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-muted/20 rounded flex items-center justify-center text-xs text-muted-foreground">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <span className="text-sm font-semibold text-foreground line-clamp-2">
-                  {model.make} {model.model}
-                </span>
+                <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-4 text-center h-full">
+                  <div className="h-24 w-full flex items-center justify-center p-2">
+                    {model.imageUrl ? (
+                      <img 
+                        src={model.imageUrl} 
+                        alt={model.model} 
+                        className="h-full object-contain transition-transform group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-muted/20 rounded flex items-center justify-center text-xs text-muted-foreground">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground line-clamp-2">
+                    {model.make} {model.model}
+                  </span>
+                </GradientBlobCard>
               </Link>
             ))}
             {filteredModels?.length === 0 && (

@@ -62,6 +62,10 @@ function HomePage() {
     c.categoryName.toLowerCase().includes("inverter")
   );
 
+  const lithiumCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("lithium")
+  );
+
   const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
   return (
@@ -206,6 +210,44 @@ function HomePage() {
                   // It must be an inverter battery, not a machine.
                   // If category or name implies it's an inverter, ensure it also implies it's a battery
                   return (cat.includes("inverter") || name.includes("inverter")) && (cat.includes("batter") || name.includes("batter"));
+                }}
+              />
+            </div>
+          </section>
+
+          <section aria-labelledby="lithium" className="mt-16 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-brand/5 via-transparent to-orange-500/5 p-6 sm:p-8">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand to-orange-500"></div>
+            <SectionHeading
+              eyebrow={
+                <span className="flex items-center gap-1.5 text-brand">
+                  <Zap className="h-4 w-4 animate-pulse" /> Next-Gen Power
+                </span>
+              }
+              title={<span id="lithium">Premium Lithium Batteries</span>}
+              description="High performance, fast charging, and longer life for modern vehicles."
+              action={
+                lithiumCategory ? (
+                  <Button asChild variant="brand">
+                    <Link to="/shop/c/$categorySlug" params={{ categorySlug: toSlug(lithiumCategory.categoryName) }}>
+                      View all <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button asChild variant="brand">
+                    <Link to="/products">
+                      View all <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                )
+              }
+            />
+            <div className="mt-8 relative z-10">
+              <FeaturedProducts 
+                limit={4} 
+                filterFn={(p) => {
+                  const cat = p.productCategory?.toLowerCase() || "";
+                  const name = p.productName.toLowerCase();
+                  return cat.includes("lithium") || name.includes("lithium");
                 }}
               />
             </div>

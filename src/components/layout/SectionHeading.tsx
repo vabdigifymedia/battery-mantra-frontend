@@ -9,7 +9,7 @@ export function SectionHeading({
   action,
   className,
 }: {
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   align?: "left" | "center";

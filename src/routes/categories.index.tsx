@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { rootCategoriesQuery } from "@/queries";
 import { Layers } from "lucide-react";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 
 export const Route = createFileRoute("/categories/")({
   component: CategoriesPage,
@@ -49,17 +50,17 @@ function CategoriesPage() {
                   </>
                 );
 
-                const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 sm:p-4 text-center transition-all hover:-translate-y-0.5 magic-border-hover hover:shadow-product";
-
                 if (c.subCategories && c.subCategories.length > 0) {
                   return (
                     <Link
                       key={c.categoryId}
                       to="/shop/c/$categorySlug"
                       params={{ categorySlug: rawSlug }}
-                      className={cardClassName}
+                      className="snap-start h-full"
                     >
-                      {cardContent}
+                      <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">
+                        {cardContent}
+                      </GradientBlobCard>
                     </Link>
                   );
                 }
@@ -69,9 +70,11 @@ function CategoriesPage() {
                     key={c.categoryId}
                     to="/manufacturers/$categorySlug"
                     params={{ categorySlug: rawSlug }}
-                    className={cardClassName}
+                    className="snap-start h-full"
                   >
-                    {cardContent}
+                    <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">
+                      {cardContent}
+                    </GradientBlobCard>
                   </Link>
                 );
               })}
