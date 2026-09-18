@@ -81,18 +81,43 @@ function SubcategoriesPage() {
 
   if (!category) {
     if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery" || categorySlug === "lithium-battery-for-inverter") {
-      const rootLithium = data.find((c: any) => c.categoryName.toLowerCase().includes("lithium power solutions") || (c.categorySlug || toSlug(c.categoryName)) === "lithium-power-solutions");
-      if (rootLithium) {
-        let name = "Lithium Battery for Inverter";
-        if (categorySlug === "lithium-integrated-inverter-battery") name = "Lithium Integrated Inverter Battery";
-        if (categorySlug === "lithium-inbuilt-solar-inverter-battery") name = "Lithium Inbuilt Solar Inverter Battery";
-        
-        category = {
-          ...rootLithium,
-          categoryName: name,
-          categorySlug: categorySlug,
-          subCategories: []
-        };
+      // First try to find the actual category in the database (user might have created it with a slightly different name/slug)
+      let actualCat: any = undefined;
+      const findCatByKeywords = (cats: any[]) => {
+        for (const c of cats) {
+          const catName = c.categoryName.toLowerCase();
+          if (categorySlug === "lithium-integrated-inverter-battery" && catName.includes("integrated") && (catName.includes("lithium") || catName.includes("inverter"))) {
+            actualCat = c; return true;
+          }
+          if (categorySlug === "lithium-inbuilt-solar-inverter-battery" && catName.includes("solar") && (catName.includes("lithium") || catName.includes("inbuilt"))) {
+            actualCat = c; return true;
+          }
+          if (categorySlug === "lithium-battery-for-inverter" && (catName.includes("battery for inverter") || catName.includes("inverter battery")) && !catName.includes("integrated") && !catName.includes("solar")) {
+            actualCat = c; return true;
+          }
+          if (c.subCategories && findCatByKeywords(c.subCategories)) return true;
+        }
+        return false;
+      };
+      findCatByKeywords(data);
+
+      if (actualCat) {
+        category = actualCat;
+      } else {
+        // Fallback to mocking if it really doesn't exist yet
+        const rootLithium = data.find((c: any) => c.categoryName.toLowerCase().includes("lithium power solutions") || (c.categorySlug || toSlug(c.categoryName)) === "lithium-power-solutions");
+        if (rootLithium) {
+          let name = "Lithium Battery for Inverter";
+          if (categorySlug === "lithium-integrated-inverter-battery") name = "Lithium Integrated Inverter Battery";
+          if (categorySlug === "lithium-inbuilt-solar-inverter-battery") name = "Lithium Inbuilt Solar Inverter Battery";
+          
+          category = {
+            ...rootLithium,
+            categoryName: name,
+            categorySlug: categorySlug,
+            subCategories: []
+          };
+        }
       }
     }
   }
