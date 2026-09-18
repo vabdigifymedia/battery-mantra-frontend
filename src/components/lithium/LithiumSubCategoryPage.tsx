@@ -89,7 +89,7 @@ export function LithiumSubCategoryPage({
                 {config.desc}
               </p>
 
-              <div className={`flex flex-wrap gap-6 ${isSolar ? 'justify-end' : 'justify-start'}`}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
                 {config.features.map((f, i) => (
                   <div key={i} className={`flex flex-col gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
                     <div className={`w-14 h-14 rounded-full ${IconBg} flex items-center justify-center shadow-md`}>
