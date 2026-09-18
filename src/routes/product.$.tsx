@@ -64,21 +64,23 @@ const searchSchema = z.object({
   autoBuy: z.enum(["true", "false"]).optional().catch(undefined),
 });
 
-export const Route = createFileRoute("/product/$slug")({
+export const Route = createFileRoute("/product/$")({
   validateSearch: searchSchema,
   loader: async ({ context, params }) => {
+    const splat = (params as any)._splat || "";
+    const [slug, citySlug] = splat.split("/");
     try {
       void context.queryClient.prefetchQuery(seoTemplatesQuery());
-      const product = await context.queryClient.ensureQueryData(productDetailQuery(params.slug));
+      const product = await context.queryClient.ensureQueryData(productDetailQuery(slug));
       const templates = await context.queryClient.ensureQueryData(seoTemplatesQuery());
-      return { product, templates };
+      return { product, templates, slug, citySlug };
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) throw notFound();
       throw e;
     }
   },
   head: ({ loaderData }) => {
-    const { product, templates } = loaderData || {};
+    const { product, templates, citySlug } = loaderData || {};
     const seo = (product?.specs?.seo as any) || product?.seo;
     
     const brandName = product?.brandName || "";
@@ -86,6 +88,12 @@ export const Route = createFileRoute("/product/$slug")({
     const productName = product?.productName || "";
     const deliveryTime = "2-4 Hours"; // default assumed time
     
+    // We try to pass city_name to resolveTemplateSeo
+    // But since citySlug is just 'delhi', we can capitalize it.
+    const cityNameStr = citySlug ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1) : undefined;
+    
+    // Temporarily override zustand state for this render if citySlug exists,
+    // though resolveTemplateSeo internally reads zustand, we can pass it via vars
     const resolvedSeo = resolveTemplateSeo(
       "PRODUCT",
       templates,
@@ -93,7 +101,8 @@ export const Route = createFileRoute("/product/$slug")({
         product_name: productName,
         brand_name: brandName,
         category_name: categoryName,
-        delivery_time: deliveryTime
+        delivery_time: deliveryTime,
+        ...(cityNameStr && { city_name: cityNameStr }),
       },
       seo,
       {
@@ -150,7 +159,7 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 export function PdpPage() {
-  const { slug } = Route.useParams();
+  const { slug, citySlug } = Route.useLoaderData();
   const { data } = useSuspenseQuery(productDetailQuery(slug));
   const { status } = useAuth();
   const navigate = useNavigate({ from: Route.fullPath });
