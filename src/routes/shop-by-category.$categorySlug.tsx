@@ -80,6 +80,22 @@ function SubcategoriesPage() {
   searchCategory(data);
 
   if (!category) {
+    if (categorySlug === "lithium-integrated-inverter-battery" || categorySlug === "lithium-inbuilt-solar-inverter-battery") {
+      const rootLithium = data.find((c: any) => c.categoryName.toLowerCase().includes("lithium power solutions") || (c.categorySlug || toSlug(c.categoryName)) === "lithium-power-solutions");
+      if (rootLithium) {
+        category = {
+          ...rootLithium,
+          categoryName: categorySlug === "lithium-integrated-inverter-battery" 
+            ? "Lithium Integrated Inverter Battery" 
+            : "Lithium Inbuilt Solar Inverter Battery",
+          categorySlug: categorySlug,
+          subCategories: []
+        };
+      }
+    }
+  }
+
+  if (!category) {
     return (
       <ErrorState
         title="Category Not Found"
