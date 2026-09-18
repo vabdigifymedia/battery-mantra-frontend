@@ -1081,7 +1081,7 @@ export function PdpPage() {
 
       <RelatedProducts currentProductId={data.productId} currentProduct={data} />
       <Container size="xl" className="pb-8">
-        <SeoCityLinks productName={data.productName} />
+        <SeoCityLinks productName={data.productName} productSlug={slug} />
       </Container>
 
       {/* FULLSCREEN GALLERY APP OVERLAY */}

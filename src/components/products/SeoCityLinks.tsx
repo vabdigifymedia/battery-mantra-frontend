@@ -3,12 +3,15 @@ import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocationStore } from "@/store/useLocationStore";
+import { Link } from "@tanstack/react-router";
+import { toSlug } from "@/lib/utils";
 
 interface SeoCityLinksProps {
   productName: string;
+  productSlug: string;
 }
 
-export function SeoCityLinks({ productName }: SeoCityLinksProps) {
+export function SeoCityLinks({ productName, productSlug }: SeoCityLinksProps) {
   const qc = useQueryClient();
   const { setLocation } = useLocationStore();
   
@@ -32,11 +35,12 @@ export function SeoCityLinks({ productName }: SeoCityLinksProps) {
           <AccordionContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
               {cities.map((city) => (
-                <a
+                <Link
                   key={city.cityId}
-                  href="#"
+                  to="/product/$"
+                  params={{ _splat: `${productSlug}/${toSlug(city.cityName)}` }}
                   onClick={(e) => {
-                    e.preventDefault();
+                    // Update the global store so the UI updates instantly
                     setLocation("", true, city);
                     qc.invalidateQueries({ queryKey: ["products"] });
                     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -47,7 +51,7 @@ export function SeoCityLinks({ productName }: SeoCityLinksProps) {
                   <span className="truncate">
                     {productName} in {city.cityName}
                   </span>
-                </a>
+                </Link>
               ))}
             </div>
           </AccordionContent>
