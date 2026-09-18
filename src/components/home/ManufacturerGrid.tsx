@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Car } from "lucide-react";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { manufacturersListQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -39,18 +40,20 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
           key={m.id}
           to="/manufacturers/$categorySlug/$makeSlug"
           params={{ categorySlug, makeSlug: toSlug(m.name) }}
-          className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 magic-border-hover hover:shadow-product min-w-[120px] snap-start lg:min-w-0"
+          className="snap-start"
         >
-          <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
-            {m.logoUrl ? (
-              <img src={m.logoUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
-            ) : (
-              <FallbackIcon className="h-8 w-8 text-muted-foreground" />
-            )}
-          </span>
-          <span className="text-sm font-medium text-foreground line-clamp-2">
-            {m.name}
-          </span>
+          <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-4 text-center min-w-[120px] lg:min-w-0">
+            <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+              {m.logoUrl ? (
+                <img src={m.logoUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+              ) : (
+                <FallbackIcon className="h-8 w-8 text-muted-foreground" />
+              )}
+            </span>
+            <span className="text-sm font-medium text-foreground line-clamp-2">
+              {m.name}
+            </span>
+          </GradientBlobCard>
         </Link>
       ))}
     </div>

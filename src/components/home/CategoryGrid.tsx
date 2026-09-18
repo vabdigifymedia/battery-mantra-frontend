@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Layers } from "lucide-react";
+import { Zap, Link as LinkIcon } from "lucide-react";
+import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -29,46 +30,49 @@ export function CategoryGrid() {
         const rawSlug = c.categorySlug || toSlug(c.categoryName);
 
         const cardContent = (
-          <>
-            <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+          <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-4 text-center min-w-[140px] lg:min-w-0">
+            <span className="grid h-20 w-20 place-items-center text-primary transition-transform group-hover:scale-110">
               {c.iconUrl ? (
                 <img src={c.iconUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
               ) : (
-                <Layers className="h-8 w-8" />
+                <Zap className="h-10 w-10 text-muted-foreground" />
               )}
             </span>
-            <span className="text-sm font-medium text-foreground line-clamp-2">
+            <span className="text-sm font-medium text-foreground line-clamp-2 px-1">
               {c.categoryName}
             </span>
-          </>
+          </GradientBlobCard>
         );
-
-        const cardClassName = "group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 magic-border-hover hover:shadow-product min-w-[140px] snap-start lg:min-w-0";
 
         if (c.clickAction === 'SHOW_BRANDS') {
           return (
-            <Link key={c.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+            <Link
+              key={c.categoryId}
+              to="/brands/$categorySlug"
+              params={{ categorySlug: rawSlug }}
+              className="snap-start"
+            >
               {cardContent}
             </Link>
           );
         }
         if (c.clickAction === 'SHOW_MANUFACTURERS') {
           return (
-            <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+            <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
               {cardContent}
             </Link>
           );
         }
         if (c.clickAction === 'SHOW_PRODUCTS') {
           return (
-            <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+            <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
               {cardContent}
             </Link>
           );
         }
         if (c.clickAction === 'SHOW_SUBCATEGORIES') {
           return (
-            <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+            <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
               {cardContent}
             </Link>
           );
@@ -81,7 +85,7 @@ export function CategoryGrid() {
               key={c.categoryId}
               to="/shop-by-category/$categorySlug"
               params={{ categorySlug: rawSlug }}
-              className={cardClassName}
+              className="snap-start"
             >
               {cardContent}
             </Link>
@@ -99,7 +103,7 @@ export function CategoryGrid() {
               key={c.categoryId}
               to="/manufacturers/$categorySlug"
               params={{ categorySlug: rawSlug }}
-              className={cardClassName}
+              className="snap-start"
             >
               {cardContent}
             </Link>
@@ -111,7 +115,7 @@ export function CategoryGrid() {
             key={c.categoryId}
             to="/brands/$categorySlug"
             params={{ categorySlug: rawSlug }}
-            className={cardClassName}
+            className="snap-start"
           >
             {cardContent}
           </Link>
