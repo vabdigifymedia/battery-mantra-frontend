@@ -118,7 +118,7 @@ function ManufacturerPage() {
             {filteredModels?.map(model => (
               <Link
                 key={model.vehicleId}
-                to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
+                to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                 params={{ categorySlug, makeSlug, modelSlug: toSlug(`${model.make}-${model.model}`) }}
                 className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-lg"
               >

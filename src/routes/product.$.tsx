@@ -1015,7 +1015,7 @@ export function PdpPage() {
                 {displayVehicles.map((v) => (
                   <Link 
                     key={v.vehicleId} 
-                    to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
+                    to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
                       makeSlug: toSlug(v.make),
@@ -1081,7 +1081,7 @@ export function PdpPage() {
 
       <RelatedProducts currentProductId={data.productId} currentProduct={data} />
       <Container size="xl" className="pb-8">
-        <SeoCityLinks productName={data.productName} productSlug={slug} />
+        <SeoCityLinks productName={data.productName} baseUrl={`/product/${slug}`} />
       </Container>
 
       {/* FULLSCREEN GALLERY APP OVERLAY */}

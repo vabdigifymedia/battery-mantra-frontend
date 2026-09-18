@@ -11,7 +11,7 @@ import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
-export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug_/$modelSlug")({
+export const Route = createFileRoute("/manufacturer-products/$categorySlug/$makeSlug/$modelSlug")({
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug_/$m
 function VehicleProductsPage() {
   const { makeSlug, modelSlug } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/manufacturers/$categorySlug/$makeSlug/$modelSlug" });
+  const navigate = useNavigate({ from: "/manufacturer-products/$categorySlug/$makeSlug/$modelSlug" });
 
   // Load all vehicles to find the matching one
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());

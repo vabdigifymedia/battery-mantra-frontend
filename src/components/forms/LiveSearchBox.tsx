@@ -219,7 +219,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedVehicles.map((v: any) => (
                     <Link
                       key={v.vehicleId}
-                      to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
+                      to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
                       params={{ 
                         categorySlug: getVehicleCategorySlug(v.categoryId), 
                         makeSlug: toSlug(v.make), 
