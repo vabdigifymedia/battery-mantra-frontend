@@ -147,6 +147,7 @@ export type CategoryListResponse = {
   categorySlug?: string;
   categoryDescription?: string;
   iconUrl?: string;
+  bannerUrl?: string;
   displayOrder?: number;
   parentId?: UUID | null;
   subCategories?: CategoryListResponse[];

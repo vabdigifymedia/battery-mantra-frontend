@@ -94,7 +94,7 @@ export function LithiumSubCategoryPage({
       <div
         className="relative min-h-[500px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
         style={{
-          backgroundImage: `url('/images/lithium/${isSolar ? 'solar-battery-banner.png' : isIntegrated ? 'integrated-battery-banner.png' : 'inverter-battery.png'}')`,
+          backgroundImage: `url('${category.bannerUrl || `/images/lithium/${isSolar ? 'solar-battery-banner.png' : isIntegrated ? 'integrated-battery-banner.png' : 'inverter-battery.png'}`}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
