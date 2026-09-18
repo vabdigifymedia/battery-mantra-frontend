@@ -171,7 +171,6 @@ function SubcategoriesPage() {
           {sorted.map((c) => {
             const name = c.categoryName.toLowerCase();
             const isCar = name.includes("car");
-            const isBike = name.includes("bike") || name.includes("two wheeler") || name.includes("2 wheeler");
             const rawSlug = c.categorySlug || toSlug(c.categoryName);
 
             const cardContent = (
@@ -229,10 +228,8 @@ function SubcategoriesPage() {
               );
             }
 
-            if (isCar || isBike) {
-              const catSlug = isCar
-                ? (rawSlug.includes("car") ? rawSlug : "car-batteries")
-                : (rawSlug.includes("bike") || rawSlug.includes("two-wheeler") ? rawSlug : "two-wheeler-batteries");
+            if (isCar) {
+              const catSlug = rawSlug.includes("car") ? rawSlug : "car-batteries";
 
               return (
                 <Link

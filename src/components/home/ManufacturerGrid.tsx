@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Car, Bike } from "lucide-react";
+import { Car } from "lucide-react";
 import { manufacturersListQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -30,8 +30,7 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
   const sorted = [...data]
     .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
     .slice(0, limit ?? data.length);
-  const isBike = categorySlug.includes("bike");
-  const FallbackIcon = isBike ? Bike : Car;
+  const FallbackIcon = Car;
 
   return (
     <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">

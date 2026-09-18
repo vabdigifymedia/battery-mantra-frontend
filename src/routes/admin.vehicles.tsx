@@ -328,7 +328,7 @@ function AdminVehicles() {
         <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="ALL" className="rounded-md">All Vehicles</TabsTrigger>
           <TabsTrigger value="CAR" className="rounded-md">Cars</TabsTrigger>
-          <TabsTrigger value="BIKE" className="rounded-md">Bikes</TabsTrigger>
+
           <TabsTrigger value="COMMERCIAL" className="rounded-md">Commercial</TabsTrigger>
           <TabsTrigger value="E_RICKSHAW" className="rounded-md">E-Rickshaws</TabsTrigger>
           <TabsTrigger value="INVERTER" className="rounded-md">Inverters</TabsTrigger>
@@ -637,7 +637,7 @@ function AdminVehicles() {
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="CAR">Car (Four Wheeler)</option>
-                <option value="BIKE">Bike (Two Wheeler)</option>
+
                 <option value="COMMERCIAL">Commercial</option>
                 <option value="E_RICKSHAW">E-Rickshaw</option>
                 <option value="INVERTER">Inverter</option>

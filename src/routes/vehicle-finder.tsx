@@ -35,7 +35,7 @@ export const Route = createFileRoute("/vehicle-finder")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Vehicle Finder — BatteryMantra",
       description:
-        "Find the perfect battery for your car, bike or commercial vehicle. Select make and model to see compatible options.",
+        "Find the perfect battery for your car, inverter or commercial vehicle. Select make and model to see compatible options.",
     }),
   component: VehicleFinderPage,
 });

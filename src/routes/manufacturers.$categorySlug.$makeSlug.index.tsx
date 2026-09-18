@@ -73,9 +73,8 @@ function ManufacturerPage() {
 
   const categoryName = categorySlug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
-  const isBike = categorySlug.includes("bike") || categorySlug.includes("two-wheeler");
   const isCar = categorySlug.includes("car");
-  const targetVehicleType = isBike ? "BIKE" : isCar ? "CAR" : null;
+  const targetVehicleType = isCar ? "CAR" : null;
 
   const filteredModels = models?.filter(model => {
     if (!targetVehicleType) return true;
@@ -102,7 +101,7 @@ function ManufacturerPage() {
           imageUrl={manufacturer?.logoUrl || ""}
           brandNameHeader={manufacturer?.name || exactMake}
           brandLogoUrl={manufacturer?.logoUrl || ""}
-          theme={isBike ? "orange" : isCar ? "red" : "blue"}
+          theme={isCar ? "red" : "blue"}
         />
 
 
@@ -165,11 +164,11 @@ function ManufacturerPage() {
           />
         ) : (
           <p className="text-muted-foreground mt-12 mb-8 text-center max-w-2xl mx-auto">
-            You will get all types of {isBike ? "two wheeler" : "car"} batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
+            You will get all types of car batteries for your {manufacturer?.name || exactMake} in Delhi With Free Delivery & Installation.
           </p>
         )}
 
-        <SeoCityLinks productName={`${manufacturer?.name || exactMake} ${categoryName}`} />
+        <SeoCityLinks productName={`${manufacturer?.name || exactMake} ${categoryName}`} baseUrl={`/manufacturers/${categorySlug}/${makeSlug}`} />
       </Container>
       
       <GlobalFaqSection 

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/queries";
-import { ChevronRight, Car, Bike, Zap, Tag } from "lucide-react";
+import { ChevronRight, Car, Zap, Tag } from "lucide-react";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
@@ -60,9 +60,7 @@ function CategoryBrandsPage() {
       if (
         c.categorySlug === categorySlug ||
         toSlug(c.categoryName) === categorySlug ||
-        (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car")) ||
-        ((categorySlug.includes("bike") || categorySlug.includes("two-wheeler")) &&
-          (c.categoryName.toLowerCase().includes("bike") || c.categoryName.toLowerCase().includes("two wheeler")))
+        (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car"))
       ) {
         return c;
       }
@@ -88,11 +86,7 @@ function CategoryBrandsPage() {
     enabled: !!category?.categoryId,
   });
 
-  const isBike =
-    categorySlug.includes("bike") ||
-    categorySlug.includes("two-wheeler") ||
-    categoryName.toLowerCase().includes("two wheeler");
-  const FallbackIcon = isBike ? Bike : Car;
+  const FallbackIcon = Car;
 
   return (
     <div className="flex flex-col gap-12">
@@ -160,7 +154,7 @@ function CategoryBrandsPage() {
           />
         )}
 
-        <SeoCityLinks productName={categoryName} />
+        <SeoCityLinks productName={categoryName} baseUrl={`/brands/${categorySlug}`} />
       </Container>
 
       <GlobalFaqSection

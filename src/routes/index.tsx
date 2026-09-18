@@ -56,10 +56,6 @@ function HomePage() {
   const carCategory = categories?.find((c) =>
     c.categoryName.toLowerCase().includes("car")
   );
-  const bikeCategory = categories?.find((c) => {
-    const name = c.categoryName.toLowerCase();
-    return name.includes("bike") || name.includes("two wheeler");
-  });
   const inverterCategory = categories?.find((c) =>
     c.categoryName.toLowerCase().includes("inverter batter")
   ) || categories?.find((c) =>
@@ -88,7 +84,7 @@ function HomePage() {
               <span className="text-primary">battery store</span>
             </>
           }
-          description="Find the right battery for any car, bike, inverter or commercial vehicle — delivered and installed at your doorstep."
+          description="Find the right battery for any car, inverter or commercial vehicle — delivered and installed at your doorstep."
           primaryAction={
             <Button asChild variant="brand" size="lg">
               <Link to="/products">
@@ -144,25 +140,7 @@ function HomePage() {
             </section>
           )}
 
-          {bikeCategory && (
-            <section aria-labelledby="bike-manufacturers" className="mt-12">
-              <SectionHeading
-                eyebrow="Find by Make"
-                title={<span id="bike-manufacturers">Shop by bike manufacturer</span>}
-                description="Select your bike manufacturer to find the perfect battery match."
-                action={
-                  <Button asChild variant="ghost-brand" size="sm">
-                    <Link to="/manufacturers/$categorySlug" params={{ categorySlug: bikeCategory.categorySlug || "two-wheeler-batteries" }}>
-                      View all <ArrowRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </Button>
-                }
-              />
-              <div className="mt-6">
-                <ManufacturerGrid categoryId={bikeCategory.categoryId} categorySlug={bikeCategory.categorySlug || "two-wheeler-batteries"} limit={6} />
-              </div>
-            </section>
-          )}
+
         </Container>
       </div>
 

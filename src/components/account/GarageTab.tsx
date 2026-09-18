@@ -16,7 +16,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const schema = z.object({
-  vehicleType: z.enum(["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
+  vehicleType: z.enum(["CAR", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
   manufacturer: z.string().min(1, "Manufacturer is required"),
   modelName: z.string().min(1, "Model name is required"),
   fuelType: z.string().min(1, "Fuel type is required"),
@@ -99,7 +99,6 @@ export function GarageTab() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="CAR">Car</SelectItem>
-                    <SelectItem value="BIKE">Bike</SelectItem>
                     <SelectItem value="COMMERCIAL">Commercial</SelectItem>
                     <SelectItem value="E_RICKSHAW">E-Rickshaw</SelectItem>
                     <SelectItem value="INVERTER">Inverter</SelectItem>
@@ -142,7 +141,7 @@ export function GarageTab() {
             <Car className="h-12 w-12 text-muted-foreground/50 mb-4" />
             <h3 className="text-lg font-medium">Your garage is empty</h3>
             <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-4">
-              Add your car or bike to quickly find compatible batteries without searching every time.
+              Add your car or commercial vehicle to quickly find compatible batteries without searching every time.
             </p>
             <Button onClick={() => setIsAdding(true)} variant="brand">
               Add Your First Vehicle

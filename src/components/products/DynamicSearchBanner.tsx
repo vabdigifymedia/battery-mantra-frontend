@@ -106,8 +106,6 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   
   if (searchString.includes("inverter") || searchString.includes("tubular") || searchString.includes("solar")) {
     theme = "blue";
-  } else if (searchString.includes("two wheeler") || searchString.includes("bike") || searchString.includes("scooter")) {
-    theme = "orange";
   }
 
   return (

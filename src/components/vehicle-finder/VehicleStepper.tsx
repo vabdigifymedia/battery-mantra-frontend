@@ -31,7 +31,7 @@ export function VehicleStepper({ value, onChange, compact, showSearch = false }:
   const vehicles = useQuery(vehiclesListQuery());
 
   const types = useMemo(() => {
-    return Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).sort();
+    return Array.from(new Set((vehicles.data ?? []).map((v) => v.vehicleType || "CAR"))).filter(t => t !== "BIKE").sort();
   }, [vehicles.data]);
 
   const makesForType = useMemo(() => {
@@ -49,7 +49,6 @@ export function VehicleStepper({ value, onChange, compact, showSearch = false }:
   const formatType = (type: string) => {
     switch (type) {
       case "CAR": return "Car";
-      case "BIKE": return "Bike";
       case "COMMERCIAL": return "Commercial";
       case "E_RICKSHAW": return "E-Rickshaw";
       case "INVERTER": return "Inverter";

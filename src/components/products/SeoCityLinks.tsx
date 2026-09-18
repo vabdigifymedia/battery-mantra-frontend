@@ -3,17 +3,19 @@ import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocationStore } from "@/store/useLocationStore";
-import { Link } from "@tanstack/react-router";
 import { toSlug } from "@/lib/utils";
+
+import { useNavigate } from "@tanstack/react-router";
 
 interface SeoCityLinksProps {
   productName: string;
-  productSlug: string;
+  baseUrl?: string;
 }
 
-export function SeoCityLinks({ productName, productSlug }: SeoCityLinksProps) {
+export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
   const qc = useQueryClient();
   const { setLocation } = useLocationStore();
+  const navigate = useNavigate();
   
   const { data: cities } = useQuery({
     queryKey: ["locations", "public-cities"],
@@ -34,25 +36,30 @@ export function SeoCityLinks({ productName, productSlug }: SeoCityLinksProps) {
           </AccordionTrigger>
           <AccordionContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
-              {cities.map((city) => (
-                <Link
-                  key={city.cityId}
-                  to="/product/$"
-                  params={{ _splat: `${productSlug}/${toSlug(city.cityName)}` }}
-                  onClick={(e) => {
-                    // Update the global store so the UI updates instantly
-                    setLocation("", true, city);
-                    qc.invalidateQueries({ queryKey: ["products"] });
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
-                >
-                  <MapPin className="h-3 w-3 shrink-0 opacity-50" />
-                  <span className="truncate">
-                    {productName} in {city.cityName}
-                  </span>
-                </Link>
-              ))}
+              {cities.map((city) => {
+                const targetUrl = baseUrl ? `${baseUrl}/${toSlug(city.cityName)}` : "#";
+                return (
+                  <a
+                    key={city.cityId}
+                    href={targetUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLocation("", true, city);
+                      qc.invalidateQueries({ queryKey: ["products"] });
+                      if (baseUrl) {
+                        navigate({ to: targetUrl });
+                      }
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
+                  >
+                    <MapPin className="h-3 w-3 shrink-0 opacity-50" />
+                    <span className="truncate">
+                      {productName} in {city.cityName}
+                    </span>
+                  </a>
+                );
+              })}
             </div>
           </AccordionContent>
         </AccordionItem>
