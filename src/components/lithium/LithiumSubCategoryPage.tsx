@@ -92,7 +92,7 @@ export function LithiumSubCategoryPage({
 
       {/* Hero Banner Area */}
       <div
-        className="relative min-h-[500px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
+        className="relative min-h-[350px] sm:min-h-[450px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
         style={{
           backgroundImage: `url('${category.bannerUrl || `/images/lithium/${isSolar ? 'solar-battery-banner.png' : isIntegrated ? 'integrated-battery-banner.png' : 'inverter-battery.png'}`}')`,
           backgroundSize: 'cover',
@@ -100,22 +100,22 @@ export function LithiumSubCategoryPage({
         }}
       >
         {/* Gradient Overlay to ensure text readability */}
-        <div className={`absolute inset-0 ${isSolar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-white/90 via-white/70 to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
+        <div className={`absolute inset-0 ${isSolar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-white/95 via-white/85 to-white/50 sm:from-white/90 sm:via-white/70 sm:to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
 
         <Container size="xl" className="relative z-10 w-full py-16">
           <div className={`flex flex-col lg:flex-row ${isSolar ? 'justify-end' : 'justify-start'}`}>
-            <div className={`w-full lg:w-1/2 ${isSolar ? 'text-right' : 'text-left'}`}>
+            <div className={`w-full lg:w-1/2 ${isSolar ? 'lg:text-right text-center' : 'text-left'}`}>
               <span className={`${IconText} font-extrabold tracking-widest text-sm uppercase mb-4 block drop-shadow-sm`}>
                 {config.subtitle}
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-slate-900 drop-shadow-md">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-slate-900 drop-shadow-md">
                 Lithium {config.titleHighlight} <br />Inverter Battery
               </h1>
               <p className={`text-lg text-slate-700 font-semibold mb-10 max-w-xl drop-shadow-sm ${isSolar ? 'ml-auto' : 'mr-auto'}`}>
                 {config.desc}
               </p>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-6">
                 {config.features.map((f, i) => (
                   <div key={i} className={`flex flex-col gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
                     <div className={`w-14 h-14 rounded-full ${IconBg} flex items-center justify-center shadow-md`}>
@@ -135,7 +135,7 @@ export function LithiumSubCategoryPage({
 
       {/* Highlights Strip */}
       <Container size="xl" className="-mt-8 relative z-20 mb-16">
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 flex justify-between gap-4 overflow-x-auto">
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {config.highlights.map((h, i) => (
             <div key={i} className="flex items-center gap-3 shrink-0">
               <div className={`w-12 h-12 rounded-full ${IconBg} flex items-center justify-center`}>
@@ -152,7 +152,7 @@ export function LithiumSubCategoryPage({
 
       {/* Featured Products */}
       <Container size="xl" className="mb-16">
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1">
               Top {category.categoryName}s
@@ -164,7 +164,7 @@ export function LithiumSubCategoryPage({
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product: any) => (
             <ProductCard key={product.productId} product={product} />
           ))}
@@ -179,7 +179,7 @@ export function LithiumSubCategoryPage({
       {/* Trust Strip */}
       <Container size="xl" className="mb-24">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 divide-x divide-slate-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:divide-x divide-slate-100">
             <div className="flex items-center gap-3 justify-center">
               <div className={`w-10 h-10 rounded-full ${IconBg} flex items-center justify-center ${IconText}`}>
                 <ShieldCheck className="w-5 h-5" />

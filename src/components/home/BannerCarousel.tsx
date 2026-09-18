@@ -60,7 +60,7 @@ export function BannerCarousel() {
           {banners.map((banner, index) => (
             <div key={banner.bannerId} className="flex-[0_0_100%] min-w-0 relative">
               {banner.linkUrl ? (
-                <Link to={banner.linkUrl as any} className="block w-full h-[150px] sm:h-[250px] md:h-[500px] lg:h-[600px]">
+                <Link to={banner.linkUrl as any} className="block w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
                   <img
                     src={banner.imageUrl}
                     alt={banner.title || "Promotional Banner"}
@@ -70,7 +70,7 @@ export function BannerCarousel() {
                   />
                 </Link>
               ) : (
-                <div className="w-full h-[150px] sm:h-[250px] md:h-[500px] lg:h-[600px]">
+                <div className="w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
                   <img
                     src={banner.imageUrl}
                     alt={banner.title || "Promotional Banner"}

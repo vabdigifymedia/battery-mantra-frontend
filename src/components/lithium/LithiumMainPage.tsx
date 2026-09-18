@@ -22,19 +22,19 @@ export function LithiumMainPage({
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
 
       {/* Hero Banner Area */}
-      <div className="bg-[#f8fafc] pb-24 pt-16 relative overflow-hidden">
+      <div className="bg-[#f8fafc] pb-16 sm:pb-24 pt-10 sm:pt-16 relative overflow-hidden">
         {/* Subtle background decoration */}
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-green-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         
         <Container size="xl" className="relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
             
             {/* Left Side: Text */}
             <div className="flex-1 text-center md:text-left">
               <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase mb-4 block">
                 SMART POWER SOLUTIONS
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight text-slate-900">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight text-slate-900">
                 Choose Your <br/>
                 <span className="text-emerald-600">Lithium Power Solution</span>
               </h1>
@@ -45,12 +45,12 @@ export function LithiumMainPage({
 
             {/* Right Side: Features */}
             <div className="flex-1 flex flex-col items-center md:items-end w-full">
-              <div className="mb-6 mr-12 -rotate-6">
+              <div className="mb-6 md:mr-12 -rotate-6">
                 <span className="font-serif italic text-2xl text-slate-800 font-bold">
                   Same Trust<br/>More Possibilities
                 </span>
               </div>
-              <div className="flex items-center gap-6 text-sm font-semibold text-slate-700 bg-white p-6 rounded-2xl shadow-xl border border-slate-100/50 w-full md:w-auto justify-center">
+              <div className="flex items-center gap-4 sm:gap-6 text-sm font-semibold text-slate-700 bg-white p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-100/50 w-full md:w-auto justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
                     <BatteryCharging className="w-6 h-6 text-emerald-600" />
@@ -77,8 +77,8 @@ export function LithiumMainPage({
       </div>
 
       {/* Options Cards */}
-      <Container size="xl" className="-mt-16 relative z-10 mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Container size="xl" className="-mt-10 sm:-mt-16 relative z-10 mb-10 sm:mb-16 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
 
           {/* Card 1: Lithium Battery for Inverter */}
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
@@ -189,7 +189,7 @@ export function LithiumMainPage({
       {/* Trust Strip */}
       <Container size="xl" className="mb-16">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 divide-x divide-slate-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:divide-x divide-slate-100">
             <div className="flex items-center gap-3 justify-center">
               <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <ShieldCheck className="w-5 h-5" />
@@ -232,7 +232,7 @@ export function LithiumMainPage({
 
       {/* Featured Products */}
       <Container size="xl" className="mb-24">
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Featured Lithium Solutions</h2>
             <p className="text-slate-500 font-medium">Top picks for a smarter, uninterrupted tomorrow.</p>
@@ -242,7 +242,7 @@ export function LithiumMainPage({
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product: any) => (
             <ProductCard key={product.productId} product={product} />
           ))}
@@ -257,7 +257,7 @@ export function LithiumMainPage({
       {/* Promotional Footer */}
       <div className="bg-emerald-900 py-12 text-white">
         <Container size="xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-emerald-800 flex items-center justify-center">
                 <Sun className="w-8 h-8 text-emerald-400" />
