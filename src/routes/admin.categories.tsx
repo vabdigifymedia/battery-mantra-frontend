@@ -523,7 +523,7 @@ function AdminCategories() {
                   value={field.value || ""}
                   onChange={field.onChange}
                   folder="battery-mantra/categories/banners"
-                  label="Banner URL (Optional, for category hero banners)"
+                  label="Upload Banner Image (Optional, for category hero banners)"
                   error={form.formState.errors.bannerUrl?.message}
                 />
               )}
