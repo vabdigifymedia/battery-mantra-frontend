@@ -8,11 +8,11 @@ import { CategoryListResponse } from "@/types/dto";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
-export function LithiumSubCategoryPage({ 
-  category, 
-  type 
-}: { 
-  category: CategoryListResponse; 
+export function LithiumSubCategoryPage({
+  category,
+  type
+}: {
+  category: CategoryListResponse;
   type: string;
 }) {
   const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 8 }));
@@ -62,9 +62,9 @@ export function LithiumSubCategoryPage({
 
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
-      
+
       {/* Hero Banner Area */}
-      <div 
+      <div
         className="relative min-h-[500px] lg:min-h-[600px] flex items-center bg-slate-900 overflow-hidden"
         style={{
           backgroundImage: `url('/images/lithium/${isSolar ? 'solar-battery-banner.png' : 'integrated-battery-banner.png'}')`,
@@ -74,7 +74,7 @@ export function LithiumSubCategoryPage({
       >
         {/* Gradient Overlay to ensure text readability */}
         <div className={`absolute inset-0 bg-gradient-to-${isSolar ? 'l' : 'r'} from-white/90 via-white/70 to-transparent lg:from-white/95 lg:via-white/80 lg:to-white/10`} />
-        
+
         <Container size="xl" className="relative z-10 w-full py-16">
           <div className={`flex flex-col lg:flex-row ${isSolar ? 'justify-end' : 'justify-start'}`}>
             <div className={`w-full lg:w-1/2 ${isSolar ? 'text-right' : 'text-left'}`}>
@@ -82,7 +82,7 @@ export function LithiumSubCategoryPage({
                 {config.subtitle}
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-slate-900 drop-shadow-md">
-                Lithium {config.titleHighlight} <br/>Inverter Battery
+                Lithium {config.titleHighlight} <br />Inverter Battery
               </h1>
               <p className={`text-lg text-slate-700 font-semibold mb-10 max-w-xl drop-shadow-sm ${isSolar ? 'ml-auto' : 'mr-auto'}`}>
                 {config.desc}
@@ -108,19 +108,19 @@ export function LithiumSubCategoryPage({
 
       {/* Highlights Strip */}
       <Container size="xl" className="-mt-8 relative z-20 mb-16">
-         <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 flex justify-between gap-4 overflow-x-auto">
-            {config.highlights.map((h, i) => (
-              <div key={i} className="flex items-center gap-3 shrink-0">
-                 <div className={`w-12 h-12 rounded-full ${IconBg} flex items-center justify-center`}>
-                    <h.icon className={`w-6 h-6 ${IconText}`} />
-                 </div>
-                 <div>
-                    <div className="font-bold text-slate-800 text-sm">{h.label}</div>
-                    <div className="text-xs text-slate-500">{h.desc}</div>
-                 </div>
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 flex justify-between gap-4 overflow-x-auto">
+          {config.highlights.map((h, i) => (
+            <div key={i} className="flex items-center gap-3 shrink-0">
+              <div className={`w-12 h-12 rounded-full ${IconBg} flex items-center justify-center`}>
+                <h.icon className={`w-6 h-6 ${IconText}`} />
               </div>
-            ))}
-         </div>
+              <div>
+                <div className="font-bold text-slate-800 text-sm">{h.label}</div>
+                <div className="text-xs text-slate-500">{h.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </Container>
 
       {/* Featured Products */}
@@ -136,7 +136,7 @@ export function LithiumSubCategoryPage({
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product: any) => (
             <ProductCard key={product.productId} product={product} />
@@ -148,7 +148,7 @@ export function LithiumSubCategoryPage({
           </div>
         )}
       </Container>
-      
+
       {/* Trust Strip */}
       <Container size="xl" className="mb-24">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
