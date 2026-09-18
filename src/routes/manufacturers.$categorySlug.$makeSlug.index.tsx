@@ -120,7 +120,7 @@ function ManufacturerPage() {
                 key={model.vehicleId}
                 to="/manufacturers/$categorySlug/$makeSlug/$modelSlug"
                 params={{ categorySlug, makeSlug, modelSlug: toSlug(`${model.make}-${model.model}`) }}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-lg"
               >
                 <div className="h-24 w-full flex items-center justify-center p-2">
                   {model.imageUrl ? (

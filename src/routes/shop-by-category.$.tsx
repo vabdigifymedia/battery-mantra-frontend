@@ -188,7 +188,7 @@ function SubcategoriesPage() {
               </>
             );
 
-            const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product";
+            const cardClassName = "group flex flex-col h-full items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-product";
 
             if (c.clickAction === 'SHOW_BRANDS') {
               return (

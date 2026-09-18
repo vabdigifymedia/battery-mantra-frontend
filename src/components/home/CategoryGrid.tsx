@@ -43,7 +43,7 @@ export function CategoryGrid() {
           </>
         );
 
-        const cardClassName = "group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product min-w-[120px] snap-start lg:min-w-0";
+        const cardClassName = "group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 magic-border-hover hover:shadow-product min-w-[140px] snap-start lg:min-w-0";
 
         if (c.clickAction === 'SHOW_BRANDS') {
           return (

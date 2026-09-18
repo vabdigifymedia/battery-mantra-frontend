@@ -119,7 +119,7 @@ function CategoryBrandsPage() {
                 key={b.brandId}
                 to="/shop/$categorySlug/$brandSlug"
                 params={{ categorySlug, brandSlug: toSlug(b.brandName) }}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-product"
+                className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 text-center transition-all hover:-translate-y-1 magic-border-hover hover:shadow-product"
               >
                 <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                   {b.brandLogo ? (

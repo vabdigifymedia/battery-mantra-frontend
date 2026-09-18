@@ -39,7 +39,7 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
           key={m.id}
           to="/manufacturers/$categorySlug/$makeSlug"
           params={{ categorySlug, makeSlug: toSlug(m.name) }}
-          className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product min-w-[120px] snap-start lg:min-w-0"
+          className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 magic-border-hover hover:shadow-product min-w-[120px] snap-start lg:min-w-0"
         >
           <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
             {m.logoUrl ? (
