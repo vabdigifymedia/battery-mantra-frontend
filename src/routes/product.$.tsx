@@ -102,6 +102,7 @@ export const Route = createFileRoute("/product/$")({
         brand_name: brandName,
         category_name: categoryName,
         delivery_time: deliveryTime,
+        manufacturer_name: (product as any)?.manufacturerName || brandName,
         ...(cityNameStr && { city_name: cityNameStr }),
       },
       seo,

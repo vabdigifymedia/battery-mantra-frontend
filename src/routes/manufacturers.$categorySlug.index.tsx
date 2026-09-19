@@ -37,7 +37,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/")({
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: category?.categoryName || categoryName },
+      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
       (category as any)?.seo, // The category's own SEO
       {
         title: `Shop by ${categoryName} | Battery Mantra`,

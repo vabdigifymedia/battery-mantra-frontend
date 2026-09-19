@@ -46,7 +46,9 @@ function SeoQuickBrandsPage() {
           <p className="font-semibold mb-1">Supported Variables:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1">
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{brand_name}`}</code> - Name of the brand</li>
+            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category</li>
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city</li>
+            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Default delivery time (e.g. 2-4 Hours)</li>
           </ul>
         </div>
       </div>
@@ -97,7 +99,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>Variables: brand_name{templateType.includes("WITH_CITY") && ", city_name"}</CardDescription>
+        <CardDescription>Variables: brand_name, category_name, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">

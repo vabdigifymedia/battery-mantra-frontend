@@ -41,7 +41,8 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug/")(
       loaderData?.templates,
       { 
         manufacturer_name: manufacturer?.name || makeName, 
-        category_name: category?.categoryName || categoryName 
+        category_name: category?.categoryName || categoryName,
+        delivery_time: "2-4 Hours",
       },
       (manufacturer as any)?.seo,
       {

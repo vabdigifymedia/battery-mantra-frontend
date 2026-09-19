@@ -32,7 +32,7 @@ export const Route = createFileRoute("/shop/c/$categorySlug")({
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: category?.categoryName || categoryName },
+      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
       (category as any)?.seo,
       {
         title: `${categoryName} Online | Buy 100% Genuine Battery`,

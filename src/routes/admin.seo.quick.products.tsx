@@ -48,6 +48,7 @@ function SeoQuickProductsPage() {
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{product_name}`}</code> - Name of the product</li>
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{brand_name}`}</code> - Name of the brand</li>
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category</li>
+            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer</li>
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Default delivery time (e.g. 2-4 Hours)</li>
             <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city</li>
           </ul>
@@ -100,7 +101,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>Variables: product_name, brand_name, category_name{templateType.includes("WITH_CITY") && ", city_name"}, delivery_time</CardDescription>
+        <CardDescription>Variables: product_name, brand_name, category_name, manufacturer_name{templateType.includes("WITH_CITY") && ", city_name"}, delivery_time</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
