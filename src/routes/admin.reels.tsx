@@ -54,6 +54,7 @@ function AdminReels() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReel, setEditingReel] = useState<ReelResponse | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const form = useForm<ReelFormValues>({
     resolver: zodResolver(reelSchema) as any,
@@ -64,18 +65,25 @@ function AdminReels() {
     },
   });
 
+  const getNextDisplayOrder = () => {
+    if (!reels || reels.length === 0) return 1;
+    return Math.max(...reels.map((r) => r.displayOrder ?? 0)) + 1;
+  };
+
   const openAddModal = () => {
     setEditingReel(null);
+    setShowAdvanced(false);
     form.reset({
       url: "",
       isActive: true,
-      displayOrder: 0,
+      displayOrder: getNextDisplayOrder(),
     });
     setIsModalOpen(true);
   };
 
   const openEditModal = (reel: ReelResponse) => {
     setEditingReel(reel);
+    setShowAdvanced(false);
     form.reset({
       url: reel.url,
       isActive: reel.isActive ?? true,
@@ -87,11 +95,13 @@ function AdminReels() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingReel(null);
+    setShowAdvanced(false);
     form.reset();
   };
 
   const invalidateReels = () => {
-    queryClient.invalidateQueries({ queryKey: reelsKeys.all });
+    queryClient.invalidateQueries({ queryKey: reelsKeys.admin() });
+    queryClient.invalidateQueries({ queryKey: reelsKeys.active() });
   };
 
   const addMutation = useMutation({
@@ -245,14 +255,26 @@ function AdminReels() {
               <Input id="url" {...form.register("url")} placeholder="https://www.instagram.com/reel/..." />
             </FormField>
 
-            <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers show first" error={form.formState.errors.displayOrder?.message}>
-              <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
-            </FormField>
-
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2">
               <input type="checkbox" id="isActive" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isActive")} />
               <label htmlFor="isActive" className="text-sm font-medium text-foreground">Active (Visible on Homepage)</label>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 focus:outline-none cursor-pointer"
+            >
+              {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+            </button>
+
+            {showAdvanced && (
+              <div className="space-y-4 border-t border-border pt-4 animate-in fade-in duration-200">
+                <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers show first (auto-incremented)" error={form.formState.errors.displayOrder?.message}>
+                  <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
+                </FormField>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="ghost" onClick={closeModal}>
@@ -269,3 +291,4 @@ function AdminReels() {
     </div>
   );
 }
+
