@@ -777,3 +777,19 @@ export type LeaveRequestResponse = {
 export type UpdateLeaveStatusRequest = {
   status: LeaveStatus;
 };
+
+/* ---------- Instagram Reels ---------- */
+export type ReelResponse = {
+  reelId: UUID;
+  url: string;
+  isActive: boolean;
+  displayOrder: number;
+};
+
+export type CreateReelRequest = {
+  url: string;
+  isActive?: boolean;
+  displayOrder?: number;
+};
+
+export type UpdateReelRequest = Partial<CreateReelRequest>;

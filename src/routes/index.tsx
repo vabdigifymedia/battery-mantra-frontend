@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BatteryCharging, Zap } from "lucide-react";
+import { ArrowRight, BatteryCharging, Zap, Instagram } from "lucide-react";
 import { HeroSection } from "@/components/layout/HeroSection";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -13,6 +13,7 @@ import { HomeCategoryPills } from "@/components/home/HomeCategoryPills";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { InstagramReelsWidget } from "@/components/home/InstagramReelsWidget";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 
 import { CallbackBanner } from "@/components/home/CallbackBanner";
@@ -272,6 +273,28 @@ function HomePage() {
                 filterFn={(p) => Boolean(p.exchangeDiscount && p.exchangeDiscount > 0)}
                 sortFn={(a, b) => (b.exchangeDiscount || 0) - (a.exchangeDiscount || 0)}
               />
+            </div>
+          </section>
+
+          <section aria-labelledby="instagram-reels" className="mt-16">
+            <SectionHeading
+              eyebrow={
+                <span className="flex items-center gap-1.5 text-pink-600 dark:text-pink-500">
+                  <Instagram className="h-4 w-4" /> @batterymantra
+                </span>
+              }
+              title={<span id="instagram-reels">Watch Our Latest Reels</span>}
+              description="Follow us on Instagram for battery tips, latest offers, and updates."
+              action={
+                <Button asChild variant="outline" className="border-pink-200 text-pink-700 hover:bg-pink-50 hover:text-pink-800 dark:border-pink-900/50 dark:text-pink-400 dark:hover:bg-pink-950/50">
+                  <a href="https://instagram.com/batterymantra" target="_blank" rel="noopener noreferrer">
+                    Follow Us <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </a>
+                </Button>
+              }
+            />
+            <div className="mt-8">
+              <InstagramReelsWidget />
             </div>
           </section>
 

@@ -2,7 +2,7 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -42,6 +42,7 @@ const navigation = [
   { name: "Leave Requests", href: "/admin/leaves", icon: CalendarRange },
   { name: "Partners", href: "/admin/partners", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
+  { name: "Instagram Reels", href: "/admin/reels", icon: Instagram },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
   { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
 ];
