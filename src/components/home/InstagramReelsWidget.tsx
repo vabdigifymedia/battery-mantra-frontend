@@ -1,14 +1,42 @@
 import { Instagram } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { activeReelsQuery } from "@/queries";
+import { useEffect, useRef } from "react";
 import type { ReelResponse } from "@/types/dto";
 
-const getEmbedUrl = (rawUrl: string) => {
+declare global {
+  interface Window {
+    instgrm?: { Embeds: { process: () => void } };
+  }
+}
+
+function useInstagramEmbed(deps: unknown[]) {
+  const scriptLoaded = useRef(false);
+
+  useEffect(() => {
+    if (window.instgrm) {
+      window.instgrm.Embeds.process();
+      return;
+    }
+
+    if (scriptLoaded.current) return;
+    scriptLoaded.current = true;
+
+    const script = document.createElement("script");
+    script.src = "https://www.instagram.com/embed.js";
+    script.async = true;
+    script.onload = () => window.instgrm?.Embeds.process();
+    document.body.appendChild(script);
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+const getCleanUrl = (rawUrl: string) => {
   try {
     const urlObj = new URL(rawUrl);
-    // Remove query parameters like ?igsh=... which break the /embed/ endpoint
-    const cleanUrl = `${urlObj.origin}${urlObj.pathname}`.replace(/\/$/, '');
-    return `${cleanUrl}/embed/`;
+    return `${urlObj.origin}${urlObj.pathname}`.replace(/\/$/, '');
   } catch {
     return rawUrl;
   }
@@ -16,6 +44,8 @@ const getEmbedUrl = (rawUrl: string) => {
 
 export function InstagramReelsWidget() {
   const { data: reels, isLoading } = useQuery(activeReelsQuery());
+
+  useInstagramEmbed([reels]);
 
   if (isLoading) {
     return (
@@ -37,24 +67,32 @@ export function InstagramReelsWidget() {
       {reels.map((reel: ReelResponse) => (
         <div 
           key={reel.reelId} 
-          // Use overflow-hidden to crop the iframe's header and footer
+          // 1. The main container defines the strict 9:16 aspect ratio box
           className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black border shadow-sm group"
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
             <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
             <span className="text-sm font-medium text-white/50">Loading Reel...</span>
           </div>
-          <iframe
-            src={getEmbedUrl(reel.url)}
-            // Scale and translate the iframe to hide Instagram's top header and bottom footer
-            className="absolute z-10 w-[calc(100%+4px)] h-[calc(100%+140px)] -top-[65px] -left-[2px] border-0"
-            scrolling="no"
-            allowTransparency={true}
-            allow="encrypted-media"
-            title={`Instagram Reel`}
-          ></iframe>
           
-          {/* Transparent overlay to prevent clicking on Instagram's external links if they peek through the edges, while still allowing play/pause in the center */}
+          {/* 2. The cropping wrapper positioned absolutely, stretching beyond the boundaries of the container */}
+          <div className="absolute z-10 w-[calc(100%+16px)] h-[calc(100%+220px)] -top-[80px] -left-[8px]">
+            <blockquote
+              className="instagram-media"
+              data-instgrm-permalink={getCleanUrl(reel.url) + '/'}
+              data-instgrm-version="14"
+              style={{
+                background: '#000',
+                border: '0',
+                margin: '0',
+                padding: '0',
+                width: '100%',
+                maxWidth: '100%',
+              }}
+            />
+          </div>
+
+          {/* 3. Transparent overlay to prevent clicking on Instagram's external links if they peek through */}
           <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"></div>
         </div>
       ))}
