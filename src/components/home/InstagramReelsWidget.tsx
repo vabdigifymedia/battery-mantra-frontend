@@ -28,7 +28,7 @@ function useInstagramEmbed(deps: unknown[]) {
     script.onload = () => window.instgrm?.Embeds.process();
     document.body.appendChild(script);
 
-    return () => {};
+    return () => { };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
@@ -51,8 +51,8 @@ export function InstagramReelsWidget() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="w-full aspect-[9/16] rounded-2xl bg-muted animate-pulse border shadow-sm"
           />
         ))}
@@ -65,23 +65,16 @@ export function InstagramReelsWidget() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {reels.map((reel: ReelResponse) => (
-        <div 
-          key={reel.reelId} 
-          // 1. The main container defines the strict aspect ratio box (229/400 matches manoj-mobiles crop)
-          // We force the iframe to take the full width of our wrapper and override Instagram's min-width.
-          // Note: We intentionally do NOT force height so the iframe calculates its own height and gets cleanly chopped at the bottom.
+        <div
+          key={reel.reelId}
           className="relative w-full aspect-[229/400] rounded-2xl overflow-hidden bg-black border shadow-sm group [&_iframe]:!w-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
             <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
             <span className="text-sm font-medium text-white/50">Loading Reel...</span>
           </div>
-          
-          {/* 2. The cropping wrapper positioned absolutely.
-              Width: calc(100% * 326 / 229) expands it to crop sides heavily.
-              Left: calc(-100% * 49 / 229) centers the expanded width.
-              Top: -56px hides the Instagram header (which is a fixed ~54px tall).
-              Bottom: Automatically cropped by the container's overflow-hidden and fixed aspect ratio. */}
+
+
           <div className="absolute z-10 w-[calc(100%*326/229)] left-[calc(-100%*49/229)] -top-[56px]">
             <blockquote
               className="instagram-media"
