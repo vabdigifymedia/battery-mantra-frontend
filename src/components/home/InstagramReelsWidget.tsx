@@ -67,16 +67,21 @@ export function InstagramReelsWidget() {
       {reels.map((reel: ReelResponse) => (
         <div 
           key={reel.reelId} 
-          // 1. The main container defines the strict 9:16 aspect ratio box
-          className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black border shadow-sm group"
+          // 1. The main container defines the strict 9:16 aspect ratio box.
+          // We use arbitrary target classes to FORCE the embed.js iframe to obey our calculated wrapper size.
+          className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black border shadow-sm group [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
             <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
             <span className="text-sm font-medium text-white/50">Loading Reel...</span>
           </div>
           
-          {/* 2. The cropping wrapper positioned absolutely, stretching beyond the boundaries of the container */}
-          <div className="absolute z-10 w-[calc(100%+16px)] h-[calc(100%+220px)] -top-[80px] -left-[8px]">
+          {/* 2. The cropping wrapper positioned absolutely.
+              Width: calc(100% + 32px) to crop 16px from each side (hides borders/padding).
+              Height: calc(100% + 300px) to give enough room for the footer to render out of bounds.
+              Top: -83px perfectly aligns the top of the video to the top of the container, hiding the 54px header + extra scale overhang. 
+              Left: -16px centers the widened wrapper. */}
+          <div className="absolute z-10 w-[calc(100%+32px)] h-[calc(100%+300px)] top-[-83px] left-[-16px]">
             <blockquote
               className="instagram-media"
               data-instgrm-permalink={getCleanUrl(reel.url) + '/'}
@@ -87,7 +92,7 @@ export function InstagramReelsWidget() {
                 margin: '0',
                 padding: '0',
                 width: '100%',
-                maxWidth: '100%',
+                height: '100%',
               }}
             />
           </div>
