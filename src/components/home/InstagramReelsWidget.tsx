@@ -1,48 +1,21 @@
 import { Instagram } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { activeReelsQuery } from "@/queries";
-import { useEffect, useRef } from "react";
 import type { ReelResponse } from "@/types/dto";
 
-declare global {
-  interface Window {
-    instgrm?: { Embeds: { process: () => void } };
+const getEmbedUrl = (rawUrl: string) => {
+  try {
+    const urlObj = new URL(rawUrl);
+    // Remove query parameters like ?igsh=... which break the /embed/ endpoint
+    const cleanUrl = `${urlObj.origin}${urlObj.pathname}`.replace(/\/$/, '');
+    return `${cleanUrl}/embed/`;
+  } catch {
+    return rawUrl;
   }
-}
-
-/** Load the Instagram embed.js script once, then re-process whenever new embeds appear. */
-function useInstagramEmbed(deps: unknown[]) {
-  const scriptLoaded = useRef(false);
-
-  useEffect(() => {
-    // If script is already loaded, just re-process embeds
-    if (window.instgrm) {
-      window.instgrm.Embeds.process();
-      return;
-    }
-
-    // Only inject the script tag once
-    if (scriptLoaded.current) return;
-    scriptLoaded.current = true;
-
-    const script = document.createElement("script");
-    script.src = "https://www.instagram.com/embed.js";
-    script.async = true;
-    script.onload = () => window.instgrm?.Embeds.process();
-    document.body.appendChild(script);
-
-    return () => {
-      // Don't remove the script on unmount — it's a global singleton
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-}
+};
 
 export function InstagramReelsWidget() {
   const { data: reels, isLoading } = useQuery(activeReelsQuery());
-
-  // Re-process Instagram embeds whenever `reels` changes
-  useInstagramEmbed([reels]);
 
   if (isLoading) {
     return (
@@ -62,23 +35,27 @@ export function InstagramReelsWidget() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {reels.map((reel: ReelResponse) => (
-        <div
-          key={reel.reelId}
-          className="w-full rounded-2xl overflow-hidden border shadow-sm bg-card [&_iframe]:!min-width-0"
+        <div 
+          key={reel.reelId} 
+          // Use overflow-hidden to crop the iframe's header and footer
+          className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black border shadow-sm group"
         >
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={reel.url.replace(/\/$/, '') + '/'}
-            data-instgrm-version="14"
-            style={{
-              margin: 0,
-              maxWidth: '100%',
-              width: '100%',
-              padding: 0,
-              border: 'none',
-              background: 'transparent',
-            }}
-          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
+            <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
+            <span className="text-sm font-medium text-white/50">Loading Reel...</span>
+          </div>
+          <iframe
+            src={getEmbedUrl(reel.url)}
+            // Scale and translate the iframe to hide Instagram's top header and bottom footer
+            className="absolute z-10 w-[calc(100%+4px)] h-[calc(100%+140px)] -top-[65px] -left-[2px] border-0"
+            scrolling="no"
+            allowTransparency={true}
+            allow="encrypted-media"
+            title={`Instagram Reel`}
+          ></iframe>
+          
+          {/* Transparent overlay to prevent clicking on Instagram's external links if they peek through the edges, while still allowing play/pause in the center */}
+          <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"></div>
         </div>
       ))}
     </div>
