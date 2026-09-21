@@ -81,7 +81,7 @@ export function HomeCategoryPills() {
           }
           if (category.clickAction === 'SHOW_SUBCATEGORIES') {
             return (
-              <Link key={category.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+              <Link key={category.categoryId} to="/shop-by-category/$" params={{ _splat: rawSlug }} className={linkClass}>
                 {cardContent}
               </Link>
             );
@@ -92,8 +92,8 @@ export function HomeCategoryPills() {
             return (
               <Link
                 key={category.categoryId}
-                to="/shop-by-category/$categorySlug"
-                params={{ categorySlug: rawSlug }}
+                to="/shop-by-category/$"
+                params={{ _splat: rawSlug }}
                 className={linkClass}
               >
                 {cardContent}

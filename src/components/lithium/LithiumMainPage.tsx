@@ -102,9 +102,9 @@ export function LithiumMainPage({
                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
               </div>
               <Link
-                to="/shop-by-category/$categorySlug"
+                to="/shop-by-category/$"
                 params={{ 
-                  categorySlug: subcategories.find(c => 
+                  _splat: subcategories.find(c => 
                     (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && 
                     !c.categoryName.toLowerCase().includes("integrated") && 
                     !c.categoryName.toLowerCase().includes("solar")
@@ -139,9 +139,9 @@ export function LithiumMainPage({
                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Award className="w-4 h-4 text-[#059669]" /></div>Ideal for<br />Homes</div>
               </div>
               <Link
-                to="/shop-by-category/$categorySlug"
+                to="/shop-by-category/$"
                 params={{ 
-                  categorySlug: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery"
+                  _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery"
                 }}
                 className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
               >
@@ -172,9 +172,9 @@ export function LithiumMainPage({
                 <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#ea580c]" /></div>Clean<br />Energy</div>
               </div>
               <Link
-                to="/shop-by-category/$categorySlug"
+                to="/shop-by-category/$"
                 params={{ 
-                  categorySlug: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery"
+                  _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery"
                 }}
                 className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
               >
@@ -237,7 +237,7 @@ export function LithiumMainPage({
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Featured Lithium Solutions</h2>
             <p className="text-slate-500 font-medium">Top picks for a smarter, uninterrupted tomorrow.</p>
           </div>
-          <Link to={`/shop/c/${category.categorySlug || toSlug(category.categoryName)}`} className="hidden md:flex items-center gap-1 text-sm font-bold text-emerald-600 hover:text-emerald-700">
+          <Link to="/shop/c/$categorySlug" params={{ categorySlug: category.categorySlug || toSlug(category.categoryName) }} className="hidden md:flex items-center gap-1 text-sm font-bold text-emerald-600 hover:text-emerald-700">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -275,7 +275,8 @@ export function LithiumMainPage({
             </div>
 
             <Link
-              to={`/shop/c/${category.categorySlug || toSlug(category.categoryName)}`}
+              to="/shop/c/$categorySlug"
+              params={{ categorySlug: category.categorySlug || toSlug(category.categoryName) }}
               className="px-6 py-3 bg-white text-emerald-900 font-bold rounded-full hover:bg-emerald-50 transition-colors"
             >
               Explore All Lithium Solutions →

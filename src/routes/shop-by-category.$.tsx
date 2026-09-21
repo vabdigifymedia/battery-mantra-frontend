@@ -221,7 +221,7 @@ function SubcategoriesPage() {
             }
             if (c.clickAction === 'SHOW_SUBCATEGORIES') {
               return (
-                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClassName}>
+                <Link key={c.categoryId} to="/shop-by-category/$" params={{ _splat: rawSlug }} className={linkClassName}>
                   <GradientBlobCard className={cardClassName}>
                     {cardContent}
                   </GradientBlobCard>
@@ -232,7 +232,7 @@ function SubcategoriesPage() {
             // AUTO or undefined fallback
             if (c.subCategories && c.subCategories.length > 0) {
               return (
-                <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className={cardClassName}>
+                <Link key={c.categoryId} to="/shop-by-category/$" params={{ _splat: rawSlug }} className={cardClassName}>
                   {cardContent}
                 </Link>
               );
