@@ -67,9 +67,10 @@ export function InstagramReelsWidget() {
       {reels.map((reel: ReelResponse) => (
         <div 
           key={reel.reelId} 
-          // 1. The main container defines the strict 9:16 aspect ratio box.
-          // We use arbitrary target classes to FORCE the embed.js iframe to obey our calculated wrapper size.
-          className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black border shadow-sm group [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
+          // 1. The main container defines the strict aspect ratio box (229/400 matches manoj-mobiles crop)
+          // We force the iframe to take the full width of our wrapper and override Instagram's min-width.
+          // Note: We intentionally do NOT force height so the iframe calculates its own height and gets cleanly chopped at the bottom.
+          className="relative w-full aspect-[229/400] rounded-2xl overflow-hidden bg-black border shadow-sm group [&_iframe]:!w-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
             <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
@@ -77,11 +78,11 @@ export function InstagramReelsWidget() {
           </div>
           
           {/* 2. The cropping wrapper positioned absolutely.
-              Width: calc(100% + 32px) to crop 16px from each side (hides borders/padding).
-              Height: calc(100% + 300px) to give enough room for the footer to render out of bounds.
-              Top: -83px perfectly aligns the top of the video to the top of the container, hiding the 54px header + extra scale overhang. 
-              Left: -16px centers the widened wrapper. */}
-          <div className="absolute z-10 w-[calc(100%+32px)] h-[calc(100%+300px)] top-[-83px] left-[-16px]">
+              Width: calc(100% * 326 / 229) expands it to crop sides heavily.
+              Left: calc(-100% * 49 / 229) centers the expanded width.
+              Top: -56px hides the Instagram header (which is a fixed ~54px tall).
+              Bottom: Automatically cropped by the container's overflow-hidden and fixed aspect ratio. */}
+          <div className="absolute z-10 w-[calc(100%*326/229)] left-[calc(-100%*49/229)] -top-[56px]">
             <blockquote
               className="instagram-media"
               data-instgrm-permalink={getCleanUrl(reel.url) + '/'}
@@ -92,7 +93,6 @@ export function InstagramReelsWidget() {
                 margin: '0',
                 padding: '0',
                 width: '100%',
-                height: '100%',
               }}
             />
           </div>
