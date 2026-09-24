@@ -28,7 +28,7 @@ export function LithiumMainPage({
           <img 
             src="/images/lithium/lithium-main-page-banner.webp" 
             alt="Lithium Power Banner" 
-            className="w-full h-full object-cover object-center" 
+            className="w-full h-full object-cover object-[70%_center] md:object-center" 
             fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent"></div>
@@ -37,9 +37,12 @@ export function LithiumMainPage({
         
         <Container size="xl" className="relative z-10 w-full py-8">
           
-          <div className="w-full text-center mb-8 md:mb-12">
-            <span className="font-serif italic text-3xl md:text-4xl text-emerald-950 font-black drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
-              Same Trust<br className="md:hidden" /> More Possibilities
+          <div className="w-full text-center mb-6 md:mb-10">
+            <span 
+              className="text-3xl md:text-4xl text-emerald-950 font-bold drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)] leading-tight block"
+              style={{ fontFamily: '"Dancing Script", cursive' }}
+            >
+              Same Trust<br />More Possibilities
             </span>
           </div>
 
@@ -60,28 +63,28 @@ export function LithiumMainPage({
             </div>
 
             {/* Right Side: Features */}
-            <div className="flex-1 flex flex-col items-center md:items-end justify-end w-full gap-8 md:pr-4 mt-8 md:mt-0">
+            <div className="flex-1 flex flex-col items-center md:items-end justify-end w-full gap-8 md:pr-4 mt-4 md:mt-0">
               
-              <div className="flex flex-col gap-6 text-white bg-white/10 backdrop-blur-2xl p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full max-w-sm md:w-auto relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
+              <div className="flex flex-row md:flex-col gap-4 md:gap-6 text-white bg-white/10 backdrop-blur-2xl p-4 md:p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full md:w-auto overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x md:overflow-visible relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
                 
-                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
-                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Longer<br/>Backup</span>
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
-                    <BatteryCharging className="w-6 h-6 text-emerald-600" />
+                <div className="flex flex-col md:flex-row items-center justify-center md:justify-end gap-2 md:gap-4 relative z-10 w-full shrink-0 snap-center min-w-[100px] md:min-w-0 group">
+                  <span className="text-center md:text-right text-xs md:text-sm font-semibold tracking-wide drop-shadow-md order-2 md:order-1">Longer<br className="hidden md:block"/> Backup</span>
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform order-1 md:order-2">
+                    <BatteryCharging className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
-                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Lower<br/>Running Cost</span>
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
-                    <BadgeIndianRupee className="w-6 h-6 text-emerald-600" />
+                <div className="flex flex-col md:flex-row items-center justify-center md:justify-end gap-2 md:gap-4 relative z-10 w-full shrink-0 snap-center min-w-[100px] md:min-w-0 group">
+                  <span className="text-center md:text-right text-xs md:text-sm font-semibold tracking-wide drop-shadow-md order-2 md:order-1">Lower<br className="hidden md:block"/> Cost</span>
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform order-1 md:order-2">
+                    <BadgeIndianRupee className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
-                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Cleaner<br/>& Greener</span>
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
-                    <Leaf className="w-6 h-6 text-emerald-600" />
+                <div className="flex flex-col md:flex-row items-center justify-center md:justify-end gap-2 md:gap-4 relative z-10 w-full shrink-0 snap-center min-w-[100px] md:min-w-0 group">
+                  <span className="text-center md:text-right text-xs md:text-sm font-semibold tracking-wide drop-shadow-md order-2 md:order-1">Cleaner<br className="hidden md:block"/> Greener</span>
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform order-1 md:order-2">
+                    <Leaf className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
                   </div>
                 </div>
 
@@ -93,11 +96,11 @@ export function LithiumMainPage({
       </div>
 
       {/* Options Cards */}
-      <Container size="xl" className="-mt-10 sm:-mt-16 relative z-10 mb-10 sm:mb-16 px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+      <Container size="xl" className="-mt-10 sm:-mt-16 relative z-10 mb-10 sm:mb-16 md:px-4">
+        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-4 sm:gap-6 pb-6 md:pb-0 px-4 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
           {/* Card 1: Lithium Battery for Inverter */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
             <div className="p-6 bg-[#ebf4ff] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#1e40af] text-white font-bold flex items-center justify-center shrink-0">1</div>
@@ -134,7 +137,7 @@ export function LithiumMainPage({
           </div>
 
           {/* Card 2: Lithium Integrated Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
             <div className="p-6 bg-[#ecfdf5] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#065f46] text-white font-bold flex items-center justify-center shrink-0">2</div>

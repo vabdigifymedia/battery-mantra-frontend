@@ -115,15 +115,15 @@ export function LithiumSubCategoryPage({
                 {config.desc}
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-3 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-4">
                 {config.features.map((f, i) => (
-                  <div key={i} className={`flex flex-col gap-0.5 sm:gap-2 lg:gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
-                    <div className={`w-6 h-6 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full ${IconBg} flex items-center justify-center shadow-sm`}>
-                      <f.icon className={`w-3 h-3 sm:w-5 sm:h-5 lg:w-7 lg:h-7 ${IconText}`} />
+                  <div key={i} className={`flex flex-col gap-1.5 sm:gap-2 lg:gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full ${IconBg} flex items-center justify-center shadow-sm`}>
+                      <f.icon className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 ${IconText}`} />
                     </div>
                     <div className={isSolar ? 'text-right' : 'text-left'}>
-                      <div className="font-bold text-[8px] sm:text-xs lg:text-sm text-slate-900 leading-tight">{f.label}</div>
-                      <div className="text-[7px] sm:text-[11px] lg:text-xs font-semibold text-slate-600">{f.desc}</div>
+                      <div className="font-bold text-[10px] sm:text-xs lg:text-sm text-slate-900 leading-tight">{f.label}</div>
+                      <div className="text-[9px] sm:text-[11px] lg:text-xs font-semibold text-slate-600">{f.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -164,9 +164,11 @@ export function LithiumSubCategoryPage({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-4 pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {products.map((product: any) => (
-            <ProductCard key={product.productId} product={product} />
+            <div key={product.productId} className="shrink-0 snap-center w-[75vw] sm:w-[45vw] md:w-auto">
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
         {products.length === 0 && (
