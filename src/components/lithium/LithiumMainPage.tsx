@@ -37,26 +37,30 @@ export function LithiumMainPage({
         
         <Container size="xl" className="relative z-10 w-full py-8">
           
-          <div className="w-full text-center mb-8 md:mb-10 mt-4 md:mt-0">
-            <span 
-              className="text-3xl md:text-4xl text-emerald-950 font-bold drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)] leading-tight block"
-              style={{ fontFamily: '"Dancing Script", cursive' }}
-            >
-              Same Trust<br />More Possibilities
-            </span>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 mt-4 md:mt-0">
             
             {/* Left Side: Text */}
             <div className="flex-1 text-center md:text-left mb-6 md:mb-0">
               <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase mb-3 md:mb-4 block">
                 SMART POWER SOLUTIONS
               </span>
-              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 md:mb-4 leading-tight text-slate-900">
-                Choose Your <br/>
-                <span className="text-emerald-600">Lithium Power Solution</span>
-              </h1>
+              
+              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-8 mb-3 md:mb-4">
+                <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-slate-900 m-0">
+                  Choose Your <br/>
+                  <span className="text-emerald-600">Lithium Power Solution</span>
+                </h1>
+                
+                <div className="transform -rotate-6 pt-2 lg:pt-6 shrink-0">
+                  <span 
+                    className="text-3xl md:text-4xl text-emerald-950 font-bold drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)] leading-tight block"
+                    style={{ fontFamily: '"Dancing Script", cursive' }}
+                  >
+                    Same Trust<br />More Possibilities
+                  </span>
+                </div>
+              </div>
+
               <p className="text-base md:text-lg text-slate-700 font-medium max-w-xl mx-auto md:mx-0">
                 Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office.
               </p>
