@@ -28,16 +28,16 @@ export function LithiumMainPage({
           <img 
             src="/images/lithium/lithium-main-page-banner.webp" 
             alt="Lithium Power Banner" 
-            className="w-full h-full object-cover object-[70%_center] md:object-center" 
+            className="w-full h-full object-cover object-[65%_center] md:object-center" 
             fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent"></div>
-          <div className="absolute inset-0 bg-white/40 md:bg-white/20 backdrop-blur-[2px] md:backdrop-blur-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-white/95 via-white/80 md:via-white/70 to-white/20 md:to-transparent"></div>
+          <div className="absolute inset-0 bg-white/30 md:bg-white/20 backdrop-blur-[2px] md:backdrop-blur-none"></div>
         </div>
         
         <Container size="xl" className="relative z-10 w-full py-8">
           
-          <div className="w-full text-center mb-6 md:mb-10">
+          <div className="w-full text-center mb-8 md:mb-10 mt-4 md:mt-0">
             <span 
               className="text-3xl md:text-4xl text-emerald-950 font-bold drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)] leading-tight block"
               style={{ fontFamily: '"Dancing Script", cursive' }}
@@ -49,15 +49,15 @@ export function LithiumMainPage({
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
             
             {/* Left Side: Text */}
-            <div className="flex-1 text-center md:text-left">
-              <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase mb-4 block">
+            <div className="flex-1 text-center md:text-left mb-6 md:mb-0">
+              <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase mb-3 md:mb-4 block">
                 SMART POWER SOLUTIONS
               </span>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight text-slate-900">
+              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 md:mb-4 leading-tight text-slate-900">
                 Choose Your <br/>
                 <span className="text-emerald-600">Lithium Power Solution</span>
               </h1>
-              <p className="text-lg text-slate-600 font-medium max-w-xl mx-auto md:mx-0">
+              <p className="text-base md:text-lg text-slate-700 font-medium max-w-xl mx-auto md:mx-0">
                 Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office.
               </p>
             </div>
@@ -170,7 +170,7 @@ export function LithiumMainPage({
           </div>
 
           {/* Card 3: Lithium Inbuilt Solar Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
             <div className="p-6 bg-[#fff7ed] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#9a3412] text-white font-bold flex items-center justify-center shrink-0">3</div>
