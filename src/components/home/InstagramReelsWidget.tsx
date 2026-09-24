@@ -49,11 +49,11 @@ export function InstagramReelsWidget() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 lg:mx-0 lg:px-0">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="w-full aspect-[9/16] rounded-2xl bg-muted animate-pulse border shadow-sm"
+            className="w-[75vw] sm:w-[45vw] lg:w-full shrink-0 snap-center aspect-[9/16] rounded-[2rem] bg-slate-100 dark:bg-slate-800 animate-pulse border-4 border-white dark:border-slate-800 shadow-sm"
           />
         ))}
       </div>
@@ -63,19 +63,21 @@ export function InstagramReelsWidget() {
   if (!reels || reels.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-8 lg:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 lg:mx-0 lg:px-0">
       {reels.map((reel: ReelResponse) => (
         <div
           key={reel.reelId}
-          className="relative w-full aspect-[229/400] rounded-2xl overflow-hidden bg-black border shadow-sm group [&_iframe]:!w-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
+          className="relative w-[75vw] sm:w-[45vw] lg:w-full shrink-0 snap-center aspect-[229/400] rounded-[2rem] overflow-hidden bg-black border-4 border-white dark:border-slate-800 shadow-md group hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(220,39,67,0.3)] transition-all duration-300 [&_iframe]:!w-full [&_iframe]:!min-w-0 [&_iframe]:!max-w-none [&_iframe]:!m-0 [&_iframe]:!p-0 [&_iframe]:!border-0"
         >
+          {/* Inner ring overlay to simulate phone bevel */}
+          <div className="absolute inset-0 z-30 rounded-[2rem] ring-1 ring-inset ring-white/10 pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
+
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground z-0">
-            <Instagram className="h-8 w-8 mb-2 opacity-20 text-white" />
+            <Instagram className="h-10 w-10 mb-2 opacity-30 text-white animate-pulse" />
             <span className="text-sm font-medium text-white/50">Loading Reel...</span>
           </div>
 
-
-          <div className="absolute z-10 w-[calc(100%*326/229)] left-[calc(-100%*49/229)] -top-[56px]">
+          <div className="absolute z-10 w-[calc(100%*326/229)] left-[calc(-100%*49/229)] -top-[56px] transition-transform duration-500 ease-out group-hover:scale-[1.02]">
             <blockquote
               className="instagram-media"
               data-instgrm-permalink={getCleanUrl(reel.url) + '/'}
@@ -90,8 +92,8 @@ export function InstagramReelsWidget() {
             />
           </div>
 
-          {/* 3. Transparent overlay to prevent clicking on Instagram's external links if they peek through */}
-          <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"></div>
+          {/* Transparent overlay to prevent clicking on Instagram's external links if they peek through */}
+          <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.3)] group-hover:shadow-[inset_0_0_10px_rgba(0,0,0,0.1)] transition-shadow duration-300"></div>
         </div>
       ))}
     </div>

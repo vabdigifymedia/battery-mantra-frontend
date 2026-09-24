@@ -261,23 +261,29 @@ function HomePage() {
             </div>
           </section>
 
-          <section aria-labelledby="instagram-reels" className="mt-16">
-            <SectionHeading
-              eyebrow={
-                <span className="flex items-center gap-1.5 text-pink-600 dark:text-pink-500">
-                  <Instagram className="h-4 w-4" /> @batterymantra
+          <section aria-labelledby="instagram-reels" className="mt-16 md:mt-24">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-10">
+              <div>
+                <span className="flex items-center gap-2 text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] mb-2 uppercase tracking-wider">
+                  <Instagram className="h-5 w-5 text-[#dc2743]" /> @batterymantra
                 </span>
-              }
-              title={<span id="instagram-reels">Watch Our Latest Reels</span>}
-              description="Follow us on Instagram for battery tips, latest offers, and updates."
-              action={
-                <Button asChild variant="outline" className="border-pink-200 text-pink-700 hover:bg-pink-50 hover:text-pink-800 dark:border-pink-900/50 dark:text-pink-400 dark:hover:bg-pink-950/50">
-                  <a href="https://instagram.com/batterymantra" target="_blank" rel="noopener noreferrer">
-                    Follow Us <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </a>
-                </Button>
-              }
-            />
+                <h2 id="instagram-reels" className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-2 leading-tight">
+                  Watch Our Latest Reels
+                </h2>
+                <p className="text-slate-500 font-medium md:text-lg">
+                  Follow us on Instagram for battery tips, latest offers, and updates.
+                </p>
+              </div>
+              <a 
+                href="https://instagram.com/batterymantra" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-bold text-white rounded-full bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] hover:shadow-[0_8px_24px_rgba(220,39,67,0.35)] hover:-translate-y-1 transition-all duration-300 w-max shrink-0"
+              >
+                Follow Us <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </div>
+            
             <div className="mt-8">
               <InstagramReelsWidget />
             </div>
