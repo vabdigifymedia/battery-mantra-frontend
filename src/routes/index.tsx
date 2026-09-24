@@ -220,12 +220,12 @@ function HomePage() {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand to-orange-500"></div>
             <SectionHeading
               eyebrow={
-                <span className="flex items-center gap-1.5 text-brand">
-                  <Zap className="h-4 w-4 animate-pulse" /> Next-Gen Power
+                <span className="text-emerald-700 font-extrabold tracking-[0.2em] text-xs uppercase">
+                  SMART POWER SOLUTIONS
                 </span>
               }
-              title={<span id="lithium">Premium Lithium Batteries</span>}
-              description="High performance, fast charging, and longer life for your home and office."
+              title={<span id="lithium">Choose Your <span className="text-emerald-600">Lithium Power Solution</span></span>}
+              description="Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office."
               action={
                 lithiumCategory ? (
                   <Button asChild variant="brand">

@@ -15,8 +15,8 @@ export function LithiumCategoriesWidget() {
             Upgrade your existing inverter with lithium. Enjoy longer backup, faster charging and zero maintenance.
           </p>
         </div>
-        <div className="w-full bg-white relative border-y border-white flex justify-center py-2">
-          <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="h-32 object-contain group-hover:scale-105 transition-transform duration-500" />
+        <div className="w-full bg-white relative border-y border-white">
+          <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
         </div>
         <div className="p-4 bg-[#ebf4ff] flex-1 flex flex-col">
           <div className="grid grid-cols-4 gap-1 mb-4 text-center text-[10px] font-semibold text-[#1e3a8a]">
@@ -46,8 +46,8 @@ export function LithiumCategoriesWidget() {
             Inverter + Lithium Battery + BMS All-in-One Smart Solution for your home and office.
           </p>
         </div>
-        <div className="w-full bg-white relative border-y border-white flex justify-center py-2">
-          <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="h-32 object-contain group-hover:scale-105 transition-transform duration-500" />
+        <div className="w-full bg-white relative border-y border-white">
+          <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
         </div>
         <div className="p-4 bg-[#ecfdf5] flex-1 flex flex-col">
           <div className="grid grid-cols-4 gap-1 mb-4 text-center text-[10px] font-semibold text-[#064e3b]">
@@ -77,8 +77,8 @@ export function LithiumCategoriesWidget() {
             Solar Inverter + Lithium Battery + Solar Charge Controller. Harness the power of the sun.
           </p>
         </div>
-        <div className="w-full bg-white relative border-y border-white flex justify-center py-2">
-          <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="h-32 object-contain group-hover:scale-105 transition-transform duration-500" />
+        <div className="w-full bg-white relative border-y border-white">
+          <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
         </div>
         <div className="p-4 bg-[#fff7ed] flex-1 flex flex-col">
           <div className="grid grid-cols-4 gap-1 mb-4 text-center text-[10px] font-semibold text-[#7c2d12]">
