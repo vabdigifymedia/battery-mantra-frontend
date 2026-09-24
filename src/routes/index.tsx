@@ -227,19 +227,11 @@ function HomePage() {
               title={<span id="lithium">Choose Your <span className="text-emerald-600">Lithium Power Solution</span></span>}
               description="Advanced. Reliable. Future Ready. Experience the next generation of power backup for your home and office."
               action={
-                lithiumCategory ? (
-                  <Button asChild variant="brand">
-                    <Link to="/shop/c/$categorySlug" params={{ categorySlug: toSlug(lithiumCategory.categoryName) }}>
-                      View all <ArrowRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button asChild variant="brand">
-                    <Link to="/products">
-                      View all <ArrowRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </Button>
-                )
+                <div className="hidden sm:block -rotate-6 sm:pr-8 opacity-80">
+                  <span className="font-serif italic text-xl sm:text-2xl text-slate-800 font-bold leading-tight">
+                    Same Trust<br/>More Possibilities
+                  </span>
+                </div>
               }
             />
             <div className="mt-8 relative z-10">
