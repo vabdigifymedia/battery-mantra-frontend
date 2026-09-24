@@ -53,31 +53,36 @@ export function LithiumMainPage({
             </div>
 
             {/* Right Side: Features */}
-            <div className="flex-1 flex flex-col items-center md:items-end w-full">
-              <div className="mb-6 md:mr-12 -rotate-6">
-                <span className="font-serif italic text-2xl text-slate-800 font-bold">
+            <div className="flex-1 flex flex-col md:flex-row items-end justify-end w-full gap-8 md:pr-4 mt-8 md:mt-0">
+              <div className="hidden md:block -rotate-6 mb-12">
+                <span className="font-serif italic text-3xl text-emerald-950 font-black drop-shadow-[0_2px_2px_rgba(255,255,255,0.8)]">
                   Same Trust<br/>More Possibilities
                 </span>
               </div>
-              <div className="flex items-center gap-4 sm:gap-6 text-sm font-semibold text-slate-700 bg-white p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-100/50 w-full md:w-auto justify-center">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
-                    <BatteryCharging className="w-6 h-6 text-emerald-600" />
+              
+              <div className="flex flex-col gap-6 text-white bg-white/10 backdrop-blur-2xl p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full md:w-auto relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
+                
+                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
+                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Longer<br/>Backup</span>
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
+                    <BatteryCharging className="w-6 h-6 text-emerald-50" />
                   </div>
-                  <span className="text-center text-xs">Longer<br/>Backup</span>
                 </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
-                    <BadgeIndianRupee className="w-6 h-6 text-emerald-600" />
+                
+                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
+                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Lower<br/>Running Cost</span>
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
+                    <BadgeIndianRupee className="w-6 h-6 text-emerald-50" />
                   </div>
-                  <span className="text-center text-xs">Lower<br/>Running Cost</span>
                 </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-1">
-                    <Leaf className="w-6 h-6 text-emerald-600" />
+                
+                <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
+                  <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Cleaner<br/>& Greener</span>
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
+                    <Leaf className="w-6 h-6 text-emerald-50" />
                   </div>
-                  <span className="text-center text-xs">Cleaner<br/>& Greener</span>
                 </div>
+
               </div>
             </div>
 
