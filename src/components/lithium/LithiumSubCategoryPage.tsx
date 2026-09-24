@@ -164,11 +164,9 @@ export function LithiumSubCategoryPage({
           </Link>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-4 pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {products.map((product: any) => (
-            <div key={product.productId} className="shrink-0 snap-center w-[75vw] sm:w-[45vw] md:w-auto">
-              <ProductCard product={product} />
-            </div>
+            <ProductCard key={product.productId} product={product} />
           ))}
         </div>
         {products.length === 0 && (
