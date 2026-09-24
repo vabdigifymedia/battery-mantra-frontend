@@ -22,11 +22,20 @@ export function LithiumMainPage({
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
 
       {/* Hero Banner Area */}
-      <div className="bg-[#f8fafc] pb-16 sm:pb-24 pt-10 sm:pt-16 relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-green-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+      <div className="relative pb-16 sm:pb-24 pt-10 sm:pt-16 overflow-hidden min-h-[450px] flex items-center">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/lithium/lithium-main-page-banner.webp" 
+            alt="Lithium Power Banner" 
+            className="w-full h-full object-cover object-center" 
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent"></div>
+          <div className="absolute inset-0 bg-white/40 md:bg-white/20 backdrop-blur-[2px] md:backdrop-blur-none"></div>
+        </div>
         
-        <Container size="xl" className="relative z-10">
+        <Container size="xl" className="relative z-10 w-full py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
             
             {/* Left Side: Text */}
