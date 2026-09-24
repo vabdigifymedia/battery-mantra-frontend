@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { productFilterQuery } from "@/queries";
 import { ProductCard } from "@/components/products/ProductCard";
-import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight, Leaf, Zap } from "lucide-react";
+import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight, Leaf, Zap, Home, Building2, Store } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
@@ -255,31 +255,48 @@ export function LithiumMainPage({
       </Container>
 
       {/* Promotional Footer */}
-      <div className="bg-emerald-900 py-12 text-white">
-        <Container size="xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-800 flex items-center justify-center">
-                <Sun className="w-8 h-8 text-emerald-400" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 py-16 text-white border-t border-emerald-800/50 mt-auto">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+        <Container size="xl" className="relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-800/50 border border-emerald-700/50 backdrop-blur-sm flex items-center justify-center shadow-inner shrink-0">
+                <Sun className="w-8 h-8 text-emerald-300" />
               </div>
               <div>
-                <div className="text-2xl font-black mb-1">Switch to Lithium.</div>
-                <div className="text-emerald-400 font-medium">Power a Cleaner Tomorrow.</div>
+                <div className="text-3xl font-black mb-1 tracking-tight">Switch to Lithium.</div>
+                <div className="text-emerald-400/90 font-medium text-lg">Power a Cleaner Tomorrow.</div>
               </div>
             </div>
 
-            <div className="flex gap-8 opacity-60">
-              <div className="text-center"><div className="font-bold text-lg">🏠</div><div className="text-xs mt-1">For Home</div></div>
-              <div className="text-center"><div className="font-bold text-lg">🏢</div><div className="text-xs mt-1">For Office</div></div>
-              <div className="text-center"><div className="font-bold text-lg">🏪</div><div className="text-xs mt-1">For Shops</div></div>
+            <div className="flex gap-6 sm:gap-10">
+              <div className="flex flex-col items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                <div className="w-10 h-10 rounded-full bg-emerald-800/40 flex items-center justify-center border border-emerald-700/30">
+                  <Home className="w-5 h-5 text-emerald-100" />
+                </div>
+                <div className="text-xs font-semibold text-emerald-50 tracking-wide uppercase">For Home</div>
+              </div>
+              <div className="flex flex-col items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                <div className="w-10 h-10 rounded-full bg-emerald-800/40 flex items-center justify-center border border-emerald-700/30">
+                  <Building2 className="w-5 h-5 text-emerald-100" />
+                </div>
+                <div className="text-xs font-semibold text-emerald-50 tracking-wide uppercase">For Office</div>
+              </div>
+              <div className="flex flex-col items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                <div className="w-10 h-10 rounded-full bg-emerald-800/40 flex items-center justify-center border border-emerald-700/30">
+                  <Store className="w-5 h-5 text-emerald-100" />
+                </div>
+                <div className="text-xs font-semibold text-emerald-50 tracking-wide uppercase">For Shops</div>
+              </div>
             </div>
 
             <Link
               to="/shop/c/$categorySlug"
               params={{ categorySlug: category.categorySlug || toSlug(category.categoryName) }}
-              className="px-6 py-3 bg-white text-emerald-900 font-bold rounded-full hover:bg-emerald-50 transition-colors"
+              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-full transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] flex items-center gap-2 group shrink-0"
             >
-              Explore All Lithium Solutions →
+              Explore All Solutions <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </Container>
