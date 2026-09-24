@@ -36,6 +36,13 @@ export function LithiumMainPage({
         </div>
         
         <Container size="xl" className="relative z-10 w-full py-8">
+          
+          <div className="w-full text-center mb-8 md:mb-12">
+            <span className="font-serif italic text-3xl md:text-4xl text-emerald-950 font-black drop-shadow-[0_2px_4px_rgba(255,255,255,0.9)]">
+              Same Trust<br className="md:hidden" /> More Possibilities
+            </span>
+          </div>
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
             
             {/* Left Side: Text */}
@@ -53,33 +60,28 @@ export function LithiumMainPage({
             </div>
 
             {/* Right Side: Features */}
-            <div className="flex-1 flex flex-col md:flex-row items-end justify-end w-full gap-8 md:pr-4 mt-8 md:mt-0">
-              <div className="hidden md:block -rotate-6 mb-12">
-                <span className="font-serif italic text-3xl text-emerald-950 font-black drop-shadow-[0_2px_2px_rgba(255,255,255,0.8)]">
-                  Same Trust<br/>More Possibilities
-                </span>
-              </div>
+            <div className="flex-1 flex flex-col items-center md:items-end justify-end w-full gap-8 md:pr-4 mt-8 md:mt-0">
               
-              <div className="flex flex-col gap-6 text-white bg-white/10 backdrop-blur-2xl p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full md:w-auto relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
+              <div className="flex flex-col gap-6 text-white bg-white/10 backdrop-blur-2xl p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full max-w-sm md:w-auto relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
                 
                 <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
                   <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Longer<br/>Backup</span>
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
-                    <BatteryCharging className="w-6 h-6 text-emerald-50" />
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
+                    <BatteryCharging className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
                   <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Lower<br/>Running Cost</span>
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
-                    <BadgeIndianRupee className="w-6 h-6 text-emerald-50" />
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
+                    <BadgeIndianRupee className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-end gap-4 relative z-10 w-full group">
                   <span className="text-right text-sm font-semibold tracking-wide drop-shadow-md">Cleaner<br/>& Greener</span>
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-300/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0 group-hover:bg-emerald-500/30 transition-colors">
-                    <Leaf className="w-6 h-6 text-emerald-50" />
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg shrink-0 group-hover:scale-105 transition-transform">
+                    <Leaf className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
 
