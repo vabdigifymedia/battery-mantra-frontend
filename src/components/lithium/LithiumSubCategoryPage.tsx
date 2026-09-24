@@ -100,30 +100,30 @@ export function LithiumSubCategoryPage({
         }}
       >
         {/* Gradient Overlay */}
-        <div className={`absolute inset-0 ${isSolar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-white/95 via-white/80 to-white/10`} />
+        <div className={`absolute inset-0 ${isSolar ? 'bg-gradient-to-b lg:bg-gradient-to-l' : 'bg-gradient-to-b lg:bg-gradient-to-r'} from-white/95 via-white/85 lg:via-white/80 to-white/40 lg:to-white/10`} />
 
         <Container size="xl" className="relative z-10 w-full py-4 sm:py-10 lg:py-16">
-          <div className={`flex flex-col lg:flex-row ${isSolar ? 'justify-end' : 'justify-start'}`}>
-            <div className={`w-full lg:w-1/2 ${isSolar ? 'text-right' : 'text-left'}`}>
-              <span className={`${IconText} font-extrabold tracking-widest text-[8px] sm:text-xs lg:text-sm uppercase mb-1 sm:mb-4 block`}>
+          <div className={`flex flex-col lg:flex-row ${isSolar ? 'lg:justify-end' : 'justify-start'}`}>
+            <div className={`w-full lg:w-1/2 text-center lg:text-left ${isSolar ? 'lg:text-right' : 'lg:text-left'} flex flex-col items-center lg:items-start ${isSolar ? 'lg:items-end' : ''}`}>
+              <span className={`${IconText} font-extrabold tracking-widest text-[10px] sm:text-xs lg:text-sm uppercase mb-2 sm:mb-4 block`}>
                 {config.subtitle}
               </span>
-              <h1 className="text-base sm:text-2xl md:text-4xl lg:text-5xl font-black mb-1 sm:mb-4 lg:mb-6 leading-tight text-slate-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-4 lg:mb-6 leading-tight text-slate-900">
                 Lithium {config.titleHighlight} <br />Inverter Battery
               </h1>
-              <p className={`text-[9px] sm:text-xs lg:text-lg text-slate-700 font-semibold mb-2 sm:mb-6 lg:mb-10 max-w-xl ${isSolar ? 'ml-auto' : 'mr-auto'}`}>
+              <p className={`text-xs lg:text-lg text-slate-700 font-semibold mb-6 sm:mb-6 lg:mb-10 max-w-xl mx-auto lg:mx-0 ${isSolar ? 'lg:ml-auto lg:mr-0' : ''}`}>
                 {config.desc}
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-4">
+              <div className="grid grid-cols-2 gap-3 lg:gap-6 mt-2 w-full max-w-md lg:max-w-none">
                 {config.features.map((f, i) => (
-                  <div key={i} className={`flex flex-col gap-1.5 sm:gap-2 lg:gap-3 ${isSolar ? 'items-end' : 'items-start'}`}>
-                    <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full ${IconBg} flex items-center justify-center shadow-sm`}>
-                      <f.icon className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 ${IconText}`} />
+                  <div key={i} className={`flex flex-col gap-1.5 lg:gap-3 items-center lg:items-start ${isSolar ? 'lg:items-end' : ''} bg-white/40 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none p-3 rounded-xl lg:p-0`}>
+                    <div className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full ${IconBg} flex items-center justify-center shadow-sm shrink-0`}>
+                      <f.icon className={`w-5 h-5 lg:w-7 lg:h-7 ${IconText}`} />
                     </div>
-                    <div className={isSolar ? 'text-right' : 'text-left'}>
-                      <div className="font-bold text-[10px] sm:text-xs lg:text-sm text-slate-900 leading-tight">{f.label}</div>
-                      <div className="text-[9px] sm:text-[11px] lg:text-xs font-semibold text-slate-600">{f.desc}</div>
+                    <div className={`text-center lg:text-left ${isSolar ? 'lg:text-right' : ''}`}>
+                      <div className="font-bold text-xs lg:text-sm text-slate-900 leading-tight">{f.label}</div>
+                      <div className="text-[10px] lg:text-xs font-semibold text-slate-600 mt-0.5">{f.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -134,15 +134,15 @@ export function LithiumSubCategoryPage({
       </div>
 
       {/* Highlights Strip */}
-      <Container size="xl" className="-mt-6 sm:-mt-8 relative z-20 mb-8 sm:mb-16">
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-100 p-3 sm:p-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <Container size="xl" className="-mt-6 sm:-mt-8 relative z-20 mb-8 sm:mb-16 md:px-4">
+        <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 gap-3 sm:gap-4 pb-4 lg:pb-0 px-4 md:px-0 -mx-4 md:mx-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {config.highlights.map((h, i) => (
-            <div key={i} className="flex items-center gap-2 sm:gap-3">
-              <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-full ${IconBg} flex items-center justify-center shrink-0`}>
-                <h.icon className={`w-4 h-4 sm:w-6 sm:h-6 ${IconText}`} />
+            <div key={i} className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-100 p-3 sm:p-6 flex items-center gap-2 sm:gap-3 shrink-0 snap-center w-[75vw] sm:w-[45vw] lg:w-auto">
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${IconBg} flex items-center justify-center shrink-0`}>
+                <h.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${IconText}`} />
               </div>
               <div>
-                <div className="font-bold text-slate-800 text-[11px] sm:text-sm">{h.label}</div>
+                <div className="font-bold text-slate-800 text-xs sm:text-sm">{h.label}</div>
                 <div className="text-[10px] sm:text-xs text-slate-500">{h.desc}</div>
               </div>
             </div>
@@ -154,10 +154,10 @@ export function LithiumSubCategoryPage({
       <Container size="xl" className="mb-16">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 mb-1 line-clamp-2 md:line-clamp-none leading-tight pr-4 md:pr-0">
               Top {category.categoryName}s
             </h2>
-            <p className="text-slate-500 font-medium">Smart. Powerful. Future Ready.</p>
+            <p className="text-slate-500 font-medium text-xs md:text-base">Smart. Powerful. Future Ready.</p>
           </div>
           <Link to="/shop/c/$categorySlug" params={{ categorySlug: type || toSlug(category.categoryName) }} className={`hidden md:flex items-center gap-1 text-sm font-bold ${IconText} hover:opacity-80`}>
             View All <ArrowRight className="w-4 h-4" />
@@ -179,7 +179,7 @@ export function LithiumSubCategoryPage({
       </Container>
 
       {/* Trust Strip */}
-      <Container size="xl" className="mb-24">
+      <Container size="xl" className="mb-24 hidden md:block">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:divide-x divide-slate-100">
             <div className="flex items-center gap-3 justify-center">

@@ -67,7 +67,7 @@ export function LithiumMainPage({
             </div>
 
             {/* Right Side: Features */}
-            <div className="flex-1 flex flex-col items-center md:items-end justify-end w-full gap-8 md:pr-4 mt-4 md:mt-0">
+            <div className="hidden md:flex flex-1 flex-col items-center md:items-end justify-end w-full gap-8 md:pr-4 mt-4 md:mt-0">
               
               <div className="flex flex-row md:flex-col gap-4 md:gap-6 text-white bg-white/10 backdrop-blur-2xl p-4 md:p-6 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/30 w-full md:w-auto overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x md:overflow-visible relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none after:absolute after:inset-0 after:shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
                 
@@ -104,105 +104,122 @@ export function LithiumMainPage({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
 
           {/* Card 1: Lithium Battery for Inverter */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
-            <div className="p-6 bg-[#ebf4ff] flex-col">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-[#1e40af] text-white font-bold flex items-center justify-center shrink-0">1</div>
-                <h3 className="text-xl font-bold text-[#1e40af] leading-tight">Lithium Battery<br />for Inverter</h3>
-              </div>
-              <p className="text-sm text-[#1e3a8a] h-12 leading-snug">
-                Upgrade your existing inverter with lithium. Enjoy longer backup, faster charging and zero maintenance.
-              </p>
+          <div className="bg-white rounded-2xl md:rounded-3xl shadow-md md:shadow-xl overflow-hidden flex flex-row md:flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+            <div className="w-1/3 md:w-full bg-white relative flex items-center justify-center p-2 md:p-0 md:order-2 shrink-0 border-r md:border-r-0 md:border-y border-slate-100/50 md:border-white">
+              <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full h-auto object-contain md:object-cover group-hover:scale-105 transition-transform duration-500 max-h-[120px] md:max-h-none" />
             </div>
-            <div className="w-full bg-white relative border-y border-white">
-              <img src="/images/lithium/inverter-battery.png" alt="Lithium Battery for Inverter" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <div className="p-5 bg-[#ebf4ff] flex-1 flex flex-col">
-              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#1e3a8a]">
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#2563eb]" /></div>Longer<br />Life</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><BatteryCharging className="w-4 h-4 text-[#2563eb]" /></div>Fast<br />Charging</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#2563eb]" /></div>Zero<br />Maintenance</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
+            <div className="w-2/3 md:w-full flex-1 flex flex-col md:order-1 md:order-3">
+              <div className="p-3 md:p-6 bg-[#ebf4ff] flex-col md:order-1 flex-1 md:flex-none">
+                <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-3">
+                  <div className="hidden md:flex w-8 h-8 rounded-full bg-[#1e40af] text-white font-bold items-center justify-center shrink-0">1</div>
+                  <h3 className="text-sm md:text-xl font-bold text-[#1e40af] leading-tight">Lithium Battery<br className="hidden md:block" />for Inverter</h3>
+                </div>
+                <p className="text-[10px] md:text-sm text-[#1e3a8a] md:h-12 leading-snug line-clamp-2 md:line-clamp-none">
+                  Upgrade your existing inverter with lithium. Enjoy longer backup, faster charging and zero maintenance.
+                </p>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && !c.categoryName.toLowerCase().includes("integrated") && !c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-battery-for-inverter" }}
+                  className="md:hidden mt-2 py-1.5 px-3 bg-[#2563eb] text-white font-bold rounded-lg text-[10px] inline-flex items-center gap-1 w-max"
+                >
+                  Explore <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-              <Link
-                to="/shop-by-category/$"
-                params={{ 
-                  _splat: subcategories.find(c => 
-                    (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && 
-                    !c.categoryName.toLowerCase().includes("integrated") && 
-                    !c.categoryName.toLowerCase().includes("solar")
-                  )?.categorySlug || "lithium-battery-for-inverter" 
-                }}
-                className="w-full mt-auto py-3 px-4 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-              >
-                Shop Lithium Batteries <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="hidden md:flex p-5 bg-[#ebf4ff] flex-1 flex-col justify-end md:order-3">
+                <div className="grid grid-cols-4 gap-2 mb-5 text-center text-xs font-semibold text-[#1e3a8a]">
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#2563eb]" /></div>Longer<br />Life</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><BatteryCharging className="w-4 h-4 text-[#2563eb]" /></div>Fast<br />Charging</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#2563eb]" /></div>Zero<br />Maintenance</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#2563eb]" /></div>Lightweight<br />& Compact</div>
+                </div>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => (c.categoryName.toLowerCase().includes("battery for inverter") || c.categoryName.toLowerCase().includes("inverter battery")) && !c.categoryName.toLowerCase().includes("integrated") && !c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-battery-for-inverter" }}
+                  className="w-full mt-auto py-3 px-4 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+                >
+                  Shop Lithium Batteries <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
 
           {/* Card 2: Lithium Integrated Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
-            <div className="p-6 bg-[#ecfdf5] flex-col">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-[#065f46] text-white font-bold flex items-center justify-center shrink-0">2</div>
-                <h3 className="text-xl font-bold text-[#065f46] leading-tight">Lithium Integrated<br />Inverter Battery</h3>
-              </div>
-              <p className="text-sm text-[#064e3b] h-12 leading-snug">
-                Inverter + Lithium Battery + BMS All-in-One Smart Solution for your home and office.
-              </p>
+          <div className="bg-white rounded-2xl md:rounded-3xl shadow-md md:shadow-xl overflow-hidden flex flex-row md:flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+            <div className="w-1/3 md:w-full bg-white relative flex items-center justify-center p-2 md:p-0 md:order-2 shrink-0 border-r md:border-r-0 md:border-y border-slate-100/50 md:border-white">
+              <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full h-auto object-contain md:object-cover group-hover:scale-105 transition-transform duration-500 max-h-[120px] md:max-h-none" />
             </div>
-            <div className="w-full bg-white relative border-y border-white">
-              <img src="/images/lithium/integrated-battery.png" alt="Lithium Integrated Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <div className="p-5 bg-[#ecfdf5] flex-1 flex flex-col">
-              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#064e3b]">
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Zap className="w-4 h-4 text-[#059669]" /></div>Plug & Play<br />Installation</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#059669]" /></div>Smart BMS<br />Protection</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#059669]" /></div>Compact<br />Design</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Award className="w-4 h-4 text-[#059669]" /></div>Ideal for<br />Homes</div>
+            <div className="w-2/3 md:w-full flex-1 flex flex-col md:order-1 md:order-3">
+              <div className="p-3 md:p-6 bg-[#ecfdf5] flex-col md:order-1 flex-1 md:flex-none">
+                <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-3">
+                  <div className="hidden md:flex w-8 h-8 rounded-full bg-[#065f46] text-white font-bold items-center justify-center shrink-0">2</div>
+                  <h3 className="text-sm md:text-xl font-bold text-[#065f46] leading-tight">Lithium Integrated<br className="hidden md:block" />Inverter</h3>
+                </div>
+                <p className="text-[10px] md:text-sm text-[#064e3b] md:h-12 leading-snug line-clamp-2 md:line-clamp-none">
+                  Inverter + Lithium Battery + BMS All-in-One Smart Solution for your home and office.
+                </p>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery" }}
+                  className="md:hidden mt-2 py-1.5 px-3 bg-[#059669] text-white font-bold rounded-lg text-[10px] inline-flex items-center gap-1 w-max"
+                >
+                  Explore <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-              <Link
-                to="/shop-by-category/$"
-                params={{ 
-                  _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery"
-                }}
-                className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-              >
-                Shop Integrated Inverters <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="hidden md:flex p-5 bg-[#ecfdf5] flex-1 flex-col justify-end md:order-3">
+                <div className="grid grid-cols-4 gap-2 mb-5 text-center text-xs font-semibold text-[#064e3b]">
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Zap className="w-4 h-4 text-[#059669]" /></div>Plug & Play<br />Installation</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#059669]" /></div>Smart BMS<br />Protection</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Battery className="w-4 h-4 text-[#059669]" /></div>Compact<br />Design</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Award className="w-4 h-4 text-[#059669]" /></div>Ideal for<br />Homes</div>
+                </div>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("integrated"))?.categorySlug || "lithium-integrated-inverter-battery" }}
+                  className="w-full mt-auto py-3 px-4 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+                >
+                  Shop Integrated Inverters <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
 
           {/* Card 3: Lithium Inbuilt Solar Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
-            <div className="p-6 bg-[#fff7ed] flex-col">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-[#9a3412] text-white font-bold flex items-center justify-center shrink-0">3</div>
-                <h3 className="text-xl font-bold text-[#9a3412] leading-tight">Lithium Inbuilt<br />Solar Inverter</h3>
-              </div>
-              <p className="text-sm text-[#7c2d12] h-12 leading-snug">
-                Solar Inverter + Lithium Battery + Solar Charge Controller. Harness the power of the sun.
-              </p>
+          <div className="bg-white rounded-2xl md:rounded-3xl shadow-md md:shadow-xl overflow-hidden flex flex-row md:flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
+            <div className="w-1/3 md:w-full bg-white relative flex items-center justify-center p-2 md:p-0 md:order-2 shrink-0 border-r md:border-r-0 md:border-y border-slate-100/50 md:border-white">
+              <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full h-auto object-contain md:object-cover group-hover:scale-105 transition-transform duration-500 max-h-[120px] md:max-h-none" />
             </div>
-            <div className="w-full bg-white relative border-y border-white">
-              <img src="/images/lithium/solar-battery.png" alt="Lithium Inbuilt Solar Inverter Battery" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <div className="p-5 bg-[#fff7ed] flex-1 flex flex-col">
-              <div className="grid grid-cols-4 gap-2 mb-5 text-center text-[10px] sm:text-xs font-semibold text-[#7c2d12]">
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Inbuilt Solar<br />Controller</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Solar<br />Charging</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#ea580c]" /></div>Zero<br />Maintenance</div>
-                <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#ea580c]" /></div>Clean<br />Energy</div>
+            <div className="w-2/3 md:w-full flex-1 flex flex-col md:order-1 md:order-3">
+              <div className="p-3 md:p-6 bg-[#fff7ed] flex-col md:order-1 flex-1 md:flex-none">
+                <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-3">
+                  <div className="hidden md:flex w-8 h-8 rounded-full bg-[#9a3412] text-white font-bold items-center justify-center shrink-0">3</div>
+                  <h3 className="text-sm md:text-xl font-bold text-[#9a3412] leading-tight">Lithium Inbuilt<br className="hidden md:block" />Solar</h3>
+                </div>
+                <p className="text-[10px] md:text-sm text-[#7c2d12] md:h-12 leading-snug line-clamp-2 md:line-clamp-none">
+                  Solar Inverter + Lithium Battery + Solar Charge Controller. Harness the power of the sun.
+                </p>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery" }}
+                  className="md:hidden mt-2 py-1.5 px-3 bg-[#ea580c] text-white font-bold rounded-lg text-[10px] inline-flex items-center gap-1 w-max"
+                >
+                  Explore <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-              <Link
-                to="/shop-by-category/$"
-                params={{ 
-                  _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery"
-                }}
-                className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
-              >
-                Shop Solar Inverters <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="hidden md:flex p-5 bg-[#fff7ed] flex-1 flex-col justify-end md:order-3">
+                <div className="grid grid-cols-4 gap-2 mb-5 text-center text-xs font-semibold text-[#7c2d12]">
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Inbuilt Solar<br />Controller</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Sun className="w-4 h-4 text-[#ea580c]" /></div>Solar<br />Charging</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><ShieldCheck className="w-4 h-4 text-[#ea580c]" /></div>Zero<br />Maintenance</div>
+                  <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1"><Leaf className="w-4 h-4 text-[#ea580c]" /></div>Clean<br />Energy</div>
+                </div>
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: subcategories.find(c => c.categoryName.toLowerCase().includes("solar"))?.categorySlug || "lithium-inbuilt-solar-inverter-battery" }}
+                  className="w-full mt-auto py-3 px-4 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+                >
+                  Shop Solar Inverters <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -211,42 +228,42 @@ export function LithiumMainPage({
 
       {/* Trust Strip */}
       <Container size="xl" className="mb-16">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:divide-x divide-slate-100">
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                <ShieldCheck className="w-5 h-5" />
+        <div className="bg-white rounded-2xl border border-slate-200 p-3 md:p-4 shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 md:divide-x divide-slate-100">
+            <div className="flex items-center gap-2 md:gap-3 justify-center md:justify-start lg:justify-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm text-slate-800">100% Genuine</div>
-                <div className="text-xs text-slate-500">Authorized Dealers</div>
+                <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight">100% Genuine</div>
+                <div className="text-[9px] md:text-xs text-slate-500 leading-tight">Authorized Dealers</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                <Truck className="w-5 h-5" />
+            <div className="flex items-center gap-2 md:gap-3 justify-center md:justify-start lg:justify-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <Truck className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm text-slate-800">Fast Delivery</div>
-                <div className="text-xs text-slate-500">In 60 Minutes</div>
+                <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight">Fast Delivery</div>
+                <div className="text-[9px] md:text-xs text-slate-500 leading-tight">In 60 Minutes</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                <Award className="w-5 h-5" />
+            <div className="flex items-center gap-2 md:gap-3 justify-center md:justify-start lg:justify-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <Award className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm text-slate-800">Expert Installation</div>
-                <div className="text-xs text-slate-500">By Professionals</div>
+                <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight">Expert Install</div>
+                <div className="text-[9px] md:text-xs text-slate-500 leading-tight">By Professionals</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                <Battery className="w-5 h-5" />
+            <div className="flex items-center gap-2 md:gap-3 justify-center md:justify-start lg:justify-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <Battery className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm text-slate-800">Dedicated Support</div>
-                <div className="text-xs text-slate-500">Before & After</div>
+                <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight">Premium Support</div>
+                <div className="text-[9px] md:text-xs text-slate-500 leading-tight">Before & After</div>
               </div>
             </div>
           </div>
