@@ -97,10 +97,10 @@ export function LithiumMainPage({
 
       {/* Options Cards */}
       <Container size="xl" className="-mt-10 sm:-mt-16 relative z-10 mb-10 sm:mb-16 md:px-4">
-        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-4 sm:gap-6 pb-6 md:pb-0 px-4 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
 
           {/* Card 1: Lithium Battery for Inverter */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
             <div className="p-6 bg-[#ebf4ff] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#1e40af] text-white font-bold flex items-center justify-center shrink-0">1</div>
@@ -137,7 +137,7 @@ export function LithiumMainPage({
           </div>
 
           {/* Card 2: Lithium Integrated Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
             <div className="p-6 bg-[#ecfdf5] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#065f46] text-white font-bold flex items-center justify-center shrink-0">2</div>
@@ -170,7 +170,7 @@ export function LithiumMainPage({
           </div>
 
           {/* Card 3: Lithium Inbuilt Solar Inverter Battery */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300 w-[85vw] sm:w-[45vw] md:w-auto shrink-0 snap-center">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col group border border-slate-100/50 hover:-translate-y-1 transition-transform duration-300">
             <div className="p-6 bg-[#fff7ed] flex-col">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[#9a3412] text-white font-bold flex items-center justify-center shrink-0">3</div>
