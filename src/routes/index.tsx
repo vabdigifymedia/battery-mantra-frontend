@@ -15,7 +15,7 @@ import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { InstagramReelsWidget } from "@/components/home/InstagramReelsWidget";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
-
+import { LithiumCategoriesWidget } from "@/components/home/LithiumCategoriesWidget";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
   productListQuery,
@@ -225,7 +225,7 @@ function HomePage() {
                 </span>
               }
               title={<span id="lithium">Premium Lithium Batteries</span>}
-              description="High performance, fast charging, and longer life for modern vehicles."
+              description="High performance, fast charging, and longer life for your home and office."
               action={
                 lithiumCategory ? (
                   <Button asChild variant="brand">
@@ -243,14 +243,7 @@ function HomePage() {
               }
             />
             <div className="mt-8 relative z-10">
-              <FeaturedProducts 
-                limit={4} 
-                filterFn={(p) => {
-                  const cat = p.productCategory?.toLowerCase() || "";
-                  const name = p.productName.toLowerCase();
-                  return cat.includes("lithium") || name.includes("lithium");
-                }}
-              />
+              <LithiumCategoriesWidget />
             </div>
           </section>
 
