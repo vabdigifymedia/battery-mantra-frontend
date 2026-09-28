@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Navigation, MapPinOff, Loader2, Search } from "lucide-react";
 import { useLocationStore } from "@/store/useLocationStore";
+import { useLocationNavigation } from "@/hooks/useLocationNavigation";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 import { toast } from "sonner";
 
@@ -21,10 +22,9 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [citySearch, setCitySearch] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const { detectLocation, isLocating } = useGeolocation();
-  const { setLocation, pincode: currentPincode, isServiceable } = useLocationStore();
+  const { pincode: currentPincode, isServiceable } = useLocationStore();
+  const { changeLocation } = useLocationNavigation();
   const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  const qc = useQueryClient();
 
   const { data: allCities = [], isLoading: isLoadingCities } = useQuery({
     queryKey: ["locations", "public-cities"],
@@ -45,13 +45,12 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
     setIsChecking(true);
     try {
       const result = await locationService.checkPincode(code);
-      setLocation(code, result.serviceable, result.city);
-      qc.invalidateQueries({ queryKey: ["products"] });
-      
-      if (result.serviceable) {
-        toast.success(`Delivery available in ${result.city?.cityName}!`);
+      if (result.serviceable && result.city) {
+        changeLocation(result.city, code, true);
+        toast.success(`Delivery available in ${result.city.cityName}!`);
         onClose();
       } else {
+        useLocationStore.getState().setLocation(code, false, result.city);
         toast.error(`Sorry, we don't deliver to ${code} yet.`);
       }
     } catch (error) {
@@ -64,8 +63,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const handleCitySelect = (city: any) => {
     // If they click a popular city, we set it as their location without a specific pincode.
     // Since it's a registered city, we know delivery is available there.
-    setLocation("", true, city);
-    qc.invalidateQueries({ queryKey: ["products"] });
+    changeLocation(city, "", true);
     toast.success(`Location set to ${city.cityName}!`);
     onClose();
   };

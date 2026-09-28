@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { geocodingService } from "@/services/geocoding.service";
 import { useLocationStore } from "@/store/useLocationStore";
+import { useLocationNavigation } from "@/hooks/useLocationNavigation";
 import { locationService } from "@/services/location.service";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export const useGeolocation = () => {
   const [isLocating, setIsLocating] = useState(false);
-  const { setLocation, setPermission } = useLocationStore();
-  const qc = useQueryClient();
+  const { setPermission } = useLocationStore();
+  const { changeLocation } = useLocationNavigation();
 
   const detectLocation = async () => {
     setIsLocating(true);
@@ -70,8 +70,7 @@ export const useGeolocation = () => {
       });
       
       if (matchedCity) {
-        setLocation("", true, matchedCity);
-        qc.invalidateQueries({ queryKey: ["products"] });
+        changeLocation(matchedCity, "", true);
         toast.success(`Location set to ${matchedCity.cityName}`);
       } else {
         toast.error(`Sorry, we do not deliver to ${cityName} yet.`);
