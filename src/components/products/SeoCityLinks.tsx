@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useLocationStore } from "@/store/useLocationStore";
 import { toSlug } from "@/lib/utils";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 interface SeoCityLinksProps {
   productName: string;
@@ -14,6 +15,7 @@ interface SeoCityLinksProps {
 export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
   const qc = useQueryClient();
   const { setLocation } = useLocationStore();
+  const navigate = useNavigate();
   
   const { data: cities } = useQuery({
     queryKey: ["locations", "public-cities"],
@@ -35,7 +37,6 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
           <AccordionContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
               {cities.map((city) => {
-                // href is kept for SEO crawlers; client-side click sets location in-place
                 const targetUrl = baseUrl ? `${baseUrl}/${toSlug(city.cityName)}` : "#";
                 return (
                   <a
@@ -47,6 +48,9 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
                       // Invalidate all cached queries so prices, delivery, and content refresh
                       qc.invalidateQueries();
                       toast.success(`Location changed to ${city.cityName}`);
+                      if (baseUrl) {
+                        navigate({ to: targetUrl });
+                      }
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
