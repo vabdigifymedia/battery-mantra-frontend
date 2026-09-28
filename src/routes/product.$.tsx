@@ -55,6 +55,7 @@ import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
 
+import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -228,6 +229,21 @@ export function PdpPage() {
       setQty(1);
     }
   }, [data?.productId, data?.productImage, data?.exchangeDiscount]);
+
+  // Sync citySlug from URL to global location state
+  useEffect(() => {
+    if (citySlug) {
+      const currentCitySlug = city?.cityName?.toLowerCase().replace(/\s+/g, '-');
+      if (currentCitySlug !== citySlug.toLowerCase()) {
+        locationService.getPublicCities().then(cities => {
+          const matchedCity = cities.find(c => c.cityName?.toLowerCase().replace(/\s+/g, '-') === citySlug.toLowerCase());
+          if (matchedCity) {
+            useLocationStore.getState().setLocation(pincode || "", true, matchedCity);
+          }
+        }).catch(console.error);
+      }
+    }
+  }, [citySlug, city?.cityName, pincode]);
 
   const galleryImages = [data?.productImage, ...(data?.additionalImages || [])].filter(Boolean) as string[];
 
