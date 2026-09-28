@@ -30,9 +30,6 @@ const COMMON_CAPACITIES = [
   "35 Ah", "40 Ah", "45 Ah", "50 Ah", "55 Ah", "60 Ah", "65 Ah", "70 Ah", "80 Ah", "100 Ah", "135 Ah", "150 Ah", "160 Ah", "200 Ah", "220 Ah", "230 Ah"
 ];
 
-const COMMON_WARRANTIES = [
-  "18 Months", "24 Months", "36 Months", "42 Months", "48 Months", "54 Months", "60 Months", "66 Months", "72 Months"
-];
 
 type Props = {
   state: ProductFilterState;
@@ -109,39 +106,6 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
       : COMMON_CAPACITIES;
   }, [dynamicCapacities.data, products, aggregations]);
 
-  // Dynamic Warranties
-  const availableWarranties = useMemo(() => {
-    const aggWars = aggregations?.warranties || (aggregations as any)?.warranty || [];
-    if (aggWars.length) {
-      return [...aggWars].sort((a, b) => {
-        const numA = parseInt(String(a));
-        const numB = parseInt(String(b));
-        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-        return String(a).localeCompare(String(b));
-      });
-    }
-
-    const wars = new Set<string>();
-    if (products) {
-      products.forEach((p: any) => {
-        let specWar = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
-        if (!specWar && p.specs) {
-          const warKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
-          if (warKey) specWar = p.specs[warKey];
-        }
-        if (specWar) wars.add(String(specWar));
-      });
-    }
-    return Array.from(wars).length > 0 
-      ? Array.from(wars).sort((a, b) => {
-          const numA = parseInt(a);
-          const numB = parseInt(b);
-          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-          return a.localeCompare(b);
-        }) 
-      : COMMON_WARRANTIES;
-  }, [products, aggregations]);
-
   const getBrandCount = (brandId: string) => {
     if (!products || products.length === 0) return 0;
     const bName = brands.data?.find((b: any) => b.brandId === brandId)?.brandName;
@@ -162,18 +126,6 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
       const dinMatch = p.productName?.match(/DIN-?(\d+)/i);
       if (dinMatch && `${dinMatch[1]} AH` === cap) return true;
       return false;
-    }).length;
-  };
-
-  const getWarCount = (war: string) => {
-    if (!products || products.length === 0) return 0;
-    return products.filter((p: any) => {
-      let specWar = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('warranty'))?.value;
-      if (!specWar && p.specs) {
-        const warKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('warranty') || k.toLowerCase().includes('guarantee'));
-        if (warKey) specWar = p.specs[warKey];
-      }
-      return specWar && String(specWar) === war;
     }).length;
   };
 
@@ -225,7 +177,7 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
         )}
       </div>
 
-      <Accordion type="multiple" defaultValue={["category", "brand", "capacity", "warranty", "price"]} className="w-full">
+      <Accordion type="multiple" defaultValue={["category", "brand", "capacity", "price"]} className="w-full">
         
         {/* CATEGORIES */}
         {!hideCategoryFilter && (cats.data && cats.data.length > 0) && (
@@ -353,43 +305,6 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
         </AccordionItem>
         <div className="mx-4 h-px bg-border" />
 
-        {/* WARRANTY */}
-        <AccordionItem value="warranty" className="border-b-0">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30 font-semibold uppercase tracking-wide text-xs">
-            Warranty
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 max-h-[250px] overflow-y-auto pt-1">
-            <div className="space-y-4">
-              {availableWarranties.map((war) => {
-                const isChecked = state.warranty?.includes(war) || false;
-                let count = null;
-                let isDisabled = false;
-
-                if (aggregations) {
-                  const aggWars = aggregations.warranties || (aggregations as any).warranty || [];
-                  const isAvailable = aggWars.some((aw: any) => typeof aw === 'string' && typeof war === 'string' && aw.toLowerCase() === war.toLowerCase());
-                  isDisabled = !isAvailable && !isChecked;
-                } else {
-                  count = products ? getWarCount(war) : null;
-                  isDisabled = count === 0 && !isChecked;
-                }
-                
-                return (
-                  <label key={war} className={cn("flex items-center gap-3 text-sm cursor-pointer hover:text-primary transition-colors", isDisabled && "opacity-50 cursor-not-allowed")}>
-                    <Checkbox 
-                      checked={isChecked}
-                      disabled={isDisabled}
-                      onCheckedChange={() => toggleArrayItem("warranty", war)}
-                    />
-                    <span className="flex-1">{war}</span>
-                    {count !== null && <span className="text-xs text-muted-foreground">({count})</span>}
-                  </label>
-                );
-              })}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <div className="mx-4 h-px bg-border" />
 
         {/* PRICE */}
         <AccordionItem value="price" className="border-b-0">
