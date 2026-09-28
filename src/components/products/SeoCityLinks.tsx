@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useLocationStore } from "@/store/useLocationStore";
 import { toSlug } from "@/lib/utils";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 
 interface SeoCityLinksProps {
   productName: string;
@@ -39,19 +39,22 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
               {cities.map((city) => {
                 const targetUrl = baseUrl ? `${baseUrl}/${toSlug(city.cityName)}` : "#";
                 return (
-                  <a
+                  <Link
                     key={city.cityId}
-                    href={targetUrl}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setLocation("", true, city);
-                      // Invalidate all cached queries so prices, delivery, and content refresh
-                      qc.invalidateQueries();
-                      toast.success(`Location changed to ${city.cityName}`);
+                    to={targetUrl as any}
+                    onClick={() => {
                       if (baseUrl) {
-                        navigate({ to: targetUrl });
+                        setLocation("", true, city);
+                        qc.invalidateQueries();
+                        toast.success(`Location changed to ${city.cityName}`);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        // If no baseUrl, it's just a location changer
+                        setLocation("", true, city);
+                        qc.invalidateQueries();
+                        toast.success(`Location changed to ${city.cityName}`);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       }
-                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
                   >
@@ -59,7 +62,7 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
                     <span className="truncate">
                       {productName} in {city.cityName}
                     </span>
-                  </a>
+                  </Link>
                 );
               })}
             </div>

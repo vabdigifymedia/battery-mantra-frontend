@@ -120,8 +120,8 @@ function ManufacturerPage() {
             {filteredModels?.map(model => (
               <Link
                 key={model.vehicleId}
-                to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
-                params={{ categorySlug, makeSlug, modelSlug: toSlug(`${model.make}-${model.model}`) }}
+                to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
+                params={{ categorySlug, makeSlug, modelSlug: toSlug(`${model.make}-${model.model}`), _splat: "" }}
                 className="snap-start"
               >
                 <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-4 text-center h-full">

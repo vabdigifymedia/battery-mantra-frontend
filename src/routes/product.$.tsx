@@ -1032,11 +1032,12 @@ export function PdpPage() {
                 {displayVehicles.map((v) => (
                   <Link 
                     key={v.vehicleId} 
-                    to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
+                    to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
                       makeSlug: toSlug(v.make),
-                      modelSlug: toSlug(v.model)
+                      modelSlug: toSlug(v.model),
+                      _splat: ""
                     }}
                     className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors"
                   >
