@@ -50,6 +50,7 @@ export interface ProductsPageLayoutProps {
   onSearchChange: (newSearch: Partial<ProductSearchState>) => void;
   vehicleIdOverride?: string;
   hideCategoryFilter?: boolean;
+  baseUrl?: string;
 }
 
 const SORTS: { value: ProductSort; label: string }[] = [
@@ -60,7 +61,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
   { value: "name-desc", label: "Name (Z–A)" },
 ];
 
-export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter }: ProductsPageLayoutProps) {
+export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl }: ProductsPageLayoutProps) {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const categoriesList = useQuery(rootCategoriesQuery()).data || [];
   const brandsList = useQuery(brandsQuery(undefined)).data || [];
@@ -356,7 +357,6 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                     : ""
                 } ${context.category_name || "Batteries"} offered`} 
               />
-              
               <SeoCityLinks 
                 productName={`${
                   pageType === "BRAND_MODEL" 
@@ -365,6 +365,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                     ? context.brand_name 
                     : ""
                 } ${context.category_name || "Batteries"}`.trim()} 
+                baseUrl={baseUrl}
               />
             </>
           )}

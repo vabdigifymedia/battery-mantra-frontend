@@ -35,7 +35,7 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
 });
 
 function VehicleProductsPage() {
-  const { makeSlug, modelSlug, _splat } = Route.useParams() as any;
+  const { categorySlug, makeSlug, modelSlug, _splat } = Route.useParams() as any;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$" });
   const { city, pincode, setLocation } = useLocationStore();
@@ -78,6 +78,7 @@ function VehicleProductsPage() {
       onSearchChange={(newSearch) => navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } })}
       hideCategoryFilter={true}
       vehicleIdOverride={vehicleIdOverride}
+      baseUrl={`/manufacturer-products/${makeSlug ? categorySlug : ""}/${makeSlug}/${modelSlug}`}
     />
   );
 }

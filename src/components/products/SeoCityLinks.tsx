@@ -3,9 +3,10 @@ import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocationStore } from "@/store/useLocationStore";
+import { useLocationNavigation } from "@/hooks/useLocationNavigation";
 import { toSlug } from "@/lib/utils";
 import { toast } from "sonner";
-import { useNavigate, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 interface SeoCityLinksProps {
   productName: string;
@@ -13,9 +14,7 @@ interface SeoCityLinksProps {
 }
 
 export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
-  const qc = useQueryClient();
-  const { setLocation } = useLocationStore();
-  const navigate = useNavigate();
+  const { changeLocation } = useLocationNavigation();
   
   const { data: cities } = useQuery({
     queryKey: ["locations", "public-cities"],
@@ -43,18 +42,9 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
                     key={city.cityId}
                     to={targetUrl as any}
                     onClick={() => {
-                      if (baseUrl) {
-                        setLocation("", true, city);
-                        qc.invalidateQueries();
-                        toast.success(`Location changed to ${city.cityName}`);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      } else {
-                        // If no baseUrl, it's just a location changer
-                        setLocation("", true, city);
-                        qc.invalidateQueries();
-                        toast.success(`Location changed to ${city.cityName}`);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }
+                      changeLocation(city, "", true);
+                      toast.success(`Location changed to ${city.cityName}`);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
                   >

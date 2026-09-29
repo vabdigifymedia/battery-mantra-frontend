@@ -31,7 +31,7 @@ export const LocationSelector = () => {
             {isLocating ? "Detecting..." : (pincode ? "Delivering to" : "Select Location")}
           </span>
           <span className="text-xs sm:text-sm font-semibold truncate max-w-[80px] sm:max-w-[150px]">
-            {isLocating ? "Please wait" : (city?.cityName ? `${city.cityName}, ${pincode}` : pincode || "Enter Pincode")}
+            {isLocating ? "Please wait" : (city?.cityName ? (pincode ? `${city.cityName}, ${pincode}` : city.cityName) : pincode || "Enter Pincode")}
           </span>
         </div>
       </Button>
