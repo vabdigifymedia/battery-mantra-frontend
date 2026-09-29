@@ -23,7 +23,13 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
   },
   head: ({ params }) => {
     const make = params.makeSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const model = params.modelSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    
+    // Extract the raw model by removing the makeSlug prefix if it exists
+    const rawModel = params.modelSlug.startsWith(params.makeSlug + '-') 
+      ? params.modelSlug.slice(params.makeSlug.length + 1)
+      : params.modelSlug;
+      
+    const model = rawModel.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     
     return buildPageHead(undefined, {
       title: `${make} ${model} Battery Online | Buy 100% Genuine Car Battery`,
@@ -66,7 +72,7 @@ function VehicleProductsPage() {
   // We match by slugifying the backend make and model
   const matchingVehicle = vehicles?.find(v => {
     const vMakeSlug = toSlug(v.make);
-    const vModelSlug = toSlug(v.model);
+    const vModelSlug = toSlug(`${v.make}-${v.model}`);
     return vMakeSlug === makeSlug && vModelSlug === modelSlug;
   });
 

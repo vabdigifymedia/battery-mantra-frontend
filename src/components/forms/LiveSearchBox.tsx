@@ -106,7 +106,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
         e.preventDefault();
         const product = products[activeIndex];
         setIsOpen(false);
-        navigate({ to: "/product/$slug", params: { slug: product.seo?.slug || product.productId } });
+        navigate({ to: "/product/$", params: { _splat: product.seo?.slug || product.productId } });
       } else {
         setIsOpen(false);
         if (onSubmit) {
@@ -219,11 +219,12 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedVehicles.map((v: any) => (
                     <Link
                       key={v.vehicleId}
-                      to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug"
+                      to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
                       params={{ 
                         categorySlug: getVehicleCategorySlug(v.categoryId), 
                         makeSlug: toSlug(v.make), 
-                        modelSlug: toSlug(v.model) 
+                        modelSlug: toSlug(`${v.make}-${v.model}`),
+                        _splat: ""
                       }}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
@@ -247,8 +248,8 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {products.map((product, index) => (
                     <Link
                       key={product.productId}
-                      to="/product/$slug"
-                      params={{ slug: product.seo?.slug || product.productId }}
+                      to="/product/$"
+                      params={{ _splat: product.seo?.slug || product.productId }}
                       onClick={() => setIsOpen(false)}
                       className={cn(
                         "flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0",
