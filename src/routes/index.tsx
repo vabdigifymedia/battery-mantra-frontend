@@ -274,14 +274,22 @@ function HomePage() {
                   Follow us on Instagram for battery tips, latest offers, and updates.
                 </p>
               </div>
-              <a 
-                href="https://instagram.com/batterymantra" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-bold text-white rounded-full bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] hover:shadow-[0_8px_24px_rgba(220,39,67,0.35)] hover:-translate-y-1 transition-all duration-300 w-max shrink-0"
-              >
-                Follow Us <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+              <div className="flex items-center gap-3 w-max shrink-0">
+                <a 
+                  href="https://instagram.com/batterymantra" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-bold text-white rounded-full bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] hover:shadow-[0_8px_24px_rgba(220,39,67,0.35)] hover:-translate-y-1 transition-all duration-300"
+                >
+                  Follow Us <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+                <Link
+                  to="/reels"
+                  className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-all duration-300 hover:-translate-y-1"
+                >
+                  View All <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
             </div>
             
             <div className="mt-8">

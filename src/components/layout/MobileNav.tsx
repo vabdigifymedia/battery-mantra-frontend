@@ -46,6 +46,8 @@ const getIcon = (label: string) => {
       return <ShoppingBag className="h-5 w-5" />;
     case "vehicle finder":
       return <Car className="h-5 w-5" />;
+    case "reels":
+      return <Instagram className="h-5 w-5" />;
     case "about us":
       return <Info className="h-5 w-5" />;
     default:
