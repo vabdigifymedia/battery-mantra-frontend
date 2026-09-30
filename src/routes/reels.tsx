@@ -47,28 +47,35 @@ const getCleanUrl = (rawUrl: string) => {
   }
 };
 
-// Reusable hook to load Instagram embed script
-function useInstagramEmbed(deps: unknown[]) {
-  const scriptLoaded = useRef(false);
+// Global flag to prevent multiple script injections
+let isIgScriptAdded = false;
 
+// Reusable hook to load Instagram embed script
+function useInstagramEmbed(shouldProcess: boolean) {
   useEffect(() => {
+    if (!shouldProcess) return;
+
     if (window.instgrm) {
-      window.instgrm.Embeds.process();
-      return;
+      // setTimeout ensures DOM is fully updated before processing
+      const timer = setTimeout(() => {
+        window.instgrm?.Embeds.process();
+      }, 100);
+      return () => clearTimeout(timer);
     }
 
-    if (scriptLoaded.current) return;
-    scriptLoaded.current = true;
-
-    const script = document.createElement("script");
-    script.src = "https://www.instagram.com/embed.js";
-    script.async = true;
-    script.onload = () => window.instgrm?.Embeds.process();
-    document.body.appendChild(script);
-
-    return () => { };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+    if (!isIgScriptAdded) {
+      isIgScriptAdded = true;
+      const script = document.createElement("script");
+      script.src = "https://www.instagram.com/embed.js";
+      script.async = true;
+      script.onload = () => {
+        setTimeout(() => {
+          window.instgrm?.Embeds.process();
+        }, 100);
+      };
+      document.body.appendChild(script);
+    }
+  }, [shouldProcess]);
 }
 
 function ReelCard({ reel, index, priority = false }: { reel: ReelResponse; index: number; priority?: boolean }) {
@@ -81,7 +88,7 @@ function ReelCard({ reel, index, priority = false }: { reel: ReelResponse; index
   const cleanUrl = getCleanUrl(reel.url);
 
   // Trigger IG script only when in view
-  useInstagramEmbed(inView ? [cleanUrl] : []);
+  useInstagramEmbed(inView);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(cleanUrl);
