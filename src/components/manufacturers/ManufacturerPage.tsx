@@ -1,8 +1,8 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery } from "@/queries";
-import { ArrowRight, ChevronRight, Zap } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
@@ -10,33 +10,14 @@ import { useLocationStore } from "@/store/useLocationStore";
 import { applySeoTemplate } from "@/lib/utils";
 import { BannerLayout } from "@/components/products/DynamicSearchBanner";
 
-// Helper to format string to slug
 const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
 
-import { buildPageHead } from "@/lib/seo";
-
-export const Route = createFileRoute("/manufacturers/$categorySlug/$makeSlug")({
-  head: ({ params }) => {
-    const makeName = params.makeSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    
-    return buildPageHead(null, {
-      title: `Buy ${makeName} ${categoryName} Online at Best Price | Battery Mantra`,
-      description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
-    });
-  },
-  component: ManufacturerPage,
-});
-
-function ManufacturerPage() {
-  const { categorySlug, makeSlug } = Route.useParams();
+export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: string, makeSlug: string }) {
   const { city } = useLocationStore();
 
-  // Find the exact manufacturer object to get the logo
   const { data: manufacturers } = useQuery(manufacturersListQuery());
   const manufacturer = manufacturers?.find(m => toSlug(m.name) === makeSlug);
   
-  // Find the exact make string from vehicles list in case it differs slightly
   const { data: allVehicles } = useQuery(vehiclesListQuery());
   const exactMake = manufacturer?.name || allVehicles?.find(v => toSlug(v.make) === makeSlug)?.make || makeSlug;
 
@@ -59,7 +40,6 @@ function ManufacturerPage() {
   return (
     <div className="flex flex-col gap-12">
       <Container size="xl" className="py-8 min-h-screen">
-        {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight className="h-4 w-4" />
@@ -68,7 +48,6 @@ function ManufacturerPage() {
           <span className="text-foreground font-medium">{manufacturer?.name || exactMake}</span>
         </nav>
 
-        {/* SEO Banner */}
         <BannerLayout 
           title={`${manufacturer?.name || exactMake} ${categoryName}`}
           subtitle={`With Battery Mantra, get ${manufacturer?.name || exactMake} ${categoryName} at best price`}
@@ -78,9 +57,6 @@ function ManufacturerPage() {
           theme={isCar ? "red" : "blue"}
         />
 
-
-
-        {/* Grid of Models */}
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {Array.from({ length: 10 }).map((_, i) => (

@@ -22,21 +22,17 @@ const CITY_ROUTE_MAP: Record<string, (params: Record<string, string>, citySlug: 
   "/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$": (params, citySlug) =>
     `/manufacturer-products/${params.categorySlug}/${params.makeSlug}/${params.modelSlug}/${citySlug}`,
 
-  // Manufacturers — city variant (already has city)
-  "/manufacturers/$categorySlug/$citySlug": (params, citySlug) =>
-    `/manufacturers/${params.categorySlug}/${citySlug}`,
+  // Manufacturers combined (slug can be make or city)
+  "/manufacturers/$categorySlug/$slug": (params, citySlug) =>
+    `/manufacturers/${params.categorySlug}/${params.slug}/${citySlug}`,
 
-  // Manufacturers — index (no city yet, navigate to city variant)
+  // Manufacturers + make + city variant
+  "/manufacturers/$categorySlug/$slug/$citySlug": (params, citySlug) =>
+    `/manufacturers/${params.categorySlug}/${params.slug}/${citySlug}`,
+
+  // Manufacturers root index
   "/manufacturers/$categorySlug/": (params, citySlug) =>
     `/manufacturers/${params.categorySlug}/${citySlug}`,
-
-  // Manufacturers + make — city variant (already has city)
-  "/manufacturers/$categorySlug/$makeSlug/$citySlug": (params, citySlug) =>
-    `/manufacturers/${params.categorySlug}/${params.makeSlug}/${citySlug}`,
-
-  // Manufacturers + make — index (no city yet, navigate to city variant)
-  "/manufacturers/$categorySlug/$makeSlug/": (params, citySlug) =>
-    `/manufacturers/${params.categorySlug}/${params.makeSlug}/${citySlug}`,
 
   // Brands — city variant (already has city)
   "/brands/$categorySlug/$citySlug": (params, citySlug) =>

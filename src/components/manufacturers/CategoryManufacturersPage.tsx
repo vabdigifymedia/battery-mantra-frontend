@@ -1,59 +1,20 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { locationService } from "@/services/location.service";
 import { Container } from "@/components/layout/Container";
 import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/queries";
-import { ChevronRight, Car, Zap, Tag } from "lucide-react";
+import { ChevronRight, Car, Tag } from "lucide-react";
 import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
-import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
-// Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
 
-export const Route = createFileRoute("/manufacturers/$categorySlug/$citySlug")({
-  loader: async ({ context }) => {
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
-    void context.queryClient.prefetchQuery(seoTemplatesQuery());
-
-    const [categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(rootCategoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
-    ]);
-    return { categories, templates };
-  },
-  head: ({ loaderData, params }) => {
-    const categoryName = params.categorySlug
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-
-    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
-
-    const seo = resolveTemplateSeo(
-      "CATEGORY",
-      loaderData?.templates,
-      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
-      (category as any)?.seo, // The category's own SEO
-      {
-        title: `Shop by ${categoryName} | Battery Mantra`,
-        description: `Select your ${categoryName} manufacturer or brand to find compatible batteries at best prices with free installation.`,
-      }
-    );
-
-    return buildPageHead(seo);
-  },
-  component: CategoryManufacturersPage,
-});
-
-function CategoryManufacturersPage() {
-  const { categorySlug, citySlug } = Route.useParams() as any;
+export function CategoryManufacturersPage({ categorySlug, citySlug }: { categorySlug: string, citySlug: string }) {
   const { city, pincode, setLocation } = useLocationStore();
 
   useEffect(() => {
@@ -70,7 +31,6 @@ function CategoryManufacturersPage() {
     }
   }, [citySlug, city?.cityName, pincode, setLocation]);
 
-  // Load root categories to find categoryId by slug
   const { data: categories } = useQuery(rootCategoriesQuery());
   const findCategory = (cats: any[]): any => {
     for (const c of cats) {
@@ -97,7 +57,6 @@ function CategoryManufacturersPage() {
       .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-  // Load manufacturers for this categoryId
   const { data: categoryMfrs, isLoading: isLoadingCatMfrs } = useQuery({
     ...manufacturersListQuery(category?.categoryId),
     enabled: !!category?.categoryId,
@@ -105,20 +64,17 @@ function CategoryManufacturersPage() {
 
   const hasSpecificMfrs = categoryMfrs && categoryMfrs.length > 0;
 
-  // Load brands as fallback/alternative for non-vehicle categories
   const { data: brands = [], isLoading: isLoadingBrands } = useQuery({
     ...brandsQuery(category?.categoryId),
     enabled: !!category?.categoryId || !hasSpecificMfrs,
   });
 
   const isLoading = isLoadingCatMfrs || isLoadingBrands;
-
   const FallbackIcon = Car;
 
   return (
     <div className="flex flex-col gap-12">
       <Container size="xl" className="py-8 min-h-screen">
-        {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary transition-colors">
             Home
@@ -131,10 +87,8 @@ function CategoryManufacturersPage() {
           </span>
         </nav>
 
-        {/* Header Banner */}
         <DynamicSearchBanner search={{ categoryId: category?.categoryId }} />
 
-        {/* Manufacturers or Brands Grid */}
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -148,8 +102,8 @@ function CategoryManufacturersPage() {
               .map((m) => (
                 <Link
                   key={m.id}
-                  to="/manufacturers/$categorySlug/$makeSlug"
-                  params={{ categorySlug, makeSlug: toSlug(m.name) }}
+                  to="/manufacturers/$categorySlug/$slug"
+                  params={{ categorySlug, slug: toSlug(m.name) }}
                   className="snap-start"
                 >
                   <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
