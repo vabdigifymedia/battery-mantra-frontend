@@ -11,10 +11,10 @@ export const LocationSelector = () => {
   const { detectLocation, isLocating } = useGeolocation();
   useEffect(() => {
     // Auto-detect location if not set, and user hasn't explicitly denied permission
-    if (!pincode && locationPermissionGranted !== false) {
+    if (!city && !pincode && locationPermissionGranted !== false) {
       detectLocation();
     }
-  }, []);
+  }, [city, pincode, locationPermissionGranted, detectLocation]);
 
   return (
     <>
