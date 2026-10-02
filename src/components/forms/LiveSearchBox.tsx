@@ -196,8 +196,8 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                     return (
                       <Link
                         key={man.id}
-                        to="/manufacturers/$categorySlug/$makeSlug"
-                        params={{ categorySlug: catSlug, makeSlug: toSlug(man.name) }}
+                        to="/manufacturers/$categorySlug/$slug"
+                        params={{ categorySlug: catSlug, slug: toSlug(man.name) }}
                         onClick={() => setIsOpen(false)}
                         className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                       >

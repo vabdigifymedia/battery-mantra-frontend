@@ -28,7 +28,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
 
   const categoryName = categorySlug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
-  const isCar = categorySlug.includes("car");
+  const isCar = /(^|-)car(-|$)/.test(categorySlug);
   const targetVehicleType = isCar ? "CAR" : null;
 
   const filteredModels = models?.filter(model => {

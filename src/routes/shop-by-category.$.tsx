@@ -148,7 +148,7 @@ function SubcategoriesPage() {
   const catName = category.categoryName.toLowerCase();
   const isLithiumIntegrated = catName.includes("integrated") && (catName.includes("lithium") || catName.includes("inverter"));
   const isLithiumSolar = catName.includes("solar") && (catName.includes("lithium") || catName.includes("inbuilt"));
-  const isLithiumBattery = (catName.includes("battery for inverter") || catName.includes("inverter battery")) && !isLithiumIntegrated && !isLithiumSolar;
+  const isLithiumBattery = (catName.includes("battery for inverter") || catName.includes("inverter battery")) && !isLithiumIntegrated && !isLithiumSolar && !catName.includes("accessories") && !catName.includes("accessory");
 
   if (isLithiumIntegrated || isLithiumSolar || isLithiumBattery) {
     let type = "lithium-battery-for-inverter";
@@ -171,7 +171,7 @@ function SubcategoriesPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {sorted.map((c) => {
             const name = c.categoryName.toLowerCase();
-            const isCar = name.includes("car");
+            const isCar = /(^|\s)car(\s|$)/i.test(name);
             const rawSlug = c.categorySlug || toSlug(c.categoryName);
 
             const cardContent = (

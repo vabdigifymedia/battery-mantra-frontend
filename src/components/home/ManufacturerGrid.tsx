@@ -38,8 +38,8 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
       {sorted.map((m) => (
         <Link
           key={m.id}
-          to="/manufacturers/$categorySlug/$makeSlug"
-          params={{ categorySlug, makeSlug: toSlug(m.name) }}
+          to="/manufacturers/$categorySlug/$slug"
+          params={{ categorySlug, slug: toSlug(m.name) }}
           className="snap-start"
         >
           <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-4 text-center min-w-[120px] lg:min-w-0">

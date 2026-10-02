@@ -37,7 +37,7 @@ export function CategoryManufacturersPage({ categorySlug, citySlug }: { category
       if (
         c.categorySlug === categorySlug ||
         toSlug(c.categoryName) === categorySlug ||
-        (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car"))
+        (/(^|-)car(-|$)/.test(categorySlug) && /(^|\s)car(\s|$)/i.test(c.categoryName))
       ) {
         return c;
       }

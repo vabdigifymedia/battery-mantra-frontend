@@ -61,7 +61,7 @@ function CategoryManufacturersPage() {
       if (
         c.categorySlug === categorySlug ||
         toSlug(c.categoryName) === categorySlug ||
-        (categorySlug.includes("car") && c.categoryName.toLowerCase().includes("car"))
+        (/(^|-)car(-|$)/.test(categorySlug) && /(^|\s)car(\s|$)/i.test(c.categoryName))
       ) {
         return c;
       }
@@ -132,8 +132,8 @@ function CategoryManufacturersPage() {
               .map((m) => (
                 <Link
                   key={m.id}
-                  to="/manufacturers/$categorySlug/$makeSlug"
-                  params={{ categorySlug, makeSlug: toSlug(m.name) }}
+                  to="/manufacturers/$categorySlug/$slug"
+                  params={{ categorySlug, slug: toSlug(m.name) }}
                   className="snap-start"
                 >
                   <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
