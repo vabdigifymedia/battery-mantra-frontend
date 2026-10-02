@@ -289,14 +289,18 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             </>
           )}
           
-          {!isDealerPage && brand && category && !vehicle && typeof search.category === 'string' && !search.category.includes(',') && typeof search.brand === 'string' && !search.brand.includes(',') && (
+          {!isDealerPage && brand && !vehicle && typeof search.brand === 'string' && !search.brand.includes(',') && (
             <div className="flex justify-center mt-12 mb-6">
               <a 
-                href={city?.cityName ? `/brand-dealer/${search.category}/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}` : `/brand-dealer/${search.category}/${search.brand}`}
+                href={
+                  typeof search.category === 'string' && !search.category.includes(',')
+                    ? (city?.cityName ? `/brand-dealer/${search.category}/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}` : `/brand-dealer/${search.category}/${search.brand}`)
+                    : (city?.cityName ? `/brand-dealer/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}${search.productType ? `?productType=${search.productType}` : ''}` : `/brand-dealer/${search.brand}${search.productType ? `?productType=${search.productType}` : ''}`)
+                }
                 className="inline-block px-8 py-4 rounded-[2rem] border border-gray-300 bg-gray-50/50 hover:bg-gray-100 transition-colors text-center shadow-sm"
               >
                 <span className="text-xl md:text-2xl font-medium text-slate-800 border-b-2 border-red-600 pb-1">
-                  {brand.brandName} {category.categoryName} Dealer
+                  {brand.brandName} {typeof search.category === 'string' && category?.categoryName ? category.categoryName + ' ' : ''}Dealer
                 </span>
               </a>
             </div>

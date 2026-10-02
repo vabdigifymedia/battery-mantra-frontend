@@ -42,6 +42,7 @@ import { Route as AdminSpecificationsRouteImport } from './routes/admin.specific
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as BrandDealerBrandSlugRouteImport } from './routes/brand-dealer.$brandSlug'
 import { Route as BrandBrandSlugRouteImport } from './routes/brand.$brandSlug'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
@@ -253,6 +254,11 @@ const AdminVehiclesRoute = AdminVehiclesRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin_/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandDealerBrandSlugRoute = BrandDealerBrandSlugRouteImport.update({
+  id: '/brand-dealer/$brandSlug',
+  path: '/brand-dealer/$brandSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrandBrandSlugRoute = BrandBrandSlugRouteImport.update({
@@ -540,6 +546,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/brand-dealer/$brandSlug': typeof BrandDealerBrandSlugRoute
   '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
@@ -620,6 +627,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/brand-dealer/$brandSlug': typeof BrandDealerBrandSlugRoute
   '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
@@ -704,6 +712,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/admin_/login': typeof AdminLoginRoute
+  '/brand-dealer/$brandSlug': typeof BrandDealerBrandSlugRoute
   '/brand/$brandSlug': typeof BrandBrandSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/partner/engineers': typeof PartnerEngineersRoute
@@ -788,6 +797,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
+    | '/brand-dealer/$brandSlug'
     | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
@@ -868,6 +878,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin/login'
+    | '/brand-dealer/$brandSlug'
     | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
@@ -951,6 +962,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/admin_/login'
+    | '/brand-dealer/$brandSlug'
     | '/brand/$brandSlug'
     | '/orders/$orderId'
     | '/partner/engineers'
@@ -1015,6 +1027,7 @@ export interface RootRouteChildren {
   ReelsRoute: typeof ReelsRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  BrandDealerBrandSlugRoute: typeof BrandDealerBrandSlugRoute
   BrandBrandSlugRoute: typeof BrandBrandSlugRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
@@ -1268,6 +1281,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand-dealer/$brandSlug': {
+      id: '/brand-dealer/$brandSlug'
+      path: '/brand-dealer/$brandSlug'
+      fullPath: '/brand-dealer/$brandSlug'
+      preLoaderRoute: typeof BrandDealerBrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/brand/$brandSlug': {
@@ -1758,6 +1778,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReelsRoute: ReelsRoute,
   VehicleFinderRoute: VehicleFinderRoute,
   AdminLoginRoute: AdminLoginRoute,
+  BrandDealerBrandSlugRoute: BrandDealerBrandSlugRoute,
   BrandBrandSlugRoute: BrandBrandSlugRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   PartnerLoginRoute: PartnerLoginRoute,
