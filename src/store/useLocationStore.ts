@@ -20,10 +20,12 @@ interface LocationState {
   city: CityDto | null;
   isServiceable: boolean;
   locationPermissionGranted: boolean | null;
+  hasHydrated: boolean;
   
   setLocation: (pincode: string, isServiceable: boolean, city?: CityDto | null) => void;
   clearLocation: () => void;
   setPermission: (granted: boolean) => void;
+  setHasHydrated: (val: boolean) => void;
 }
 
 export const useLocationStore = create<LocationState>()(
@@ -33,6 +35,7 @@ export const useLocationStore = create<LocationState>()(
       city: null,
       isServiceable: false,
       locationPermissionGranted: null,
+      hasHydrated: false,
       
       setLocation: (pincode, isServiceable, city = null) => 
         set({ pincode, isServiceable, city }),
@@ -42,11 +45,17 @@ export const useLocationStore = create<LocationState>()(
         
       setPermission: (granted) =>
         set({ locationPermissionGranted: granted }),
+
+      setHasHydrated: (hasHydrated) =>
+        set({ hasHydrated }),
     }),
     {
       name: "battery-mantra-location",
       storage: createJSONStorage(() => cookieStorage),
       skipHydration: true,
+      onRehydrateStorage: () => () => {
+        useLocationStore.setState({ hasHydrated: true });
+      },
     }
   )
 );
@@ -55,5 +64,6 @@ if (typeof window !== "undefined") {
   // Delay hydration until after the first render to match SSR
   setTimeout(() => {
     useLocationStore.persist.rehydrate();
+    useLocationStore.setState({ hasHydrated: true });
   }, 0);
 }

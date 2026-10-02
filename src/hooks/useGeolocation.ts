@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { geocodingService } from "@/services/geocoding.service";
 import { useLocationStore } from "@/store/useLocationStore";
-import { useLocationNavigation } from "@/hooks/useLocationNavigation";
+import { useLocationNavigation, isRouteCityScoped } from "@/hooks/useLocationNavigation";
 import { locationService } from "@/services/location.service";
+import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const useGeolocation = () => {
   const [isLocating, setIsLocating] = useState(false);
   const { setPermission } = useLocationStore();
   const { changeLocation } = useLocationNavigation();
+  const router = useRouter();
 
-  const detectLocation = async () => {
+  const detectLocation = async (isManual: boolean = false) => {
     setIsLocating(true);
 
     if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser");
+      if (isManual) {
+        toast.error("Geolocation is not supported by your browser");
+      }
       setIsLocating(false);
       return;
     }
@@ -50,7 +54,9 @@ export const useGeolocation = () => {
       const cityName = await geocodingService.reverseGeocodeCity(latitude, longitude);
       
       if (!cityName) {
-        toast.error("Could not determine your city from your location.");
+        if (isManual) {
+          toast.error("Could not determine your city from your location.");
+        }
         setIsLocating(false);
         return;
       }
@@ -70,18 +76,40 @@ export const useGeolocation = () => {
       });
       
       if (matchedCity) {
-        changeLocation(matchedCity, "", true);
-        toast.success(`Location set to ${matchedCity.cityName}`);
+        if (isManual) {
+          // Explicit manual action by user
+          changeLocation(matchedCity, "", true);
+          toast.success(`Location set to ${matchedCity.cityName}`);
+        } else {
+          // Automatic detection on page load:
+          // NEVER redirect or overwrite if current page/route is already city-scoped!
+          const matches = router.state.matches;
+          const leafMatch = matches[matches.length - 1];
+          const routeId = leafMatch?.routeId as string;
+          const params = (leafMatch?.params || {}) as Record<string, string>;
+          const pathname = router.state.location.pathname;
+
+          if (isRouteCityScoped(routeId, params, pathname, publicCities)) {
+            console.log("[Geolocation] Auto-detect skipped redirect because current page is city-scoped:", pathname);
+          } else {
+            changeLocation(matchedCity, "", true);
+            toast.success(`Location set to ${matchedCity.cityName}`);
+          }
+        }
       } else {
-        toast.error(`Sorry, we do not deliver to ${cityName} yet.`);
+        if (isManual) {
+          toast.error(`Sorry, we do not deliver to ${cityName} yet.`);
+        }
       }
     } catch (error: any) {
       setPermission(false);
       console.error(error);
-      if (error.code === 1) { // PERMISSION_DENIED
-        toast.error("Location permission denied. Please enter manually.");
-      } else {
-        toast.error("Unable to retrieve your location.");
+      if (isManual) {
+        if (error.code === 1) { // PERMISSION_DENIED
+          toast.error("Location permission denied. Please enter manually.");
+        } else {
+          toast.error("Unable to retrieve your location.");
+        }
       }
     } finally {
       setIsLocating(false);

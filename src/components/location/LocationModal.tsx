@@ -88,7 +88,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
           variant="default" 
           className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 transition-all duration-300"
           onClick={() => {
-            detectLocation().then(() => {
+            detectLocation(true).then(() => {
               // We don't automatically close here unless we want to, wait for state to update.
             });
           }}

@@ -3,7 +3,67 @@ import { useLocationStore } from "@/store/useLocationStore";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CityDto } from "@/types/dto";
 
-const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
+export const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
+
+/**
+ * Checks whether the current route or URL is explicitly scoped to a city.
+ * E.g. /shop/inverter-battery/exide/faridabad -> true
+ *      /products/faridabad -> true
+ *      /brands/car-battery/faridabad -> true
+ *      /shop/inverter-battery/exide -> false
+ */
+export function isRouteCityScoped(
+  routeId?: string,
+  params?: Record<string, string>,
+  pathname?: string,
+  cities?: CityDto[]
+): boolean {
+  // 1. Direct route params check (synchronous and instant on render)
+  if (params?.citySlug) return true;
+  if (routeId?.includes("$citySlug")) return true;
+
+  // 2. Splats that contain 2 segments (e.g. product/slug/city or shop-by-category/slug/city)
+  if (params?._splat && params._splat.includes("/")) {
+    return true;
+  }
+
+  // 3. Pathname segments check against known cities
+  if (pathname && cities && cities.length > 0) {
+    const clean = pathname.replace(/\/+$/, "");
+    const segments = clean.split("/").filter(Boolean);
+    const lastSeg = segments[segments.length - 1]?.toLowerCase();
+    if (lastSeg && cities.some(c => toSlug(c.cityName) === lastSeg)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Extracts and matches a CityDto from route params or pathname
+ */
+export function getMatchedCityFromUrl(
+  pathname?: string,
+  params?: Record<string, string>,
+  cities?: CityDto[]
+): CityDto | undefined {
+  if (!cities || cities.length === 0) return undefined;
+
+  const targetSlug = params?.citySlug?.toLowerCase() || (
+    params?._splat && params._splat.includes("/")
+      ? params._splat.split("/")[1]?.toLowerCase()
+      : undefined
+  ) || (
+    pathname
+      ? pathname.replace(/\/+$/, "").split("/").filter(Boolean).pop()?.toLowerCase()
+      : undefined
+  );
+
+  if (!targetSlug) return undefined;
+
+  return cities.find(c => toSlug(c.cityName) === targetSlug);
+}
 
 /**
  * Route IDs (from routeTree.gen.ts) that contain a city slug in the URL.
@@ -24,7 +84,7 @@ const CITY_ROUTE_MAP: Record<string, (params: Record<string, string>, citySlug: 
 
   // Manufacturers combined (slug can be make or city)
   "/manufacturers/$categorySlug/$slug": (params, citySlug) =>
-    `/manufacturers/${params.categorySlug}/${params.slug}/${citySlug}`,
+    `/manufacturers/${params.categorySlug}/${citySlug}`,
 
   // Manufacturers + make + city variant
   "/manufacturers/$categorySlug/$slug/$citySlug": (params, citySlug) =>
