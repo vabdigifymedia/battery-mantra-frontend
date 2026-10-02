@@ -51,6 +51,7 @@ export interface ProductsPageLayoutProps {
   vehicleIdOverride?: string;
   hideCategoryFilter?: boolean;
   baseUrl?: string;
+  isDealerPage?: boolean;
 }
 
 const SORTS: { value: ProductSort; label: string }[] = [
@@ -61,7 +62,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
   { value: "name-desc", label: "Name (Z–A)" },
 ];
 
-export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl }: ProductsPageLayoutProps) {
+export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl, isDealerPage }: ProductsPageLayoutProps) {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const categoriesList = useQuery(rootCategoriesQuery()).data || [];
   const brandsList = useQuery(brandsQuery(undefined)).data || [];
@@ -207,7 +208,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
         </aside>
 
         <div className="min-w-0">
-          <DynamicSearchBanner search={{ ...search, vehicleId: activeVehicleId }} />
+          <DynamicSearchBanner search={{ ...search, vehicleId: activeVehicleId }} isDealerPage={isDealerPage} />
           <div className="mb-4 flex items-center justify-between gap-3">
             <Drawer>
               <DrawerTrigger asChild>

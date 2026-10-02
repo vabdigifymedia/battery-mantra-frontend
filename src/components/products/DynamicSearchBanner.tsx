@@ -3,7 +3,7 @@ import { brandsQuery, categoriesQuery, vehiclesListQuery } from "@/queries";
 import { useLocationStore } from "@/store/useLocationStore";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee } from "lucide-react";
 
-export function DynamicSearchBanner({ search }: { search: any }) {
+export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isDealerPage?: boolean }) {
   const { city } = useLocationStore();
   const locationName = city?.cityName || "Delhi"; // Fallback to Delhi if not set
 
@@ -74,7 +74,9 @@ export function DynamicSearchBanner({ search }: { search: any }) {
   const catName = category?.categoryName || "Battery";
 
   if (vehicle) {
-    title = `${vehicle.make} ${vehicle.model} ${catName} Price in ${locationName}`;
+    title = isDealerPage 
+      ? `${vehicle.make} ${vehicle.model} ${catName} Dealer in ${locationName}`
+      : `${vehicle.make} ${vehicle.model} ${catName} Price in ${locationName}`;
     subtitle = `With Battery Mantra, get ${vehicle.make} ${vehicle.model} ${catName} at best price`;
     imageUrl = vehicle.imageUrl || "/images/placeholders/car-placeholder.png";
     brandNameHeader = vehicle.make;
@@ -82,19 +84,25 @@ export function DynamicSearchBanner({ search }: { search: any }) {
     const matchedBrand = brands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase());
     if (matchedBrand) brandLogoUrl = matchedBrand.brandLogo || "";
   } else if (brand && category) {
-    title = `${brand.brandName} ${category.categoryName} Price in ${locationName}`;
+    title = isDealerPage
+      ? `${brand.brandName} ${category.categoryName} Dealer in ${locationName}`
+      : `${brand.brandName} ${category.categoryName} Price in ${locationName}`;
     subtitle = `With Battery Mantra, get ${brand.brandName} ${category.categoryName} at best price`;
     imageUrl = brand.brandLogo || category.iconUrl || "";
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (brand) {
-    title = `${brand.brandName} Batteries Price in ${locationName}`;
+    title = isDealerPage
+      ? `${brand.brandName} Batteries Dealer in ${locationName}`
+      : `${brand.brandName} Batteries Price in ${locationName}`;
     subtitle = `With Battery Mantra, get ${brand.brandName} Batteries at best price`;
     imageUrl = brand.brandLogo || "";
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (category) {
-    title = `${category.categoryName} Price in ${locationName}`;
+    title = isDealerPage
+      ? `${category.categoryName} Dealer in ${locationName}`
+      : `${category.categoryName} Price in ${locationName}`;
     subtitle = `With Battery Mantra, get ${category.categoryName} at best price`;
     imageUrl = category.iconUrl || "";
     brandNameHeader = category.categoryName;
