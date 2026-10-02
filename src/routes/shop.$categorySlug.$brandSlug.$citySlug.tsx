@@ -1,6 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
+import { locationService } from "@/services/location.service";
+import { useLocationStore } from "@/store/useLocationStore";
 import {
   rootCategoriesQuery,
   brandsQuery,
@@ -12,7 +15,7 @@ import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
-export const Route = createFileRoute("/shop/$categorySlug/$brandSlug")({
+export const Route = createFileRoute("/shop/$categorySlug/$brandSlug/$citySlug")({
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
@@ -51,9 +54,24 @@ export const Route = createFileRoute("/shop/$categorySlug/$brandSlug")({
 });
 
 function CategoryBrandProductsPage() {
-  const { categorySlug, brandSlug } = Route.useParams();
+  const { categorySlug, brandSlug, citySlug } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.id });
+  const { city, pincode, setLocation } = useLocationStore();
+
+  useEffect(() => {
+    if (citySlug) {
+      const currentCitySlug = city?.cityName?.toLowerCase().replace(/\s+/g, '-');
+      if (currentCitySlug !== citySlug.toLowerCase()) {
+        locationService.getPublicCities().then(cities => {
+          const matchedCity = cities.find(c => c.cityName?.toLowerCase().replace(/\s+/g, '-') === citySlug.toLowerCase());
+          if (matchedCity) {
+            setLocation(pincode || "", true, matchedCity);
+          }
+        }).catch(console.error);
+      }
+    }
+  }, [citySlug, city?.cityName, pincode, setLocation]);
 
   const { data: categories, isLoading: isCatLoading } = useQuery(categoriesQuery());
   const { data: brands, isLoading: isBrandLoading } = useQuery(brandsQuery());
@@ -94,6 +112,7 @@ function CategoryBrandProductsPage() {
         }
       }}
       hideCategoryFilter={true}
+      baseUrl={`/shop/${categorySlug}/${brandSlug}`}
     />
   );
 }

@@ -1,0 +1,110 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
+import { locationService } from "@/services/location.service";
+import { useLocationStore } from "@/store/useLocationStore";
+import {
+  rootCategoriesQuery,
+  brandsQuery,
+  categoriesQuery,
+} from "@/queries";
+import { buildPageHead } from "@/lib/seo";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
+import { toSlug } from "@/lib/utils";
+import { FullPageLoader } from "@/components/feedback/FullPageLoader";
+
+export const Route = createFileRoute("/shop/c/$categorySlug/$citySlug")({
+  loader: async ({ context }) => {
+    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+    void context.queryClient.prefetchQuery(brandsQuery());
+    void context.queryClient.prefetchQuery(categoriesQuery());
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+
+    const [categories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(categoriesQuery()),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    ]);
+    return { categories, templates };
+  },
+  head: ({ loaderData, params }) => {
+    const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    const seo = resolveTemplateSeo(
+      "CATEGORY",
+      loaderData?.templates,
+      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
+      (category as any)?.seo,
+      {
+        title: `${categoryName} Online | Buy 100% Genuine Battery`,
+        description: `Buy 100% Genuine ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      }
+    );
+
+    return buildPageHead(seo);
+  },
+  validateSearch: productSearchSchema,
+  component: CategoryProductsPage,
+});
+
+function CategoryProductsPage() {
+  const { categorySlug, citySlug } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.id });
+  const { city, pincode, setLocation } = useLocationStore();
+
+  useEffect(() => {
+    if (citySlug) {
+      const currentCitySlug = city?.cityName?.toLowerCase().replace(/\s+/g, '-');
+      if (currentCitySlug !== citySlug.toLowerCase()) {
+        locationService.getPublicCities().then(cities => {
+          const matchedCity = cities.find(c => c.cityName?.toLowerCase().replace(/\s+/g, '-') === citySlug.toLowerCase());
+          if (matchedCity) {
+            setLocation(pincode || "", true, matchedCity);
+          }
+        }).catch(console.error);
+      }
+    }
+  }, [citySlug, city?.cityName, pincode, setLocation]);
+
+  const { data: categories, isLoading } = useQuery(categoriesQuery());
+
+  if (isLoading) {
+    return <FullPageLoader />;
+  }
+
+  const matchingCategory = categories?.find(c => toSlug(c.categoryName) === categorySlug);
+  const activeCategoryId = matchingCategory?.categoryId;
+
+  // We inject the category into the search context
+  const activeSearch = {
+    ...search,
+    category: categorySlug,
+  };
+
+  return (
+    <ProductsPageLayout 
+      search={activeSearch}
+      onSearchChange={(newSearch) => {
+        // If the user selects a DIFFERENT category in the sidebar, or adds a brand, 
+        // we navigate to the generic /products route to handle complex filters seamlessly
+        if (
+          (newSearch.category && newSearch.category.split(',').length > 0 && !newSearch.category.split(',').includes(categorySlug)) ||
+          (newSearch.brand && newSearch.brand.length > 0)
+        ) {
+          navigate({ 
+            to: "/products", 
+            search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
+          });
+        } else {
+          const { category, ...cleanSearch } = newSearch;
+          navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
+        }
+      }}
+      hideCategoryFilter={true}
+      baseUrl={`/shop/c/${categorySlug}`}
+    />
+  );
+}

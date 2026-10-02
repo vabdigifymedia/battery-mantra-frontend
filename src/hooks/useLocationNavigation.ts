@@ -45,6 +45,25 @@ const CITY_ROUTE_MAP: Record<string, (params: Record<string, string>, citySlug: 
   // Brands — index (no city yet, navigate to city variant)
   "/brands/$categorySlug/": (params, citySlug) =>
     `/brands/${params.categorySlug}/${citySlug}`,
+
+  // Products
+  "/products/": (params, citySlug) => `/products/${citySlug}`,
+  "/products/$citySlug": (params, citySlug) => `/products/${citySlug}`,
+
+  // Shop specific categories
+  "/shop/c/$categorySlug/": (params, citySlug) => `/shop/c/${params.categorySlug}/${citySlug}`,
+  "/shop/c/$categorySlug/$citySlug": (params, citySlug) => `/shop/c/${params.categorySlug}/${citySlug}`,
+
+  // Shop category and brand
+  "/shop/$categorySlug/$brandSlug/": (params, citySlug) => `/shop/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+  "/shop/$categorySlug/$brandSlug/$citySlug": (params, citySlug) => `/shop/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+
+  // Shop by category splat: /shop-by-category/{categorySlug}/{citySlug}
+  "/shop-by-category/$": (params, citySlug) => {
+    const splat = params._splat || "";
+    const categorySlug = splat.split("/")[0];
+    return categorySlug ? `/shop-by-category/${categorySlug}/${citySlug}` : "";
+  },
 };
 
 /**
