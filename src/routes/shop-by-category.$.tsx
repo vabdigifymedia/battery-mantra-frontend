@@ -13,6 +13,7 @@ import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { LithiumMainPage } from "@/components/lithium/LithiumMainPage";
 import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -277,6 +278,8 @@ function SubcategoriesPage() {
             }}
           />
         )}
+
+        <SeoCityLinks productName={category.categoryName} />
       </Container>
     </div>
   );
