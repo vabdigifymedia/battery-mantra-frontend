@@ -1,16 +1,39 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useLocationStore } from "@/store/useLocationStore";
 import { useLocationNavigation } from "@/hooks/useLocationNavigation";
 import { toSlug } from "@/lib/utils";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 
 interface SeoCityLinksProps {
   productName: string;
   baseUrl?: string;
+}
+
+/**
+ * Derives a baseUrl from the current route path by stripping any trailing city slug.
+ * E.g. /shop/inverter-battery/exide/faridabad → /shop/inverter-battery/exide
+ *      /shop/inverter-battery/exide → /shop/inverter-battery/exide (no change)
+ *      /manufacturers/car-battery → /manufacturers/car-battery (no change)
+ */
+function useAutoBaseUrl(cities: any[] | undefined): string {
+  const router = useRouter();
+  const pathname = router.state.location.pathname.replace(/\/+$/, ""); // strip trailing slash
+
+  if (!cities || cities.length === 0) return pathname;
+
+  const segments = pathname.split("/");
+  const lastSegment = segments[segments.length - 1];
+
+  // If the last segment is a known city slug, strip it to get the base
+  const isCity = cities.some(c => toSlug(c.cityName) === lastSegment);
+  if (isCity) {
+    return segments.slice(0, -1).join("/");
+  }
+
+  return pathname;
 }
 
 export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
@@ -20,6 +43,10 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
     queryKey: ["locations", "public-cities"],
     queryFn: () => locationService.getPublicCities(),
   });
+
+  // Auto-detect baseUrl from current route if not explicitly provided
+  const autoBaseUrl = useAutoBaseUrl(cities);
+  const effectiveBaseUrl = baseUrl || autoBaseUrl;
 
   if (!cities || cities.length === 0) return null;
 
@@ -36,7 +63,7 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
           <AccordionContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
               {cities.map((city) => {
-                const targetUrl = baseUrl ? `${baseUrl}/${toSlug(city.cityName)}` : "#";
+                const targetUrl = `${effectiveBaseUrl}/${toSlug(city.cityName)}`;
                 return (
                   <Link
                     key={city.cityId}
@@ -62,4 +89,3 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
     </div>
   );
 }
-
