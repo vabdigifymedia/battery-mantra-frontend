@@ -5,6 +5,7 @@ import { productFilterQuery } from "@/queries";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, Zap, Leaf, ArrowRight } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -220,6 +221,9 @@ export function LithiumSubCategoryPage({
         </div>
       </Container>
 
+      <Container size="xl" className="mb-16">
+        <SeoCityLinks productName={category?.categoryName || "Lithium Battery"} />
+      </Container>
     </div>
   );
 }

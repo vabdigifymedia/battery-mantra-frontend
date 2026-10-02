@@ -5,6 +5,7 @@ import { productFilterQuery } from "@/queries";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight, Leaf, Zap, Home, Building2, Store } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -342,6 +343,9 @@ export function LithiumMainPage({
         </Container>
       </div>
 
+      <Container size="xl" className="mb-16">
+        <SeoCityLinks productName={category?.categoryName || "Lithium Power Solutions"} />
+      </Container>
     </div>
   );
 }
