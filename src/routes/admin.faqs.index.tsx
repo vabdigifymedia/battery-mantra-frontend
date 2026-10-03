@@ -64,21 +64,23 @@ function AdminFaqsList() {
                 </TableCell>
               </TableRow>
             ) : (
-              faqs.map((faq) => (
+              faqs.map((faq) => {
+                const active = faq.isActive ?? (faq as any).active ?? false;
+                return (
                 <TableRow key={faq.faqId}>
                   <TableCell className="font-medium">
                     <Badge variant="outline">{faq.pageType}</Badge>
                   </TableCell>
                   <TableCell>{faq.title}</TableCell>
                   <TableCell>
-                    <Badge variant={faq.isActive ? "default" : "destructive"}>
-                      {faq.isActive ? "Active" : "Inactive"}
+                    <Badge variant={active ? "default" : "destructive"}>
+                      {active ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild>
-                        <Link to="/admin/faqs/$id/edit" params={{ slug: faq.faqId }}>
+                        <Link to="/admin/faqs/$id/edit" params={{ id: faq.faqId }}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -97,7 +99,7 @@ function AdminFaqsList() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+              )})
             )}
           </TableBody>
         </Table>
