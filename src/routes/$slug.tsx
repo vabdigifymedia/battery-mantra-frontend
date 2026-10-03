@@ -45,10 +45,22 @@ export const Route = createFileRoute("/$slug")({
       ogDescription: pageSeo?.ogDescription || page?.seo?.ogDescription,
     };
 
-    return buildPageHead(mergedSeo, {
+    const ogImage = page?.seo?.ogImage || page?.image1;
+
+    const head = buildPageHead(mergedSeo, {
       title: page ? `${page.title} — ${APP.name}` : undefined,
       description: page ? page.title : undefined,
     });
+
+    // Inject og:image if available
+    if (ogImage) {
+      if (!head.meta) head.meta = [];
+      head.meta.push({ property: "og:image", content: ogImage });
+      head.meta.push({ name: "twitter:image", content: ogImage });
+      head.meta.push({ name: "twitter:card", content: "summary_large_image" });
+    }
+
+    return head;
   },
 });
 
@@ -81,31 +93,74 @@ function CmsPageRender() {
     );
   }
 
+  const desktopBanner = page.image1;
+  const mobileBanner = page.image2;
+  const hasBanner = desktopBanner || mobileBanner;
+
+  const templateVars = {
+    city_name: city?.cityName || "your city",
+    page_title: page.title || "",
+  };
+
   return (
     <div className="bg-background min-h-[60vh] pb-20">
-      {/* Hero Section */}
-      {page.image1 ? (
-        <div className="relative h-[40vh] min-h-[300px] w-full bg-slate-900 overflow-hidden">
-          <div className="absolute inset-0">
-            <img
-              src={page.image1}
-              alt={page.title}
-              className="h-full w-full object-cover opacity-60 mix-blend-overlay"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-          </div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4 tracking-tight drop-shadow-md">
-              {page.title}
-            </h1>
-            {page.subTitle && (
-              <p className="text-lg md:text-xl text-slate-200 max-w-2xl drop-shadow">
-                {page.subTitle}
-              </p>
-            )}
-          </div>
+      {/* Hero Section — Responsive Desktop / Mobile Banners */}
+      {hasBanner ? (
+        <div className="relative w-full bg-slate-900 overflow-hidden">
+          {/* Desktop Banner — shown on md+ screens */}
+          {desktopBanner && (
+            <div className={`${mobileBanner ? "hidden md:block" : "block"}`}>
+              <div className="relative h-[40vh] min-h-[300px] w-full">
+                <div className="absolute inset-0">
+                  <img
+                    src={desktopBanner}
+                    alt={page.title}
+                    className="h-full w-full object-cover opacity-60 mix-blend-overlay"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                  <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4 tracking-tight drop-shadow-md">
+                    {page.title}
+                  </h1>
+                  {page.subTitle && (
+                    <p className="text-lg md:text-xl text-slate-200 max-w-2xl drop-shadow">
+                      {page.subTitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Banner — shown on < md screens */}
+          {mobileBanner && (
+            <div className={`${desktopBanner ? "block md:hidden" : "block"}`}>
+              <div className="relative h-[35vh] min-h-[250px] w-full">
+                <div className="absolute inset-0">
+                  <img
+                    src={mobileBanner}
+                    alt={page.title}
+                    className="h-full w-full object-cover opacity-60 mix-blend-overlay"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                  <h1 className="text-3xl font-display font-bold text-white mb-3 tracking-tight drop-shadow-md">
+                    {page.title}
+                  </h1>
+                  {page.subTitle && (
+                    <p className="text-base text-slate-200 max-w-sm drop-shadow">
+                      {page.subTitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
+        /* No banner — gradient text header */
         <div className="relative py-16 md:py-24 border-b border-border bg-gradient-to-b from-muted/50 to-background overflow-hidden">
           {/* Decorative background elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-full -z-0"></div>
@@ -127,28 +182,15 @@ function CmsPageRender() {
         {page.content && (
           <div 
             className="prose prose-slate max-w-none dark:prose-invert prose-headings:font-display mb-12"
-            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content, {
-              city_name: city?.cityName || "your city",
-              page_title: page.title || ""
-            }) }}
+            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content, templateVars) }}
           />
-        )}
-
-        {/* Secondary Image */}
-        {page.image2 && (
-          <div className="my-12 rounded-xl overflow-hidden border bg-card shadow-sm">
-            <img src={page.image2} alt={`${page.title} details`} className="w-full h-auto object-cover max-h-[500px]" />
-          </div>
         )}
 
         {/* Render Rich Text Content 2 */}
         {page.content2 && (
           <div 
             className="prose prose-slate max-w-none dark:prose-invert prose-headings:font-display mt-12"
-            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content2, {
-              city_name: city?.cityName || "your city",
-              page_title: page.title || ""
-            }) }}
+            dangerouslySetInnerHTML={{ __html: applySeoTemplate(page.content2, templateVars) }}
           />
         )}
       </Container>
