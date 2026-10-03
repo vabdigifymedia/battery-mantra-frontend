@@ -64,32 +64,38 @@ export function ProductFilters({ state, onChange, products, aggregations, hideCa
   const availableCapacities = useMemo(() => {
     const aggCaps = aggregations?.capacities || (aggregations as any)?.capacity || [];
     if (aggCaps.length) {
-      return [...aggCaps].sort((a, b) => {
-        const numA = parseInt(String(a));
-        const numB = parseInt(String(b));
-        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-        return String(a).localeCompare(String(b));
-      });
+      return [...aggCaps]
+        .filter(c => /\\d/.test(String(c)))
+        .sort((a, b) => {
+          const numA = parseInt(String(a));
+          const numB = parseInt(String(b));
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return String(a).localeCompare(String(b));
+        });
     }
 
     const caps = new Set<string>();
     
     if (dynamicCapacities.data && Array.isArray(dynamicCapacities.data)) {
-      dynamicCapacities.data.forEach((c: any) => caps.add(c.capacityName));
+      dynamicCapacities.data.forEach((c: any) => {
+        if (/\\d/.test(String(c.capacityName))) {
+          caps.add(c.capacityName);
+        }
+      });
     }
     
     if (products) {
       products.forEach((p: any) => {
         const specCap = p.specDetails?.find((s: any) => s.attributeName?.toLowerCase().includes('capacity'))?.value;
-        if (specCap) caps.add(String(specCap));
+        if (specCap && /\\d/.test(String(specCap))) caps.add(String(specCap));
         else if (p.specs) {
           const capKey = Object.keys(p.specs).find(k => k.toLowerCase().includes('capacity') || k.toLowerCase() === 'ah');
-          if (capKey) caps.add(String(p.specs[capKey]));
+          if (capKey && /\\d/.test(String(p.specs[capKey]))) caps.add(String(p.specs[capKey]));
         } else {
-          const match = p.productName?.match(/(\d+)\s*(Ah|AH|ah)/i);
+          const match = p.productName?.match(/(\\d+)\\s*(Ah|AH|ah)/i);
           if (match) caps.add(match[0].toUpperCase());
           else {
-            const dinMatch = p.productName?.match(/DIN-?(\d+)/i);
+            const dinMatch = p.productName?.match(/DIN-?(\\d+)/i);
             if (dinMatch) caps.add(`${dinMatch[1]} AH`);
           }
         }

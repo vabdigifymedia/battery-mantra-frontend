@@ -26,6 +26,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$slug")({
     return { isCity, categories, manufacturers, templates };
   },
   head: ({ loaderData, params }) => {
+    if (!loaderData) return { meta: [{ title: "Battery Mantra" }] };
     const { isCity, categories, manufacturers, templates } = loaderData;
     const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const category = categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);

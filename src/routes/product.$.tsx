@@ -132,7 +132,7 @@ export const Route = createFileRoute("/product/$")({
     <Container size="lg" className="py-12">
       <ErrorState
         title="Couldn't load this product"
-        description={error.message}
+        description={(error as Error).message || "An unknown error occurred"}
         onRetry={reset}
       />
     </Container>
