@@ -36,7 +36,6 @@ export function BrandStrip() {
           key={b.brandId}
           to="/brand/$brandSlug"
           params={{ brandSlug: toSlug(b.brandName) }}
-          search={{ productType: "battery" }}
           className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
         >
           {/* Subtle glow on hover */}
