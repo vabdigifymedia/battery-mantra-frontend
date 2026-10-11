@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Save } from "lucide-react";
 
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 export const Route = createFileRoute("/admin/seo/quick/manufacturers")({
   component: SeoQuickManufacturersPage,
 });
@@ -40,39 +42,91 @@ function SeoQuickManufacturersPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8 pb-32">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">SEO Quick (Manufacturers)</h1>
-        <p className="text-muted-foreground mt-2">Manage global SEO templates for all manufacturers.</p>
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg border text-sm">
-          <p className="font-semibold mb-1">Supported Variables:</p>
-          <ul className="list-disc list-inside text-muted-foreground space-y-1">
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer (e.g. Maruti, Honda)</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Car Batteries)</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Default delivery time (e.g. 2-4 Hours)</li>
-          </ul>
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">SEO Quick (Manufacturers & Models)</h1>
+        <p className="text-muted-foreground mt-2">Manage global SEO templates for manufacturers (Make level) and sub-manufacturers / vehicle models.</p>
       </div>
 
-      <SeoTemplateForm 
-        title="Manufacturers (without city)" 
-        templateType="MANUFACTURER_WITHOUT_CITY" 
-        data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITHOUT_CITY")} 
-        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITHOUT_CITY" })}
-        isPending={saveMutation.isPending}
-      />
+      <Tabs defaultValue="manufacturers" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="manufacturers">Manufacturers (Make)</TabsTrigger>
+          <TabsTrigger value="sub-manufacturers">Sub-Manufacturers (Models)</TabsTrigger>
+        </TabsList>
 
-      <SeoTemplateForm 
-        title="Manufacturers (with city)" 
-        templateType="MANUFACTURER_WITH_CITY" 
-        data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITH_CITY")} 
-        onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITH_CITY" })}
-        isPending={saveMutation.isPending}
-      />
+        <TabsContent value="manufacturers" className="space-y-6">
+          <div className="p-4 bg-muted/50 rounded-lg border text-sm">
+            <p className="font-semibold mb-1">Supported Variables (Manufacturer):</p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-1">
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer (e.g. BMW, Maruti, Honda)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Car Batteries)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city (e.g. Noida, Delhi)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Delivery time (e.g. 2-4 Hours)</li>
+            </ul>
+          </div>
+
+          <SeoTemplateForm 
+            title="Manufacturers (without city)" 
+            templateType="MANUFACTURER_WITHOUT_CITY" 
+            data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITHOUT_CITY")} 
+            onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITHOUT_CITY" })}
+            isPending={saveMutation.isPending}
+            placeholderEntity="manufacturer_name"
+          />
+
+          <SeoTemplateForm 
+            title="Manufacturers (with city)" 
+            templateType="MANUFACTURER_WITH_CITY" 
+            data={templates?.find((t: any) => t.templateType === "MANUFACTURER_WITH_CITY")} 
+            onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "MANUFACTURER_WITH_CITY" })}
+            isPending={saveMutation.isPending}
+            placeholderEntity="manufacturer_name"
+          />
+        </TabsContent>
+
+        <TabsContent value="sub-manufacturers" className="space-y-6">
+          <div className="p-4 bg-muted/50 rounded-lg border text-sm">
+            <p className="font-semibold mb-1">Supported Variables (Sub-Manufacturer / Models):</p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-1">
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer/make (e.g. BMW, Maruti)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{model_name}`}</code> - Name of the model/sub-make (e.g. 3 Series 325i Petrol, Swift)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Car Batteries)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city (e.g. Noida, Delhi)</li>
+              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Delivery time (e.g. 1-2 Hours)</li>
+            </ul>
+          </div>
+
+          <SeoTemplateForm 
+            title="Sub-Manufacturers / Models (without city)" 
+            templateType="SUB_MANUFACTURER_WITHOUT_CITY" 
+            data={templates?.find((t: any) => t.templateType === "SUB_MANUFACTURER_WITHOUT_CITY")} 
+            onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "SUB_MANUFACTURER_WITHOUT_CITY" })}
+            isPending={saveMutation.isPending}
+            placeholderEntity="manufacturer_name model_name"
+          />
+
+          <SeoTemplateForm 
+            title="Sub-Manufacturers / Models (with city)" 
+            templateType="SUB_MANUFACTURER_WITH_CITY" 
+            data={templates?.find((t: any) => t.templateType === "SUB_MANUFACTURER_WITH_CITY")} 
+            onSave={(data: any) => saveMutation.mutate({ ...data, templateType: "SUB_MANUFACTURER_WITH_CITY" })}
+            isPending={saveMutation.isPending}
+            placeholderEntity="manufacturer_name model_name"
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
-function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) {
+function SeoTemplateForm({ title, templateType, data, onSave, isPending, placeholderEntity }: any) {
+  const isSub = templateType.startsWith("SUB_MANUFACTURER");
+  const varDesc = isSub
+    ? `Variables: manufacturer_name, model_name, category_name, delivery_time${templateType.includes("WITH_CITY") ? ", city_name" : ""}`
+    : `Variables: manufacturer_name, category_name, delivery_time${templateType.includes("WITH_CITY") ? ", city_name" : ""}`;
+  const entityExample = isSub ? "{manufacturer_name} {model_name}" : "{manufacturer_name}";
+  const titlePlaceholder = templateType.includes("WITH_CITY")
+    ? `Buy ${entityExample} Battery in {city_name} | Batterymantra.com`
+    : `Buy ${entityExample} Battery at Best Price | Batterymantra.com`;
+
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       seoTitleTemplate: data?.seoTitleTemplate || "",
@@ -99,29 +153,29 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>Variables: manufacturer_name, category_name, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}</CardDescription>
+        <CardDescription>{varDesc}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div className="space-y-2">
             <Label>SEO Title</Label>
-            <Input placeholder={`Buy manufacturer_name at Best Price | Batterymantra.com`} {...register("seoTitleTemplate")} />
+            <Input placeholder={titlePlaceholder} {...register("seoTitleTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>SEO Keywords</Label>
-            <Input placeholder={`manufacturer_name price, buy manufacturer_name...`} {...register("seoKeywordsTemplate")} />
+            <Input placeholder={`${entityExample} battery, buy ${entityExample}...`} {...register("seoKeywordsTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>SEO Description</Label>
-            <Input placeholder={`Buy manufacturer_name at Best Price. Cash on delivery available...`} {...register("seoDescriptionTemplate")} />
+            <Input placeholder={`Buy 100% genuine ${entityExample} battery online at lowest price...`} {...register("seoDescriptionTemplate")} />
           </div>
           <div className="space-y-2 mt-4 pt-4 border-t">
             <Label>OG Title</Label>
-            <Input placeholder={`Buy manufacturer_name at Best Price | Batterymantra.com`} {...register("ogTitleTemplate")} />
+            <Input placeholder={titlePlaceholder} {...register("ogTitleTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>OG Description</Label>
-            <Input placeholder={`Buy manufacturer_name at Best Price. Cash on delivery available...`} {...register("ogDescriptionTemplate")} />
+            <Input placeholder={`Buy 100% genuine ${entityExample} battery online at lowest price...`} {...register("ogDescriptionTemplate")} />
           </div>
           <div className="pt-2 flex justify-end">
             <Button type="submit" disabled={isPending}>

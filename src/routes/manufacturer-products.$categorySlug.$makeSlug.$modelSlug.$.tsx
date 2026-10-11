@@ -10,6 +10,7 @@ import {
   vehiclesListQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
+import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -19,19 +20,45 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
-    return {};
+    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+    const templates = await context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => []);
+    return { templates };
   },
-  head: ({ params }) => {
-    const make = params.makeSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  head: ({ params, loaderData }) => {
+    const { templates } = (loaderData as any) || {};
+    const { categorySlug, makeSlug, modelSlug, _splat } = params as any;
+    const make = makeSlug ? makeSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
     
     // Extract the raw model by removing the makeSlug prefix if it exists
-    const rawModel = params.modelSlug.startsWith(params.makeSlug + '-') 
-      ? params.modelSlug.slice(params.makeSlug.length + 1)
-      : params.modelSlug;
+    const rawModel = modelSlug && modelSlug.startsWith(makeSlug + '-') 
+      ? modelSlug.slice(makeSlug.length + 1)
+      : (modelSlug || "");
       
-    const model = rawModel.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    
-    return buildPageHead(undefined, {
+    const model = rawModel ? rawModel.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
+    const categoryName = categorySlug ? categorySlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "Car Batteries";
+
+    // City from splat (e.g. /manufacturer-products/.../noida) or undefined
+    const citySlug = _splat || undefined;
+    const cityNameStr = citySlug ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1) : undefined;
+
+    const seo = resolveTemplateSeo(
+      "SUB_MANUFACTURER",
+      templates,
+      {
+        manufacturer_name: make,
+        model_name: model,
+        category_name: categoryName,
+        delivery_time: "1-2 Hours",
+        ...(cityNameStr && { city_name: cityNameStr }),
+      },
+      null,
+      {
+        title: `${make} ${model} Battery Online | Buy 100% Genuine Car Battery`,
+        description: `Buy 100% Genuine ${make} ${model} Battery Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      }
+    );
+
+    return buildPageHead(seo, {
       title: `${make} ${model} Battery Online | Buy 100% Genuine Car Battery`,
       description: `Buy 100% Genuine ${make} ${model} Battery Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
     });
