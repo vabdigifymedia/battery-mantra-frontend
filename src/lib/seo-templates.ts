@@ -69,21 +69,34 @@ export function resolveTemplateSeo(
 
   // Entity's own SEO fields (with city variant if available)
   const ownSeo = entitySeo || {};
-  const ownTitle = (cityName && (ownSeo as any)?.metaTitleCity) 
-    ? replaceVars((ownSeo as any).metaTitleCity, allVars) 
-    : ownSeo?.metaTitle ? replaceVars(ownSeo.metaTitle, allVars) : "";
-  const ownDesc = (cityName && (ownSeo as any)?.metaDescriptionCity)
-    ? replaceVars((ownSeo as any).metaDescriptionCity, allVars)
-    : ownSeo?.metaDescription ? replaceVars(ownSeo.metaDescription, allVars) : "";
-  const ownKeywords = (cityName && (ownSeo as any)?.metaKeywordsCity)
-    ? replaceVars((ownSeo as any).metaKeywordsCity, allVars)
-    : ownSeo?.metaKeywords ? replaceVars(ownSeo.metaKeywords, allVars) : "";
-  const ownOgTitle = (cityName && (ownSeo as any)?.ogTitleCity)
-    ? replaceVars((ownSeo as any).ogTitleCity, allVars)
-    : ownSeo?.ogTitle ? replaceVars(ownSeo.ogTitle, allVars) : "";
-  const ownOgDesc = (cityName && (ownSeo as any)?.ogDescriptionCity)
-    ? replaceVars((ownSeo as any).ogDescriptionCity, allVars)
-    : ownSeo?.ogDescription ? replaceVars(ownSeo.ogDescription, allVars) : "";
+
+  // Helper to detect if legacy text has hardcoded city references when no city is active
+  const hasHardcodedCity = (text?: string | null) => {
+    if (!text) return false;
+    return /\b(in\s+)?(noida|greater\s+noida|delhi(?:\s*ncr)?|gurgaon|gurugram|faridabad|ghaziabad|mumbai|bangalore|bengaluru|kolkata|chennai|hyderabad|pune|ahmedabad|jaipur|lucknow|chandigarh)\b/i.test(text);
+  };
+
+  // If a city IS selected: prefer entity's city variant, otherwise fallback to WITH_CITY template
+  // If NO city is selected: if entity has hardcoded city pollution, discard it and use clean WITHOUT_CITY template
+  const effectiveOwnTitle = cityName
+    ? ((ownSeo as any)?.metaTitleCity ? replaceVars((ownSeo as any).metaTitleCity, allVars) : "")
+    : (hasHardcodedCity(ownSeo?.metaTitle) ? "" : (ownSeo?.metaTitle ? replaceVars(ownSeo.metaTitle, allVars) : ""));
+
+  const effectiveOwnDesc = cityName
+    ? ((ownSeo as any)?.metaDescriptionCity ? replaceVars((ownSeo as any).metaDescriptionCity, allVars) : "")
+    : (hasHardcodedCity(ownSeo?.metaDescription) ? "" : (ownSeo?.metaDescription ? replaceVars(ownSeo.metaDescription, allVars) : ""));
+
+  const effectiveOwnKeywords = cityName
+    ? ((ownSeo as any)?.metaKeywordsCity ? replaceVars((ownSeo as any).metaKeywordsCity, allVars) : "")
+    : (hasHardcodedCity(ownSeo?.metaKeywords) ? "" : (ownSeo?.metaKeywords ? replaceVars(ownSeo.metaKeywords, allVars) : ""));
+
+  const effectiveOwnOgTitle = cityName
+    ? ((ownSeo as any)?.ogTitleCity ? replaceVars((ownSeo as any).ogTitleCity, allVars) : "")
+    : (hasHardcodedCity(ownSeo?.ogTitle) ? "" : (ownSeo?.ogTitle ? replaceVars(ownSeo.ogTitle, allVars) : ""));
+
+  const effectiveOwnOgDesc = cityName
+    ? ((ownSeo as any)?.ogDescriptionCity ? replaceVars((ownSeo as any).ogDescriptionCity, allVars) : "")
+    : (hasHardcodedCity(ownSeo?.ogDescription) ? "" : (ownSeo?.ogDescription ? replaceVars(ownSeo.ogDescription, allVars) : ""));
 
   // Template-resolved fields
   const tplTitle = replaceVars(template?.seoTitleTemplate, allVars);
@@ -93,10 +106,10 @@ export function resolveTemplateSeo(
   const tplOgDesc = replaceVars(template?.ogDescriptionTemplate, allVars);
 
   return {
-    metaTitle: ownTitle || tplTitle || defaults?.title || "",
-    metaDescription: ownDesc || tplDesc || defaults?.description || "",
-    metaKeywords: ownKeywords || tplKeywords || "",
-    ogTitle: ownOgTitle || tplOgTitle || ownTitle || tplTitle || defaults?.title || "",
-    ogDescription: ownOgDesc || tplOgDesc || ownDesc || tplDesc || defaults?.description || "",
+    metaTitle: effectiveOwnTitle || tplTitle || ownSeo?.metaTitle || defaults?.title || "",
+    metaDescription: effectiveOwnDesc || tplDesc || ownSeo?.metaDescription || defaults?.description || "",
+    metaKeywords: effectiveOwnKeywords || tplKeywords || ownSeo?.metaKeywords || "",
+    ogTitle: effectiveOwnOgTitle || tplOgTitle || effectiveOwnTitle || tplTitle || defaults?.title || "",
+    ogDescription: effectiveOwnOgDesc || tplOgDesc || effectiveOwnDesc || tplDesc || defaults?.description || "",
   };
 }
