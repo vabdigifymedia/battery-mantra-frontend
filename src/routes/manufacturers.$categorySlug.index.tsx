@@ -185,6 +185,51 @@ function CategoryManufacturersPage() {
           </div>
         )}
 
+        {/* Shop by Brand Section (Specifically for car-batteries when manufacturers are shown) */}
+        {hasSpecificMfrs && categorySlug.toLowerCase() === "car-batteries" && brands.filter((b) => b.productCount === undefined || b.productCount > 0).length > 0 && (
+          <div className="mt-14 space-y-6">
+            <div className="border-b pb-3">
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <Tag className="h-5 w-5 text-primary" />
+                Shop by Brand
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Prefer to choose by battery brand? Explore leading car battery brands
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {brands
+                .filter((b) => b.productCount === undefined || b.productCount > 0)
+                .map((b) => (
+                  <Link
+                    key={b.brandId}
+                    to="/shop/$categorySlug/$brandSlug"
+                    params={{ categorySlug, brandSlug: toSlug(b.brandName) }}
+                    className="snap-start group"
+                  >
+                    <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full hover:shadow-md transition-all">
+                      <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+                        {b.brandLogo ? (
+                          <img
+                            src={b.brandLogo}
+                            alt={b.brandName}
+                            className="h-full w-full object-contain mix-blend-multiply"
+                          />
+                        ) : (
+                          <Tag className="h-8 w-8 text-muted-foreground" />
+                        )}
+                      </span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-2">
+                        {b.brandName}
+                      </span>
+                    </GradientBlobCard>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        )}
+
         {category?.categoryDescription && (
           <div 
             className="prose prose-sm md:prose-base max-w-none mt-12 mb-8 text-muted-foreground"
