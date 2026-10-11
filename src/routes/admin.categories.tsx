@@ -14,8 +14,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Layers, CornerDownRight, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
-import { generateSlug, applySeoTemplate } from "@/lib/utils";
-import { apiFetch } from "@/lib/api/client";
+import { generateSlug } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -45,26 +44,13 @@ export const Route = createFileRoute("/admin/categories")({
 
 const categorySchema = z.object({
   categoryName: z.string().trim().min(1, "Name is required"),
+  categorySlug: z.string().trim().optional(),
   categoryDescription: z.string().trim().optional(),
   iconUrl: z.string().trim().optional(),
   bannerUrl: z.string().trim().optional(),
   displayOrder: z.coerce.number().optional(),
   clickAction: z.enum(['AUTO', 'SHOW_BRANDS', 'SHOW_MANUFACTURERS', 'SHOW_PRODUCTS', 'SHOW_SUBCATEGORIES']).optional().default('AUTO'),
   parentId: z.string().uuid().optional().nullable().or(z.literal("")),
-  seo: z.object({
-    slug: z.string().optional(),
-    metaTitle: z.string().optional(),
-    metaDescription: z.string().optional(),
-    metaKeywords: z.string().optional(),
-    metaTitleCity: z.string().optional(),
-    metaDescriptionCity: z.string().optional(),
-    metaKeywordsCity: z.string().optional(),
-    ogTitle: z.string().optional(),
-    ogDescription: z.string().optional(),
-    ogTitleCity: z.string().optional(),
-    ogDescriptionCity: z.string().optional(),
-    canonicalUrl: z.string().optional(),
-  }).optional().default({})
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -76,11 +62,6 @@ function AdminCategories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryListResponse | null>(null);
-
-  const { data: templates } = useQuery({
-    queryKey: ["seo", "templates"],
-    queryFn: () => apiFetch<any[]>("/api/seo/templates"),
-  });
 
   // Flatten categories for the dropdown options (excluding the currently editing category and its children to prevent circular reference)
   const flattenedCategories = useMemo(() => {
@@ -108,6 +89,7 @@ function AdminCategories() {
     resolver: zodResolver(categorySchema) as any,
     defaultValues: {
       categoryName: "",
+      categorySlug: "",
       categoryDescription: "",
       iconUrl: "",
       bannerUrl: "",
@@ -121,66 +103,28 @@ function AdminCategories() {
     setEditingCategory(null);
     form.reset({
       categoryName: "",
+      categorySlug: "",
       categoryDescription: "",
       iconUrl: "",
       bannerUrl: "",
       displayOrder: 0,
       clickAction: "AUTO",
       parentId,
-      seo: {
-        slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
-        metaTitleCity: "",
-        metaDescriptionCity: "",
-        metaKeywordsCity: "",
-        ogTitle: "",
-        ogDescription: "",
-        ogTitleCity: "",
-        ogDescriptionCity: "",
-        canonicalUrl: "",
-      }
     });
     setIsModalOpen(true);
   };
 
   const openEditModal = (category: any) => {
     setEditingCategory(category);
-    
-    let newSeo = { 
-      slug: category.categorySlug || "",
-      ...(category.seo || {}) 
-    };
-    
-    if (templates && templates.length > 0) {
-      const templateWithoutCity = templates.find((t: any) => t.templateType === "CATEGORY_WITHOUT_CITY");
-      const templateWithCity = templates.find((t: any) => t.templateType === "CATEGORY_WITH_CITY");
-      const context = { category_name: category.categoryName || "" };
-      
-      if (templateWithoutCity) {
-        if (!newSeo.metaTitle && templateWithoutCity.seoTitleTemplate) newSeo.metaTitle = applySeoTemplate(templateWithoutCity.seoTitleTemplate, context);
-        if (!newSeo.metaDescription && templateWithoutCity.seoDescriptionTemplate) newSeo.metaDescription = applySeoTemplate(templateWithoutCity.seoDescriptionTemplate, context);
-        if (!newSeo.metaKeywords && templateWithoutCity.seoKeywordsTemplate) newSeo.metaKeywords = applySeoTemplate(templateWithoutCity.seoKeywordsTemplate, context);
-        if (!newSeo.ogTitle && templateWithoutCity.ogTitleTemplate) newSeo.ogTitle = applySeoTemplate(templateWithoutCity.ogTitleTemplate, context);
-        if (!newSeo.ogDescription && templateWithoutCity.ogDescriptionTemplate) newSeo.ogDescription = applySeoTemplate(templateWithoutCity.ogDescriptionTemplate, context);
-      }
-      if (templateWithCity) {
-        if (!newSeo.metaTitleCity && templateWithCity.seoTitleTemplate) newSeo.metaTitleCity = applySeoTemplate(templateWithCity.seoTitleTemplate, context);
-        if (!newSeo.metaDescriptionCity && templateWithCity.seoDescriptionTemplate) newSeo.metaDescriptionCity = applySeoTemplate(templateWithCity.seoDescriptionTemplate, context);
-        if (!newSeo.metaKeywordsCity && templateWithCity.seoKeywordsTemplate) newSeo.metaKeywordsCity = applySeoTemplate(templateWithCity.seoKeywordsTemplate, context);
-      }
-    }
-
     form.reset({
       categoryName: category.categoryName,
+      categorySlug: category.categorySlug || "",
       categoryDescription: category.categoryDescription ?? "",
       iconUrl: category.iconUrl ?? "",
       bannerUrl: category.bannerUrl ?? "",
       displayOrder: category.displayOrder ?? 0,
       clickAction: category.clickAction ?? "AUTO",
       parentId: category.parentId ?? null,
-      seo: newSeo
     });
     setIsModalOpen(true);
   };
@@ -221,6 +165,7 @@ function AdminCategories() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
+    const slug = values.categorySlug?.trim() ? generateSlug(values.categorySlug) : generateSlug(values.categoryName);
     const payload: CreateCategoryRequest = {
       categoryName: values.categoryName,
       categoryDescription: values.categoryDescription,
@@ -230,12 +175,7 @@ function AdminCategories() {
       clickAction: values.clickAction,
       parentId: values.parentId || null,
       removeParent: !values.parentId, // Tell backend explicitly to detach
-      seo: editingCategory 
-        ? { 
-            ...values.seo, 
-            slug: values.seo?.slug ? values.seo.slug : generateSlug(values.categoryName) 
-          } 
-        : { slug: generateSlug(values.categoryName) },
+      seo: { slug },
     } as any;
 
     if (editingCategory) {
@@ -485,6 +425,10 @@ function AdminCategories() {
             <FormField label="Name" htmlFor="categoryName" required error={form.formState.errors.categoryName?.message}>
               <Input id="categoryName" {...form.register("categoryName")} placeholder="e.g. Car Batteries" />
             </FormField>
+
+            <FormField label="URL Slug (Optional)" htmlFor="categorySlug" error={form.formState.errors.categorySlug?.message}>
+              <Input id="categorySlug" {...form.register("categorySlug")} placeholder="Leave blank to auto-generate from name" />
+            </FormField>
             
             <Controller
               control={form.control}
@@ -547,70 +491,7 @@ function AdminCategories() {
               </select>
             </FormField>
 
-            {editingCategory && (
-              <div className="pt-6 pb-2">
-                <h3 className="text-lg font-semibold">SEO Information</h3>
-                <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this category</p>
-                
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Category URL (Slug)</Label>
-                      <Input placeholder="Leave blank to auto-generate" {...form.register("seo.slug")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>SEO Title</Label>
-                      <Input placeholder="Buy Category at Best Price" {...form.register("seo.metaTitle")} />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Search / SEO Keywords</Label>
-                    <Input placeholder="Category price, buy category..." {...form.register("seo.metaKeywords")} />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>SEO Description</Label>
-                    <Input placeholder="Buy Category At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 pt-2">
-                    <div className="space-y-2">
-                      <Label>SEO Title City</Label>
-                      <Input placeholder="Category Price in city_name" {...form.register("seo.metaTitleCity")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>SEO Keywords City</Label>
-                      <Input placeholder="Category At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>SEO Description City</Label>
-                    <Input placeholder="Buy Category At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
-                    <div className="space-y-2 mt-4">
-                      <Label>OG Title</Label>
-                      <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
-                    </div>
-                    <div className="space-y-2 mt-4">
-                      <Label>OG Description</Label>
-                      <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>OG Title City</Label>
-                      <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>OG Description City</Label>
-                      <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="flex justify-end gap-3 pt-6 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
