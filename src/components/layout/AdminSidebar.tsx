@@ -64,6 +64,7 @@ const seoQuickNavigation = [
   { name: "Manufacturers", href: "/admin/seo/quick/manufacturers" },
   { name: "Categories", href: "/admin/seo/quick/categories" },
   { name: "Products", href: "/admin/seo/quick/products" },
+  { name: "Dealers", href: "/admin/seo/quick/dealers" },
 ];
 
 export function AdminSidebar() {

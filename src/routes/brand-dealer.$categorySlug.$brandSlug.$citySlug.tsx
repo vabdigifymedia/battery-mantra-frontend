@@ -38,7 +38,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
 
     // Provide dealer specific SEO
     const seo = resolveTemplateSeo(
-      "BRAND",
+      "DEALER",
       loaderData?.templates,
       { brand_name: brand?.brandName || brandName, category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours", city_name: cityName },
       (brand as any)?.seo,

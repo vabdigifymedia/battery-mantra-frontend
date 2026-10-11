@@ -81,6 +81,7 @@ import { Route as AdminPartnersIdEditRouteImport } from './routes/admin.partners
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
 import { Route as AdminSeoQuickBrandsRouteImport } from './routes/admin.seo.quick.brands'
 import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
+import { Route as AdminSeoQuickDealersRouteImport } from './routes/admin.seo.quick.dealers'
 import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as BrandDealerCategorySlugBrandSlugIndexRouteImport } from './routes/brand-dealer.$categorySlug.$brandSlug.index'
@@ -455,6 +456,11 @@ const AdminSeoQuickCategoriesRoute = AdminSeoQuickCategoriesRouteImport.update({
   path: '/seo/quick/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSeoQuickDealersRoute = AdminSeoQuickDealersRouteImport.update({
+  id: '/seo/quick/dealers',
+  path: '/seo/quick/dealers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSeoQuickManufacturersRoute =
   AdminSeoQuickManufacturersRouteImport.update({
     id: '/seo/quick/manufacturers',
@@ -586,6 +592,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/dealers': typeof AdminSeoQuickDealersRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
@@ -667,6 +674,7 @@ export interface FileRoutesByTo {
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/dealers': typeof AdminSeoQuickDealersRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
@@ -752,6 +760,7 @@ export interface FileRoutesById {
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
+  '/admin/seo/quick/dealers': typeof AdminSeoQuickDealersRoute
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
@@ -837,6 +846,7 @@ export interface FileRouteTypes {
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/dealers'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
@@ -918,6 +928,7 @@ export interface FileRouteTypes {
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/dealers'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
@@ -1002,6 +1013,7 @@ export interface FileRouteTypes {
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
+    | '/admin/seo/quick/dealers'
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
@@ -1556,6 +1568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoQuickCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/seo/quick/dealers': {
+      id: '/admin/seo/quick/dealers'
+      path: '/seo/quick/dealers'
+      fullPath: '/admin/seo/quick/dealers'
+      preLoaderRoute: typeof AdminSeoQuickDealersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/seo/quick/manufacturers': {
       id: '/admin/seo/quick/manufacturers'
       path: '/seo/quick/manufacturers'
@@ -1682,6 +1701,7 @@ interface AdminRouteChildren {
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
   AdminSeoQuickBrandsRoute: typeof AdminSeoQuickBrandsRoute
   AdminSeoQuickCategoriesRoute: typeof AdminSeoQuickCategoriesRoute
+  AdminSeoQuickDealersRoute: typeof AdminSeoQuickDealersRoute
   AdminSeoQuickManufacturersRoute: typeof AdminSeoQuickManufacturersRoute
   AdminSeoQuickProductsRoute: typeof AdminSeoQuickProductsRoute
 }
@@ -1727,6 +1747,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,
   AdminSeoQuickBrandsRoute: AdminSeoQuickBrandsRoute,
   AdminSeoQuickCategoriesRoute: AdminSeoQuickCategoriesRoute,
+  AdminSeoQuickDealersRoute: AdminSeoQuickDealersRoute,
   AdminSeoQuickManufacturersRoute: AdminSeoQuickManufacturersRoute,
   AdminSeoQuickProductsRoute: AdminSeoQuickProductsRoute,
 }
@@ -1808,13 +1829,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

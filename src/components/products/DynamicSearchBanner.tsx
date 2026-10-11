@@ -43,7 +43,7 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   const { data: brands } = useQuery(brandsQuery(catId));
   const { data: vehicles } = useQuery(vehiclesListQuery());
 
-  const brand = brndId ? brands?.find((b: any) => b.brandId === brndId) : null;
+  const brand = brndId ? (brands?.find((b: any) => b.brandId === brndId) || allBrands?.find((b: any) => b.brandId === brndId)) : null;
   
   // Recursively search for category in case it's a subcategory
   let category: any = null;
@@ -71,7 +71,7 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   let brandNameHeader = "";
   let brandLogoUrl = "";
 
-  const catName = category?.categoryName || "Battery";
+  const catName = category?.categoryName || (search.productType === "inverter" ? "Inverter" : search.productType === "solar" ? "Solar" : "Battery");
 
   if (vehicle) {
     title = isDealerPage 
@@ -81,7 +81,7 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
     imageUrl = vehicle.imageUrl || "/images/placeholders/car-placeholder.png";
     brandNameHeader = vehicle.make;
     // Attempt to find brand logo if vehicle make matches a brand
-    const matchedBrand = brands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase());
+    const matchedBrand = brands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase()) || allBrands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase());
     if (matchedBrand) brandLogoUrl = matchedBrand.brandLogo || "";
   } else if (brand && category) {
     title = isDealerPage
@@ -92,10 +92,15 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (brand) {
+    const productTypeLabel = search.productType === "inverter" 
+      ? "Inverters" 
+      : search.productType === "solar" 
+      ? "Solar Batteries" 
+      : "Batteries";
     title = isDealerPage
-      ? `${brand.brandName} Batteries Dealer in ${locationName}`
-      : `${brand.brandName} Batteries Price in ${locationName}`;
-    subtitle = `With Battery Mantra, get ${brand.brandName} Batteries at best price`;
+      ? `${brand.brandName} ${productTypeLabel} Dealer in ${locationName}`
+      : `${brand.brandName} ${productTypeLabel} Price in ${locationName}`;
+    subtitle = `With Battery Mantra, get ${brand.brandName} ${productTypeLabel} at best price`;
     imageUrl = brand.brandLogo || "";
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
@@ -110,7 +115,7 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
 
   // Determine dynamic theme colors based on category or name
   let theme = "red"; // default theme for cars
-  const searchString = `${catName} ${vehicle?.make} ${vehicle?.model}`.toLowerCase();
+  const searchString = `${catName} ${vehicle?.make || ''} ${vehicle?.model || ''} ${search.productType || ''}`.toLowerCase();
   
   if (searchString.includes("inverter") || searchString.includes("tubular") || searchString.includes("solar")) {
     theme = "blue";

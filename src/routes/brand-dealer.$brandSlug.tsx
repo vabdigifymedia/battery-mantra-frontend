@@ -30,7 +30,7 @@ export const Route = createFileRoute("/brand-dealer/$brandSlug")({
     const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
     
     const seo = resolveTemplateSeo(
-      "BRAND",
+      "DEALER",
       loaderData?.templates,
       { brand_name: brand?.brandName || brandName, delivery_time: "2-4 Hours" },
       (brand as any)?.seo,
@@ -67,6 +67,7 @@ function DealerBrandProductsPage() {
     <ProductsPageLayout 
       search={activeSearch}
       isDealerPage={true}
+      baseUrl={`/brand-dealer/${brandSlug}`}
       onSearchChange={(newSearch) => {
         // If the user selects a DIFFERENT brand in the sidebar, we navigate to the generic /products route
         if (

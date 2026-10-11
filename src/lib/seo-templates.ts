@@ -37,7 +37,7 @@ function replaceVars(template: string | undefined | null, vars: Record<string, s
   return result;
 }
 
-type SeoEntityType = "BRAND" | "CATEGORY" | "MANUFACTURER" | "PRODUCT";
+type SeoEntityType = "BRAND" | "CATEGORY" | "MANUFACTURER" | "PRODUCT" | "DEALER";
 
 /**
  * Resolves SEO metadata using this priority:
@@ -53,7 +53,7 @@ export function resolveTemplateSeo(
   defaults?: { title?: string; description?: string }
 ): PageSeoData {
   const city = useLocationStore.getState().city;
-  const cityName = city?.cityName || "";
+  const cityName = vars.city_name || city?.cityName || "";
 
   // Merge city_name into vars
   const allVars = { ...vars, city_name: cityName || "India" };
@@ -64,7 +64,8 @@ export function resolveTemplateSeo(
   const fallbackType = `${entityType}_WITHOUT_CITY`;
 
   const template = templates?.find((t) => t.templateType === templateType)
-    || templates?.find((t) => t.templateType === fallbackType);
+    || templates?.find((t) => t.templateType === fallbackType)
+    || (entityType === "DEALER" ? (templates?.find((t) => t.templateType === `BRAND_${suffix}`) || templates?.find((t) => t.templateType === "BRAND_WITHOUT_CITY")) : undefined);
 
   // Entity's own SEO fields (with city variant if available)
   const ownSeo = entitySeo || {};
