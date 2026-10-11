@@ -58,7 +58,7 @@ type CategoryFormValues = z.infer<typeof categorySchema>;
 function AdminCategories() {
   const queryClient = useQueryClient();
   const { data: categories, isLoading } = useQuery(rootCategoriesQuery());
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryListResponse | null>(null);
@@ -67,14 +67,14 @@ function AdminCategories() {
   const flattenedCategories = useMemo(() => {
     const list: { id: string; name: string; level: number }[] = [];
     if (!categories) return list;
-    
+
     function traverse(cats: CategoryListResponse[], level: number) {
       // Sort by display order
       const sorted = [...cats].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
       for (const cat of sorted) {
         // Skip if this is the category we're editing (prevent assigning self as parent)
         if (editingCategory && cat.categoryId === editingCategory.categoryId) continue;
-        
+
         list.push({ id: cat.categoryId, name: cat.categoryName, level });
         if (cat.subCategories && cat.subCategories.length > 0) {
           traverse(cat.subCategories, level + 1);
@@ -234,7 +234,7 @@ function AdminCategories() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
+                    <AlertDialogAction
                       onClick={() => deleteMutation.mutate(category.categoryId)}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
@@ -321,7 +321,7 @@ function AdminCategories() {
               const renderMobileCards = (cats: CategoryListResponse[], depth: number = 0) => {
                 const sorted = [...cats].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
                 const elements: React.ReactNode[] = [];
-                
+
                 sorted.forEach((category) => {
                   elements.push(
                     <div key={category.categoryId} className="rounded-xl border bg-card p-3 shadow-sm relative overflow-hidden" style={{ marginLeft: `${depth * 16}px` }}>
@@ -350,7 +350,7 @@ function AdminCategories() {
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t">
                         <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground" onClick={() => openAddModal(category.categoryId)}>
                           <Plus className="h-3.5 w-3.5 mr-1" /> Add Sub
@@ -373,7 +373,7 @@ function AdminCategories() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
+                              <AlertDialogAction
                                 onClick={() => deleteMutation.mutate(category.categoryId)}
                                 className="bg-destructive hover:bg-destructive/90"
                               >
@@ -385,15 +385,15 @@ function AdminCategories() {
                       </div>
                     </div>
                   );
-                  
+
                   if (category.subCategories && category.subCategories.length > 0) {
                     elements.push(...renderMobileCards(category.subCategories, depth + 1));
                   }
                 });
-                
+
                 return elements;
               };
-              
+
               return renderMobileCards(categories);
             })()}
           </div>
@@ -406,7 +406,7 @@ function AdminCategories() {
             <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
-            
+
             <FormField label="Parent Category" htmlFor="parentId" error={form.formState.errors.parentId?.message}>
               <select
                 id="parentId"
@@ -429,7 +429,7 @@ function AdminCategories() {
             <FormField label="URL Slug (Optional)" htmlFor="categorySlug" error={form.formState.errors.categorySlug?.message}>
               <Input id="categorySlug" {...form.register("categorySlug")} placeholder="Leave blank to auto-generate from name" />
             </FormField>
-            
+
             <Controller
               control={form.control}
               name="categoryDescription"
@@ -505,12 +505,12 @@ function AdminCategories() {
           </form>
         </DialogContent>
       </Dialog>
-      
+
       {categories && (
-        <CategoryReorderModal 
-          isOpen={isReorderModalOpen} 
-          onClose={() => setIsReorderModalOpen(false)} 
-          categories={categories} 
+        <CategoryReorderModal
+          isOpen={isReorderModalOpen}
+          onClose={() => setIsReorderModalOpen(false)}
+          categories={categories}
         />
       )}
     </div>

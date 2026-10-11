@@ -1,16 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { bannersListQuery } from "@/queries";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { parseBannerTitle } from "@/lib/banner-utils";
 
 export function BannerCarousel() {
   const { data, isLoading } = useQuery(bannersListQuery());
+  const isMobile = useIsMobile();
 
-  const banners = Array.isArray(data) ? data : (data as any)?.content || [];
+  const allBanners: any[] = Array.isArray(data) ? data : (data as any)?.content || [];
+
+  const banners = useMemo(() => {
+    if (!allBanners.length) return [];
+    const target = isMobile ? "MOBILE" : "DESKTOP";
+    
+    // Check if there are banners targeting the current device
+    const deviceSpecific = allBanners.filter((b) => parseBannerTitle(b.title).deviceType === target);
+    // Banners targeting ALL devices
+    const universal = allBanners.filter((b) => parseBannerTitle(b.title).deviceType === "ALL");
+
+    const matched = [...deviceSpecific, ...universal].sort(
+      (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+    );
+
+    return matched.length > 0 ? matched : allBanners;
+  }, [allBanners, isMobile]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -57,31 +76,34 @@ export function BannerCarousel() {
     <div className="relative w-full mb-4 group">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex touch-pan-y touch-pinch-zoom">
-          {banners.map((banner, index) => (
-            <div key={banner.bannerId} className="flex-[0_0_100%] min-w-0 relative">
-              {banner.linkUrl ? (
-                <Link to={banner.linkUrl as any} className="block w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
-                  <img
-                    src={banner.imageUrl}
-                    alt={banner.title || "Promotional Banner"}
-                    className="w-full h-full object-cover"
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                    loading={index === 0 ? "eager" : "lazy"}
-                  />
-                </Link>
-              ) : (
-                <div className="w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
-                  <img
-                    src={banner.imageUrl}
-                    alt={banner.title || "Promotional Banner"}
-                    className="w-full h-full object-cover"
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                    loading={index === 0 ? "eager" : "lazy"}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+          {banners.map((banner, index) => {
+            const cleanTitle = parseBannerTitle(banner.title).cleanTitle;
+            return (
+              <div key={banner.bannerId} className="flex-[0_0_100%] min-w-0 relative">
+                {banner.linkUrl ? (
+                  <Link to={banner.linkUrl as any} className="block w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
+                    <img
+                      src={banner.imageUrl}
+                      alt={cleanTitle || "Promotional Banner"}
+                      className="w-full h-full object-cover"
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </Link>
+                ) : (
+                  <div className="w-full h-[220px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
+                    <img
+                      src={banner.imageUrl}
+                      alt={cleanTitle || "Promotional Banner"}
+                      className="w-full h-full object-cover"
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
