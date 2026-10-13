@@ -411,7 +411,7 @@ function CategoryBrandsView({
               .map((b: any) => (
                 <Link
                   key={b.brandId}
-                  to="/shop/$categorySlug/$brandSlug"
+                  to="/brand-products/$categorySlug/$brandSlug"
                   params={{ categorySlug: canonicalCatSlug, brandSlug: toSlug(b.brandName) }}
                   className="snap-start"
                 >

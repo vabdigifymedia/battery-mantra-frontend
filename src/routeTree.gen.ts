@@ -87,6 +87,8 @@ import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.s
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as BrandDealerCategorySlugBrandSlugIndexRouteImport } from './routes/brand-dealer.$categorySlug.$brandSlug.index'
 import { Route as BrandDealerCategorySlugBrandSlugCitySlugRouteImport } from './routes/brand-dealer.$categorySlug.$brandSlug.$citySlug'
+import { Route as BrandProductsCategorySlugBrandSlugIndexRouteImport } from './routes/brand-products.$categorySlug.$brandSlug.index'
+import { Route as BrandProductsCategorySlugBrandSlugCitySlugRouteImport } from './routes/brand-products.$categorySlug.$brandSlug.$citySlug'
 import { Route as ManufacturersCategorySlugSlugCitySlugRouteImport } from './routes/manufacturers.$categorySlug.$slug.$citySlug'
 import { Route as ShopCategorySlugBrandSlugIndexRouteImport } from './routes/shop.$categorySlug.$brandSlug.index'
 import { Route as ShopCategorySlugBrandSlugCitySlugRouteImport } from './routes/shop.$categorySlug.$brandSlug.$citySlug'
@@ -490,6 +492,18 @@ const BrandDealerCategorySlugBrandSlugCitySlugRoute =
     path: '/brand-dealer/$categorySlug/$brandSlug/$citySlug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BrandProductsCategorySlugBrandSlugIndexRoute =
+  BrandProductsCategorySlugBrandSlugIndexRouteImport.update({
+    id: '/brand-products/$categorySlug/$brandSlug/',
+    path: '/brand-products/$categorySlug/$brandSlug/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BrandProductsCategorySlugBrandSlugCitySlugRoute =
+  BrandProductsCategorySlugBrandSlugCitySlugRouteImport.update({
+    id: '/brand-products/$categorySlug/$brandSlug/$citySlug',
+    path: '/brand-products/$categorySlug/$brandSlug/$citySlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ManufacturersCategorySlugSlugCitySlugRoute =
   ManufacturersCategorySlugSlugCitySlugRouteImport.update({
     id: '/$citySlug',
@@ -603,10 +617,12 @@ export interface FileRoutesByFullPath {
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
+  '/brand-products/$categorySlug/$brandSlug/$citySlug': typeof BrandProductsCategorySlugBrandSlugCitySlugRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug/': typeof BrandDealerCategorySlugBrandSlugIndexRoute
+  '/brand-products/$categorySlug/$brandSlug/': typeof BrandProductsCategorySlugBrandSlugIndexRoute
   '/shop/$categorySlug/$brandSlug/': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug/': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -686,10 +702,12 @@ export interface FileRoutesByTo {
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
+  '/brand-products/$categorySlug/$brandSlug/$citySlug': typeof BrandProductsCategorySlugBrandSlugCitySlugRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug': typeof BrandDealerCategorySlugBrandSlugIndexRoute
+  '/brand-products/$categorySlug/$brandSlug': typeof BrandProductsCategorySlugBrandSlugIndexRoute
   '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -773,10 +791,12 @@ export interface FileRoutesById {
   '/admin/seo/quick/manufacturers': typeof AdminSeoQuickManufacturersRoute
   '/admin/seo/quick/products': typeof AdminSeoQuickProductsRoute
   '/brand-dealer/$categorySlug/$brandSlug/$citySlug': typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
+  '/brand-products/$categorySlug/$brandSlug/$citySlug': typeof BrandProductsCategorySlugBrandSlugCitySlugRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug/': typeof BrandDealerCategorySlugBrandSlugIndexRoute
+  '/brand-products/$categorySlug/$brandSlug/': typeof BrandProductsCategorySlugBrandSlugIndexRoute
   '/shop/$categorySlug/$brandSlug/': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug/': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -860,10 +880,12 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
+    | '/brand-products/$categorySlug/$brandSlug/$citySlug'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug/'
+    | '/brand-products/$categorySlug/$brandSlug/'
     | '/shop/$categorySlug/$brandSlug/'
     | '/shop/c/$categorySlug/'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -943,10 +965,12 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
+    | '/brand-products/$categorySlug/$brandSlug/$citySlug'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug'
+    | '/brand-products/$categorySlug/$brandSlug'
     | '/shop/$categorySlug/$brandSlug'
     | '/shop/c/$categorySlug'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -1029,10 +1053,12 @@ export interface FileRouteTypes {
     | '/admin/seo/quick/manufacturers'
     | '/admin/seo/quick/products'
     | '/brand-dealer/$categorySlug/$brandSlug/$citySlug'
+    | '/brand-products/$categorySlug/$brandSlug/$citySlug'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug/'
+    | '/brand-products/$categorySlug/$brandSlug/'
     | '/shop/$categorySlug/$brandSlug/'
     | '/shop/c/$categorySlug/'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -1067,9 +1093,11 @@ export interface RootRouteChildren {
   BrandsCategorySlugIndexRoute: typeof BrandsCategorySlugIndexRoute
   ManufacturersCategorySlugIndexRoute: typeof ManufacturersCategorySlugIndexRoute
   BrandDealerCategorySlugBrandSlugCitySlugRoute: typeof BrandDealerCategorySlugBrandSlugCitySlugRoute
+  BrandProductsCategorySlugBrandSlugCitySlugRoute: typeof BrandProductsCategorySlugBrandSlugCitySlugRoute
   ShopCategorySlugBrandSlugCitySlugRoute: typeof ShopCategorySlugBrandSlugCitySlugRoute
   ShopCCategorySlugCitySlugRoute: typeof ShopCCategorySlugCitySlugRoute
   BrandDealerCategorySlugBrandSlugIndexRoute: typeof BrandDealerCategorySlugBrandSlugIndexRoute
+  BrandProductsCategorySlugBrandSlugIndexRoute: typeof BrandProductsCategorySlugBrandSlugIndexRoute
   ShopCategorySlugBrandSlugIndexRoute: typeof ShopCategorySlugBrandSlugIndexRoute
   ShopCCategorySlugIndexRoute: typeof ShopCCategorySlugIndexRoute
   ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute: typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -1623,6 +1651,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BrandDealerCategorySlugBrandSlugCitySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brand-products/$categorySlug/$brandSlug/': {
+      id: '/brand-products/$categorySlug/$brandSlug/'
+      path: '/brand-products/$categorySlug/$brandSlug'
+      fullPath: '/brand-products/$categorySlug/$brandSlug/'
+      preLoaderRoute: typeof BrandProductsCategorySlugBrandSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand-products/$categorySlug/$brandSlug/$citySlug': {
+      id: '/brand-products/$categorySlug/$brandSlug/$citySlug'
+      path: '/brand-products/$categorySlug/$brandSlug/$citySlug'
+      fullPath: '/brand-products/$categorySlug/$brandSlug/$citySlug'
+      preLoaderRoute: typeof BrandProductsCategorySlugBrandSlugCitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manufacturers/$categorySlug/$slug/$citySlug': {
       id: '/manufacturers/$categorySlug/$slug/$citySlug'
       path: '/$citySlug'
@@ -1837,11 +1879,15 @@ const rootRouteChildren: RootRouteChildren = {
   ManufacturersCategorySlugIndexRoute: ManufacturersCategorySlugIndexRoute,
   BrandDealerCategorySlugBrandSlugCitySlugRoute:
     BrandDealerCategorySlugBrandSlugCitySlugRoute,
+  BrandProductsCategorySlugBrandSlugCitySlugRoute:
+    BrandProductsCategorySlugBrandSlugCitySlugRoute,
   ShopCategorySlugBrandSlugCitySlugRoute:
     ShopCategorySlugBrandSlugCitySlugRoute,
   ShopCCategorySlugCitySlugRoute: ShopCCategorySlugCitySlugRoute,
   BrandDealerCategorySlugBrandSlugIndexRoute:
     BrandDealerCategorySlugBrandSlugIndexRoute,
+  BrandProductsCategorySlugBrandSlugIndexRoute:
+    BrandProductsCategorySlugBrandSlugIndexRoute,
   ShopCategorySlugBrandSlugIndexRoute: ShopCategorySlugBrandSlugIndexRoute,
   ShopCCategorySlugIndexRoute: ShopCCategorySlugIndexRoute,
   ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute:

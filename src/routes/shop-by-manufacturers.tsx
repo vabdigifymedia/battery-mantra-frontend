@@ -165,7 +165,7 @@ function ShopByManufacturersPage() {
                 .map((b) => (
                   <Link
                     key={b.brandId}
-                    to="/shop/$categorySlug/$brandSlug"
+                    to="/brand-products/$categorySlug/$brandSlug"
                     params={{ categorySlug, brandSlug: toSlug(b.brandName) }}
                     className="snap-start group"
                   >
