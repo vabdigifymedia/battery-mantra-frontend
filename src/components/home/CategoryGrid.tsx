@@ -44,25 +44,30 @@ export function CategoryGrid() {
           </GradientBlobCard>
         );
 
-        if (c.clickAction === 'SHOW_BRANDS') {
+        const isCar = /(^|\s)car(\s|$)/i.test(c.categoryName);
+        if (isCar || c.clickAction === 'SHOW_MANUFACTURERS') {
           return (
-            <Link
-              key={c.categoryId}
-              to="/brands/$categorySlug"
-              params={{ categorySlug: rawSlug }}
-              className="snap-start"
-            >
+            <Link key={c.categoryId} to="/shop-by-manufacturers" className="snap-start">
               {cardContent}
             </Link>
           );
         }
-        if (c.clickAction === 'SHOW_MANUFACTURERS') {
+
+        const isCategoryBrands =
+          rawSlug === "inverter-battery" ||
+          rawSlug === "generator-battery" ||
+          rawSlug === "generator-batteries" ||
+          c.clickAction === 'SHOW_BRANDS';
+
+        if (isCategoryBrands) {
+          const targetSlug = rawSlug === "generator-battery" ? "generator-batteries" : rawSlug;
           return (
-            <Link key={c.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
+            <Link key={c.categoryId} to="/shop-by-category/$" params={{ _splat: targetSlug }} className="snap-start">
               {cardContent}
             </Link>
           );
         }
+
         if (c.clickAction === 'SHOW_PRODUCTS') {
           return (
             <Link key={c.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
@@ -70,23 +75,10 @@ export function CategoryGrid() {
             </Link>
           );
         }
-        if (c.clickAction === 'SHOW_SUBCATEGORIES') {
-          return (
-            <Link key={c.categoryId} to="/shop-by-category/$categorySlug" params={{ categorySlug: rawSlug }} className="snap-start">
-              {cardContent}
-            </Link>
-          );
-        }
 
-        // AUTO or undefined fallback
-        if (c.subCategories && c.subCategories.length > 0) {
+        if (c.clickAction === 'SHOW_SUBCATEGORIES' || (c.subCategories && c.subCategories.length > 0)) {
           return (
-            <Link
-              key={c.categoryId}
-              to="/shop-by-category/$categorySlug"
-              params={{ categorySlug: rawSlug }}
-              className="snap-start"
-            >
+            <Link key={c.categoryId} to="/shop-by-category/$" params={{ _splat: rawSlug }} className="snap-start">
               {cardContent}
             </Link>
           );
@@ -94,7 +86,7 @@ export function CategoryGrid() {
 
         const isVehicle = (() => {
           const n = c.categoryName.toLowerCase();
-          return n.includes("car") || n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
+          return n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
         })();
 
         if (isVehicle) {
@@ -113,8 +105,8 @@ export function CategoryGrid() {
         return (
           <Link
             key={c.categoryId}
-            to="/brands/$categorySlug"
-            params={{ categorySlug: rawSlug }}
+            to="/shop-by-category/$"
+            params={{ _splat: rawSlug }}
             className="snap-start"
           >
             {cardContent}

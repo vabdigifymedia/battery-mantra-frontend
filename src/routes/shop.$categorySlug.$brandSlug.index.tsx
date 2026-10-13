@@ -30,7 +30,10 @@ export const Route = createFileRoute("/shop/$categorySlug/$brandSlug/")({
     const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
-    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const category = loaderData?.categories?.find((c: any) => {
+      const s = toSlug(c.categoryName);
+      return s === params.categorySlug || s.replace(/-battery$/, "-batteries") === params.categorySlug || s.replace(/-batteries$/, "-battery") === params.categorySlug;
+    });
 
     // Try brand SEO first (more specific), then category
     const seo = resolveTemplateSeo(
@@ -62,7 +65,10 @@ function CategoryBrandProductsPage() {
     return <FullPageLoader />;
   }
 
-  const matchingCategory = categories?.find(c => toSlug(c.categoryName) === categorySlug);
+  const matchingCategory = categories?.find(c => {
+    const s = toSlug(c.categoryName);
+    return s === categorySlug || s.replace(/-battery$/, "-batteries") === categorySlug || s.replace(/-batteries$/, "-battery") === categorySlug;
+  });
   const activeCategoryId = matchingCategory?.categoryId;
   
   const matchingBrand = brands?.find(b => toSlug(b.brandName) === brandSlug);

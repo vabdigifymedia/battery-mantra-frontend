@@ -19,6 +19,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as ReelsRouteImport } from './routes/reels'
+import { Route as ShopByManufacturersRouteImport } from './routes/shop-by-manufacturers'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
@@ -140,6 +141,11 @@ const PartnerRoute = PartnerRouteImport.update({
 const ReelsRoute = ReelsRouteImport.update({
   id: '/reels',
   path: '/reels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopByManufacturersRoute = ShopByManufacturersRouteImport.update({
+  id: '/shop-by-manufacturers',
+  path: '/shop-by-manufacturers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
@@ -530,6 +536,7 @@ export interface FileRoutesByFullPath {
   '/contact-us': typeof ContactUsRoute
   '/partner': typeof PartnerRouteWithChildren
   '/reels': typeof ReelsRoute
+  '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -612,6 +619,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact-us': typeof ContactUsRoute
   '/reels': typeof ReelsRoute
+  '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -698,6 +706,7 @@ export interface FileRoutesById {
   '/contact-us': typeof ContactUsRoute
   '/partner': typeof PartnerRouteWithChildren
   '/reels': typeof ReelsRoute
+  '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -784,6 +793,7 @@ export interface FileRouteTypes {
     | '/contact-us'
     | '/partner'
     | '/reels'
+    | '/shop-by-manufacturers'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -866,6 +876,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact-us'
     | '/reels'
+    | '/shop-by-manufacturers'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -951,6 +962,7 @@ export interface FileRouteTypes {
     | '/contact-us'
     | '/partner'
     | '/reels'
+    | '/shop-by-manufacturers'
     | '/vehicle-finder'
     | '/_auth/login'
     | '/_auth/register'
@@ -1037,6 +1049,7 @@ export interface RootRouteChildren {
   ContactUsRoute: typeof ContactUsRoute
   PartnerRoute: typeof PartnerRouteWithChildren
   ReelsRoute: typeof ReelsRoute
+  ShopByManufacturersRoute: typeof ShopByManufacturersRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BrandDealerBrandSlugRoute: typeof BrandDealerBrandSlugRoute
@@ -1132,6 +1145,13 @@ declare module '@tanstack/react-router' {
       path: '/reels'
       fullPath: '/reels'
       preLoaderRoute: typeof ReelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop-by-manufacturers': {
+      id: '/shop-by-manufacturers'
+      path: '/shop-by-manufacturers'
+      fullPath: '/shop-by-manufacturers'
+      preLoaderRoute: typeof ShopByManufacturersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vehicle-finder': {
@@ -1797,6 +1817,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactUsRoute: ContactUsRoute,
   PartnerRoute: PartnerRouteWithChildren,
   ReelsRoute: ReelsRoute,
+  ShopByManufacturersRoute: ShopByManufacturersRoute,
   VehicleFinderRoute: VehicleFinderRoute,
   AdminLoginRoute: AdminLoginRoute,
   BrandDealerBrandSlugRoute: BrandDealerBrandSlugRoute,

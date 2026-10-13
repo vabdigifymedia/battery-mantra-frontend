@@ -58,20 +58,30 @@ export function HomeCategoryPills() {
 
           const linkClass = "flex flex-col items-center gap-2 min-w-[68px] snap-start active:scale-95 transition-transform duration-200";
 
-          if (category.clickAction === 'SHOW_BRANDS') {
+          const isCar = /(^|\s)car(\s|$)/i.test(category.categoryName);
+          if (isCar || category.clickAction === 'SHOW_MANUFACTURERS') {
             return (
-              <Link key={category.categoryId} to="/brands/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+              <Link key={category.categoryId} to="/shop-by-manufacturers" className={linkClass}>
                 {cardContent}
               </Link>
             );
           }
-          if (category.clickAction === 'SHOW_MANUFACTURERS') {
+
+          const isCategoryBrands =
+            rawSlug === "inverter-battery" ||
+            rawSlug === "generator-battery" ||
+            rawSlug === "generator-batteries" ||
+            category.clickAction === 'SHOW_BRANDS';
+
+          if (isCategoryBrands) {
+            const targetSlug = rawSlug === "generator-battery" ? "generator-batteries" : rawSlug;
             return (
-              <Link key={category.categoryId} to="/manufacturers/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
+              <Link key={category.categoryId} to="/shop-by-category/$" params={{ _splat: targetSlug }} className={linkClass}>
                 {cardContent}
               </Link>
             );
           }
+
           if (category.clickAction === 'SHOW_PRODUCTS') {
             return (
               <Link key={category.categoryId} to="/shop/c/$categorySlug" params={{ categorySlug: rawSlug }} className={linkClass}>
@@ -79,7 +89,8 @@ export function HomeCategoryPills() {
               </Link>
             );
           }
-          if (category.clickAction === 'SHOW_SUBCATEGORIES') {
+
+          if (category.clickAction === 'SHOW_SUBCATEGORIES' || (category.subCategories && category.subCategories.length > 0)) {
             return (
               <Link key={category.categoryId} to="/shop-by-category/$" params={{ _splat: rawSlug }} className={linkClass}>
                 {cardContent}
@@ -87,23 +98,9 @@ export function HomeCategoryPills() {
             );
           }
 
-          // AUTO or undefined fallback
-          if (category.subCategories && category.subCategories.length > 0) {
-            return (
-              <Link
-                key={category.categoryId}
-                to="/shop-by-category/$"
-                params={{ _splat: rawSlug }}
-                className={linkClass}
-              >
-                {cardContent}
-              </Link>
-            );
-          }
-
           const isVehicle = (() => {
             const n = category.categoryName.toLowerCase();
-            return n.includes("car") || n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
+            return n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
           })();
 
           if (isVehicle) {
@@ -122,8 +119,8 @@ export function HomeCategoryPills() {
           return (
             <Link
               key={category.categoryId}
-              to="/brands/$categorySlug"
-              params={{ categorySlug: rawSlug }}
+              to="/shop-by-category/$"
+              params={{ _splat: rawSlug }}
               className={linkClass}
             >
               {cardContent}
