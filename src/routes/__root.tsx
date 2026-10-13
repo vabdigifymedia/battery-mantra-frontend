@@ -6,8 +6,10 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  redirect,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { getSeoRedirect } from "@/lib/seo-redirects";
 
 import appCss from "../styles.css?url";
 
@@ -67,6 +69,15 @@ function ErrorComponent({ error, reset }: { error: any; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: ({ location }) => {
+    const target = getSeoRedirect(location.pathname);
+    if (target && target !== location.pathname) {
+      throw redirect({
+        href: target,
+        statusCode: 301,
+      });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
