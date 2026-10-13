@@ -431,7 +431,7 @@ function CategoryBrandsView({
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {brands
+            {((brands as any[]) || [])
               .filter((b: any) => b.productCount === undefined || b.productCount > 0)
               .map((b: any) => {
                 const brandSlug = toSlug(b.brandName);
@@ -439,7 +439,7 @@ function CategoryBrandsView({
                   <Link
                     key={b.brandId}
                     to="/brand-products/$categorySlug/$brandSlug/$citySlug"
-                    params={{ categorySlug: canonicalCatSlug, brandSlug, citySlug }}
+                    params={{ categorySlug: canonicalCatSlug, brandSlug, citySlug } as any}
                     className="snap-start"
                   >
                     <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
@@ -463,7 +463,7 @@ function CategoryBrandsView({
                   <Link
                     key={b.brandId}
                     to="/brand-products/$categorySlug/$brandSlug"
-                    params={{ categorySlug: canonicalCatSlug, brandSlug }}
+                    params={{ categorySlug: canonicalCatSlug, brandSlug } as any}
                     className="snap-start"
                   >
                     <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
