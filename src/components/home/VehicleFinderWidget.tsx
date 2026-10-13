@@ -20,7 +20,7 @@ export function VehicleFinderWidget() {
           <Search className="h-4 w-4" />
         </span>
         <div>
-          <h3 className="font-display text-base font-semibold">Find my battery</h3>
+          <h3 className="font-display text-base font-semibold">Find Your Battery</h3>
           <p className="text-xs text-muted-foreground">
             Pick your vehicle make and model to see compatible batteries.
           </p>
@@ -39,7 +39,7 @@ export function VehicleFinderWidget() {
           })
         }
       >
-        Show compatible batteries
+        Show Compatible Batteries
       </Button>
     </div>
   );

@@ -56,10 +56,10 @@ export function CallbackBanner() {
                   alt=""
                   className="w-56 h-56 sm:w-64 sm:h-64 object-contain lg:hidden mb-2 lg:mb-0 scale-110"
                 />
-                Request a CallBack
+                Request a Callback
               </h2>
               <p className="text-muted-foreground text-lg">
-                Enter your mobile no. and we'll call you as soon as possible
+                Enter your mobile number and our battery expert will call you shortly.
               </p>
             </div>
 
@@ -87,7 +87,7 @@ export function CallbackBanner() {
             </form>
 
             <div className="pt-4 flex items-center justify-center lg:justify-start gap-2 text-muted-foreground text-lg">
-              <span>or Call us to</span>
+              <span>or call us directly at</span>
               <a href="tel:09200920051" className="text-primary font-bold text-2xl hover:underline ml-1">
                 09200920051
               </a>

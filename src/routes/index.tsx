@@ -79,28 +79,28 @@ function HomePage() {
         <HeroSection
           eyebrow={
             <span className="inline-flex items-center gap-1.5">
-              <Zap className="h-3 w-3" /> Genuine batteries · Free fitment
+              <Zap className="h-3 w-3" /> Genuine Batteries · Free Fitment
             </span>
           }
           title={
             <>
-              India&apos;s most trusted
+              India&apos;s Most Trusted
               <br />
-              <span className="text-primary">battery store</span>
+              <span className="text-primary">Battery Store</span>
             </>
           }
           description="Find the right battery for any car, inverter or commercial vehicle — delivered and installed at your doorstep."
           primaryAction={
             <Button asChild variant="brand" size="lg">
               <Link to="/products">
-                Shop batteries <ArrowRight className="h-4 w-4" />
+                Shop Batteries <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           }
           secondaryAction={
             <Button asChild variant="brand-outline" size="lg">
               <Link to="/vehicle-finder">
-                <BatteryCharging className="h-4 w-4" /> Find by vehicle
+                <BatteryCharging className="h-4 w-4" /> Find by Vehicle
               </Link>
             </Button>
           }
@@ -112,12 +112,12 @@ function HomePage() {
         <BannerCarousel />
       </div>
 
-      <div className="order-2 lg:order-3 w-full bg-background pt-6 lg:pt-12">
+      <div className="order-2 lg:order-3 w-full bg-background pt-2 sm:pt-6 lg:pt-12">
         <Container size="xl">
           <section aria-labelledby="categories" className="hidden sm:block">
             <SectionHeading
               eyebrow="Browse"
-              title={<span id="categories">Shop by category</span>}
+              title={<span id="categories">Shop by Category</span>}
               description="Pick from a curated catalogue of leading battery categories."
             />
             <div className="mt-6">
@@ -126,15 +126,15 @@ function HomePage() {
           </section>
 
           {carCategory && (
-            <section aria-labelledby="car-manufacturers" className="mt-12">
+            <section aria-labelledby="car-manufacturers" className="mt-4 sm:mt-12">
               <SectionHeading
                 eyebrow="Find by Make"
-                title={<span id="car-manufacturers">Shop by car manufacturer</span>}
+                title={<span id="car-manufacturers">Shop by Car Manufacturer</span>}
                 description="Select your car manufacturer to find the perfect battery match."
                 action={
                   <Button asChild variant="ghost-brand" size="sm">
                     <Link to="/manufacturers/$categorySlug" params={{ categorySlug: carCategory.categorySlug || "car-batteries" }}>
-                      View all <ArrowRight className="h-4 w-4 ml-1" />
+                      View All <ArrowRight className="h-4 w-4 ml-1" />
                     </Link>
                   </Button>
                 }
@@ -153,8 +153,8 @@ function HomePage() {
         <Container size="xl" className="space-y-16 py-12 sm:py-16">
           <section aria-labelledby="brands">
             <SectionHeading
-              eyebrow="Trusted brands"
-              title={<span id="brands">Top battery brands</span>}
+              eyebrow="Trusted Brands"
+              title={<span id="brands">Top Battery Brands</span>}
             />
             <div className="mt-6">
               <BrandStrip />
@@ -163,13 +163,13 @@ function HomePage() {
 
           <section aria-labelledby="featured">
             <SectionHeading
-              eyebrow="Best of"
-              title={<span id="featured">Featured automotive batteries</span>}
+              eyebrow="Top Rated"
+              title={<span id="featured">Featured Automotive Batteries</span>}
               action={
                 carCategory && (
                   <Button asChild variant="ghost-brand">
                     <Link to="/shop/c/$categorySlug" params={{ categorySlug: toSlug(carCategory.categoryName) }}>
-                      View all <ArrowRight className="h-4 w-4" />
+                      View All <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
                 )
@@ -191,12 +191,12 @@ function HomePage() {
             <SectionHeading
               eyebrow="Power Backup"
               title={<span id="inverter">Inverter Batteries</span>}
-              description="Reliable inverter batteries for uninterrupted power."
+              description="Reliable inverter batteries for uninterrupted power backup."
               action={
                 inverterCategory && (
                   <Button asChild variant="ghost-brand">
                     <Link to="/shop/c/$categorySlug" params={{ categorySlug: toSlug(inverterCategory.categoryName) }}>
-                      View all <ArrowRight className="h-4 w-4" />
+                      View All <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
                 )
@@ -247,7 +247,7 @@ function HomePage() {
               action={
                 <Button asChild variant="ghost-brand">
                   <Link to="/products">
-                    View all <ArrowRight className="h-4 w-4" />
+                    View All <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               }
@@ -300,7 +300,7 @@ function HomePage() {
           <section aria-labelledby="why">
             <SectionHeading
               eyebrow="Why BatteryMantra"
-              title={<span id="why">Built for confidence</span>}
+              title={<span id="why">Built for Confidence</span>}
               align="center"
             />
             <div className="mt-8">
