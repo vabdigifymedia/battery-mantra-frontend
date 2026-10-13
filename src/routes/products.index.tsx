@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
 import {
   rootCategoriesQuery,
@@ -9,6 +9,27 @@ import { buildPageHead } from "@/lib/seo";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 
 export const Route = createFileRoute("/products/")({
+  beforeLoad: ({ search }) => {
+    if (
+      search?.category &&
+      typeof search.category === "string" &&
+      !search.category.includes(",") &&
+      search?.brand &&
+      typeof search.brand === "string" &&
+      !search.brand.includes(",")
+    ) {
+      const { category, brand, ...restSearch } = search;
+      throw redirect({
+        to: "/brand-products/$categorySlug/$brandSlug",
+        params: {
+          categorySlug: category.trim(),
+          brandSlug: brand.trim(),
+        },
+        search: Object.keys(restSearch).length > 0 ? restSearch : undefined,
+        statusCode: 301,
+      });
+    }
+  },
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());

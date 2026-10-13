@@ -1,124 +1,19 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
-import { locationService } from "@/services/location.service";
-import { useLocationStore } from "@/store/useLocationStore";
-import {
-  rootCategoriesQuery,
-  brandsQuery,
-  categoriesQuery,
-} from "@/queries";
-import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
-import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
-import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/shop/$categorySlug/$brandSlug/$citySlug")({
-  loader: async ({ context }) => {
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
-    void context.queryClient.prefetchQuery(brandsQuery());
-    void context.queryClient.prefetchQuery(categoriesQuery());
-    void context.queryClient.prefetchQuery(seoTemplatesQuery());
-
-    const [brands, categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(brandsQuery()),
-      context.queryClient.ensureQueryData(categoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
-    ]);
-    return { brands, categories, templates };
-  },
-  head: ({ loaderData, params }) => {
-    const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
-    const category = loaderData?.categories?.find((c: any) => {
-      const s = toSlug(c.categoryName);
-      return s === params.categorySlug || s.replace(/-battery$/, "-batteries") === params.categorySlug || s.replace(/-batteries$/, "-battery") === params.categorySlug;
-    });
-
-    // Try brand SEO first (more specific), then category
-    const seo = resolveTemplateSeo(
-      "BRAND",
-      loaderData?.templates,
-      { brand_name: brand?.brandName || brandName, category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
-      (brand as any)?.seo,
-      {
-        title: `${brandName} ${categoryName} Online | Buy 100% Genuine Battery`,
-        description: `Buy 100% Genuine ${brandName} ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
-      }
-    );
-
-    return buildPageHead(seo);
-  },
   validateSearch: productSearchSchema,
-  component: CategoryBrandProductsPage,
+  beforeLoad: ({ params, search }) => {
+    throw redirect({
+      to: "/brand-products/$categorySlug/$brandSlug/$citySlug",
+      params: {
+        categorySlug: params.categorySlug,
+        brandSlug: params.brandSlug,
+        citySlug: params.citySlug,
+      },
+      search,
+      statusCode: 301,
+    });
+  },
+  component: () => null,
 });
-
-function CategoryBrandProductsPage() {
-  const { categorySlug, brandSlug, citySlug } = Route.useParams();
-  const search = Route.useSearch();
-  const navigate = useNavigate({ from: Route.id });
-  const { city, pincode, setLocation } = useLocationStore();
-
-  useEffect(() => {
-    if (citySlug) {
-      const currentCitySlug = city?.cityName?.toLowerCase().replace(/\s+/g, '-');
-      if (currentCitySlug !== citySlug.toLowerCase()) {
-        locationService.getPublicCities().then(cities => {
-          const matchedCity = cities.find(c => c.cityName?.toLowerCase().replace(/\s+/g, '-') === citySlug.toLowerCase());
-          if (matchedCity) {
-            setLocation(pincode || "", true, matchedCity);
-          }
-        }).catch(console.error);
-      }
-    }
-  }, [citySlug, city?.cityName, pincode, setLocation]);
-
-  const { data: categories, isLoading: isCatLoading } = useQuery(categoriesQuery());
-  const { data: brands, isLoading: isBrandLoading } = useQuery(brandsQuery());
-
-  if (isCatLoading || isBrandLoading) {
-    return <FullPageLoader />;
-  }
-
-  const matchingCategory = categories?.find(c => {
-    const s = toSlug(c.categoryName);
-    return s === categorySlug || s.replace(/-battery$/, "-batteries") === categorySlug || s.replace(/-batteries$/, "-battery") === categorySlug;
-  });
-  const activeCategoryId = matchingCategory?.categoryId;
-  
-  const matchingBrand = brands?.find(b => toSlug(b.brandName) === brandSlug);
-  const activeBrandId = matchingBrand?.brandId;
-
-  // We inject both into the search context
-  const activeSearch = {
-    ...search,
-    category: categorySlug,
-    brand: brandSlug,
-  };
-
-  return (
-    <ProductsPageLayout 
-      search={activeSearch}
-      onSearchChange={(newSearch) => {
-        // If the user selects DIFFERENT categories or brands, navigate to generic route
-        if (
-          (newSearch.category && newSearch.category.split(',').length > 0 && !newSearch.category.split(',').includes(categorySlug)) ||
-          (newSearch.brand && newSearch.brand.split(',').length > 0 && !newSearch.brand.split(',').includes(brandSlug))
-        ) {
-          navigate({ 
-            to: "/products", 
-            search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
-          });
-        } else {
-          const { category, brand, ...cleanSearch } = newSearch;
-          navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
-        }
-      }}
-      hideCategoryFilter={true}
-      baseUrl={`/shop/${categorySlug}/${brandSlug}`}
-    />
-  );
-}

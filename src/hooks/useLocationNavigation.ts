@@ -110,9 +110,17 @@ const CITY_ROUTE_MAP: Record<string, (params: Record<string, string>, citySlug: 
   "/shop/c/$categorySlug/": (params, citySlug) => `/shop/c/${params.categorySlug}/${citySlug}`,
   "/shop/c/$categorySlug/$citySlug": (params, citySlug) => `/shop/c/${params.categorySlug}/${citySlug}`,
 
-  // Shop category and brand
-  "/shop/$categorySlug/$brandSlug/": (params, citySlug) => `/shop/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
-  "/shop/$categorySlug/$brandSlug/$citySlug": (params, citySlug) => `/shop/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+  // Brand products
+  "/brand-products/$categorySlug/$brandSlug/": (params, citySlug) =>
+    `/brand-products/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+  "/brand-products/$categorySlug/$brandSlug/$citySlug": (params, citySlug) =>
+    `/brand-products/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+
+  // Shop category and brand (legacy redirect targets)
+  "/shop/$categorySlug/$brandSlug/": (params, citySlug) =>
+    `/brand-products/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
+  "/shop/$categorySlug/$brandSlug/$citySlug": (params, citySlug) =>
+    `/brand-products/${params.categorySlug}/${params.brandSlug}/${citySlug}`,
 
   // Shop by category splat: /shop-by-category/{categorySlug}/{citySlug}
   "/shop-by-category/$": (params, citySlug) => {

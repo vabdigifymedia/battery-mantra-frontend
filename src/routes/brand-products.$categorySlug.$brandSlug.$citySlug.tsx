@@ -169,6 +169,7 @@ function CityBrandProductsPage() {
         }
       }}
       hideCategoryFilter={true}
+      baseUrl={`/brand-products/${categorySlug}/${brandSlug}`}
     />
   );
 }

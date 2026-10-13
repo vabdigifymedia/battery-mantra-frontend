@@ -134,8 +134,8 @@ function CategoryBrandsPage() {
             {brands.filter((b) => b.productCount === undefined || b.productCount > 0).map((b) => (
               <Link
                 key={b.brandId}
-                to="/brand-products/$categorySlug/$brandSlug"
-                params={{ categorySlug, brandSlug: toSlug(b.brandName) }}
+                to="/brand-products/$categorySlug/$brandSlug/$citySlug"
+                params={{ categorySlug, brandSlug: toSlug(b.brandName), citySlug }}
                 className="snap-start"
               >
                 <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">

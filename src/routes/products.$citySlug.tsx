@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
 import { locationService } from "@/services/location.service";
@@ -12,6 +12,28 @@ import { buildPageHead } from "@/lib/seo";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 
 export const Route = createFileRoute("/products/$citySlug")({
+  beforeLoad: ({ params, search }) => {
+    if (
+      search?.category &&
+      typeof search.category === "string" &&
+      !search.category.includes(",") &&
+      search?.brand &&
+      typeof search.brand === "string" &&
+      !search.brand.includes(",")
+    ) {
+      const { category, brand, ...restSearch } = search;
+      throw redirect({
+        to: "/brand-products/$categorySlug/$brandSlug/$citySlug",
+        params: {
+          categorySlug: category.trim(),
+          brandSlug: brand.trim(),
+          citySlug: params.citySlug,
+        },
+        search: Object.keys(restSearch).length > 0 ? restSearch : undefined,
+        statusCode: 301,
+      });
+    }
+  },
   loader: async ({ context }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());

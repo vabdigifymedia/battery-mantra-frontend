@@ -142,6 +142,7 @@ function BrandProductsPage() {
         }
       }}
       hideCategoryFilter={true}
+      baseUrl={`/brand-products/${categorySlug}/${brandSlug}`}
     />
   );
 }

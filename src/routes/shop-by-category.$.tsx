@@ -65,7 +65,7 @@ export const Route = createFileRoute("/shop-by-category/$")({
     return { pageSeo, categories, templates, categorySlug, citySlug };
   },
   head: ({ loaderData }) => {
-    const { categorySlug = "category", categories = [], templates, pageSeo } = loaderData || {};
+    const { categorySlug = "category", citySlug, categories = [], templates, pageSeo } = loaderData || {};
 
     let foundCategory: any = undefined;
     const findInTree = (cats: any[]): boolean => {
@@ -86,18 +86,43 @@ export const Route = createFileRoute("/shop-by-category/$")({
       .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
+    const cityName = citySlug
+      ? citySlug
+          .replace(/-/g, " ")
+          .split(" ")
+          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ")
+      : "";
+
     const seo = resolveTemplateSeo(
       "CATEGORY",
       templates ?? undefined,
-      { category_name: foundCategory?.categoryName || categoryName, delivery_time: "2-4 Hours" },
+      {
+        category_name: foundCategory?.categoryName || categoryName,
+        city_name: cityName,
+        delivery_time: "2-4 Hours",
+      },
       pageSeo?.seo || (foundCategory as any)?.seo,
       {
-        title: `Shop ${categoryName} — BatteryMantra`,
-        description: `Browse premium ${categoryName} from trusted brands with free doorstep delivery and installation.`,
+        title: cityName
+          ? `Shop ${categoryName} in ${cityName} — BatteryMantra`
+          : `Shop ${categoryName} — BatteryMantra`,
+        description: cityName
+          ? `Browse premium ${categoryName} in ${cityName} from trusted brands with free express delivery and installation.`
+          : `Browse premium ${categoryName} from trusted brands with free doorstep delivery and installation.`,
       }
     );
 
-    return buildPageHead(seo);
+    const headResult = buildPageHead(seo);
+    return {
+      ...headResult,
+      links: [
+        {
+          rel: "canonical",
+          href: `https://www.batterymantra.com/shop-by-category/${categorySlug}${citySlug ? `/${citySlug}` : ""}`,
+        },
+      ],
+    };
   },
   component: SubcategoriesPage,
 });
@@ -408,31 +433,58 @@ function CategoryBrandsView({
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {brands
               .filter((b: any) => b.productCount === undefined || b.productCount > 0)
-              .map((b: any) => (
-                <Link
-                  key={b.brandId}
-                  to="/brand-products/$categorySlug/$brandSlug"
-                  params={{ categorySlug: canonicalCatSlug, brandSlug: toSlug(b.brandName) }}
-                  className="snap-start"
-                >
-                  <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
-                    <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
-                      {b.brandLogo ? (
-                        <img
-                          src={b.brandLogo}
-                          alt={b.brandName}
-                          className="h-full w-full object-contain mix-blend-multiply"
-                        />
-                      ) : (
-                        <Tag className="h-8 w-8 text-muted-foreground" />
-                      )}
-                    </span>
-                    <span className="text-sm font-semibold text-foreground line-clamp-2">
-                      {b.brandName}
-                    </span>
-                  </GradientBlobCard>
-                </Link>
-              ))}
+              .map((b: any) => {
+                const brandSlug = toSlug(b.brandName);
+                return citySlug ? (
+                  <Link
+                    key={b.brandId}
+                    to="/brand-products/$categorySlug/$brandSlug/$citySlug"
+                    params={{ categorySlug: canonicalCatSlug, brandSlug, citySlug }}
+                    className="snap-start"
+                  >
+                    <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
+                      <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+                        {b.brandLogo ? (
+                          <img
+                            src={b.brandLogo}
+                            alt={b.brandName}
+                            className="h-full w-full object-contain mix-blend-multiply"
+                          />
+                        ) : (
+                          <Tag className="h-8 w-8 text-muted-foreground" />
+                        )}
+                      </span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-2">
+                        {b.brandName}
+                      </span>
+                    </GradientBlobCard>
+                  </Link>
+                ) : (
+                  <Link
+                    key={b.brandId}
+                    to="/brand-products/$categorySlug/$brandSlug"
+                    params={{ categorySlug: canonicalCatSlug, brandSlug }}
+                    className="snap-start"
+                  >
+                    <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full">
+                      <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+                        {b.brandLogo ? (
+                          <img
+                            src={b.brandLogo}
+                            alt={b.brandName}
+                            className="h-full w-full object-contain mix-blend-multiply"
+                          />
+                        ) : (
+                          <Tag className="h-8 w-8 text-muted-foreground" />
+                        )}
+                      </span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-2">
+                        {b.brandName}
+                      </span>
+                    </GradientBlobCard>
+                  </Link>
+                );
+              })}
           </div>
         )}
 
