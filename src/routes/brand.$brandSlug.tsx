@@ -169,7 +169,7 @@ function BrandProductsPage() {
                 return (
                   <Link
                     key={c.categoryId}
-                    to="/shop/$categorySlug/$brandSlug"
+                    to="/brand-products/$categorySlug/$brandSlug"
                     params={{ categorySlug: catSlug, brandSlug }}
                     className="group snap-start"
                   >
