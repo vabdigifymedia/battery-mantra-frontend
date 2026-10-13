@@ -184,6 +184,43 @@ function AdminBanners() {
         </Button>
       </div>
 
+      {/* Recommended Banner Specs Info Card */}
+      <div className="rounded-xl border border-border/70 bg-card p-4 shadow-xs text-xs space-y-3">
+        <div className="font-semibold text-foreground flex items-center justify-between">
+          <span className="flex items-center gap-1.5 text-sm font-bold">
+            📐 Recommended Banner Sizes & Resolutions
+          </span>
+          <span className="text-[11px] text-muted-foreground font-normal">Formats: WebP, PNG, JPG (Max 5MB)</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50">
+            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 shrink-0">
+              <Monitor className="h-4 w-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-semibold text-blue-950 dark:text-blue-100 text-xs">Desktop Banners</span>
+              <p className="text-blue-900 dark:text-blue-200">
+                Resolution: <strong className="font-bold text-blue-700 dark:text-blue-300">1920 × 650 px</strong> (or 1920 × 600 px)
+              </p>
+              <p className="text-[11px] text-blue-800/80 dark:text-blue-300/80">Aspect ratio: ~16:5 / ultra-wide landscape. Displays on desktop screens.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50">
+            <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 shrink-0">
+              <Smartphone className="h-4 w-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-semibold text-emerald-950 dark:text-emerald-100 text-xs">Mobile Banners</span>
+              <p className="text-emerald-900 dark:text-emerald-200">
+                Resolution: <strong className="font-bold text-emerald-700 dark:text-emerald-300">1080 × 800 px</strong> (or 1080 × 1000 px)
+              </p>
+              <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80">Aspect ratio: ~4:3 or 1:1. Height is optimized for mobile screens.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Device Filter Tabs */}
       <div className="flex items-center gap-1.5 p-1 bg-muted rounded-xl w-fit text-xs font-medium border border-border/50">
         <button
@@ -421,7 +458,7 @@ function AdminBanners() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle>{editingBanner ? "Edit Banner" : "Add Banner"}</DialogTitle>
           </DialogHeader>
@@ -470,11 +507,40 @@ function AdminBanners() {
                       <span>Mobile Only</span>
                     </button>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    {field.value === "DESKTOP" && "Desktop: Recommended 16:9 or 21:9 wide ratio (e.g. 1920×600 px)"}
-                    {field.value === "MOBILE" && "Mobile: Recommended 4:5 or 1:1 ratio (e.g. 1080×1080 or 800×1000 px)"}
-                    {field.value === "ALL" && "Will be displayed on all screen sizes"}
-                  </p>
+
+                  {/* Dynamic Dimension Callout Box */}
+                  <div className="p-3 rounded-xl border text-xs bg-muted/40 space-y-1">
+                    {field.value === "DESKTOP" && (
+                      <div className="flex items-start gap-2.5 text-blue-950 dark:text-blue-200">
+                        <Monitor className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold text-blue-900 dark:text-blue-100">Desktop Banner Specifications:</p>
+                          <p className="mt-0.5">• Recommended Resolution: <strong className="font-bold text-blue-700 dark:text-blue-300">1920 × 650 px</strong> (or 1920 × 600 px)</p>
+                          <p className="text-[11px] text-muted-foreground">• Aspect ratio ~16:5. Max size 5MB (WebP/JPG/PNG).</p>
+                        </div>
+                      </div>
+                    )}
+                    {field.value === "MOBILE" && (
+                      <div className="flex items-start gap-2.5 text-emerald-950 dark:text-emerald-200">
+                        <Smartphone className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold text-emerald-900 dark:text-emerald-100">Mobile Banner Specifications:</p>
+                          <p className="mt-0.5">• Recommended Resolution: <strong className="font-bold text-emerald-700 dark:text-emerald-300">1080 × 800 px</strong> (or 1080 × 1000 px)</p>
+                          <p className="text-[11px] text-muted-foreground">• Aspect ratio ~4:3 or 1:1. Max size 5MB (WebP/JPG/PNG).</p>
+                        </div>
+                      </div>
+                    )}
+                    {field.value === "ALL" && (
+                      <div className="flex items-start gap-2.5 text-slate-900 dark:text-slate-200">
+                        <Globe className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold text-foreground">Universal Banner Specifications:</p>
+                          <p className="mt-0.5">• Recommended: <strong className="font-bold text-primary">1920 × 650 px</strong> (Desktop) / scales on mobile</p>
+                          <p className="text-[11px] text-muted-foreground">• Note: Keep text & products centered so edges aren't cut off on mobile.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             />
@@ -482,21 +548,32 @@ function AdminBanners() {
             <Controller
               control={form.control}
               name="imageUrl"
-              render={({ field }) => (
-                <CloudinaryUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  folder="battery-mantra/banners"
-                  label={
-                    form.watch("deviceType") === "DESKTOP"
-                      ? "Desktop Banner Image *"
-                      : form.watch("deviceType") === "MOBILE"
-                      ? "Mobile Banner Image *"
-                      : "Banner Image *"
-                  }
-                  error={form.formState.errors.imageUrl?.message}
-                />
-              )}
+              render={({ field }) => {
+                const devType = form.watch("deviceType");
+                const hintText =
+                  devType === "DESKTOP"
+                    ? "Recommended: 1920 × 650 px (Wide banner)"
+                    : devType === "MOBILE"
+                    ? "Recommended: 1080 × 800 px or 1080 × 1000 px"
+                    : "Recommended: 1920 × 650 px (Keep focal content centered)";
+
+                return (
+                  <CloudinaryUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    folder="battery-mantra/banners"
+                    label={
+                      devType === "DESKTOP"
+                        ? "Desktop Banner Image *"
+                        : devType === "MOBILE"
+                        ? "Mobile Banner Image *"
+                        : "Banner Image *"
+                    }
+                    hint={hintText}
+                    error={form.formState.errors.imageUrl?.message}
+                  />
+                );
+              }}
             />
 
             <button

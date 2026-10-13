@@ -12,6 +12,7 @@ interface CloudinaryUploadProps {
   onChange: (url: string) => void;
   folder: string;
   label?: string;
+  hint?: string;
   className?: string;
   error?: string;
 }
@@ -21,6 +22,7 @@ export function CloudinaryUpload({
   onChange,
   folder,
   label = "Upload Image",
+  hint,
   className,
   error,
 }: CloudinaryUploadProps) {
@@ -79,7 +81,10 @@ export function CloudinaryUpload({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <Label>{label}</Label>
+      <div>
+        <Label>{label}</Label>
+        {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
+      </div>
 
       {!value && !showManual ? (
         <div
