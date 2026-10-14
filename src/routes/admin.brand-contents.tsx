@@ -13,16 +13,16 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/feedback/Spinner";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { toast } from "sonner";
-import { 
-  Save, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  FileEdit, 
-  Layers, 
-  Tag, 
-  ShieldCheck, 
-  ShoppingBag, 
+import {
+  Save,
+  Copy,
+  Check,
+  ExternalLink,
+  FileEdit,
+  Layers,
+  Tag,
+  ShieldCheck,
+  ShoppingBag,
   Info,
   Search,
   RotateCcw
@@ -64,8 +64,8 @@ function AdminBrandContentsPage() {
   const { data: allBrandContents = [], isLoading: isLoadingContents } = useQuery(adminBrandContentsQuery());
 
   // Specific content query for selected Category + Brand
-  const { 
-    data: activeContent, 
+  const {
+    data: activeContent,
     isLoading: isLoadingActiveContent,
     isFetching: isFetchingActiveContent
   } = useQuery({
@@ -140,11 +140,11 @@ function AdminBrandContentsPage() {
   const selectedCategory = categories.find((c: any) => c.categoryId === selectedCategoryId);
   const selectedBrand = brands.find((b: any) => b.brandId === selectedBrandId);
 
-  const previewRetailUrl = selectedCategory && selectedBrand 
+  const previewRetailUrl = selectedCategory && selectedBrand
     ? `/brand-products/${toSlug(selectedCategory.categoryName)}/${toSlug(selectedBrand.brandName)}`
     : null;
 
-  const previewDealerUrl = selectedCategory && selectedBrand 
+  const previewDealerUrl = selectedCategory && selectedBrand
     ? `/brand-dealer/${toSlug(selectedCategory.categoryName)}/${toSlug(selectedBrand.brandName)}`
     : null;
 
@@ -177,7 +177,7 @@ function AdminBrandContentsPage() {
             <div>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Brand Content Management</h1>
               <p className="text-muted-foreground text-sm mt-0.5">
-                Customize category + brand specific rich descriptions for Retail (Normal) and Dealer landing pages.
+                Customize category + brand specific rich descriptions for Normal and Dealer landing pages.
               </p>
             </div>
           </div>
@@ -186,20 +186,20 @@ function AdminBrandContentsPage() {
         {selectedCategoryId && selectedBrandId && (
           <div className="flex items-center gap-2 self-start md:self-auto">
             {previewRetailUrl && (
-              <a 
-                href={previewRetailUrl} 
-                target="_blank" 
+              <a
+                href={previewRetailUrl}
+                target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
-                <span>View Retail Page</span>
+                <span>View Brand Page</span>
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             )}
             {previewDealerUrl && (
-              <a 
-                href={previewDealerUrl} 
-                target="_blank" 
+              <a
+                href={previewDealerUrl}
+                target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
@@ -229,8 +229,8 @@ function AdminBrandContentsPage() {
                 <Layers className="h-4 w-4 text-muted-foreground" />
                 <span>Category</span>
               </Label>
-              <Select 
-                value={selectedCategoryId} 
+              <Select
+                value={selectedCategoryId}
                 onValueChange={(val) => {
                   setSelectedCategoryId(val);
                   setIsDirty(true);
@@ -254,8 +254,8 @@ function AdminBrandContentsPage() {
                 <Tag className="h-4 w-4 text-muted-foreground" />
                 <span>Brand</span>
               </Label>
-              <Select 
-                value={selectedBrandId} 
+              <Select
+                value={selectedBrandId}
                 onValueChange={(val) => {
                   setSelectedBrandId(val);
                   setIsDirty(true);
@@ -351,12 +351,12 @@ function AdminBrandContentsPage() {
                     <div>
                       <CardTitle className="text-lg font-bold">Normal</CardTitle>
                       <CardDescription className="text-xs">
-                        Appears at the bottom of the retail brand page (/brand-products/...)
+                        Appears at the bottom of the brand page (/brand-products/...)
                       </CardDescription>
                     </div>
                   </div>
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    Retail
+                    Normal
                   </Badge>
                 </div>
               </CardHeader>
@@ -370,7 +370,7 @@ function AdminBrandContentsPage() {
                     setNormalDescription(html);
                     setIsDirty(true);
                   }}
-                  placeholder="Write detailed rich content, headings, brand features, and guarantees for normal retail customers..."
+                  placeholder="Write detailed rich content, headings, brand features, and guarantees for normal customers..."
                   maxHeight="320px"
                   minHeight="220px"
                 />
@@ -540,8 +540,8 @@ function AdminBrandContentsPage() {
                   const hasDealer = Boolean(item.dealerDescription);
 
                   return (
-                    <TableRow 
-                      key={item.id} 
+                    <TableRow
+                      key={item.id}
                       className={isSelected ? "bg-primary/5 font-medium" : undefined}
                     >
                       <TableCell className="font-semibold text-foreground">

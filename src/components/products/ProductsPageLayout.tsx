@@ -72,7 +72,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     if (!search.category) return undefined;
     const slugs = search.category.split(',');
     const ids: string[] = [];
-    
+
     const findId = (cats: any[]) => {
       for (const cat of cats) {
         const catSlug = cat.categorySlug || cat.categoryName.toLowerCase().replace(/\s+/g, '-');
@@ -94,7 +94,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
         return true;
       })
       .map((c: any) => c.categoryId);
-    
+
     if (pTypeIds && pTypeIds.length > 0) {
       effectiveCategoryIds = pTypeIds;
     }
@@ -129,11 +129,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     ...sortToApi((search.sort as ProductSort) || "relevance"),
   };
 
-  const { 
-    data, 
-    isLoading, 
-    isError, 
-    refetch, 
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
     isFetching,
     fetchNextPage,
     hasNextPage,
@@ -143,7 +143,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const { data: aggregations } = useQuery(productFilterAggregationsQuery(params));
 
   const { ref, inView } = useInView();
-  
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -154,7 +154,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const { data: brands } = useQuery(brandsQuery(singleCategoryId));
   const { data: categories } = useQuery(categoriesQuery());
   const { data: vehicles } = useQuery(vehiclesListQuery());
-  
+
   const brand = (effectiveBrandIds && effectiveBrandIds.length > 0) ? brands?.find((b: any) => b.brandId === effectiveBrandIds[0]) : null;
   const category = (effectiveCategoryIds && effectiveCategoryIds.length > 0) ? categories?.find((c: any) => c.categoryId === effectiveCategoryIds[0]) : null;
   const activeVehicleId = vehicleIdOverride ?? search.vehicleId;
@@ -273,8 +273,8 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             />
           ) : (
             <>
-              <ActiveFilterBadges 
-                filters={filters} 
+              <ActiveFilterBadges
+                filters={filters}
                 onRemove={(key, value) => {
                   if (key === 'minPrice' || key === 'maxPrice') {
                     onSearchChange({ [key]: undefined, page: 0 });
@@ -303,17 +303,17 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
               />
               <ProductGrid products={products} loading={isLoading || isFetching} />
 
-              
+
               {/* Infinite Scroll trigger element */}
               <div ref={ref} className="h-10 w-full flex items-center justify-center mt-8">
                 {isFetchingNextPage && <div className="text-muted-foreground text-sm">Loading more...</div>}
               </div>
             </>
           )}
-          
+
           {!isDealerPage && brand && !vehicle && typeof search.brand === 'string' && !search.brand.includes(',') && (
             <div className="flex justify-center mt-12 mb-6">
-              <a 
+              <a
                 href={
                   typeof search.category === 'string' && !search.category.includes(',')
                     ? (city?.cityName ? `/brand-dealer/${search.category}/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}` : `/brand-dealer/${search.category}/${search.brand}`)
@@ -332,9 +332,9 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
           {isDealerPage && brand && pageType === "BRAND" && (
             <div className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8">
               {(brandContent?.dealerDescription || brand.dealerDescription) ? (
-                <div 
-                  dangerouslySetInnerHTML={{ 
-                    __html: applySeoTemplate(brandContent?.dealerDescription || brand.dealerDescription, context) 
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: applySeoTemplate(brandContent?.dealerDescription || brand.dealerDescription, context)
                   }}
                 />
               ) : (
@@ -343,7 +343,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                     Authorized {brand.brandName} {category?.categoryName || "Battery"} Dealer in {city?.cityName || "Delhi / NCR"}
                   </h2>
                   <p className="mb-4">
-                    Looking for a certified and genuine <strong>{brand.brandName} {category?.categoryName || "Battery"}</strong> dealer in {city?.cityName || "Delhi / NCR"}? 
+                    Looking for a certified and genuine <strong>{brand.brandName} {category?.categoryName || "Battery"}</strong> dealer in {city?.cityName || "Delhi / NCR"}?
                     Battery Mantra is an authorized partner delivering 100% original manufacturer products with official warranty cards, GST invoices, and express doorstep installation.
                   </p>
                   <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -360,16 +360,16 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             </div>
           )}
 
-          {/* Normal Retail Brand Page Description */}
+          {/* Normal Brand Page Description */}
           {!isDealerPage && brand && pageType === "BRAND" && (brandContent?.normalDescription || brand.description) && (
-            <div 
+            <div
               className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8"
-              dangerouslySetInnerHTML={{ 
-                __html: applySeoTemplate(brandContent?.normalDescription || brand.description, context) 
+              dangerouslySetInnerHTML={{
+                __html: applySeoTemplate(brandContent?.normalDescription || brand.description, context)
               }}
             />
           )}
-          
+
           {pageType === "BRAND_MODEL" && (
             <div className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8">
               <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">
@@ -384,7 +384,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
               <p className="mb-6">
                 You can find the finest batteries from top brands like Exide, Amaron, SF Sonic, and Livguard right here at Battery Mantra. A high-quality battery for your {context.brand_name} {context.model_name} in {city?.cityName || "Gurgaon"} ensures that the vehicle runs perfectly even in harsh weather conditions. It is impossible to drive your {context.brand_name} {context.model_name} safely without a healthy battery.
               </p>
-              
+
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Buying {context.brand_name} {context.model_name} Battery Online
               </h3>
@@ -398,59 +398,57 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
           )}
 
           {category?.categoryDescription && pageType === "CATEGORY" && (
-            <div 
+            <div
               className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8"
-              dangerouslySetInnerHTML={{ 
+              dangerouslySetInnerHTML={{
                 __html: applySeoTemplate(category.categoryDescription, {
                   city: city?.cityName || "Delhi / NCR",
                   city_name: city?.cityName || "Delhi / NCR",
                   category: category.categoryName || "Battery",
                   category_name: category.categoryName || "Battery",
-                }) 
+                })
               }}
             />
           )}
 
           {products.length > 0 && (
             <>
-              <SeoPriceTable 
-                products={products} 
-                title={`Price List, Capacity, Warranty Details for Best ${
-                  pageType === "BRAND_MODEL" 
-                    ? `${context.brand_name} ${context.model_name}` 
-                    : pageType === "BRAND" 
-                    ? context.brand_name 
-                    : ""
-                } ${context.category_name || "Batteries"} offered`} 
+              <SeoPriceTable
+                products={products}
+                title={`Price List, Capacity, Warranty Details for Best ${pageType === "BRAND_MODEL"
+                    ? `${context.brand_name} ${context.model_name}`
+                    : pageType === "BRAND"
+                      ? context.brand_name
+                      : ""
+                  } ${context.category_name || "Batteries"} offered`}
               />
-              <SeoCityLinks 
-                productName={`${
-                  pageType === "BRAND_MODEL" 
-                    ? `${context.brand_name} ${context.model_name}` 
-                    : pageType === "BRAND" 
-                    ? context.brand_name 
-                    : ""
-                } ${context.category_name || "Batteries"}`.trim()} 
+              <SeoCityLinks
+                productName={`${pageType === "BRAND_MODEL"
+                    ? `${context.brand_name} ${context.model_name}`
+                    : pageType === "BRAND"
+                      ? context.brand_name
+                      : ""
+                  } ${context.category_name || "Batteries"}`.trim()}
                 baseUrl={baseUrl}
               />
             </>
           )}
         </div>
       </Container>
-      
+
       <GlobalFaqSection pageType={pageType} context={context} />
     </div>
   );
 }
 
-function ActiveFilterBadges({ 
-  filters, 
+function ActiveFilterBadges({
+  filters,
   onRemove,
   onClearAll,
-  brands, 
-  categories 
-}: { 
-  filters: ProductFilterState; 
+  brands,
+  categories
+}: {
+  filters: ProductFilterState;
   onRemove: (key: string, value: any) => void;
   onClearAll: () => void;
   brands: any[];
@@ -516,8 +514,8 @@ function ActiveFilterBadges({
       {activeFilters.map((af, i) => (
         <Badge key={i} variant="secondary" className="flex items-center gap-1.5 px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20">
           {af.label}
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => {
               if (af.key === 'price') {
                 onRemove('minPrice', null);
@@ -525,16 +523,16 @@ function ActiveFilterBadges({
               } else {
                 onRemove(af.key, af.value);
               }
-            }} 
+            }}
             className="hover:text-foreground p-0.5 rounded-full hover:bg-black/10 transition-colors"
           >
             <X className="h-3 w-3" />
           </button>
         </Badge>
       ))}
-      <Button 
-        variant="ghost" 
-        size="sm" 
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={onClearAll}
         className="h-7 px-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted"
       >
