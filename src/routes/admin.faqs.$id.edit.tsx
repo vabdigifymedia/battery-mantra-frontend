@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/feedback/Spinner";
+import { FaqVariableHelper } from "@/components/admin/FaqVariableHelper";
 import type { FaqResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/admin/faqs/$id/edit")({
@@ -82,7 +83,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
         </Button>
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight">Edit FAQ</h2>
-          <p className="text-muted-foreground">Modify an existing dynamic FAQ.</p>
+          <p className="text-muted-foreground">Modify dynamic FAQ with curly bracket variable tokens.</p>
         </div>
       </div>
 
@@ -102,14 +103,19 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
           <p className="text-xs text-muted-foreground">Which page should this FAQ appear on?</p>
         </div>
 
+        <FaqVariableHelper pageType={pageType} />
+
         <div className="space-y-2">
           <Label>Question (Title) <span className="text-destructive">*</span></Label>
           <Input 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g. How do I know my {category_name} is failing?" 
+            placeholder="e.g. What is the price of {product_name} in {city_name}?" 
             required 
           />
+          <p className="text-xs text-muted-foreground">
+            Use curly brackets for variables, e.g. <code className="bg-muted px-1 py-0.5 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{price_name}`}</code>.
+          </p>
         </div>
 
         <div className="space-y-2">

@@ -161,23 +161,40 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
 
   const { city } = useLocationStore();
 
-  let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
-  let context: Record<string, string> = {};
-
-  if (vehicle) {
-    pageType = "BRAND_MODEL";
-    context = { model_name: vehicle.model, brand_name: vehicle.make, category_name: category?.categoryName || "Battery" };
-  } else if (brand) {
-    pageType = "BRAND";
-    context = { brand_name: brand.brandName, category_name: category?.categoryName || "Battery" };
-  } else if (category) {
-    pageType = "CATEGORY";
-    context = { category_name: category.categoryName };
-  }
-
   const products = data?.pages.flatMap((page) => page.content || []) ?? [];
   const total = data?.pages[0]?.totalElements ?? 0;
   const totalPages = data?.pages[0]?.totalPages ?? 0;
+
+  // Calculate With-Exchange price statistics from products
+  const withExchangePrices = products
+    .map((p: any) => Math.max(0, (p.productPrice || 0) - (p.exchangeDiscount || 0)))
+    .filter((p: number) => p > 0);
+  const minWithExchange = withExchangePrices.length > 0 ? Math.min(...withExchangePrices) : 0;
+  const maxWithExchange = withExchangePrices.length > 0 ? Math.max(...withExchangePrices) : 0;
+  const priceRangeFormatted = minWithExchange > 0
+    ? (minWithExchange === maxWithExchange ? `₹${minWithExchange.toLocaleString()}` : `₹${minWithExchange.toLocaleString()} - ₹${maxWithExchange.toLocaleString()}`)
+    : "";
+
+  let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
+  let context: Record<string, string> = {
+    city_name: city?.cityName || "Delhi / NCR",
+    delivery_time: "1-2 Hours",
+    price_range: priceRangeFormatted,
+    price_name: minWithExchange > 0 ? minWithExchange.toString() : "",
+    price: minWithExchange > 0 ? minWithExchange.toString() : "",
+    with_exchange_price: minWithExchange > 0 ? minWithExchange.toString() : "",
+  };
+
+  if (vehicle) {
+    pageType = "BRAND_MODEL";
+    context = { ...context, model_name: vehicle.model, brand_name: vehicle.make, category_name: category?.categoryName || "Battery" };
+  } else if (brand) {
+    pageType = "BRAND";
+    context = { ...context, brand_name: brand.brandName, category_name: category?.categoryName || "Battery" };
+  } else if (category) {
+    pageType = "CATEGORY";
+    context = { ...context, category_name: category.categoryName };
+  }
 
   const handleFilterChange = (newFilters: ProductFilterState) => {
     const cleanFilters: Partial<ProductFilterState> = {};

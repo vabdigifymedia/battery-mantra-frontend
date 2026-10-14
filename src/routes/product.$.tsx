@@ -421,13 +421,21 @@ export function PdpPage() {
   const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
   const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : null);
 
+  const withExchangePrice = (data.exchangeDiscount ?? 0) > 0 
+    ? Math.max(0, (data.productPrice || 0) - (data.exchangeDiscount || 0))
+    : (data.productPrice || 0);
+
   const seoContext = {
     product_name: data.productName,
     brand_name: data.brandName || "Brand",
     category_name: data.categoryName || "Battery",
     city_name: city?.cityName || "your city",
     warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
-    price_name: data.productPrice?.toString() || "",
+    price_name: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
+    price: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
+    with_exchange_price: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
+    without_exchange_price: (data.productPrice || 0).toString(),
+    price_range: withExchangePrice > 0 ? `₹${withExchangePrice.toLocaleString()}` : `₹${(data.productPrice || 0).toLocaleString()}`,
     mrp_name: ((data.productPrice || 0) * 1.2).toFixed(2),
     capa_ct_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || ""),
     manufacturer_name: data.brandName || "Manufacturer", // Fallback to brandName if manufacturerName not explicitly returned

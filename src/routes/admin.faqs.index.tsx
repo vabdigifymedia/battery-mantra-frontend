@@ -40,6 +40,15 @@ function AdminFaqsList() {
         </Button>
       </div>
 
+      <div className="p-4 bg-muted/40 rounded-xl border flex items-center justify-between gap-4 text-xs">
+        <div>
+          <p className="font-medium text-foreground">Variable Format Tip:</p>
+          <p className="text-muted-foreground mt-0.5">
+            Always wrap variable tokens in curly brackets (e.g. <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{price_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{product_name}`}</code>). Note that <strong>{`{price_name}`}</strong> automatically renders the <strong>With Exchange</strong> price.
+          </p>
+        </div>
+      </div>
+
       <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/50">

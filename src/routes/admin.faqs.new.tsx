@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { FaqVariableHelper } from "@/components/admin/FaqVariableHelper";
 
 export const Route = createFileRoute("/admin/faqs/new")({
   component: NewFaq,
@@ -67,7 +68,7 @@ function NewFaq() {
         </Button>
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight">Add New FAQ</h2>
-          <p className="text-muted-foreground">Create a new dynamic FAQ.</p>
+          <p className="text-muted-foreground">Create a new dynamic FAQ with curly bracket variable tokens.</p>
         </div>
       </div>
 
@@ -86,14 +87,19 @@ function NewFaq() {
           </Select>
         </div>
 
+        <FaqVariableHelper pageType={pageType} />
+
         <div className="space-y-2">
           <Label>Title (Question) <span className="text-destructive">*</span></Label>
           <Input 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g. How do I know my car battery is failing?" 
+            placeholder="e.g. What is the price of {product_name} in {city_name}?" 
             required 
           />
+          <p className="text-xs text-muted-foreground">
+            Use curly brackets for variables, e.g. <code className="bg-muted px-1 py-0.5 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{price_name}`}</code>.
+          </p>
         </div>
 
         <div className="space-y-2">

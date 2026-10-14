@@ -13,10 +13,19 @@ export function DynamicFaq({ pageType, context, hideHeading = false }: DynamicFa
   const { data: faqs = [], isLoading } = useQuery(publicFaqsQuery(pageType));
 
   const replacePlaceholders = (text: string) => {
+    if (!text) return "";
     let result = text;
     for (const [key, value] of Object.entries(context)) {
-      const regex = new RegExp(`\\b${key}\\b`, "gi");
-      result = result.replace(regex, value);
+      if (value === undefined || value === null) continue;
+      const strVal = String(value);
+
+      // 1. Replace with curly braces: {variable_name}
+      const bracketRegex = new RegExp(`\\{${key}\\}`, "gi");
+      result = result.replace(bracketRegex, strVal);
+
+      // 2. Also replace bare word for legacy FAQs: variable_name
+      const bareRegex = new RegExp(`\\b${key}\\b`, "gi");
+      result = result.replace(bareRegex, strVal);
     }
     return result;
   };
