@@ -306,7 +306,48 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             </div>
           )}
 
-          {brand?.description && pageType === "BRAND" && (
+          {/* Dealer Page Description */}
+          {isDealerPage && brand && pageType === "BRAND" && (
+            <div className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8">
+              {brand.dealerDescription ? (
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: applySeoTemplate(brand.dealerDescription, {
+                      city: city?.cityName || "Delhi / NCR",
+                      city_name: city?.cityName || "Delhi / NCR",
+                      brand: brand.brandName || "",
+                      brand_name: brand.brandName || "",
+                      category: category?.categoryName || "Battery",
+                      category_name: category?.categoryName || "Battery",
+                      delivery_time: "1-2 Hours",
+                    }) 
+                  }}
+                />
+              ) : (
+                <>
+                  <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">
+                    Authorized {brand.brandName} {category?.categoryName || "Battery"} Dealer in {city?.cityName || "Delhi / NCR"}
+                  </h2>
+                  <p className="mb-4">
+                    Looking for a certified and genuine <strong>{brand.brandName} {category?.categoryName || "Battery"}</strong> dealer in {city?.cityName || "Delhi / NCR"}? 
+                    Battery Mantra is an authorized partner delivering 100% original manufacturer products with official warranty cards, GST invoices, and express doorstep installation.
+                  </p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    Why Choose Battery Mantra for {brand.brandName} Dealership?
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 mb-4">
+                    <li><strong>100% Genuine Products:</strong> Fresh stock directly sourced from authorized {brand.brandName} channels with original manufacturer replacement warranty.</li>
+                    <li><strong>Express Delivery & Free Fitting:</strong> Get your battery delivered and fitted at your doorstep within 1-2 hours across {city?.cityName || "Delhi / NCR"}.</li>
+                    <li><strong>Old Battery Exchange Rebate:</strong> Get instant discount and value by trading in your old scrap battery during installation.</li>
+                    <li><strong>Multiple Payment Options:</strong> Pay conveniently via Cash on Delivery, UPI, Debit/Credit Cards after installation is verified.</li>
+                  </ul>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Normal Retail Brand Page Description */}
+          {!isDealerPage && brand?.description && pageType === "BRAND" && (
             <div 
               className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8"
               dangerouslySetInnerHTML={{ 
@@ -317,6 +358,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                   brand_name: brand.brandName || "",
                   category: category?.categoryName || "Battery",
                   category_name: category?.categoryName || "Battery",
+                  delivery_time: "1-2 Hours",
                 }) 
               }}
             />

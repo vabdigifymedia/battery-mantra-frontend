@@ -46,6 +46,7 @@ const brandSchema = z.object({
   brandName: z.string().trim().min(1, "Name is required"),
   brandLogo: z.string().trim().optional(),
   description: z.string().optional(),
+  dealerDescription: z.string().optional(),
   featured: z.boolean().default(false),
   seo: z.object({
     slug: z.string().optional(),
@@ -83,6 +84,7 @@ function AdminBrands() {
       brandName: "",
       brandLogo: "",
       description: "",
+      dealerDescription: "",
       featured: false,
       seo: {
         slug: "",
@@ -107,6 +109,7 @@ function AdminBrands() {
       brandName: "",
       brandLogo: "",
       description: "",
+      dealerDescription: "",
       featured: false,
       seo: {
         slug: "",
@@ -154,6 +157,7 @@ function AdminBrands() {
       brandName: brand.brandName,
       brandLogo: brand.brandLogo ?? "",
       description: brand.description ?? "",
+      dealerDescription: brand.dealerDescription ?? "",
       featured: brand.featured ?? false,
       seo: newSeo
     });
@@ -200,6 +204,7 @@ function AdminBrands() {
       brandName: values.brandName,
       brandLogo: values.brandLogo,
       description: values.description,
+      dealerDescription: values.dealerDescription,
       featured: values.featured,
       seo: editingBrand ? values.seo : { slug: generateSlug(values.brandName) },
     };
@@ -391,14 +396,29 @@ function AdminBrands() {
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormField label="Brand Description (HTML / SEO Content)" htmlFor="description" error={form.formState.errors.description?.message}>
+                <FormField label="Brand Description (Retail / Products Page)" htmlFor="description" error={form.formState.errors.description?.message}>
                   <div>
-                      <RichTextEditor value={field.value || ""} onChange={field.onChange} />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code> which will be automatically replaced on the frontend based on the user's location and brand context.
-                      </p>
-                    </div>
-                  </FormField>
+                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Shown on retail brand pages (e.g. <code>/brand-products/category/brand</code>). Supports variables: <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>.
+                    </p>
+                  </div>
+                </FormField>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="dealerDescription"
+              render={({ field }) => (
+                <FormField label="Dealer Description (Dealer Landing Page)" htmlFor="dealerDescription" error={form.formState.errors.dealerDescription?.message}>
+                  <div>
+                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Shown exclusively on <strong>Brand Dealer</strong> pages (e.g. <code>/brand-dealer/category/brand/city</code>). Supports variables: <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>, <code className="bg-muted px-1 rounded">{`{delivery_time}`}</code>.
+                    </p>
+                  </div>
+                </FormField>
               )}
             />
 

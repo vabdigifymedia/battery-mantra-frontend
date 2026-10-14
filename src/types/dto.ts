@@ -112,6 +112,7 @@ export type BrandResponse = {
   brandName: string;
   brandLogo?: string;
   description?: string;
+  dealerDescription?: string;
   featured?: boolean;
   productCount?: number;
 };
@@ -119,6 +120,7 @@ export type BrandRequest = {
   brandName: string;
   brandLogo?: string;
   description?: string;
+  dealerDescription?: string;
   featured?: boolean;
 };
 
