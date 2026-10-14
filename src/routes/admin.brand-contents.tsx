@@ -14,16 +14,16 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/feedback/Spinner";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { toast } from "sonner";
-import { 
-  Save, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  FileEdit, 
-  Layers, 
-  Tag, 
-  ShieldCheck, 
-  ShoppingBag, 
+import {
+  Save,
+  Copy,
+  Check,
+  ExternalLink,
+  FileEdit,
+  Layers,
+  Tag,
+  ShieldCheck,
+  ShoppingBag,
   Info,
   Search,
   RotateCcw
@@ -70,8 +70,8 @@ function AdminBrandContentsPage() {
   const { data: allBrandContents = [], isLoading: isLoadingContents } = useQuery(adminBrandContentsQuery());
 
   // Specific content query for selected Category + Brand
-  const { 
-    data: activeContent, 
+  const {
+    data: activeContent,
     isLoading: isLoadingActiveContent,
     isFetching: isFetchingActiveContent
   } = useQuery({
@@ -166,7 +166,7 @@ function AdminBrandContentsPage() {
   const selectedCategory = categories.find((c: any) => c.categoryId === selectedCategoryId);
   const selectedBrand = brands.find((b: any) => b.brandId === selectedBrandId);
 
-  const previewRetailUrl = selectedCategory && selectedBrand 
+  const previewRetailUrl = selectedCategory && selectedBrand
     ? `/brand-products/${toSlug(selectedCategory.categoryName)}/${toSlug(selectedBrand.brandName)}`
     : null;
 
@@ -214,9 +214,9 @@ function AdminBrandContentsPage() {
         {selectedCategoryId && selectedBrandId && (
           <div className="flex items-center gap-2 self-start md:self-auto">
             {previewRetailUrl && (
-              <a 
-                href={previewRetailUrl} 
-                target="_blank" 
+              <a
+                href={previewRetailUrl}
+                target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
@@ -225,9 +225,9 @@ function AdminBrandContentsPage() {
               </a>
             )}
             {previewDealerUrl && (
-              <a 
-                href={previewDealerUrl} 
-                target="_blank" 
+              <a
+                href={previewDealerUrl}
+                target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
@@ -257,8 +257,8 @@ function AdminBrandContentsPage() {
                 <Layers className="h-4 w-4 text-muted-foreground" />
                 <span>Category</span>
               </Label>
-              <Select 
-                value={selectedCategoryId} 
+              <Select
+                value={selectedCategoryId}
                 onValueChange={(val) => {
                   setSelectedCategoryId(val);
                   setIsDirty(true);
@@ -282,8 +282,8 @@ function AdminBrandContentsPage() {
                 <Tag className="h-4 w-4 text-muted-foreground" />
                 <span>Brand</span>
               </Label>
-              <Select 
-                value={selectedBrandId} 
+              <Select
+                value={selectedBrandId}
                 onValueChange={(val) => {
                   setSelectedBrandId(val);
                   setIsDirty(true);
@@ -377,7 +377,7 @@ function AdminBrandContentsPage() {
                       <ShoppingBag className="h-4 w-4" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-bold">Normal (Retail Customer)</CardTitle>
+                      <CardTitle className="text-lg font-bold">Normal</CardTitle>
                       <CardDescription className="text-xs">
                         Appears at the bottom of the retail brand catalogue page (/brand-products/...)
                       </CardDescription>
@@ -453,9 +453,9 @@ function AdminBrandContentsPage() {
                       <ShieldCheck className="h-4 w-4" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-bold">Authorized Dealer</CardTitle>
+                      <CardTitle className="text-lg font-bold">Dealer</CardTitle>
                       <CardDescription className="text-xs">
-                        Appears at the bottom of the authorized dealer page (/brand-dealer/...)
+                        Appears at the bottom of the dealer page (/brand-dealer/...)
                       </CardDescription>
                     </div>
                   </div>
@@ -640,8 +640,8 @@ function AdminBrandContentsPage() {
                   const hasDealer = Boolean(item.dealerDescription || item.dealerSeoTitle || item.dealerShortDescription);
 
                   return (
-                    <TableRow 
-                      key={item.id} 
+                    <TableRow
+                      key={item.id}
                       className={isSelected ? "bg-primary/5 font-medium" : undefined}
                     >
                       <TableCell className="font-semibold text-foreground">
