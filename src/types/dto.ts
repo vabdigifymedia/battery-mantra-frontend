@@ -124,6 +124,34 @@ export type BrandRequest = {
   featured?: boolean;
 };
 
+/* ---------- Brand Contents (Category + Brand Specific) ---------- */
+export type BrandContentRequest = {
+  categoryId: UUID;
+  brandId: UUID;
+  normalShortDescription?: string;
+  normalDescription?: string;
+  normalSeoTitle?: string;
+  dealerShortDescription?: string;
+  dealerDescription?: string;
+  dealerSeoTitle?: string;
+};
+
+export type BrandContentResponse = {
+  id: UUID;
+  categoryId: UUID;
+  categoryName: string;
+  brandId: UUID;
+  brandName: string;
+  normalShortDescription?: string;
+  normalDescription?: string;
+  normalSeoTitle?: string;
+  dealerShortDescription?: string;
+  dealerDescription?: string;
+  dealerSeoTitle?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 /* ---------- Banners ---------- */
 export type BannerResponse = {
   bannerId: UUID;

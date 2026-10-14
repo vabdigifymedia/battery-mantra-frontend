@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -11,10 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Tag } from "lucide-react";
+import { Trash2, Plus, Edit, Tag, FileEdit } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { generateSlug, applySeoTemplate } from "@/lib/utils";
 import { apiFetch } from "@/lib/api/client";
 import {
@@ -392,35 +391,21 @@ function AdminBrands() {
               )}
             />
             
-            <Controller
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormField label="Brand Description (Retail / Products Page)" htmlFor="description" error={form.formState.errors.description?.message}>
-                  <div>
-                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Shown on retail brand pages (e.g. <code>/brand-products/category/brand</code>). Supports variables: <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>.
-                    </p>
-                  </div>
-                </FormField>
-              )}
-            />
-
-            <Controller
-              control={form.control}
-              name="dealerDescription"
-              render={({ field }) => (
-                <FormField label="Dealer Description (Dealer Landing Page)" htmlFor="dealerDescription" error={form.formState.errors.dealerDescription?.message}>
-                  <div>
-                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Shown exclusively on <strong>Brand Dealer</strong> pages (e.g. <code>/brand-dealer/category/brand/city</code>). Supports variables: <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>, <code className="bg-muted px-1 rounded">{`{delivery_time}`}</code>.
-                    </p>
-                  </div>
-                </FormField>
-              )}
-            />
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3.5 flex items-start gap-3">
+              <FileEdit className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1">
+                <p className="font-semibold text-foreground">Category-Specific Descriptions & Dealer Content</p>
+                <p className="text-muted-foreground">
+                  Brand descriptions and authorized dealer content are managed per Category (e.g., Inverter Battery vs Car Battery) under <strong>Brand Contents</strong>.
+                </p>
+                <Link 
+                  to="/admin/brand-contents" 
+                  className="inline-flex items-center gap-1 text-primary font-medium hover:underline pt-0.5"
+                >
+                  Manage Category Descriptions in Brand Contents &rarr;
+                </Link>
+              </div>
+            </div>
 
             <div className="flex items-center gap-2 pt-2">
               <input type="checkbox" id="featured" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("featured")} />

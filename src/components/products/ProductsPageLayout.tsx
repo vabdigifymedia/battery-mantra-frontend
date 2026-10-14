@@ -33,6 +33,7 @@ import {
   pageSeoQuery,
   categoriesQuery,
   vehiclesListQuery,
+  brandContentQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 import type { ProductFilterParams } from "@/types/dto";
@@ -158,6 +159,10 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const category = (effectiveCategoryIds && effectiveCategoryIds.length > 0) ? categories?.find((c: any) => c.categoryId === effectiveCategoryIds[0]) : null;
   const activeVehicleId = vehicleIdOverride ?? search.vehicleId;
   const vehicle = activeVehicleId ? vehicles?.find((v: any) => v.vehicleId === activeVehicleId) : null;
+
+  const { data: brandContent } = useQuery(
+    brandContentQuery(category?.categoryId, brand?.brandId)
+  );
 
   const { city } = useLocationStore();
 
@@ -326,18 +331,10 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
           {/* Dealer Page Description */}
           {isDealerPage && brand && pageType === "BRAND" && (
             <div className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8">
-              {brand.dealerDescription ? (
+              {(brandContent?.dealerDescription || brand.dealerDescription) ? (
                 <div 
                   dangerouslySetInnerHTML={{ 
-                    __html: applySeoTemplate(brand.dealerDescription, {
-                      city: city?.cityName || "Delhi / NCR",
-                      city_name: city?.cityName || "Delhi / NCR",
-                      brand: brand.brandName || "",
-                      brand_name: brand.brandName || "",
-                      category: category?.categoryName || "Battery",
-                      category_name: category?.categoryName || "Battery",
-                      delivery_time: "1-2 Hours",
-                    }) 
+                    __html: applySeoTemplate(brandContent?.dealerDescription || brand.dealerDescription, context) 
                   }}
                 />
               ) : (
@@ -364,19 +361,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
           )}
 
           {/* Normal Retail Brand Page Description */}
-          {!isDealerPage && brand?.description && pageType === "BRAND" && (
+          {!isDealerPage && brand && pageType === "BRAND" && (brandContent?.normalDescription || brand.description) && (
             <div 
               className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8"
               dangerouslySetInnerHTML={{ 
-                __html: applySeoTemplate(brand.description, {
-                  city: city?.cityName || "Delhi / NCR",
-                  city_name: city?.cityName || "Delhi / NCR",
-                  brand: brand.brandName || "",
-                  brand_name: brand.brandName || "",
-                  category: category?.categoryName || "Battery",
-                  category_name: category?.categoryName || "Battery",
-                  delivery_time: "1-2 Hours",
-                }) 
+                __html: applySeoTemplate(brandContent?.normalDescription || brand.description, context) 
               }}
             />
           )}

@@ -6,6 +6,7 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   categoriesQuery,
+  brandContentQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -16,18 +17,35 @@ import { locationService } from "@/services/location.service";
 import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")({
-  loader: async ({ context }) => {
+  loader: async ({ context, params }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
 
     const [brands, categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(brandsQuery()),
-      context.queryClient.ensureQueryData(categoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+      context.queryClient.ensureQueryData(brandsQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(categoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
-    return { brands, categories, templates };
+
+    const firstSlug = params.categorySlug.toLowerCase();
+    const secondSlug = params.brandSlug.toLowerCase();
+    const brandMatchesSecond = brands.find((b: any) => toSlug(b.brandName) === secondSlug);
+    const category = categories.find((c: any) => toSlug(c.categoryName) === firstSlug);
+
+    let brandContent = null;
+    if (category?.categoryId && brandMatchesSecond?.brandId) {
+      try {
+        brandContent = await context.queryClient.fetchQuery(
+          brandContentQuery(category.categoryId, brandMatchesSecond.brandId)
+        );
+      } catch {
+        // ignore
+      }
+    }
+
+    return { brands, categories, templates, brandContent };
   },
   head: ({ loaderData, params }) => {
     const firstSlug = params.categorySlug.toLowerCase();
@@ -66,6 +84,13 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       ? `Buy 100% Genuine ${brandName} Batteries from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
       : `Buy 100% Genuine ${brandName} ${categoryName} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`;
 
+    const contentSeo = (loaderData?.brandContent?.dealerSeoTitle || loaderData?.brandContent?.dealerShortDescription)
+      ? {
+          metaTitle: loaderData.brandContent.dealerSeoTitle || undefined,
+          metaDescription: loaderData.brandContent.dealerShortDescription || undefined,
+        }
+      : undefined;
+
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
@@ -75,7 +100,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
         city_name: cityName,
         delivery_time: "2-4 Hours",
       },
-      (brand as any)?.seo,
+      contentSeo || (brand as any)?.seo,
       {
         title: defaultTitle,
         description: defaultDesc,

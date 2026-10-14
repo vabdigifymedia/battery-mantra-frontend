@@ -25,6 +25,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
+import { Route as AdminBrandContentsRouteImport } from './routes/admin.brand-contents'
 import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
 import { Route as AdminBulkPricingRouteImport } from './routes/admin.bulk-pricing'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
@@ -173,6 +174,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminBannersRoute = AdminBannersRouteImport.update({
   id: '/banners',
   path: '/banners',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBrandContentsRoute = AdminBrandContentsRouteImport.update({
+  id: '/brand-contents',
+  path: '/brand-contents',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBrandsRoute = AdminBrandsRouteImport.update({
@@ -555,6 +561,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
+  '/admin/brand-contents': typeof AdminBrandContentsRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
@@ -640,6 +647,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
+  '/admin/brand-contents': typeof AdminBrandContentsRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
@@ -729,6 +737,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
+  '/admin/brand-contents': typeof AdminBrandContentsRoute
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/bulk-pricing': typeof AdminBulkPricingRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
@@ -818,6 +827,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/admin/banners'
+    | '/admin/brand-contents'
     | '/admin/brands'
     | '/admin/bulk-pricing'
     | '/admin/callbacks'
@@ -903,6 +913,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/admin/banners'
+    | '/admin/brand-contents'
     | '/admin/brands'
     | '/admin/bulk-pricing'
     | '/admin/callbacks'
@@ -991,6 +1002,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/admin/banners'
+    | '/admin/brand-contents'
     | '/admin/brands'
     | '/admin/bulk-pricing'
     | '/admin/callbacks'
@@ -1215,6 +1227,13 @@ declare module '@tanstack/react-router' {
       path: '/banners'
       fullPath: '/admin/banners'
       preLoaderRoute: typeof AdminBannersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/brand-contents': {
+      id: '/admin/brand-contents'
+      path: '/brand-contents'
+      fullPath: '/admin/brand-contents'
+      preLoaderRoute: typeof AdminBrandContentsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/brands': {
@@ -1724,6 +1743,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
+  AdminBrandContentsRoute: typeof AdminBrandContentsRoute
   AdminBrandsRoute: typeof AdminBrandsRoute
   AdminBulkPricingRoute: typeof AdminBulkPricingRoute
   AdminCallbacksRoute: typeof AdminCallbacksRoute
@@ -1770,6 +1790,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
+  AdminBrandContentsRoute: AdminBrandContentsRoute,
   AdminBrandsRoute: AdminBrandsRoute,
   AdminBulkPricingRoute: AdminBulkPricingRoute,
   AdminCallbacksRoute: AdminCallbacksRoute,

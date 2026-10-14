@@ -9,7 +9,9 @@ import { ordersService } from "@/services/orders.service";
 import { adminService } from "@/services/admin.service";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
 import { faqService } from "@/services/faq.service";
-import type { ProductFilterParams } from "@/types/dto";
+import { apiFetch } from "@/lib/api/client";
+import { endpoints } from "@/lib/api/endpoints";
+import type { ProductFilterParams, BrandContentResponse } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
 
@@ -220,6 +222,29 @@ export const pageSeoQuery = (route: string) =>
     queryKey: queryKeys.seo.page(route),
     queryFn: () => seoService.getPageSeo(route),
     staleTime: 5 * 60_000,
+  });
+
+export const brandContentQuery = (categoryId?: string, brandId?: string) =>
+  queryOptions({
+    queryKey: ["brand-content", categoryId, brandId],
+    queryFn: async () => {
+      if (!categoryId || !brandId) return null;
+      try {
+        return await apiFetch<BrandContentResponse | null>(endpoints.brandContents.get(categoryId, brandId), { auth: false });
+      } catch (e: any) {
+        if (e?.status === 404 || e?.status === 204) return null;
+        throw e;
+      }
+    },
+    enabled: Boolean(categoryId && brandId),
+    staleTime: 5 * 60_000,
+  });
+
+export const adminBrandContentsQuery = () =>
+  queryOptions({
+    queryKey: ["admin", "brand-contents"],
+    queryFn: () => adminService.getAllBrandContents(),
+    staleTime: 60_000,
   });
 
 export * from "./reels";

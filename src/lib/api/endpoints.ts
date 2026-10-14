@@ -48,6 +48,9 @@ export const endpoints = {
     featured: "/api/brands/featured",
     byId: (id: string) => `/api/brands/${encodeURIComponent(id)}`,
   },
+  brandContents: {
+    get: (categoryId: string, brandId: string) => `/api/brand-contents?categoryId=${encodeURIComponent(categoryId)}&brandId=${encodeURIComponent(brandId)}`,
+  },
   banners: {
     active: "/api/banners/active",
   },
@@ -117,6 +120,11 @@ export const endpoints = {
       create: "/api/admin/brands",
       update: (id: string) => `/api/admin/brands/${encodeURIComponent(id)}`,
       delete: (id: string) => `/api/admin/brands/${encodeURIComponent(id)}`,
+    },
+    brandContents: {
+      list: "/api/admin/brand-contents",
+      find: (categoryId: string, brandId: string) => `/api/admin/brand-contents/find?categoryId=${encodeURIComponent(categoryId)}&brandId=${encodeURIComponent(brandId)}`,
+      save: "/api/admin/brand-contents",
     },
     banners: {
       list: "/api/admin/banners",

@@ -13,6 +13,8 @@ import type {
   UpdateCategoryRequest,
   BrandResponse,
   BrandRequest,
+  BrandContentResponse,
+  BrandContentRequest,
   BannerResponse,
   CreateBannerRequest,
   UpdateBannerRequest,
@@ -144,6 +146,20 @@ export const adminService = {
     apiFetch<BrandResponse>(endpoints.admin.brands.update(id), { method: "PUT", body }),
   deleteBrand: (id: UUID) => 
     apiFetch<void>(endpoints.admin.brands.delete(id), { method: "DELETE" }),
+
+  // Brand Contents (Category + Brand Specific)
+  getAllBrandContents: () =>
+    apiFetch<BrandContentResponse[]>(endpoints.admin.brandContents.list),
+  findBrandContent: async (categoryId: string, brandId: string) => {
+    try {
+      return await apiFetch<BrandContentResponse | null>(endpoints.admin.brandContents.find(categoryId, brandId));
+    } catch (e: any) {
+      if (e?.status === 404 || e?.status === 204) return null;
+      throw e;
+    }
+  },
+  saveBrandContent: (body: BrandContentRequest) =>
+    apiFetch<BrandContentResponse>(endpoints.admin.brandContents.save, { method: "POST", body }),
 
   // Vehicles
   createVehicle: (body: CreateVehicleRequest) => 

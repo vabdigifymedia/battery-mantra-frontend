@@ -20,7 +20,7 @@ export function generateSlug(text: string): string {
 
 export const toSlug = (text?: string) => text ? text.toLowerCase().trim().replace(/\s+/g, "-") : "";
 
-export function applySeoTemplate(template: string, context: Record<string, string>): string {
+export function applySeoTemplate(template?: string | null, context: Record<string, string> = {}): string {
   if (!template) return "";
   let result = template;
   for (const [key, value] of Object.entries(context)) {
