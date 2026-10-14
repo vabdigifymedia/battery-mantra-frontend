@@ -26,4 +26,7 @@ export const deliveryTimeService = {
   // Public endpoints
   getDeliveryTime: (categoryId: string, cityId: string) =>
     apiFetch<DeliveryTimeResponse>(`/api/public/delivery-time?categoryId=${categoryId}&cityId=${cityId}`, { method: "GET", auth: false }),
+
+  getDeliveryTimesByCity: (cityId: string) =>
+    apiFetch<DeliveryTimeResponse[]>(`/api/public/delivery-times/city/${cityId}`, { method: "GET", auth: false }),
 };

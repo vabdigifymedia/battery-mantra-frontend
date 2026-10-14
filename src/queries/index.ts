@@ -11,6 +11,7 @@ import { partnerDashboardService } from "@/services/partner-dashboard.service";
 import { faqService } from "@/services/faq.service";
 import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
+import { deliveryTimeService } from "@/services/delivery-time.service";
 import type { ProductFilterParams, BrandContentResponse } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
@@ -245,6 +246,14 @@ export const adminBrandContentsQuery = () =>
     queryKey: ["admin", "brand-contents"],
     queryFn: () => adminService.getAllBrandContents(),
     staleTime: 60_000,
+  });
+
+export const cityDeliveryTimesQuery = (cityId?: string | null) =>
+  queryOptions({
+    queryKey: ["delivery-times", "city", cityId],
+    queryFn: () => (cityId ? deliveryTimeService.getDeliveryTimesByCity(cityId) : Promise.resolve([])),
+    enabled: !!cityId,
+    staleTime: 10 * 60_000,
   });
 
 export * from "./reels";

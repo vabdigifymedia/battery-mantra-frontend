@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useState, useEffect, startTransition } from "react";
+import { useState, useEffect, useMemo, startTransition } from "react";
 import { z } from "zod";
 import { 
   Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText, 
@@ -57,6 +57,7 @@ import { useLocationStore } from "@/store/useLocationStore";
 
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
+import { formatDeliveryPillText } from "@/lib/delivery";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
@@ -193,6 +194,10 @@ export function PdpPage() {
     queryFn: () => deliveryTimeService.getDeliveryTime(data.categoryId!, city!.cityId!),
     enabled: !!data.categoryId && !!city?.cityId,
   });
+
+  const floatingPillDeliveryText = useMemo(() => {
+    return formatDeliveryPillText(deliveryTime?.hours, deliveryTime?.days);
+  }, [deliveryTime]);
 
   const inStock = (data.productStock ?? 0) > 0;
 
@@ -889,7 +894,7 @@ export function PdpPage() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
                   <span className="text-emerald-400 font-bold">⚡ Express Delivery:</span>
-                  <span>Get it Today in 2-4 Hours</span>
+                  <span>{floatingPillDeliveryText}</span>
                 </div>
               </div>
 

@@ -223,6 +223,7 @@ export type ProductListResponse = {
   productImage?: string;
   additionalImages?: string[];
   productCategory?: string;
+  categoryId?: UUID;
   capacity?: string;
   capacityAh?: string;
   globalDisplayOrder?: number;

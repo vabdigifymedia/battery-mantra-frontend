@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LocationModal } from "@/components/location/LocationModal";
 import type { CityDto } from "@/types/dto";
+import { formatDeliveryDetailSla } from "@/lib/delivery";
 
 interface ProductDeliveryInfoBoxProps {
   city: CityDto | null;
@@ -24,23 +25,9 @@ export function ProductDeliveryInfoBox({
   const deliveryCharge = city?.deliveryCharge ?? 0;
   const originalDeliveryCharge = city?.originalDeliveryCharge ?? 40;
 
-  const parsedHours = deliveryTimeHours ? Number(deliveryTimeHours) : undefined;
-  const parsedDays = deliveryTimeDays ? Number(deliveryTimeDays) : undefined;
-
-  const isSameDay = !!parsedHours || !parsedDays;
-
   // Delivery SLA Text
   const formatSla = () => {
-    if (parsedHours) {
-      return `Delivery by Today in ${parsedHours} Hours`;
-    }
-    if (parsedDays && parsedDays === 1) {
-      return "Delivery by Tomorrow";
-    }
-    if (parsedDays) {
-      return `Delivery within ${parsedDays} Days`;
-    }
-    return "Delivery by Today in 1 Hours";
+    return formatDeliveryDetailSla(deliveryTimeHours, deliveryTimeDays);
   };
 
   return (

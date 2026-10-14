@@ -1,10 +1,14 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink } from "@tanstack/react-router";
 import { Image } from "@/components/common/Image";
 import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
 import type { ProductListResponse } from "@/types/dto";
 import { useWishlist } from "@/providers/WishlistProvider";
+import { useLocationStore } from "@/store/useLocationStore";
+import { cityDeliveryTimesQuery, categoriesQuery } from "@/queries";
+import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
 import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,6 +23,39 @@ export function ProductCard({
 }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const wishlisted = isWishlisted(product.productId);
+
+  const city = useLocationStore((state) => state.city);
+  const { data: cityDeliveryTimes } = useQuery(cityDeliveryTimesQuery(city?.cityId));
+  const { data: categories } = useQuery(categoriesQuery());
+
+  const matchedDeliveryTime = useMemo(() => {
+    if (!cityDeliveryTimes || cityDeliveryTimes.length === 0) return null;
+
+    if (product.categoryId) {
+      const match = cityDeliveryTimes.find((dt) => dt.categoryId === product.categoryId);
+      if (match) return match;
+    }
+
+    if (product.productCategory && categories) {
+      const cat = categories.find(
+        (c) => c.categoryName.toLowerCase() === product.productCategory?.toLowerCase()
+      );
+      if (cat) {
+        const match = cityDeliveryTimes.find((dt) => dt.categoryId === cat.categoryId);
+        if (match) return match;
+      }
+    }
+
+    return null;
+  }, [cityDeliveryTimes, categories, product.categoryId, product.productCategory]);
+
+  const deliverySla = useMemo(() => {
+    return formatDeliveryCardSla(matchedDeliveryTime?.hours, matchedDeliveryTime?.days);
+  }, [matchedDeliveryTime]);
+
+  const deliveryCityLabel = useMemo(() => {
+    return formatCityDeliveryLabel(city?.cityName);
+  }, [city?.cityName]);
 
   const hasExchange = (product.exchangeDiscount ?? 0) > 0;
   const exchangePrice = hasExchange
@@ -107,8 +144,8 @@ export function ProductCard({
 
         {/* Product Image Stage */}
         <RouterLink 
-          to="/product/$slug" 
-          params={{ slug: product.seo?.slug || product.productId }}
+          to="/product/$" 
+          params={{ _splat: product.seo?.slug || product.productId }}
           className="relative pt-10 pb-4 px-4 flex items-center justify-center bg-slate-50/50 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 transition-colors"
         >
           <Image
@@ -133,7 +170,7 @@ export function ProductCard({
           </div>
 
           {/* Title */}
-          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
             <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug">
               {product.productName}
             </h3>
@@ -194,9 +231,9 @@ export function ProductCard({
         <div className="hidden sm:flex mx-4 mb-3 bg-emerald-50/80 rounded-lg p-2.5 items-center justify-between border border-emerald-100/50">
           <div className="flex items-start gap-1.5 w-1/2 border-r border-emerald-200/50 pr-2">
             <Truck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-emerald-800 leading-tight">Delivery in 30-60 min</span>
-              <span className="text-[9px] text-emerald-600/80 leading-tight truncate">Noida & Delhi NCR</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-bold text-emerald-800 leading-tight truncate">{deliverySla}</span>
+              <span className="text-[9px] text-emerald-600/80 leading-tight truncate">{deliveryCityLabel}</span>
             </div>
           </div>
           <div className="flex items-start gap-1.5 pl-2">
@@ -214,12 +251,12 @@ export function ProductCard({
       {/* Action Buttons - Stack on mobile, side-by-side on sm+ */}
       <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-0 flex flex-col sm:flex-row items-center gap-2 mt-auto">
         <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg">
-          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
             <span className="text-[10px] sm:text-xs font-bold flex items-center"><ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now</span>
           </RouterLink>
         </Button>
         <Button asChild size="sm" variant="outline" className="border-border shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-50">
-          <RouterLink to="/product/$slug" params={{ slug: product.seo?.slug || product.productId }}>
+          <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
             <span className="text-[10px] sm:text-xs font-bold text-slate-700 flex items-center justify-center">View Details <ArrowRight className="ml-1 w-3 h-3" /></span>
           </RouterLink>
         </Button>
