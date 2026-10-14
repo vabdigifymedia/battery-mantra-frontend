@@ -44,7 +44,7 @@ function AdminFaqsList() {
         <div>
           <p className="font-medium text-foreground">Variable Format Tip:</p>
           <p className="text-muted-foreground mt-0.5">
-            Always wrap variable tokens in curly brackets (e.g. <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{price_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{product_name}`}</code>). Note that <strong>{`{price_name}`}</strong> automatically renders the <strong>With Exchange</strong> price.
+            Always wrap variable tokens in curly brackets (e.g. <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{price}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded font-mono text-primary font-bold">{`{product_name}`}</code>). Note that <strong>{`{price}`}</strong> automatically renders the <strong>With Exchange</strong> price.
           </p>
         </div>
       </div>

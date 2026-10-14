@@ -11,22 +11,20 @@ interface VariableDef {
 
 const VARIABLES_BY_PAGE_TYPE: Record<string, VariableDef[]> = {
   PRODUCT: [
-    { key: "{price_name}", label: "With Exchange Price", highlight: true },
+    { key: "{price}", label: "With Exchange Price", highlight: true },
     { key: "{product_name}", label: "Product Name" },
-    { key: "{city_name}", label: "City Name" },
     { key: "{brand_name}", label: "Brand Name" },
     { key: "{category_name}", label: "Category Name" },
-    { key: "{warranty_name}", label: "Warranty Period" },
-    { key: "{capa_ct_name}", label: "Capacity (Ah)" },
-    { key: "{without_exchange_price}", label: "Without Exchange Price" },
-    { key: "{mrp_name}", label: "MRP Price" },
-    { key: "{manufacturer_name}", label: "Manufacturer" },
+    { key: "{city_name}", label: "City Name" },
+    { key: "{warranty}", label: "Warranty Period" },
+    { key: "{capacity}", label: "Capacity (e.g. 35 Ah)" },
+    { key: "{mrp}", label: "MRP" },
   ],
   CATEGORY: [
     { key: "{category_name}", label: "Category Name" },
     { key: "{city_name}", label: "City Name" },
     { key: "{price_range}", label: "With Exchange Price Range", highlight: true },
-    { key: "{price_name}", label: "Min Price (With Exchange)", highlight: true },
+    { key: "{price}", label: "Starting Price (With Exchange)", highlight: true },
     { key: "{delivery_time}", label: "Delivery Time (e.g. 1-2 Hours)" },
   ],
   BRAND: [
@@ -34,7 +32,7 @@ const VARIABLES_BY_PAGE_TYPE: Record<string, VariableDef[]> = {
     { key: "{category_name}", label: "Category Name" },
     { key: "{city_name}", label: "City Name" },
     { key: "{price_range}", label: "With Exchange Price Range", highlight: true },
-    { key: "{price_name}", label: "Min Price (With Exchange)", highlight: true },
+    { key: "{price}", label: "Starting Price (With Exchange)", highlight: true },
     { key: "{delivery_time}", label: "Delivery Time" },
   ],
   BRAND_MODEL: [
@@ -43,7 +41,7 @@ const VARIABLES_BY_PAGE_TYPE: Record<string, VariableDef[]> = {
     { key: "{category_name}", label: "Category Name" },
     { key: "{city_name}", label: "City Name" },
     { key: "{price_range}", label: "With Exchange Price Range", highlight: true },
-    { key: "{price_name}", label: "Min Price (With Exchange)", highlight: true },
+    { key: "{price}", label: "Starting Price (With Exchange)", highlight: true },
   ],
   MANUFACTURER: [
     { key: "{manufacturer_name}", label: "Manufacturer Name" },
@@ -123,7 +121,7 @@ export function FaqVariableHelper({ pageType }: FaqVariableHelperProps) {
       </div>
 
       <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/50">
-        💡 <strong>Price Note:</strong> Variables like <code>{`{price_name}`}</code> automatically display the <strong>With Exchange</strong> price (after deducting old battery rebate).
+        💡 <strong>Price Note:</strong> <code>{`{price}`}</code> and <code>{`{price_range}`}</code> automatically calculate and display the discounted <strong>With Exchange</strong> price (after deducting old scrap battery rebate).
       </p>
     </div>
   );

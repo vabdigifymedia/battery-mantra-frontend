@@ -425,20 +425,33 @@ export function PdpPage() {
     ? Math.max(0, (data.productPrice || 0) - (data.exchangeDiscount || 0))
     : (data.productPrice || 0);
 
+  const warrantyVal = String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || warrantyText || "");
+  const capacityVal = String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || "");
+  const mrpVal = ((data.productPrice || 0) * 1.2).toFixed(2);
+  const cityVal = city?.cityName || "your city";
+  const activePriceStr = withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || "");
+
   const seoContext = {
+    // Grammatically sound primary variables:
     product_name: data.productName,
     brand_name: data.brandName || "Brand",
     category_name: data.categoryName || "Battery",
-    city_name: city?.cityName || "your city",
-    warranty_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || ""),
-    price_name: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
-    price: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
-    with_exchange_price: withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || ""),
-    without_exchange_price: (data.productPrice || 0).toString(),
+    city_name: cityVal,
+    city: cityVal,
+    price: activePriceStr,
+    warranty: warrantyVal,
+    capacity: capacityVal,
+    mrp: mrpVal,
     price_range: withExchangePrice > 0 ? `₹${withExchangePrice.toLocaleString()}` : `₹${(data.productPrice || 0).toLocaleString()}`,
-    mrp_name: ((data.productPrice || 0) * 1.2).toFixed(2),
-    capa_ct_name: String(allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || ""),
-    manufacturer_name: data.brandName || "Manufacturer", // Fallback to brandName if manufacturerName not explicitly returned
+
+    // Legacy backwards-compatible variables:
+    price_name: activePriceStr,
+    warranty_name: warrantyVal,
+    capa_ct_name: capacityVal,
+    mrp_name: mrpVal,
+    with_exchange_price: activePriceStr,
+    without_exchange_price: (data.productPrice || 0).toString(),
+    manufacturer_name: data.brandName || "Manufacturer",
   };
 
   return (
