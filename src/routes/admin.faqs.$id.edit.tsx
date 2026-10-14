@@ -120,13 +120,11 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
 
         <div className="space-y-2">
           <Label>Answer (Description) <span className="text-destructive">*</span></Label>
-          <div className="border rounded-md">
-            <RichTextEditor 
-              value={description}
-              onChange={setDescription}
-              placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, etc."
-            />
-          </div>
+          <RichTextEditor 
+            value={description}
+            onChange={setDescription}
+            placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, {price}, etc."
+          />
         </div>
 
         <div className="flex items-center gap-2 pt-2">

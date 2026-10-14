@@ -20,9 +20,11 @@ interface RichTextEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  maxHeight?: string;
+  minHeight?: string;
 }
 
-export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, className, maxHeight = "260px", minHeight = "140px" }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isLinkOpen, setIsLinkOpen] = useState(false);
@@ -53,7 +55,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[150px] w-full rounded-b-md bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 prose prose-sm dark:prose-invert max-w-none',
+        class: 'min-h-[140px] w-full bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 prose prose-sm dark:prose-invert max-w-none',
       },
     },
   });
@@ -87,8 +89,8 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   };
 
   return (
-    <div className={cn("flex flex-col rounded-md border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden", className)}>
-      <div className="flex flex-wrap items-center gap-1 border-b bg-muted/50 p-1">
+    <div className={cn("flex flex-col rounded-md border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden bg-background shadow-xs", className)}>
+      <div className="flex flex-wrap items-center gap-1 border-b bg-muted/60 p-1 shrink-0 sticky top-0 z-10">
         {/* Formatting */}
         <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBold().run()} className={cn("h-8 w-8 p-0", editor.isActive('bold') && "bg-muted text-foreground")}>
           <Bold className="h-4 w-4" />
@@ -177,7 +179,19 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         </Popover>
 
       </div>
-      <EditorContent editor={editor} className="[&>div]:outline-none" />
+      <div 
+        onClick={() => editor.commands.focus()}
+        className={cn(
+          "w-full overflow-y-auto cursor-text bg-background",
+          "[scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/50 [&::-webkit-scrollbar-track]:bg-transparent"
+        )}
+        style={{
+          maxHeight: maxHeight,
+          minHeight: minHeight,
+        }}
+      >
+        <EditorContent editor={editor} className="[&>div]:outline-none [&>div]:min-h-[140px]" />
+      </div>
     </div>
   );
 }

@@ -104,13 +104,11 @@ function NewFaq() {
 
         <div className="space-y-2">
           <Label>Description (Answer) <span className="text-destructive">*</span></Label>
-          <div className="bg-white rounded-md border min-h-[200px]">
-            <RichTextEditor 
-              value={description} 
-              onChange={setDescription} 
-              className="min-h-[200px]"
-            />
-          </div>
+          <RichTextEditor 
+            value={description} 
+            onChange={setDescription} 
+            placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, {price}, etc."
+          />
         </div>
 
         <div className="flex justify-end gap-4 pt-4">
