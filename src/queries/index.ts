@@ -225,9 +225,9 @@ export const pageSeoQuery = (route: string) =>
   });
 
 export const brandContentQuery = (categoryId?: string, brandId?: string) =>
-  queryOptions({
+  queryOptions<BrandContentResponse | null>({
     queryKey: ["brand-content", categoryId, brandId],
-    queryFn: async () => {
+    queryFn: async (): Promise<BrandContentResponse | null> => {
       if (!categoryId || !brandId) return null;
       try {
         return await apiFetch<BrandContentResponse | null>(endpoints.brandContents.get(categoryId, brandId), { auth: false });
