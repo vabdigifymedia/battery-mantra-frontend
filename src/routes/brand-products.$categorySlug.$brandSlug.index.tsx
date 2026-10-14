@@ -6,7 +6,6 @@ import {
   brandsQuery,
   categoriesQuery,
   pageSeoQuery,
-  brandContentQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -36,28 +35,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
       // ignore
     }
 
-    const brand = brands.find((b: any) => toSlug(b.brandName) === params.brandSlug);
-    const category = categories.find((c: any) => {
-      const s = toSlug(c.categoryName);
-      return (
-        s === params.categorySlug ||
-        s.replace(/-battery$/, "-batteries") === params.categorySlug ||
-        s.replace(/-batteries$/, "-battery") === params.categorySlug
-      );
-    });
-
-    let brandContent = null;
-    if (category?.categoryId && brand?.brandId) {
-      try {
-        brandContent = await context.queryClient.fetchQuery(
-          brandContentQuery(category.categoryId, brand.brandId)
-        );
-      } catch {
-        // ignore
-      }
-    }
-
-    return { brands, categories, templates, pageSeo, brandContent };
+    return { brands, categories, templates, pageSeo };
   },
   head: ({ loaderData, params }) => {
     const categoryName = params.categorySlug
@@ -82,14 +60,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
     const displayBrandName = brand?.brandName || brandName;
     const displayCategoryName = category?.categoryName || categoryName;
 
-    const contentSeo = (loaderData?.brandContent?.normalSeoTitle || loaderData?.brandContent?.normalShortDescription)
-      ? {
-          metaTitle: loaderData.brandContent.normalSeoTitle || undefined,
-          metaDescription: loaderData.brandContent.normalShortDescription || undefined,
-        }
-      : undefined;
-
-    // Use specific CMS Page SEO first, then BrandContent SEO, then entity SEO, then templates
+    // Use specific CMS Page SEO first, then entity SEO, then templates
     const seo = resolveTemplateSeo(
       "BRAND",
       loaderData?.templates ?? undefined,
@@ -98,7 +69,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
         category_name: displayCategoryName,
         delivery_time: "1-2 Hours",
       },
-      loaderData?.pageSeo?.seo || contentSeo || (brand as any)?.seo || (category as any)?.seo,
+      loaderData?.pageSeo?.seo || (brand as any)?.seo || (category as any)?.seo,
       {
         title: `${displayBrandName} ${displayCategoryName} Online | Buy 100% Genuine Battery — BatteryMantra`,
         description: `Buy 100% Genuine ${displayBrandName} ${displayCategoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,

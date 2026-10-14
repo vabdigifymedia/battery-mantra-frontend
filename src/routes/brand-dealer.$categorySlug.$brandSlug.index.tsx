@@ -6,7 +6,6 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   categoriesQuery,
-  brandContentQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -29,23 +28,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
 
-    const firstSlug = params.categorySlug.toLowerCase();
-    const secondSlug = params.brandSlug.toLowerCase();
-    const brandMatchesSecond = brands.find((b: any) => toSlug(b.brandName) === secondSlug);
-    const category = categories.find((c: any) => toSlug(c.categoryName) === firstSlug);
-
-    let brandContent = null;
-    if (category?.categoryId && brandMatchesSecond?.brandId) {
-      try {
-        brandContent = await context.queryClient.fetchQuery(
-          brandContentQuery(category.categoryId, brandMatchesSecond.brandId)
-        );
-      } catch {
-        // ignore
-      }
-    }
-
-    return { brands, categories, templates, brandContent };
+    return { brands, categories, templates };
   },
   head: ({ loaderData, params }) => {
     const firstSlug = params.categorySlug.toLowerCase();
@@ -84,13 +67,6 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       ? `Buy 100% Genuine ${brandName} Batteries from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
       : `Buy 100% Genuine ${brandName} ${categoryName} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`;
 
-    const contentSeo = (loaderData?.brandContent?.dealerSeoTitle || loaderData?.brandContent?.dealerShortDescription)
-      ? {
-          metaTitle: loaderData.brandContent.dealerSeoTitle || undefined,
-          metaDescription: loaderData.brandContent.dealerShortDescription || undefined,
-        }
-      : undefined;
-
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
@@ -100,7 +76,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
         city_name: cityName,
         delivery_time: "2-4 Hours",
       },
-      contentSeo || (brand as any)?.seo,
+      (brand as any)?.seo,
       {
         title: defaultTitle,
         description: defaultDesc,

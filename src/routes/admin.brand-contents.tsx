@@ -6,7 +6,6 @@ import { categoriesQuery, brandsQuery, adminBrandContentsQuery } from "@/queries
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,16 +13,16 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/feedback/Spinner";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { toast } from "sonner";
-import {
-  Save,
-  Copy,
-  Check,
-  ExternalLink,
-  FileEdit,
-  Layers,
-  Tag,
-  ShieldCheck,
-  ShoppingBag,
+import { 
+  Save, 
+  Copy, 
+  Check, 
+  ExternalLink, 
+  FileEdit, 
+  Layers, 
+  Tag, 
+  ShieldCheck, 
+  ShoppingBag, 
   Info,
   Search,
   RotateCcw
@@ -51,13 +50,8 @@ function AdminBrandContentsPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedBrandId, setSelectedBrandId] = useState<string>("");
 
-  // Form state
-  const [normalSeoTitle, setNormalSeoTitle] = useState("");
-  const [normalShortDescription, setNormalShortDescription] = useState("");
+  // Form state: only category-specific detailed descriptions
   const [normalDescription, setNormalDescription] = useState("");
-
-  const [dealerSeoTitle, setDealerSeoTitle] = useState("");
-  const [dealerShortDescription, setDealerShortDescription] = useState("");
   const [dealerDescription, setDealerDescription] = useState("");
 
   const [isDirty, setIsDirty] = useState(false);
@@ -70,8 +64,8 @@ function AdminBrandContentsPage() {
   const { data: allBrandContents = [], isLoading: isLoadingContents } = useQuery(adminBrandContentsQuery());
 
   // Specific content query for selected Category + Brand
-  const {
-    data: activeContent,
+  const { 
+    data: activeContent, 
     isLoading: isLoadingActiveContent,
     isFetching: isFetchingActiveContent
   } = useQuery({
@@ -83,18 +77,10 @@ function AdminBrandContentsPage() {
   // Populate form fields when activeContent loads or changes
   useEffect(() => {
     if (activeContent) {
-      setNormalSeoTitle(activeContent.normalSeoTitle || "");
-      setNormalShortDescription(activeContent.normalShortDescription || "");
       setNormalDescription(activeContent.normalDescription || "");
-      setDealerSeoTitle(activeContent.dealerSeoTitle || "");
-      setDealerShortDescription(activeContent.dealerShortDescription || "");
       setDealerDescription(activeContent.dealerDescription || "");
     } else {
-      setNormalSeoTitle("");
-      setNormalShortDescription("");
       setNormalDescription("");
-      setDealerSeoTitle("");
-      setDealerShortDescription("");
       setDealerDescription("");
     }
     setIsDirty(false);
@@ -103,7 +89,7 @@ function AdminBrandContentsPage() {
   // Save Mutation
   const saveMutation = useMutation({
     mutationFn: (payload: BrandContentRequest) => adminService.saveBrandContent(payload),
-    onSuccess: (saved) => {
+    onSuccess: () => {
       toast.success("Brand content saved successfully!");
       setIsDirty(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "brand-contents"] });
@@ -124,11 +110,7 @@ function AdminBrandContentsPage() {
     const payload: BrandContentRequest = {
       categoryId: selectedCategoryId,
       brandId: selectedBrandId,
-      normalSeoTitle: normalSeoTitle.trim() || undefined,
-      normalShortDescription: normalShortDescription.trim() || undefined,
       normalDescription: normalDescription.trim() || undefined,
-      dealerSeoTitle: dealerSeoTitle.trim() || undefined,
-      dealerShortDescription: dealerShortDescription.trim() || undefined,
       dealerDescription: dealerDescription.trim() || undefined,
     };
 
@@ -137,18 +119,10 @@ function AdminBrandContentsPage() {
 
   const handleReset = () => {
     if (activeContent) {
-      setNormalSeoTitle(activeContent.normalSeoTitle || "");
-      setNormalShortDescription(activeContent.normalShortDescription || "");
       setNormalDescription(activeContent.normalDescription || "");
-      setDealerSeoTitle(activeContent.dealerSeoTitle || "");
-      setDealerShortDescription(activeContent.dealerShortDescription || "");
       setDealerDescription(activeContent.dealerDescription || "");
     } else {
-      setNormalSeoTitle("");
-      setNormalShortDescription("");
       setNormalDescription("");
-      setDealerSeoTitle("");
-      setDealerShortDescription("");
       setDealerDescription("");
     }
     setIsDirty(false);
@@ -166,11 +140,11 @@ function AdminBrandContentsPage() {
   const selectedCategory = categories.find((c: any) => c.categoryId === selectedCategoryId);
   const selectedBrand = brands.find((b: any) => b.brandId === selectedBrandId);
 
-  const previewRetailUrl = selectedCategory && selectedBrand
+  const previewRetailUrl = selectedCategory && selectedBrand 
     ? `/brand-products/${toSlug(selectedCategory.categoryName)}/${toSlug(selectedBrand.brandName)}`
     : null;
 
-  const previewDealerUrl = selectedCategory && selectedBrand
+  const previewDealerUrl = selectedCategory && selectedBrand 
     ? `/brand-dealer/${toSlug(selectedCategory.categoryName)}/${toSlug(selectedBrand.brandName)}`
     : null;
 
@@ -181,9 +155,7 @@ function AdminBrandContentsPage() {
     return allBrandContents.filter(
       (c) =>
         c.categoryName?.toLowerCase().includes(q) ||
-        c.brandName?.toLowerCase().includes(q) ||
-        c.normalSeoTitle?.toLowerCase().includes(q) ||
-        c.dealerSeoTitle?.toLowerCase().includes(q)
+        c.brandName?.toLowerCase().includes(q)
     );
   }, [allBrandContents, tableSearch]);
 
@@ -205,7 +177,7 @@ function AdminBrandContentsPage() {
             <div>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Brand Content Management</h1>
               <p className="text-muted-foreground text-sm mt-0.5">
-                Customize category + brand specific content, SEO titles, and rich descriptions for Retail and Authorized Dealer landing pages.
+                Customize category + brand specific rich descriptions for Retail (Normal) and Dealer landing pages.
               </p>
             </div>
           </div>
@@ -214,9 +186,9 @@ function AdminBrandContentsPage() {
         {selectedCategoryId && selectedBrandId && (
           <div className="flex items-center gap-2 self-start md:self-auto">
             {previewRetailUrl && (
-              <a
-                href={previewRetailUrl}
-                target="_blank"
+              <a 
+                href={previewRetailUrl} 
+                target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
@@ -225,9 +197,9 @@ function AdminBrandContentsPage() {
               </a>
             )}
             {previewDealerUrl && (
-              <a
-                href={previewDealerUrl}
-                target="_blank"
+              <a 
+                href={previewDealerUrl} 
+                target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-background hover:bg-muted text-foreground transition-colors"
               >
@@ -247,7 +219,7 @@ function AdminBrandContentsPage() {
             {isFetchingActiveContent && <Spinner className="h-4 w-4 text-primary" />}
           </CardTitle>
           <CardDescription>
-            Choose a Category and Brand combination to view and modify its specific descriptions and SEO titles.
+            Choose a Category and Brand combination to view and update its descriptions.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -257,8 +229,8 @@ function AdminBrandContentsPage() {
                 <Layers className="h-4 w-4 text-muted-foreground" />
                 <span>Category</span>
               </Label>
-              <Select
-                value={selectedCategoryId}
+              <Select 
+                value={selectedCategoryId} 
                 onValueChange={(val) => {
                   setSelectedCategoryId(val);
                   setIsDirty(true);
@@ -282,8 +254,8 @@ function AdminBrandContentsPage() {
                 <Tag className="h-4 w-4 text-muted-foreground" />
                 <span>Brand</span>
               </Label>
-              <Select
-                value={selectedBrandId}
+              <Select 
+                value={selectedBrandId} 
                 onValueChange={(val) => {
                   setSelectedBrandId(val);
                   setIsDirty(true);
@@ -311,7 +283,7 @@ function AdminBrandContentsPage() {
                   <span className="flex items-center gap-1"><Spinner className="h-3 w-3" /> Checking records...</span>
                 ) : activeContent ? (
                   <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300">
-                    Existing Record Found (ID: {activeContent.id.slice(0, 8)}...)
+                    Existing Record Found
                   </Badge>
                 ) : (
                   <Badge variant="outline" className="text-amber-600 border-amber-300 dark:text-amber-400">
@@ -339,7 +311,7 @@ function AdminBrandContentsPage() {
               <span>Supported Template Variables (click any chip to copy with curly brackets):</span>
             </div>
             <span className="text-[11px] text-muted-foreground italic">
-              Variables resolve dynamically for the visitor&apos;s city, prices, and warranties.
+              Variables resolve dynamically on customer pages for their selected city and prices.
             </span>
           </div>
           <div className="flex flex-wrap gap-2 mt-2.5">
@@ -368,7 +340,7 @@ function AdminBrandContentsPage() {
       {selectedCategoryId && selectedBrandId ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column: Normal / Retail */}
+            {/* Left Column: Normal */}
             <Card className="shadow-xs border-blue-500/20">
               <CardHeader className="bg-blue-500/5 border-b pb-4">
                 <div className="flex items-center justify-between">
@@ -379,7 +351,7 @@ function AdminBrandContentsPage() {
                     <div>
                       <CardTitle className="text-lg font-bold">Normal</CardTitle>
                       <CardDescription className="text-xs">
-                        Appears at the bottom of the retail brand catalogue page (/brand-products/...)
+                        Appears at the bottom of the retail brand page (/brand-products/...)
                       </CardDescription>
                     </div>
                   </div>
@@ -388,63 +360,27 @@ function AdminBrandContentsPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-5 pt-5">
-                {/* Short Description */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="normal-short-desc" className="text-xs font-semibold">
-                    Short Description
-                  </Label>
-                  <Textarea
-                    id="normal-short-desc"
-                    rows={3}
-                    placeholder="Brief highlight or summary to appear above the fold or in excerpts..."
-                    value={normalShortDescription}
-                    onChange={(e) => {
-                      setNormalShortDescription(e.target.value);
-                      setIsDirty(true);
-                    }}
-                  />
-                </div>
-
-                {/* Detailed Description (RichTextEditor) */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">
-                    Detailed Description
-                  </Label>
-                  <RichTextEditor
-                    value={normalDescription}
-                    onChange={(html) => {
-                      setNormalDescription(html);
-                      setIsDirty(true);
-                    }}
-                    placeholder="Write detailed rich content, SEO headings, brand features, and guarantees..."
-                    maxHeight="280px"
-                    minHeight="180px"
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Internally scrollable editor. Supports headings, bold, lists, links, and template variables like {'{city_name}'}.
-                  </p>
-                </div>
-
-                {/* SEO Title */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="normal-seo-title" className="text-xs font-semibold">
-                    SEO Meta Title
-                  </Label>
-                  <Input
-                    id="normal-seo-title"
-                    placeholder="e.g. Buy {brand_name} {category_name} Online in {city_name} | Best Price"
-                    value={normalSeoTitle}
-                    onChange={(e) => {
-                      setNormalSeoTitle(e.target.value);
-                      setIsDirty(true);
-                    }}
-                  />
-                </div>
+              <CardContent className="space-y-3 pt-5">
+                <Label className="text-xs font-semibold">
+                  Detailed Description
+                </Label>
+                <RichTextEditor
+                  value={normalDescription}
+                  onChange={(html) => {
+                    setNormalDescription(html);
+                    setIsDirty(true);
+                  }}
+                  placeholder="Write detailed rich content, headings, brand features, and guarantees for normal retail customers..."
+                  maxHeight="320px"
+                  minHeight="220px"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Supports headings, lists, links, formatting, and template variables like {'{city_name}'}.
+                </p>
               </CardContent>
             </Card>
 
-            {/* Right Column: Authorized Dealer */}
+            {/* Right Column: Dealer */}
             <Card className="shadow-xs border-amber-500/20">
               <CardHeader className="bg-amber-500/5 border-b pb-4">
                 <div className="flex items-center justify-between">
@@ -464,59 +400,23 @@ function AdminBrandContentsPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-5 pt-5">
-                {/* Short Description */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="dealer-short-desc" className="text-xs font-semibold">
-                    Short Description
-                  </Label>
-                  <Textarea
-                    id="dealer-short-desc"
-                    rows={3}
-                    placeholder="Brief highlight or summary for dealership and authorized partner benefits..."
-                    value={dealerShortDescription}
-                    onChange={(e) => {
-                      setDealerShortDescription(e.target.value);
-                      setIsDirty(true);
-                    }}
-                  />
-                </div>
-
-                {/* Detailed Description (RichTextEditor) */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">
-                    Detailed Description
-                  </Label>
-                  <RichTextEditor
-                    value={dealerDescription}
-                    onChange={(html) => {
-                      setDealerDescription(html);
-                      setIsDirty(true);
-                    }}
-                    placeholder="Write detailed authorized dealership information, genuine warranty, and certified service benefits..."
-                    maxHeight="280px"
-                    minHeight="180px"
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Internally scrollable editor. Supports headings, bold, lists, links, and template variables like {'{city_name}'}.
-                  </p>
-                </div>
-
-                {/* SEO Title */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="dealer-seo-title" className="text-xs font-semibold">
-                    SEO Meta Title
-                  </Label>
-                  <Input
-                    id="dealer-seo-title"
-                    placeholder="e.g. Authorized {brand_name} {category_name} Dealer Near Me in {city_name}"
-                    value={dealerSeoTitle}
-                    onChange={(e) => {
-                      setDealerSeoTitle(e.target.value);
-                      setIsDirty(true);
-                    }}
-                  />
-                </div>
+              <CardContent className="space-y-3 pt-5">
+                <Label className="text-xs font-semibold">
+                  Detailed Description
+                </Label>
+                <RichTextEditor
+                  value={dealerDescription}
+                  onChange={(html) => {
+                    setDealerDescription(html);
+                    setIsDirty(true);
+                  }}
+                  placeholder="Write authorized dealership information, genuine warranty, and certified service benefits..."
+                  maxHeight="320px"
+                  minHeight="220px"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Supports headings, lists, links, formatting, and template variables like {'{city_name}'}.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -591,7 +491,7 @@ function AdminBrandContentsPage() {
           <div>
             <CardTitle className="text-lg font-bold">Configured Brand Contents</CardTitle>
             <CardDescription className="text-xs">
-              Overview of all Category + Brand content records currently configured in the database ({allBrandContents.length} total)
+              Overview of all Category + Brand content records currently configured ({allBrandContents.length} total)
             </CardDescription>
           </div>
 
@@ -612,10 +512,10 @@ function AdminBrandContentsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px] font-semibold">Category</TableHead>
-                <TableHead className="w-[180px] font-semibold">Brand</TableHead>
-                <TableHead className="font-semibold">Retail (Normal)</TableHead>
-                <TableHead className="font-semibold">Authorized Dealer</TableHead>
+                <TableHead className="w-[240px] font-semibold">Category</TableHead>
+                <TableHead className="w-[200px] font-semibold">Brand</TableHead>
+                <TableHead className="font-semibold">Normal Description</TableHead>
+                <TableHead className="font-semibold">Dealer Description</TableHead>
                 <TableHead className="w-[100px] text-right font-semibold">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -636,12 +536,12 @@ function AdminBrandContentsPage() {
               ) : (
                 filteredContents.map((item) => {
                   const isSelected = item.categoryId === selectedCategoryId && item.brandId === selectedBrandId;
-                  const hasNormal = Boolean(item.normalDescription || item.normalSeoTitle || item.normalShortDescription);
-                  const hasDealer = Boolean(item.dealerDescription || item.dealerSeoTitle || item.dealerShortDescription);
+                  const hasNormal = Boolean(item.normalDescription);
+                  const hasDealer = Boolean(item.dealerDescription);
 
                   return (
-                    <TableRow
-                      key={item.id}
+                    <TableRow 
+                      key={item.id} 
                       className={isSelected ? "bg-primary/5 font-medium" : undefined}
                     >
                       <TableCell className="font-semibold text-foreground">
@@ -653,40 +553,26 @@ function AdminBrandContentsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1">
-                          <div className="text-xs text-foreground truncate max-w-[280px]" title={item.normalSeoTitle}>
-                            {item.normalSeoTitle || <span className="text-muted-foreground italic">No SEO title</span>}
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            {hasNormal ? (
-                              <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
-                                Content Configured
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                                Empty
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
+                        {hasNormal ? (
+                          <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                            Configured
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">
+                            Empty
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1">
-                          <div className="text-xs text-foreground truncate max-w-[280px]" title={item.dealerSeoTitle}>
-                            {item.dealerSeoTitle || <span className="text-muted-foreground italic">No SEO title</span>}
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            {hasDealer ? (
-                              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200">
-                                Content Configured
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                                Empty
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
+                        {hasDealer ? (
+                          <Badge variant="secondary" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
+                            Configured
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">
+                            Empty
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
