@@ -3,6 +3,8 @@ import { publicFaqsQuery } from "@/queries";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Spinner } from "@/components/feedback/Spinner";
 
+import { applySeoTemplate } from "@/lib/utils";
+
 interface DynamicFaqProps {
   pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
   context: Record<string, string>;
@@ -14,20 +16,8 @@ export function DynamicFaq({ pageType, context, hideHeading = false }: DynamicFa
 
   const replacePlaceholders = (text: string) => {
     if (!text) return "";
-    let result = text;
-    for (const [key, value] of Object.entries(context)) {
-      if (value === undefined || value === null) continue;
-      const strVal = String(value);
-
-      // 1. Replace with curly braces: {variable_name}
-      const bracketRegex = new RegExp(`\\{${key}\\}`, "gi");
-      result = result.replace(bracketRegex, strVal);
-
-      // 2. Also replace bare word for legacy FAQs: variable_name
-      const bareRegex = new RegExp(`\\b${key}\\b`, "gi");
-      result = result.replace(bareRegex, strVal);
-    }
-    return result;
+    // STRICT RULE: Only replace variables enclosed in curly brackets like {price}, {product_name}, {city_name}
+    return applySeoTemplate(text, context);
   };
 
   if (isLoading) {
