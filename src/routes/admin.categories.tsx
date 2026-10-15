@@ -10,6 +10,7 @@ import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Layers, CornerDownRight, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
@@ -424,7 +425,7 @@ function AdminCategories() {
             </FormField>
 
             <FormField label="Name" htmlFor="categoryName" required error={form.formState.errors.categoryName?.message}>
-              <Input id="categoryName" {...form.register("categoryName")} placeholder="e.g. Car Batteries" />
+              <AutoResizeTextarea id="categoryName" {...form.register("categoryName")} placeholder="e.g. Car Batteries" />
             </FormField>
 
             <FormField label="URL Slug (Optional)" htmlFor="categorySlug" error={form.formState.errors.categorySlug?.message}>

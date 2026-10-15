@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -98,23 +98,23 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div className="space-y-2">
             <Label>SEO Title</Label>
-            <Input placeholder={`Buy category_name at Best Price | Batterymantra.com`} {...register("seoTitleTemplate")} />
+            <AutoResizeTextarea placeholder={`Buy category_name at Best Price | Batterymantra.com`} {...register("seoTitleTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>SEO Keywords</Label>
-            <Input placeholder={`category_name price, buy category_name...`} {...register("seoKeywordsTemplate")} />
+            <AutoResizeTextarea placeholder={`category_name price, buy category_name...`} {...register("seoKeywordsTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>SEO Description</Label>
-            <Input placeholder={`Buy category_name at Best Price. Cash on delivery available...`} {...register("seoDescriptionTemplate")} />
+            <AutoResizeTextarea placeholder={`Buy category_name at Best Price. Cash on delivery available...`} {...register("seoDescriptionTemplate")} />
           </div>
           <div className="space-y-2 mt-4 pt-4 border-t">
             <Label>OG Title</Label>
-            <Input placeholder={`Buy category_name at Best Price | Batterymantra.com`} {...register("ogTitleTemplate")} />
+            <AutoResizeTextarea placeholder={`Buy category_name at Best Price | Batterymantra.com`} {...register("ogTitleTemplate")} />
           </div>
           <div className="space-y-2">
             <Label>OG Description</Label>
-            <Input placeholder={`Buy category_name at Best Price. Cash on delivery available...`} {...register("ogDescriptionTemplate")} />
+            <AutoResizeTextarea placeholder={`Buy category_name at Best Price. Cash on delivery available...`} {...register("ogDescriptionTemplate")} />
           </div>
           <div className="pt-2 flex justify-end">
             <Button type="submit" disabled={isPending}>

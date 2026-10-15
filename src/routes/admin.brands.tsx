@@ -10,6 +10,7 @@ import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Tag, FileEdit } from "lucide-react";
 import { toast } from "sonner";
@@ -430,52 +431,52 @@ function AdminBrands() {
                     </div>
                     <div className="space-y-2">
                       <Label>SEO Title</Label>
-                      <Input placeholder="Buy Brand at Best Price" {...form.register("seo.metaTitle")} />
+                      <AutoResizeTextarea placeholder="Buy Brand at Best Price" {...form.register("seo.metaTitle")} />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <Label>Search / SEO Keywords</Label>
-                    <Input placeholder="Brand price, buy brand..." {...form.register("seo.metaKeywords")} />
+                    <AutoResizeTextarea placeholder="Brand price, buy brand..." {...form.register("seo.metaKeywords")} />
                   </div>
                   
                   <div className="space-y-2">
                     <Label>SEO Description</Label>
-                    <Input placeholder="Buy Brand At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+                    <AutoResizeTextarea placeholder="Buy Brand At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 pt-2">
                     <div className="space-y-2">
                       <Label>SEO Title City</Label>
-                      <Input placeholder="Brand Price in city_name" {...form.register("seo.metaTitleCity")} />
+                      <AutoResizeTextarea placeholder="Brand Price in city_name" {...form.register("seo.metaTitleCity")} />
                     </div>
                     <div className="space-y-2">
                       <Label>SEO Keywords City</Label>
-                      <Input placeholder="Brand At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+                      <AutoResizeTextarea placeholder="Brand At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <Label>SEO Description City</Label>
-                    <Input placeholder="Buy Brand At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
+                    <AutoResizeTextarea placeholder="Buy Brand At Best Price in city_name..." {...form.register("seo.metaDescriptionCity")} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 pt-2 border-t mt-4 border-muted">
                     <div className="space-y-2 mt-4">
                       <Label>OG Title</Label>
-                      <Input placeholder="OG Title" {...form.register("seo.ogTitle")} />
+                      <AutoResizeTextarea placeholder="OG Title" {...form.register("seo.ogTitle")} />
                     </div>
                     <div className="space-y-2 mt-4">
                       <Label>OG Description</Label>
-                      <Input placeholder="OG Description" {...form.register("seo.ogDescription")} />
+                      <AutoResizeTextarea placeholder="OG Description" {...form.register("seo.ogDescription")} />
                     </div>
                     <div className="space-y-2">
                       <Label>OG Title City</Label>
-                      <Input placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
+                      <AutoResizeTextarea placeholder="OG Title City" {...form.register("seo.ogTitleCity")} />
                     </div>
                     <div className="space-y-2">
                       <Label>OG Description City</Label>
-                      <Input placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
+                      <AutoResizeTextarea placeholder="OG Description City" {...form.register("seo.ogDescriptionCity")} />
                     </div>
                   </div>
                 </div>

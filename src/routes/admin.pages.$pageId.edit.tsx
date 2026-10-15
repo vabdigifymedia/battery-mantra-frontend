@@ -4,6 +4,7 @@ import { cmsService, CreateCmsPageRequest } from "@/services/cms.service";
 import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -170,7 +171,7 @@ function EditPage() {
 
             <div className="grid gap-2">
               <Label htmlFor="subTitle">Sub Title</Label>
-              <Input
+              <AutoResizeTextarea
                 id="subTitle"
                 {...register("subTitle")}
                 placeholder="e.g. India's top battery provider"
@@ -339,7 +340,7 @@ function EditPage() {
 
             <div className="grid gap-2">
               <Label htmlFor="seo.metaTitle">Meta Title</Label>
-              <Input id="seo.metaTitle" {...register("seo.metaTitle")} placeholder="Default uses Page Title" />
+              <AutoResizeTextarea id="seo.metaTitle" {...register("seo.metaTitle")} placeholder="Default uses Page Title" />
             </div>
 
             <div className="grid gap-2">
@@ -354,7 +355,7 @@ function EditPage() {
 
             <div className="grid gap-2">
               <Label htmlFor="seo.metaKeywords">Meta Keywords</Label>
-              <Input
+              <AutoResizeTextarea
                 id="seo.metaKeywords"
                 {...register("seo.metaKeywords")}
                 placeholder="e.g. battery, inverter battery, car battery, buy online"

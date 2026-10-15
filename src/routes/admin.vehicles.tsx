@@ -10,6 +10,7 @@ import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -628,7 +629,7 @@ function AdminVehicles() {
             </div>
 
             <FormField label="Model (Name)" htmlFor="model" required error={form.formState.errors.model?.message}>
-              <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
+              <AutoResizeTextarea id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
             </FormField>
 
             <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>

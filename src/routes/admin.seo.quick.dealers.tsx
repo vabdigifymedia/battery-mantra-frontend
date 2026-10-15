@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -98,7 +98,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div className="space-y-2">
             <Label>SEO Title</Label>
-            <Input 
+            <AutoResizeTextarea 
               placeholder={templateType.includes("WITH_CITY") 
                 ? "{brand_name} {category_name} Authorized Dealer in {city_name} | Batterymantra.com"
                 : "{brand_name} {category_name} Authorized Dealer Online | Batterymantra.com"
@@ -108,7 +108,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
           </div>
           <div className="space-y-2">
             <Label>SEO Keywords</Label>
-            <Input 
+            <AutoResizeTextarea 
               placeholder={templateType.includes("WITH_CITY")
                 ? "{brand_name} dealer in {city_name}, {brand_name} authorized shop {city_name}, genuine {brand_name} batteries"
                 : "{brand_name} dealer, authorized {brand_name} dealer online, genuine {brand_name} batteries"
@@ -118,7 +118,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
           </div>
           <div className="space-y-2">
             <Label>SEO Description</Label>
-            <Input 
+            <AutoResizeTextarea 
               placeholder={templateType.includes("WITH_CITY")
                 ? "Buy 100% Genuine {brand_name} {category_name} from Authorized Dealer in {city_name} at Best Price. Get Free Express Delivery and Installation in {delivery_time}."
                 : "Buy 100% Genuine {brand_name} {category_name} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in {delivery_time}."
@@ -128,7 +128,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
           </div>
           <div className="space-y-2 mt-4 pt-4 border-t">
             <Label>OG Title</Label>
-            <Input 
+            <AutoResizeTextarea 
               placeholder={templateType.includes("WITH_CITY") 
                 ? "{brand_name} {category_name} Authorized Dealer in {city_name} | Batterymantra.com"
                 : "{brand_name} {category_name} Authorized Dealer Online | Batterymantra.com"
@@ -138,7 +138,7 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
           </div>
           <div className="space-y-2">
             <Label>OG Description</Label>
-            <Input 
+            <AutoResizeTextarea 
               placeholder={templateType.includes("WITH_CITY")
                 ? "Buy 100% Genuine {brand_name} {category_name} from Authorized Dealer in {city_name} at Best Price. Free Express Delivery."
                 : "Buy 100% Genuine {brand_name} {category_name} from Authorized Dealer Online at Best Price in India. Free Express Delivery."

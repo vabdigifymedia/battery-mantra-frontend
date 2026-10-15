@@ -9,6 +9,7 @@ import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -247,7 +248,7 @@ function AddProductPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="productName">Product Name <span className="text-red-500">*</span></Label>
-                <Input id="productName" placeholder="e.g. Amaron Pro 12V 45Ah" {...form.register("productName")} />
+                <AutoResizeTextarea id="productName" placeholder="e.g. Amaron Pro 12V 45Ah" {...form.register("productName")} />
                 {form.formState.errors.productName && <p className="text-xs text-red-500">{form.formState.errors.productName.message}</p>}
               </div>
               <div className="space-y-2">

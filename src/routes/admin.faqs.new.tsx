@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { faqService } from "@/services/faq.service";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -91,7 +91,7 @@ function NewFaq() {
 
         <div className="space-y-2">
           <Label>Title (Question) <span className="text-destructive">*</span></Label>
-          <Input 
+          <AutoResizeTextarea 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
             placeholder="e.g. What is the price of {product_name} in {city_name}?" 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { faqService } from "@/services/faq.service";
 import { adminFaqsQuery } from "@/queries";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -107,7 +107,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
 
         <div className="space-y-2">
           <Label>Question (Title) <span className="text-destructive">*</span></Label>
-          <Input 
+          <AutoResizeTextarea 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
             placeholder="e.g. What is the price of {product_name} in {city_name}?" 
