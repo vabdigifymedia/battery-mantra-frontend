@@ -19,6 +19,7 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/ProductEnquiryModals";
+import { ShareProductModal } from "@/components/products/ShareProductModal";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
 import { cn, applySeoTemplate, toSlug } from "@/lib/utils";
@@ -171,6 +172,7 @@ export function PdpPage() {
   const [qty, setQty] = useState(1);
   const [isQuotationOpen, setIsQuotationOpen] = useState(false);
   const [isCorporateOpen, setIsCorporateOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const [showDeliveryPill, setShowDeliveryPill] = useState(true);
@@ -503,6 +505,15 @@ export function PdpPage() {
               >
                 <Search className="h-5 w-5" />
               </button>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="p-2 rounded-full hover:bg-muted text-foreground"
+                aria-label="Share Product"
+                title="Share Product"
+              >
+                <Share2 className="h-5 w-5" />
+              </button>
               <Link to="/shopping-cart" className="p-2 rounded-full hover:bg-muted text-foreground relative" aria-label="View Cart">
                 <ShoppingCart className="h-5 w-5" />
               </Link>
@@ -589,33 +600,46 @@ export function PdpPage() {
                   <div className="absolute -bottom-1.5 left-0 w-2 h-1.5 bg-emerald-800" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}></div>
                 </div>
 
-                {/* Floating Wishlist Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    toggleWishlist({
-                      productId: data.productId,
-                      productName: data.productName,
-                      productPrice: data.productPrice,
-                      originalPrice: data.originalPrice,
-                      exchangeDiscount: data.exchangeDiscount,
-                      productImage: data.productImage,
-                      productCategory: data.categoryName,
-                      brandName: data.brandName,
-                      capacity: data.capacity,
-                      seo: data.seo,
-                    });
-                  }}
-                  className="absolute top-4 sm:top-6 right-2 sm:right-4 z-20 p-2.5 rounded-full bg-white/90 backdrop-blur-md border border-border/60 text-muted-foreground hover:text-rose-500 hover:bg-white shadow-md transition-all active:scale-95"
-                  aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                >
-                  <Heart
-                    className={cn(
-                      "w-5 h-5 transition-all",
-                      wishlisted && "fill-rose-500 text-rose-500"
-                    )}
-                  />
-                </button>
+                {/* Floating Action Buttons: Wishlist & Share */}
+                <div className="absolute top-4 sm:top-6 right-2 sm:right-4 z-20 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleWishlist({
+                        productId: data.productId,
+                        productName: data.productName,
+                        productPrice: data.productPrice,
+                        originalPrice: data.originalPrice,
+                        exchangeDiscount: data.exchangeDiscount,
+                        productImage: data.productImage,
+                        productCategory: data.categoryName,
+                        brandName: data.brandName,
+                        capacity: data.capacity,
+                        seo: data.seo,
+                      });
+                    }}
+                    className="p-2.5 rounded-full bg-white/90 backdrop-blur-md border border-border/60 text-muted-foreground hover:text-rose-500 hover:bg-white shadow-md transition-all active:scale-95 flex items-center justify-center"
+                    aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <Heart
+                      className={cn(
+                        "w-5 h-5 transition-all",
+                        wishlisted && "fill-rose-500 text-rose-500"
+                      )}
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsShareModalOpen(true)}
+                    className="p-2.5 rounded-full bg-white/90 backdrop-blur-md border border-border/60 text-muted-foreground hover:text-brand hover:bg-white shadow-md transition-all active:scale-95 flex items-center justify-center"
+                    aria-label="Share product"
+                    title="Share product"
+                  >
+                    <Share2 className="w-5 h-5 transition-transform hover:scale-110" />
+                  </button>
+                </div>
 
                 {activeImage ? (
                   <button 
@@ -648,15 +672,28 @@ export function PdpPage() {
           <div className="lg:col-span-7 flex flex-col space-y-6 sm:space-y-8">
             {/* Title & Core Details */}
             <div className="space-y-2.5 sm:space-y-4 order-1">
-              <div>
-                {data.brandName && (
-                  <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-brand mb-0.5 sm:mb-1">
-                    {data.brandName}
-                  </p>
-                )}
-                <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
-                  {data.productName}
-                </h1>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  {data.brandName && (
+                    <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-brand mb-0.5 sm:mb-1">
+                      {data.brandName}
+                    </p>
+                  )}
+                  <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
+                    {data.productName}
+                  </h1>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground border-border/70 hover:border-border shadow-2xs hover:bg-muted shrink-0"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-brand" />
+                  <span>Share</span>
+                </Button>
               </div>
 
               {/* Reviews, Sold Stats & Creative Warranty Guarantee Banner */}
@@ -917,6 +954,17 @@ export function PdpPage() {
                     )}
                   >
                     <Heart className={cn("h-5 w-5", wishlisted && "fill-rose-600 text-rose-600")} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    aria-label="Share product"
+                    onClick={() => setIsShareModalOpen(true)}
+                    className="hidden sm:inline-flex h-12 sm:h-14 px-3 sm:px-3.5 border-2 transition-all shrink-0 bg-background sm:bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
+                    title="Share product"
+                  >
+                    <Share2 className="h-5 w-5" />
                   </Button>
                   <Button
                     variant="outline"
@@ -1243,6 +1291,20 @@ export function PdpPage() {
         productId={data.productId}
         productName={data.productName}
         brandName={data.brandName}
+      />
+
+      <ShareProductModal
+        open={isShareModalOpen}
+        onOpenChange={setIsShareModalOpen}
+        product={{
+          productId: data.productId,
+          productName: data.productName,
+          productImage: data.productImage || (galleryImages && galleryImages[0]),
+          brandName: data.brandName,
+          productPrice: data.productPrice,
+          exchangeDiscount: data.exchangeDiscount,
+          categoryName: data.categoryName,
+        }}
       />
     </div>
   );

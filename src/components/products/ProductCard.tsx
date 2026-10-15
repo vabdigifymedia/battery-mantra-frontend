@@ -9,7 +9,8 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
 import { cityDeliveryTimesQuery, categoriesQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
-import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart } from "lucide-react";
+import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,35 @@ export function ProductCard({
   }, [city?.cityName]);
 
   const hasExchange = (product.exchangeDiscount ?? 0) > 0;
+
+  const handleShareCard = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const productSlug = product.seo?.slug || product.productId;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/product/${productSlug}` : "";
+    const title = `${product.productName} | BatteryMantra`;
+    const text = `Check out ${product.productName} on BatteryMantra!`;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        return;
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+      }
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Product link copied to clipboard!");
+      } else {
+        toast.success("Product link copied!");
+      }
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
   const exchangePrice = hasExchange
     ? Math.max(0, product.productPrice - (product.exchangeDiscount || 0))
     : product.productPrice;
@@ -123,23 +153,35 @@ export function ProductCard({
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleWishlist(product);
-            }}
-            className="pointer-events-auto p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500 hover:bg-white transition-all shadow-sm"
-            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          >
-            <Heart
-              className={cn(
-                "w-4 h-4 transition-all",
-                wishlisted && "fill-rose-500 text-rose-500",
-              )}
-            />
-          </button>
+          <div className="flex items-center gap-1.5 pointer-events-auto">
+            <button
+              type="button"
+              onClick={handleShareCard}
+              className="p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-brand hover:bg-white transition-all shadow-sm active:scale-95"
+              aria-label="Share product"
+              title="Share product"
+            >
+              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleWishlist(product);
+              }}
+              className="p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500 hover:bg-white transition-all shadow-sm active:scale-95"
+              aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              <Heart
+                className={cn(
+                  "w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all",
+                  wishlisted && "fill-rose-500 text-rose-500",
+                )}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Product Image Stage */}
