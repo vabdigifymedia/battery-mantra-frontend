@@ -15,6 +15,7 @@ import { Trash2, Plus, Edit, Layers, CornerDownRight, ArrowUpDown } from "lucide
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import { generateSlug } from "@/lib/utils";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import {
   Dialog,
   DialogContent,
@@ -435,11 +436,9 @@ function AdminCategories() {
               name="categoryDescription"
               render={({ field }) => (
                 <FormField label="Description (HTML / SEO Content)" htmlFor="categoryDescription" error={form.formState.errors.categoryDescription?.message}>
-                  <div>
+                  <div className="space-y-2">
+                    <VariableChipsHelper type="CATEGORIES" compact={true} />
                     <RichTextEditor value={field.value || ""} onChange={field.onChange} />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code> which will be automatically replaced on the frontend based on the user's location and context.
-                    </p>
                   </div>
                 </FormField>
               )}

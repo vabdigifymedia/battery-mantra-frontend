@@ -24,6 +24,7 @@ import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 import { applySeoTemplate } from "@/lib/utils";
 import { apiFetch } from "@/lib/api/client";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
 const AVAILABLE_ICONS = [
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
@@ -433,6 +434,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productDescription">Description</Label>
+                <VariableChipsHelper type="PRODUCT" compact={true} />
                 <Controller
                   name="productDescription"
                   control={form.control}
@@ -443,9 +445,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                         onChange={field.onChange}
                         placeholder="Detailed product description..."
                       />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>, <code className="bg-muted px-1 rounded">{`{manufacturer_name}`}</code> which will be automatically replaced on the frontend based on the user's location and product context.
-                      </p>
                     </div>
                   )}
                 />
@@ -781,7 +780,8 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                 <Label>SEO Description</Label>
                 <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
               </div>
-              <div className="space-y-2 mt-4">
+              <div className="space-y-2 mt-4 pt-3 border-t">
+                <VariableChipsHelper type="SEO_PRODUCTS" compact={true} />
                 <Label>SEO Title City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
                 <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery Price in city_name | Batterymantra.com" {...form.register("seo.metaTitleCity")} />
               </div>

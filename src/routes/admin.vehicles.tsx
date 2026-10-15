@@ -21,6 +21,7 @@ import { X } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -665,6 +666,7 @@ function AdminVehicles() {
 
             <div className="space-y-2">
               <Label>Description</Label>
+              <VariableChipsHelper type="VEHICLES" compact={true} />
               <Controller
                 name="description"
                 control={form.control}

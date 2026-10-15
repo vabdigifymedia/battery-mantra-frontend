@@ -15,6 +15,7 @@ import { Trash2, Plus, Edit, Tag, FileEdit } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import { generateSlug, applySeoTemplate } from "@/lib/utils";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import { apiFetch } from "@/lib/api/client";
 import {
   Dialog,
@@ -413,9 +414,13 @@ function AdminBrands() {
             </div>
 
             {editingBrand && (
-              <div className="pt-6 pb-2">
-                <h3 className="text-lg font-semibold">SEO Information</h3>
-                <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this brand</p>
+              <div className="pt-6 pb-2 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">SEO Information</h3>
+                  <p className="text-sm text-muted-foreground">Configure search engine optimization for this brand</p>
+                </div>
+
+                <VariableChipsHelper type="BRANDS" compact={true} />
                 
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">

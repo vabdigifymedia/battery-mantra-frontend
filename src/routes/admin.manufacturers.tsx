@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { generateSlug, applySeoTemplate } from "@/lib/utils";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import { apiFetch } from "@/lib/api/client";
 import {
   Dialog,
@@ -402,9 +403,13 @@ function AdminManufacturers() {
             </div>
 
             {editingManufacturer && (
-              <div className="pt-6 pb-2">
-                <h3 className="text-lg font-semibold">SEO Information</h3>
-                <p className="text-sm text-muted-foreground mb-4">Configure search engine optimization for this manufacturer</p>
+              <div className="pt-6 pb-2 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">SEO Information</h3>
+                  <p className="text-sm text-muted-foreground">Configure search engine optimization for this manufacturer</p>
+                </div>
+
+                <VariableChipsHelper type="MANUFACTURERS" compact={true} />
                 
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">

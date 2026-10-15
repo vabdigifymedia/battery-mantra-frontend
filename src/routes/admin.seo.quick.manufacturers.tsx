@@ -12,6 +12,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Save } from "lucide-react";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
 export const Route = createFileRoute("/admin/seo/quick/manufacturers")({
   component: SeoQuickManufacturersPage,
@@ -53,15 +54,7 @@ function SeoQuickManufacturersPage() {
         </TabsList>
 
         <TabsContent value="manufacturers" className="space-y-6">
-          <div className="p-4 bg-muted/50 rounded-lg border text-sm">
-            <p className="font-semibold mb-1">Supported Variables (Manufacturer):</p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-1">
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer (e.g. BMW, Maruti, Honda)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Car Batteries)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city (e.g. Noida, Delhi)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Delivery time (e.g. 2-4 Hours)</li>
-            </ul>
-          </div>
+          <VariableChipsHelper type="SEO_MANUFACTURERS" title="Supported Variables (Manufacturer / Make):" />
 
           <SeoTemplateForm 
             title="Manufacturers (without city)" 
@@ -83,16 +76,7 @@ function SeoQuickManufacturersPage() {
         </TabsContent>
 
         <TabsContent value="sub-manufacturers" className="space-y-6">
-          <div className="p-4 bg-muted/50 rounded-lg border text-sm">
-            <p className="font-semibold mb-1">Supported Variables (Sub-Manufacturer / Models):</p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-1">
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{manufacturer_name}`}</code> - Name of the manufacturer/make (e.g. BMW, Maruti)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{model_name}`}</code> - Name of the model/sub-make (e.g. 3 Series 325i Petrol, Swift)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Car Batteries)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city (e.g. Noida, Delhi)</li>
-              <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Delivery time (e.g. 1-2 Hours)</li>
-            </ul>
-          </div>
+          <VariableChipsHelper type="SEO_MODELS" title="Supported Variables (Sub-Manufacturer / Models):" />
 
           <SeoTemplateForm 
             title="Sub-Manufacturers / Models (without city)" 

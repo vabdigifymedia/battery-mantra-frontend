@@ -23,6 +23,7 @@ import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 import { generateSlug } from "@/lib/utils";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { FormDraftBanner } from "@/components/forms/FormDraftBanner";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
 const AVAILABLE_ICONS = [
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield" },
@@ -251,6 +252,7 @@ function AddProductPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productDescription">Description</Label>
+                <VariableChipsHelper type="PRODUCT" compact={true} />
                 <Controller
                   name="productDescription"
                   control={form.control}
@@ -261,9 +263,6 @@ function AddProductPage() {
                         onChange={field.onChange}
                         placeholder="Detailed product description..."
                       />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        You can use dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 rounded">{`{brand_name}`}</code>, <code className="bg-muted px-1 rounded">{`{category_name}`}</code>, <code className="bg-muted px-1 rounded">{`{manufacturer_name}`}</code> which will be automatically replaced on the frontend based on the user's location and product context.
-                      </p>
                     </div>
                   )}
                 />

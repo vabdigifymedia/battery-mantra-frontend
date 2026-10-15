@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Save } from "lucide-react";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
 export const Route = createFileRoute("/admin/seo/quick/dealers")({
   component: SeoQuickDealersPage,
@@ -42,15 +43,7 @@ function SeoQuickDealersPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">SEO Quick (Brand Dealers)</h1>
         <p className="text-muted-foreground mt-2">Manage global SEO templates for all authorized brand dealer pages.</p>
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg border text-sm">
-          <p className="font-semibold mb-1">Supported Variables:</p>
-          <ul className="list-disc list-inside text-muted-foreground space-y-1">
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{brand_name}`}</code> - Name of the brand</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{category_name}`}</code> - Name of the category (e.g. Batteries, Inverters)</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{city_name}`}</code> - Name of the selected city</li>
-            <li><code className="bg-muted px-1.5 py-0.5 rounded text-primary">{`{delivery_time}`}</code> - Default delivery time (e.g. 2-4 Hours)</li>
-          </ul>
-        </div>
+        <VariableChipsHelper type="SEO_DEALERS" className="mt-4" />
       </div>
 
       <SeoTemplateForm 

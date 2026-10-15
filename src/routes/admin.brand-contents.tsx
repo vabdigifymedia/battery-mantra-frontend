@@ -29,20 +29,11 @@ import {
 } from "lucide-react";
 import { toSlug } from "@/lib/utils";
 import type { BrandContentRequest, BrandContentResponse } from "@/types/dto";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
 export const Route = createFileRoute("/admin/brand-contents")({
   component: AdminBrandContentsPage,
 });
-
-const TEMPLATE_VARIABLES = [
-  { key: "{city_name}", label: "City Name" },
-  { key: "{brand_name}", label: "Brand Name" },
-  { key: "{category_name}", label: "Category Name" },
-  { key: "{delivery_time}", label: "Delivery Time (1-2 Hours)" },
-  { key: "{price}", label: "Starting Price (With Exchange)" },
-  { key: "{price_range}", label: "Price Range (With Exchange)" },
-  { key: "{warranty_range}", label: "Warranty Period" },
-];
 
 function AdminBrandContentsPage() {
   const queryClient = useQueryClient();
@@ -55,7 +46,6 @@ function AdminBrandContentsPage() {
   const [dealerDescription, setDealerDescription] = useState("");
 
   const [isDirty, setIsDirty] = useState(false);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [tableSearch, setTableSearch] = useState("");
 
   // Queries
@@ -127,13 +117,6 @@ function AdminBrandContentsPage() {
     }
     setIsDirty(false);
     toast.info("Form reset to saved content.");
-  };
-
-  const handleCopyVariable = (key: string) => {
-    navigator.clipboard.writeText(key);
-    setCopiedKey(key);
-    toast.success(`Copied ${key} to clipboard`);
-    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   // Find selected names for previews
@@ -303,38 +286,7 @@ function AdminBrandContentsPage() {
       </Card>
 
       {/* Variable Chips Helper */}
-      <Card className="bg-muted/40 border-muted">
-        <CardContent className="py-3 px-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-              <Info className="h-4 w-4 text-primary shrink-0" />
-              <span>Supported Template Variables (click any chip to copy with curly brackets):</span>
-            </div>
-            <span className="text-[11px] text-muted-foreground italic">
-              Variables resolve dynamically on customer pages for their selected city and prices.
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2.5">
-            {TEMPLATE_VARIABLES.map((v) => (
-              <button
-                key={v.key}
-                type="button"
-                onClick={() => handleCopyVariable(v.key)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md bg-background hover:bg-primary/10 border hover:border-primary/40 text-foreground transition-all cursor-pointer font-mono group"
-                title={`Click to copy ${v.key} (${v.label})`}
-              >
-                <span className="font-semibold text-primary">{v.key}</span>
-                <span className="text-[11px] text-muted-foreground font-sans">({v.label})</span>
-                {copiedKey === v.key ? (
-                  <Check className="h-3 w-3 text-emerald-600" />
-                ) : (
-                  <Copy className="h-3 w-3 opacity-40 group-hover:opacity-100 transition-opacity" />
-                )}
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <VariableChipsHelper type="BRAND_CONTENTS" />
 
       {/* Editor Form (Two Columns) */}
       {selectedCategoryId && selectedBrandId ? (

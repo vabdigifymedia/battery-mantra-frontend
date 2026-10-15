@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import { toast } from "sonner";
 import { ArrowLeft, Monitor, Smartphone, Info, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -225,6 +226,8 @@ function NewPage() {
             <CardDescription>Write your page content using the rich text editor. You can embed images directly within the editor.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <VariableChipsHelper type="CMS_PAGES" />
+
             <div className="grid gap-2">
               <Label htmlFor="content">Description 1 (Main Content)</Label>
               <Controller
@@ -232,31 +235,11 @@ function NewPage() {
                 name="content"
                 render={({ field }) => (
                   <div>
-                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                      <span className="text-xs text-muted-foreground mr-1">Insert variable:</span>
-                      {["{city_name}", "{page_title}"].map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border border-dashed border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                          onClick={() => {
-                            const current = field.value || "";
-                            field.onChange(current + v);
-                            toast.info(`Inserted ${v} — it will appear at the end of current content.`);
-                          }}
-                        >
-                          + {v}
-                        </button>
-                      ))}
-                    </div>
                     <RichTextEditor
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Write your main page content here..."
                     />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{page_title}`}</code> are automatically replaced based on the user's location and context.
-                    </p>
                   </div>
                 )}
               />
@@ -269,31 +252,11 @@ function NewPage() {
                 name="content2"
                 render={({ field }) => (
                   <div>
-                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                      <span className="text-xs text-muted-foreground mr-1">Insert variable:</span>
-                      {["{city_name}", "{page_title}"].map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border border-dashed border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                          onClick={() => {
-                            const current = field.value || "";
-                            field.onChange(current + v);
-                            toast.info(`Inserted ${v} — it will appear at the end of current content.`);
-                          }}
-                        >
-                          + {v}
-                        </button>
-                      ))}
-                    </div>
                     <RichTextEditor
                       value={field.value || ""}
                       onChange={field.onChange}
                       placeholder="Write your secondary page content here (optional)..."
                     />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Dynamic variables like <code className="bg-muted px-1 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 rounded">{`{page_title}`}</code> are automatically replaced based on the user's location and context.
-                    </p>
                   </div>
                 )}
               />
@@ -308,6 +271,7 @@ function NewPage() {
             <CardDescription>Optimize this page for search engines and social media sharing</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <VariableChipsHelper type="CMS_PAGES" compact={true} />
             <div className="grid gap-2">
               <Label htmlFor="seo.slug">URL Slug</Label>
               <Input
