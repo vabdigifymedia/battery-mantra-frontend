@@ -84,7 +84,7 @@ export const Route = createFileRoute("/product/$")({
     }
   },
   head: ({ loaderData }) => {
-    const { product, templates, citySlug } = loaderData || {};
+    const { product, templates, citySlug, slug } = loaderData || {};
     const seo = (product?.specs?.seo as any) || product?.seo;
     
     const brandName = product?.brandName || "";
@@ -116,18 +116,70 @@ export const Route = createFileRoute("/product/$")({
       }
     );
 
+    const rawImage = product?.productImage || (product?.additionalImages && product.additionalImages[0]) || "";
+    const ogImage = rawImage
+      ? (rawImage.startsWith("http://") || rawImage.startsWith("https://")
+          ? rawImage
+          : `https://batterymantra.com${rawImage.startsWith("/") ? "" : "/"}${rawImage}`)
+      : "https://batterymantra.com/logo.png";
+    const imageType = ogImage.toLowerCase().endsWith(".jpg") || ogImage.toLowerCase().endsWith(".jpeg")
+      ? "image/jpeg"
+      : ogImage.toLowerCase().endsWith(".webp")
+      ? "image/webp"
+      : "image/png";
+    const pageUrl = citySlug
+      ? `https://batterymantra.com/product/${slug}/${citySlug}`
+      : `https://batterymantra.com/product/${slug}`;
+
     return {
       meta: [
         { title: resolvedSeo.metaTitle },
         { name: "description", content: resolvedSeo.metaDescription },
         { name: "keywords", content: resolvedSeo.metaKeywords },
-        { property: "og:title", content: resolvedSeo.ogTitle },
-        { property: "og:description", content: resolvedSeo.ogDescription },
-        { name: "robots", content: "index,follow" }
-      ].filter(m => ('title' in m) || m.content),
-      links: product?.productImage ? [
-        { rel: "preload", as: "image", href: product.productImage, fetchpriority: "high" }
-      ] : [],
+        { name: "robots", content: "index,follow" },
+
+        // Open Graph (WhatsApp, Facebook, LinkedIn, Telegram)
+        { property: "og:site_name", content: "BatteryMantra" },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:title", content: resolvedSeo.ogTitle || resolvedSeo.metaTitle },
+        { property: "og:description", content: resolvedSeo.ogDescription || resolvedSeo.metaDescription },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:secure_url", content: ogImage },
+        { property: "og:image:type", content: imageType },
+        { property: "og:image:alt", content: productName || "Battery" },
+        { property: "og:image:width", content: "800" },
+        { property: "og:image:height", content: "800" },
+
+        // Duplicate name="og:..." for platforms matching name attribute
+        { name: "og:title", content: resolvedSeo.ogTitle || resolvedSeo.metaTitle },
+        { name: "og:description", content: resolvedSeo.ogDescription || resolvedSeo.metaDescription },
+        { name: "og:image", content: ogImage },
+        { name: "og:url", content: pageUrl },
+
+        // Twitter Cards (summary_large_image displays prominent preview)
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@batterymantra" },
+        { name: "twitter:title", content: resolvedSeo.ogTitle || resolvedSeo.metaTitle },
+        { name: "twitter:description", content: resolvedSeo.ogDescription || resolvedSeo.metaDescription },
+        { name: "twitter:image", content: ogImage },
+        { name: "twitter:image:alt", content: productName || "Battery" },
+
+        // Product specific tags
+        ...(product?.productPrice ? [
+          { property: "product:price:amount", content: String(product.productPrice) },
+          { property: "product:price:currency", content: "INR" },
+        ] : []),
+        ...(brandName ? [
+          { property: "product:brand", content: brandName },
+        ] : []),
+      ].filter((m: any) => ('title' in m) || m.content),
+      links: [
+        { rel: "canonical", href: pageUrl },
+        ...(product?.productImage ? [
+          { rel: "preload", as: "image", href: product.productImage, fetchpriority: "high" }
+        ] : []),
+      ],
     };
   },
   component: PdpPage,

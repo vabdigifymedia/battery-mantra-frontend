@@ -82,7 +82,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: APP.tagline },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: APP.name },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://batterymantra.com/logo.png" },
+      { property: "og:image:secure_url", content: "https://batterymantra.com/logo.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@batterymantra" },
+      { name: "twitter:image", content: "https://batterymantra.com/logo.png" },
     ],
     links: [
       { rel: "icon", href: "/favicon.png", type: "image/png" },
