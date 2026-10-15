@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { cmsService } from "@/services/cms.service";
 import { Container } from "@/components/layout/Container";
@@ -11,6 +11,11 @@ import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/$slug")({
+  beforeLoad: ({ params: { slug } }) => {
+    if (slug === "shipping-and-replacement") {
+      throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, replace: true });
+    }
+  },
   component: CmsPageRender,
   loader: async ({ context, params: { slug } }) => {
     let page = null;
@@ -19,6 +24,13 @@ export const Route = createFileRoute("/$slug")({
       page = await cmsService.getPageBySlug(slug);
     } catch (e) {
       page = null;
+    }
+    if (!page && slug === "shipping-return") {
+      try {
+        page = await cmsService.getPageBySlug("shipping-and-replacement");
+      } catch {
+        page = null;
+      }
     }
     try {
       pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/" + slug));

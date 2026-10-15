@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Search, label: "Find Battery", to: "/vehicle-finder" },
   { icon: Grid, label: "Categories", to: "/categories" },
-  { icon: ShoppingCart, label: "Cart", to: "/cart", badge: true },
+  { icon: ShoppingCart, label: "Cart", to: "/shopping-cart", badge: true },
   { icon: User, label: "Account", to: "/account" },
 ];
 

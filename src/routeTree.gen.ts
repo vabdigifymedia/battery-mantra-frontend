@@ -20,7 +20,9 @@ import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as ReelsRouteImport } from './routes/reels'
 import { Route as ShopByManufacturersRouteImport } from './routes/shop-by-manufacturers'
+import { Route as ShoppingCartRouteImport } from './routes/shopping-cart'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -151,9 +153,19 @@ const ShopByManufacturersRoute = ShopByManufacturersRouteImport.update({
   path: '/shop-by-manufacturers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShoppingCartRoute = ShoppingCartRouteImport.update({
+  id: '/shopping-cart',
+  path: '/shopping-cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
   id: '/vehicle-finder',
   path: '/vehicle-finder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -557,7 +569,9 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRouteWithChildren
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
+  '/shopping-cart': typeof ShoppingCartRoute
   '/vehicle-finder': typeof VehicleFinderRoute
+  '/wishlist': typeof WishlistRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -643,7 +657,9 @@ export interface FileRoutesByTo {
   '/contact-us': typeof ContactUsRoute
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
+  '/shopping-cart': typeof ShoppingCartRoute
   '/vehicle-finder': typeof VehicleFinderRoute
+  '/wishlist': typeof WishlistRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -733,7 +749,9 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRouteWithChildren
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
+  '/shopping-cart': typeof ShoppingCartRoute
   '/vehicle-finder': typeof VehicleFinderRoute
+  '/wishlist': typeof WishlistRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -823,7 +841,9 @@ export interface FileRouteTypes {
     | '/partner'
     | '/reels'
     | '/shop-by-manufacturers'
+    | '/shopping-cart'
     | '/vehicle-finder'
+    | '/wishlist'
     | '/login'
     | '/register'
     | '/admin/banners'
@@ -909,7 +929,9 @@ export interface FileRouteTypes {
     | '/contact-us'
     | '/reels'
     | '/shop-by-manufacturers'
+    | '/shopping-cart'
     | '/vehicle-finder'
+    | '/wishlist'
     | '/login'
     | '/register'
     | '/admin/banners'
@@ -998,7 +1020,9 @@ export interface FileRouteTypes {
     | '/partner'
     | '/reels'
     | '/shop-by-manufacturers'
+    | '/shopping-cart'
     | '/vehicle-finder'
+    | '/wishlist'
     | '/_auth/login'
     | '/_auth/register'
     | '/admin/banners'
@@ -1088,7 +1112,9 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRouteWithChildren
   ReelsRoute: typeof ReelsRoute
   ShopByManufacturersRoute: typeof ShopByManufacturersRoute
+  ShoppingCartRoute: typeof ShoppingCartRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
+  WishlistRoute: typeof WishlistRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BrandDealerBrandSlugRoute: typeof BrandDealerBrandSlugRoute
   BrandBrandSlugRoute: typeof BrandBrandSlugRoute
@@ -1194,11 +1220,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopByManufacturersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shopping-cart': {
+      id: '/shopping-cart'
+      path: '/shopping-cart'
+      fullPath: '/shopping-cart'
+      preLoaderRoute: typeof ShoppingCartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vehicle-finder': {
       id: '/vehicle-finder'
       path: '/vehicle-finder'
       fullPath: '/vehicle-finder'
       preLoaderRoute: typeof VehicleFinderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/login': {
@@ -1881,7 +1921,9 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRouteWithChildren,
   ReelsRoute: ReelsRoute,
   ShopByManufacturersRoute: ShopByManufacturersRoute,
+  ShoppingCartRoute: ShoppingCartRoute,
   VehicleFinderRoute: VehicleFinderRoute,
+  WishlistRoute: WishlistRoute,
   AdminLoginRoute: AdminLoginRoute,
   BrandDealerBrandSlugRoute: BrandDealerBrandSlugRoute,
   BrandBrandSlugRoute: BrandBrandSlugRoute,

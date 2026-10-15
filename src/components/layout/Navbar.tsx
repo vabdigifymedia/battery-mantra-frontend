@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/AuthProvider";
 import { cartQuery } from "@/queries";
+import { useWishlist } from "@/providers/WishlistProvider";
 import { cn } from "@/lib/utils";
 
 export type NavLink = { label: string; to: string };
@@ -45,6 +46,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   const shouldFetchCart = status === "authenticated" && !isAdmin && !isPartner && !isEngineer;
   const cart = useQuery(cartQuery(shouldFetchCart));
   const cartCount = (cart.data?.cartItems ?? []).reduce((s, it) => s + it.quantity, 0);
+  const { items: wishlistItems } = useWishlist();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -112,8 +114,19 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
 
         <nav aria-label="Account actions" className="flex items-center gap-1 sm:gap-2">
 
-          <Button variant="ghost" size="icon" aria-label="Wishlist" className="hidden sm:inline-flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Wishlist${wishlistItems.length ? `, ${wishlistItems.length} items` : ""}`}
+            className="relative hidden sm:inline-flex"
+            onClick={() => navigate({ to: "/wishlist" })}
+          >
             <Heart className="h-5 w-5" />
+            {wishlistItems.length > 0 ? (
+              <span className="absolute -right-1 -top-1 grid h-4 place-items-center rounded-full bg-rose-600 px-1 text-[10px] font-semibold text-white">
+                {wishlistItems.length > 99 ? "99+" : wishlistItems.length}
+              </span>
+            ) : null}
           </Button>
 
           <Button
@@ -121,7 +134,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
             size="icon"
             aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
             className="relative"
-            onClick={() => navigate({ to: "/cart" })}
+            onClick={() => navigate({ to: "/shopping-cart" })}
           >
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 ? (
@@ -157,7 +170,12 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/cart">
+                  <Link to="/wishlist">
+                    <Heart className="mr-2 h-4 w-4" /> My Wishlist
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/shopping-cart">
                     <ShoppingCart className="mr-2 h-4 w-4" /> My cart
                   </Link>
                 </DropdownMenuItem>

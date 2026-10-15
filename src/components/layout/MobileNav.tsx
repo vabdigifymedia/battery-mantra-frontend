@@ -15,6 +15,7 @@ import {
   LogOut,
   Package,
   ShoppingCart,
+  Heart,
   Settings,
   Facebook,
   Instagram,
@@ -22,6 +23,7 @@ import {
   Youtube,
   Linkedin,
 } from "lucide-react";
+import { useWishlist } from "@/providers/WishlistProvider";
 
 type NavLink = { label: string; to: string };
 
@@ -74,6 +76,7 @@ export function MobileNav({
   const shouldFetchCart = status === "authenticated" && !isAdmin && !isPartner && !isEngineer;
   const cart = useQuery(cartQuery(shouldFetchCart));
   const cartCount = (cart.data?.cartItems ?? []).reduce((s, it) => s + it.quantity, 0);
+  const { items: wishlistItems } = useWishlist();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -149,7 +152,23 @@ export function MobileNav({
                     Account Settings
                   </Link>
                   <Link
-                    to="/cart"
+                    to="/wishlist"
+                    onClick={() => onOpenChange(false)}
+                    className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-all duration-200"
+                    activeProps={{ className: "bg-primary/10 text-primary" }}
+                  >
+                    <div className="flex items-center">
+                      <Heart className="mr-3 h-4.5 w-4.5 text-muted-foreground" />
+                      My Wishlist
+                    </div>
+                    {wishlistItems.length > 0 && (
+                      <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                        {wishlistItems.length}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    to="/shopping-cart"
                     onClick={() => onOpenChange(false)}
                     className="flex items-center rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-all duration-200"
                     activeProps={{ className: "bg-primary/10 text-primary" }}

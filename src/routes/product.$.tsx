@@ -54,6 +54,7 @@ import { cartService } from "@/services/cart.service";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
+import { useWishlist } from "@/providers/WishlistProvider";
 
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
@@ -183,6 +184,9 @@ export function PdpPage() {
   const { isServiceable, pincode, city } = useLocationStore();
   const locationChecked = Boolean(pincode || city);
   const blockPurchase = locationChecked && !isServiceable;
+
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const wishlisted = isWishlisted(data.productId);
 
   const vehicles = useQuery(vehiclesListQuery());
   const displayVehicles = data.capacity 
@@ -499,7 +503,7 @@ export function PdpPage() {
               >
                 <Search className="h-5 w-5" />
               </button>
-              <Link to="/cart" className="p-2 rounded-full hover:bg-muted text-foreground relative" aria-label="View Cart">
+              <Link to="/shopping-cart" className="p-2 rounded-full hover:bg-muted text-foreground relative" aria-label="View Cart">
                 <ShoppingCart className="h-5 w-5" />
               </Link>
             </div>
@@ -584,6 +588,34 @@ export function PdpPage() {
                   {/* Ribbon Fold effect */}
                   <div className="absolute -bottom-1.5 left-0 w-2 h-1.5 bg-emerald-800" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}></div>
                 </div>
+
+                {/* Floating Wishlist Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleWishlist({
+                      productId: data.productId,
+                      productName: data.productName,
+                      productPrice: data.productPrice,
+                      originalPrice: data.originalPrice,
+                      exchangeDiscount: data.exchangeDiscount,
+                      productImage: data.productImage,
+                      productCategory: data.categoryName,
+                      brandName: data.brandName,
+                      capacity: data.capacity,
+                      seo: data.seo,
+                    });
+                  }}
+                  className="absolute top-4 sm:top-6 right-2 sm:right-4 z-20 p-2.5 rounded-full bg-white/90 backdrop-blur-md border border-border/60 text-muted-foreground hover:text-rose-500 hover:bg-white shadow-md transition-all active:scale-95"
+                  aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart
+                    className={cn(
+                      "w-5 h-5 transition-all",
+                      wishlisted && "fill-rose-500 text-rose-500"
+                    )}
+                  />
+                </button>
 
                 {activeImage ? (
                   <button 
@@ -858,6 +890,34 @@ export function PdpPage() {
                 </div>
                 
                 <div className="flex-1 flex w-full gap-2 sm:gap-3 fixed bottom-0 left-0 right-0 z-[60] p-3 bg-background border-t border-border shadow-[0_-8px_16px_rgba(0,0,0,0.05)] sm:relative sm:z-auto sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none pb-safe sm:pb-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    onClick={() =>
+                      toggleWishlist({
+                        productId: data.productId,
+                        productName: data.productName,
+                        productPrice: data.productPrice,
+                        originalPrice: data.originalPrice,
+                        exchangeDiscount: data.exchangeDiscount,
+                        productImage: data.productImage,
+                        productCategory: data.categoryName,
+                        brandName: data.brandName,
+                        capacity: data.capacity,
+                        seo: data.seo,
+                      })
+                    }
+                    className={cn(
+                      "h-12 sm:h-14 px-3 sm:px-3.5 border-2 transition-all shrink-0 bg-background sm:bg-transparent",
+                      wishlisted
+                        ? "border-rose-300 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/30"
+                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Heart className={cn("h-5 w-5", wishlisted && "fill-rose-600 text-rose-600")} />
+                  </Button>
                   <Button
                     variant="outline"
                     size="lg"

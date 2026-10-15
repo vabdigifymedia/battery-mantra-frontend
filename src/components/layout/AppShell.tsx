@@ -33,7 +33,7 @@ const FOOTER_GROUPS: FooterGroup[] = [
   {
     title: "Policies",
     links: [
-      { label: "Shipping & Replacement", to: "/shipping-and-replacement" },
+      { label: "Shipping & Return", to: "/shipping-return" },
       { label: "Privacy Policy", to: "/privacy-policy" },
       { label: "Terms & Conditions", to: "/terms-conditions" },
     ],
