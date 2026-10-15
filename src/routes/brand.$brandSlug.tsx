@@ -14,8 +14,7 @@ import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { Container } from "@/components/layout/Container";
-import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
-import { ChevronRight, ShieldCheck, Car, Zap, BatteryCharging, Tag, Sparkles } from "lucide-react";
+import { ChevronRight, Car, Zap, BatteryCharging, Tag, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/brand/$brandSlug")({
   loader: async ({ context }) => {
@@ -108,61 +107,30 @@ function BrandProductsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <Container size="xl" className="pt-6">
+    <div className="flex flex-col">
+      <Container size="xl" className="pt-4 pb-2">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <nav className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-4">
           <Link to="/" className="hover:text-primary transition-colors">
             Home
           </Link>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-muted-foreground">Brands</span>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-foreground font-medium">{brandName}</span>
         </nav>
 
-        {/* Brand Header Banner */}
-        <div className="rounded-2xl border bg-gradient-to-r from-card via-card/95 to-primary/5 p-6 md:p-8 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <div className="flex h-20 w-32 md:h-24 md:w-40 shrink-0 items-center justify-center rounded-xl bg-background border p-3 shadow-inner">
-            {matchingBrand?.brandLogo ? (
-              <img
-                src={matchingBrand.brandLogo}
-                alt={brandName}
-                className="h-full w-full object-contain mix-blend-multiply"
-              />
-            ) : (
-              <span className="text-2xl font-bold text-primary">{brandName}</span>
-            )}
-          </div>
-          <div className="flex-1 text-center sm:text-left space-y-2">
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-                {brandName} Batteries & Inverters
-              </h1>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">
-                <ShieldCheck className="h-3.5 w-3.5" /> 100% Genuine
-              </span>
-            </div>
-            <p className="text-sm md:text-base text-muted-foreground max-w-2xl">
-              Select your battery category below to find genuine {brandName} models with verified manufacturer warranty, fast express delivery, and professional installation.
-            </p>
-          </div>
-        </div>
-
-        {/* Categories Grid (Only categories where this brand has products) */}
+        {/* Compact Categories Selector */}
         {brandCategories.length > 0 && (
-          <div className="mt-8 space-y-4">
-            <div className="border-b pb-3">
-              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+          <div className="mb-2">
+            <div className="flex items-center gap-2 mb-2.5">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 Select Category for {brandName}
               </h2>
-              <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
-                Choose a category to browse specific models, capacities, and best prices
-              </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
               {brandCategories.map((c) => {
                 const IconComponent = getCategoryIcon(c.categoryName);
                 const catSlug = toSlug(c.categoryName);
@@ -171,31 +139,25 @@ function BrandProductsPage() {
                     key={c.categoryId}
                     to="/brand-products/$categorySlug/$brandSlug"
                     params={{ categorySlug: catSlug, brandSlug }}
-                    className="group snap-start"
+                    className="group inline-flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-semibold text-foreground hover:text-primary shadow-xs"
                   >
-                    <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-5 text-center h-full hover:shadow-md transition-all border hover:border-primary/40">
-                      <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
-                        {c.iconUrl ? (
-                          <img
-                            src={c.iconUrl}
-                            alt={c.categoryName}
-                            className="h-full w-full object-contain mix-blend-multiply"
-                          />
-                        ) : (
-                          <IconComponent className="h-9 w-9 text-primary/80" />
-                        )}
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary shrink-0 group-hover:scale-110 transition-transform">
+                      {c.iconUrl ? (
+                        <img
+                          src={c.iconUrl}
+                          alt={c.categoryName}
+                          className="h-3.5 w-3.5 object-contain mix-blend-multiply"
+                        />
+                      ) : (
+                        <IconComponent className="h-3.5 w-3.5" />
+                      )}
+                    </span>
+                    <span>{c.categoryName}</span>
+                    {c.productCount ? (
+                      <span className="text-[10px] text-muted-foreground font-medium bg-muted px-1.5 py-0.5 rounded-full">
+                        {c.productCount}
                       </span>
-                      <div className="space-y-1">
-                        <span className="text-sm md:text-base font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-                          {c.categoryName}
-                        </span>
-                        {c.productCount ? (
-                          <p className="text-xs text-muted-foreground font-medium">
-                            {c.productCount} {c.productCount === 1 ? "Product" : "Products"}
-                          </p>
-                        ) : null}
-                      </div>
-                    </GradientBlobCard>
+                    ) : null}
                   </Link>
                 );
               })}
@@ -204,37 +166,25 @@ function BrandProductsPage() {
         )}
       </Container>
 
-      {/* Full Products Section */}
-      <div className="border-t pt-8">
-        <Container size="xl" className="mb-4">
-          <div className="border-b pb-3">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
-              All {brandName} Products
-            </h2>
-            <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
-              Browse and filter all available {brandName} batteries and inverters
-            </p>
-          </div>
-        </Container>
-
-        <ProductsPageLayout 
-          search={activeSearch}
-          onSearchChange={(newSearch) => {
-            if (
-              (newSearch.brand && newSearch.brand.split(',').length > 0 && !newSearch.brand.split(',').includes(brandSlug)) ||
-              (newSearch.category && newSearch.category.length > 0)
-            ) {
-              navigate({ 
-                to: "/products", 
-                search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
-              });
-            } else {
-              const { brand, ...cleanSearch } = newSearch;
-              navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
-            }
-          }}
-        />
-      </div>
+      {/* Products Section with Dynamic Banner as Primary Header */}
+      <ProductsPageLayout 
+        search={activeSearch}
+        hidePageHeader={true}
+        onSearchChange={(newSearch) => {
+          if (
+            (newSearch.brand && newSearch.brand.split(',').length > 0 && !newSearch.brand.split(',').includes(brandSlug)) ||
+            (newSearch.category && newSearch.category.length > 0)
+          ) {
+            navigate({ 
+              to: "/products", 
+              search: { ...activeSearch, ...newSearch, page: newSearch.page ?? activeSearch.page } 
+            });
+          } else {
+            const { brand, ...cleanSearch } = newSearch;
+            navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
+          }
+        }}
+      />
     </div>
   );
 }

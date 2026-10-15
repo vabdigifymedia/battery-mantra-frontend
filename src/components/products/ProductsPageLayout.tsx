@@ -53,6 +53,7 @@ export interface ProductsPageLayoutProps {
   hideCategoryFilter?: boolean;
   baseUrl?: string;
   isDealerPage?: boolean;
+  hidePageHeader?: boolean;
 }
 
 const SORTS: { value: ProductSort; label: string }[] = [
@@ -63,7 +64,7 @@ const SORTS: { value: ProductSort; label: string }[] = [
   { value: "name-desc", label: "Name (Z–A)" },
 ];
 
-export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl, isDealerPage }: ProductsPageLayoutProps) {
+export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl, isDealerPage, hidePageHeader }: ProductsPageLayoutProps) {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const categoriesList = useQuery(rootCategoriesQuery()).data || [];
   const brandsList = useQuery(brandsQuery(undefined)).data || [];
@@ -216,15 +217,17 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
 
   return (
     <div>
-      <PageHeader
-        title="Shop batteries"
-        description={
-          isLoading
-            ? "Loading the catalogue…"
-            : `${total} product${total === 1 ? "" : "s"}${search.q ? ` for "${search.q}"` : ""}`
-        }
-      />
-      <Container size="xl" className="grid gap-8 py-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+      {!hidePageHeader && (
+        <PageHeader
+          title="Shop batteries"
+          description={
+            isLoading
+              ? "Loading the catalogue…"
+              : `${total} product${total === 1 ? "" : "s"}${search.q ? ` for "${search.q}"` : ""}`
+          }
+        />
+      )}
+      <Container size="xl" className={`grid gap-8 ${hidePageHeader ? "pt-2 pb-8 sm:pb-12" : "py-8"} lg:grid-cols-[260px_minmax(0,1fr)]`}>
         <aside className="hidden lg:block">
           <ProductFilters state={filters} onChange={handleFilterChange} products={products} aggregations={aggregations} hideCategoryFilter={hideCategoryFilter} />
         </aside>
