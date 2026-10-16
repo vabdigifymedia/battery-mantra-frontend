@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 export type NavLink = { label: string; to: string };
 
 const DEFAULT_LINKS: NavLink[] = [
+  { label: "Categories", to: "/categories" },
   { label: "Shop", to: "/products" },
   { label: "Vehicle Finder", to: "/vehicle-finder" },
   { label: "Reels", to: "/reels" },

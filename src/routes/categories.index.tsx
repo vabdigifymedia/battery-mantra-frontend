@@ -50,7 +50,29 @@ function CategoriesPage() {
                   </>
                 );
 
-                if (c.subCategories && c.subCategories.length > 0) {
+                const isCategoryBrands =
+                  rawSlug === "inverter-battery" ||
+                  rawSlug === "generator-battery" ||
+                  rawSlug === "generator-batteries" ||
+                  c.clickAction === 'SHOW_BRANDS';
+
+                if (isCategoryBrands) {
+                  const targetSlug = rawSlug === "generator-battery" ? "generator-batteries" : rawSlug;
+                  return (
+                    <Link
+                      key={c.categoryId}
+                      to="/shop-by-category/$"
+                      params={{ _splat: targetSlug }}
+                      className="snap-start h-full"
+                    >
+                      <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">
+                        {cardContent}
+                      </GradientBlobCard>
+                    </Link>
+                  );
+                }
+
+                if (c.clickAction === 'SHOW_PRODUCTS') {
                   return (
                     <Link
                       key={c.categoryId}
@@ -65,11 +87,46 @@ function CategoriesPage() {
                   );
                 }
 
+                if (c.clickAction === 'SHOW_SUBCATEGORIES' || (c.subCategories && c.subCategories.length > 0)) {
+                  return (
+                    <Link
+                      key={c.categoryId}
+                      to="/shop-by-category/$"
+                      params={{ _splat: rawSlug }}
+                      className="snap-start h-full"
+                    >
+                      <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">
+                        {cardContent}
+                      </GradientBlobCard>
+                    </Link>
+                  );
+                }
+
+                const isVehicle = (() => {
+                  const n = c.categoryName.toLowerCase();
+                  return n.includes("commercial") || n.includes("tractor") || n.includes("three wheeler") || n.includes("3 wheeler");
+                })();
+
+                if (isVehicle) {
+                  return (
+                    <Link
+                      key={c.categoryId}
+                      to="/manufacturers/$categorySlug"
+                      params={{ categorySlug: rawSlug }}
+                      className="snap-start h-full"
+                    >
+                      <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">
+                        {cardContent}
+                      </GradientBlobCard>
+                    </Link>
+                  );
+                }
+
                 return (
                   <Link
                     key={c.categoryId}
-                    to="/manufacturers/$categorySlug"
-                    params={{ categorySlug: rawSlug }}
+                    to="/shop-by-category/$"
+                    params={{ _splat: rawSlug }}
                     className="snap-start h-full"
                   >
                     <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-3 sm:p-4 text-center h-full">

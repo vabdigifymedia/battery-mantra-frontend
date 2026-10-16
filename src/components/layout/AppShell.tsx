@@ -10,6 +10,7 @@ const FOOTER_GROUPS: FooterGroup[] = [
   {
     title: "Shop",
     links: [
+      { label: "All Categories", to: "/categories" },
       { label: "All Batteries", to: "/products" },
       { label: "Vehicle Finder", to: "/vehicle-finder" },
     ],

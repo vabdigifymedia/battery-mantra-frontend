@@ -150,8 +150,8 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                   {matchedCategories.map((cat: any) => (
                     <Link
                       key={cat.categoryId}
-                      to="/shop/c/$categorySlug"
-                      params={{ categorySlug: toSlug(cat.categoryName) }}
+                      to="/shop-by-category/$"
+                      params={{ _splat: cat.categorySlug || toSlug(cat.categoryName) }}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >
