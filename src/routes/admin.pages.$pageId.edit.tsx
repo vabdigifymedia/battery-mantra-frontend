@@ -39,6 +39,8 @@ function EditPage() {
   const { data: page, isLoading } = useQuery({
     queryKey: ["admin", "cms-pages", pageId],
     queryFn: () => cmsService.getPageById(pageId),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const { register, handleSubmit, control, formState: { errors }, reset, watch, setError, clearErrors } = useForm<CreateCmsPageRequest>({

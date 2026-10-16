@@ -88,7 +88,11 @@ export const Route = createFileRoute("/admin/products/$productId/edit")({
 
 function EditProductPage() {
   const { productId } = Route.useParams();
-  const { data: product, isLoading, isError } = useQuery(productDetailQuery(productId));
+  const { data: product, isLoading, isError } = useQuery({
+    ...productDetailQuery(productId),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
 
   if (isLoading) {
     return (
@@ -179,10 +183,25 @@ function EditProductPage() {
       canonicalUrl: product.seo?.canonicalUrl || (product.specs?.seo as any)?.canonicalUrl || "",
     }
   };
-  return <EditProductForm productId={productId} defaultValues={defaultValues} />;
+  return (
+    <EditProductForm
+      key={`${productId}-${product.productName}-${product.productPrice}-${product.productStock}`}
+      product={product}
+      productId={productId}
+      defaultValues={defaultValues}
+    />
+  );
 }
 
-function EditProductForm({ productId, defaultValues }: { productId: string; defaultValues: FormValues }) {
+function EditProductForm({
+  productId,
+  product,
+  defaultValues,
+}: {
+  productId: string;
+  product: any;
+  defaultValues: FormValues;
+}) {
   const navigate = useNavigate();
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: brands = [] } = useQuery(brandsQuery());
@@ -222,7 +241,15 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
     defaultValues,
+    values: defaultValues,
+    resetOptions: {
+      keepDirtyValues: false,
+    },
   });
+
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [product]);
 
   // Ensure categoryId and brandId stay synced — fixes race condition where
   // controlled Select value transitions (empty → valid) can wipe form values
@@ -310,6 +337,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     onSuccess: () => {
       draft.clearDraft();
       toast.success("Product updated successfully!");
+      queryClient.removeQueries({ queryKey: ["products", "detail", productId] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate({ to: "/admin/products" as any });

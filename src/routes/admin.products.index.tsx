@@ -36,7 +36,11 @@ export const Route = createFileRoute("/admin/products/")({
 
 function AdminProducts() {
   const queryClient = useQueryClient();
-  const { data: products, isLoading } = useQuery(productListQuery());
+  const { data: products, isLoading } = useQuery({
+    ...productListQuery(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeBrand, setActiveBrand] = useState("ALL");

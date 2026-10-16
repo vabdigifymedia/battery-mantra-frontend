@@ -30,13 +30,17 @@ const PAGE_TYPES = [
 function EditFaq() {
   const { id } = Route.useParams();
   
-  const { data: faqs, isLoading } = useQuery(adminFaqsQuery());
+  const { data: faqs, isLoading } = useQuery({
+    ...adminFaqsQuery(),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const faq = faqs?.find((f: any) => f.faqId === id);
 
   if (isLoading) return <div className="p-12 text-center"><Spinner className="mx-auto" /></div>;
   if (!faq) return <div className="p-12 text-center text-red-500">FAQ not found.</div>;
 
-  return <EditFaqForm faq={faq} id={id} />;
+  return <EditFaqForm key={`${id}-${faq.title}-${faq.pageType}`} faq={faq} id={id} />;
 }
 
 function EditFaqForm({ faq, id }: { faq: any; id: string }) {
@@ -47,6 +51,15 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
   const [title, setTitle] = useState(faq.title || "");
   const [description, setDescription] = useState(faq.description || "");
   const [isActive, setIsActive] = useState(faq.isActive ?? faq.active ?? true);
+
+  useEffect(() => {
+    if (faq) {
+      setPageType(faq.pageType || "");
+      setTitle(faq.title || "");
+      setDescription(faq.description || "");
+      setIsActive(faq.isActive ?? faq.active ?? true);
+    }
+  }, [faq]);
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => faqService.updateFaq(id, data),
