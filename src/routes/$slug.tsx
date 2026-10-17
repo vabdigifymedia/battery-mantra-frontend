@@ -15,6 +15,9 @@ export const Route = createFileRoute("/$slug")({
     if (slug === "shipping-and-replacement") {
       throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, replace: true });
     }
+    if (slug === "solar-systems" || slug === "solar") {
+      throw redirect({ to: "/shop-by-category/$", params: { _splat: "solar-systems" }, replace: true });
+    }
   },
   component: CmsPageRender,
   loader: async ({ context, params: { slug } }) => {

@@ -219,10 +219,11 @@ function SubcategoriesPage() {
     }
   }
 
-  if (!category && (categorySlug === "solar" || categorySlug === "solar-solutions" || categorySlug === "solar-power-solutions")) {
+  if (!category && (categorySlug === "solar-systems" || categorySlug === "solar" || categorySlug === "solar-solutions" || categorySlug === "solar-power-solutions")) {
     const rootSolar = data.find((c: any) => {
       const name = c.categoryName.toLowerCase();
-      return name.includes("solar") && !name.includes("lithium");
+      const slug = (c.categorySlug || toSlug(c.categoryName)).toLowerCase();
+      return (slug === "solar-systems" || slug === "solar" || name.includes("solar system") || name.includes("solar")) && !name.includes("lithium");
     });
     if (rootSolar) {
       category = rootSolar;
@@ -263,7 +264,10 @@ function SubcategoriesPage() {
 
   // Check if this is the Solar root category
   const isSolarRoot =
-    (catName === "solar" ||
+    (categorySlug === "solar-systems" ||
+     catName === "solar systems" ||
+     catName === "solar system" ||
+     catName === "solar" ||
      catName === "solar solutions" ||
      catName === "solar power solutions" ||
      catName === "solar products" ||

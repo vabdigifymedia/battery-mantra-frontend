@@ -326,21 +326,29 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 <div className="h-44 w-full rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3 mb-4 group-hover:bg-amber-50/30 transition-colors">
-                  <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="15" y="15" width="130" height="130" rx="8" fill="#0f172a" stroke="#cbd5e1" strokeWidth="4"/>
-                    <rect x="23" y="23" width="114" height="114" rx="4" fill="#0284c7" opacity="0.9"/>
-                    <line x1="23" y1="61" x2="137" y2="61" stroke="#e0f2fe" strokeWidth="1.5"/>
-                    <line x1="23" y1="99" x2="137" y2="99" stroke="#e0f2fe" strokeWidth="1.5"/>
-                    <line x1="61" y1="23" x2="61" y2="137" stroke="#e0f2fe" strokeWidth="1.5"/>
-                    <line x1="99" y1="23" x2="99" y2="137" stroke="#e0f2fe" strokeWidth="1.5"/>
-                    <circle cx="42" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
-                    <circle cx="80" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
-                    <circle cx="118" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
-                  </svg>
+                  {panelsCat?.iconUrl ? (
+                    <img 
+                      src={panelsCat.iconUrl} 
+                      alt={panelsCat.categoryName} 
+                      className="w-32 h-32 object-contain"
+                    />
+                  ) : (
+                    <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="15" y="15" width="130" height="130" rx="8" fill="#0f172a" stroke="#cbd5e1" strokeWidth="4"/>
+                      <rect x="23" y="23" width="114" height="114" rx="4" fill="#0284c7" opacity="0.9"/>
+                      <line x1="23" y1="61" x2="137" y2="61" stroke="#e0f2fe" strokeWidth="1.5"/>
+                      <line x1="23" y1="99" x2="137" y2="99" stroke="#e0f2fe" strokeWidth="1.5"/>
+                      <line x1="61" y1="23" x2="61" y2="137" stroke="#e0f2fe" strokeWidth="1.5"/>
+                      <line x1="99" y1="23" x2="99" y2="137" stroke="#e0f2fe" strokeWidth="1.5"/>
+                      <circle cx="42" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
+                      <circle cx="80" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
+                      <circle cx="118" cy="42" r="3" fill="#ffffff" opacity="0.7"/>
+                    </svg>
+                  )}
                 </div>
 
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                  Solar Panels
+                  {panelsCat?.categoryName || "Solar Panels"}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   Mono-PERC, Half-Cut & Bifacial Modules with up to 22.8% cell efficiency.
@@ -369,20 +377,28 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 <div className="h-44 w-full rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3 mb-4 group-hover:bg-amber-50/30 transition-colors">
-                  <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="30" y="20" width="100" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" strokeWidth="3"/>
-                    <rect x="42" y="32" width="76" height="40" rx="4" fill="#0f172a"/>
-                    <text x="50" y="52" fill="#10b981" fontSize="10" fontFamily="monospace">GEN: 3.2 kW</text>
-                    <text x="50" y="65" fill="#38bdf8" fontSize="9" fontFamily="monospace">GRID: 230V OK</text>
-                    <circle cx="80" cy="95" r="14" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="2"/>
-                    <path d="M76 95 L84 95 M80 91 L80 99" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"/>
-                    <line x1="45" y1="124" x2="115" y2="124" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round"/>
-                    <line x1="50" y1="129" x2="110" y2="129" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                  {invertersCat?.iconUrl ? (
+                    <img 
+                      src={invertersCat.iconUrl} 
+                      alt={invertersCat.categoryName} 
+                      className="w-32 h-32 object-contain"
+                    />
+                  ) : (
+                    <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="30" y="20" width="100" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" strokeWidth="3"/>
+                      <rect x="42" y="32" width="76" height="40" rx="4" fill="#0f172a"/>
+                      <text x="50" y="52" fill="#10b981" fontSize="10" fontFamily="monospace">GEN: 3.2 kW</text>
+                      <text x="50" y="65" fill="#38bdf8" fontSize="9" fontFamily="monospace">GRID: 230V OK</text>
+                      <circle cx="80" cy="95" r="14" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="2"/>
+                      <path d="M76 95 L84 95 M80 91 L80 99" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="45" y1="124" x2="115" y2="124" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="50" y1="129" x2="110" y2="129" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  )}
                 </div>
 
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                  Solar Inverters
+                  {invertersCat?.categoryName || "Solar Inverters"}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   On-Grid, Off-Grid & Hybrid PCU Inverters with built-in solar prioritizing.
@@ -411,23 +427,31 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 <div className="h-44 w-full rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3 mb-4 group-hover:bg-amber-50/30 transition-colors">
-                  <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="25" y="45" width="110" height="95" rx="6" fill="#1e293b" stroke="#0f172a" strokeWidth="3"/>
-                    <rect x="20" y="32" width="120" height="16" rx="4" fill="#dc2626"/>
-                    <rect x="36" y="24" width="12" height="10" rx="2" fill="#ef4444"/>
-                    <rect x="112" y="24" width="12" height="10" rx="2" fill="#3b82f6"/>
-                    <circle cx="56" cy="40" r="3" fill="#ffffff"/>
-                    <circle cx="72" cy="40" r="3" fill="#ffffff"/>
-                    <circle cx="88" cy="40" r="3" fill="#ffffff"/>
-                    <circle cx="104" cy="40" r="3" fill="#ffffff"/>
-                    <rect x="35" y="60" width="90" height="40" rx="3" fill="#ffffff"/>
-                    <text x="42" y="78" fill="#dc2626" fontSize="10" fontWeight="bold">SOLAR TUBULAR</text>
-                    <text x="42" y="92" fill="#0f172a" fontSize="9" fontWeight="bold">150Ah - C10 RATING</text>
-                  </svg>
+                  {batteriesCat?.iconUrl ? (
+                    <img 
+                      src={batteriesCat.iconUrl} 
+                      alt={batteriesCat.categoryName} 
+                      className="w-32 h-32 object-contain"
+                    />
+                  ) : (
+                    <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="25" y="45" width="110" height="95" rx="6" fill="#1e293b" stroke="#0f172a" strokeWidth="3"/>
+                      <rect x="20" y="32" width="120" height="16" rx="4" fill="#dc2626"/>
+                      <rect x="36" y="24" width="12" height="10" rx="2" fill="#ef4444"/>
+                      <rect x="112" y="24" width="12" height="10" rx="2" fill="#3b82f6"/>
+                      <circle cx="56" cy="40" r="3" fill="#ffffff"/>
+                      <circle cx="72" cy="40" r="3" fill="#ffffff"/>
+                      <circle cx="88" cy="40" r="3" fill="#ffffff"/>
+                      <circle cx="104" cy="40" r="3" fill="#ffffff"/>
+                      <rect x="35" y="60" width="90" height="40" rx="3" fill="#ffffff"/>
+                      <text x="42" y="78" fill="#dc2626" fontSize="10" fontWeight="bold">SOLAR TUBULAR</text>
+                      <text x="42" y="92" fill="#0f172a" fontSize="9" fontWeight="bold">150Ah - C10 RATING</text>
+                    </svg>
+                  )}
                 </div>
 
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                  Solar Tubular Batteries
+                  {batteriesCat?.categoryName || "Solar Tubular Batteries"}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   Heavy-duty tall tubular backup batteries with 1500+ deep cycles and minimal water loss.
@@ -456,19 +480,27 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 <div className="h-44 w-full rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-3 mb-4 group-hover:bg-amber-50/30 transition-colors">
-                  <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="20" y="115" width="120" height="14" rx="2" fill="#94a3b8" stroke="#64748b" strokeWidth="2"/>
-                    <polygon points="35,115 50,65 65,115" fill="#cbd5e1" stroke="#64748b" strokeWidth="2"/>
-                    <rect x="60" y="30" width="40" height="16" rx="4" fill="#0f172a"/>
-                    <rect x="52" y="34" width="8" height="8" rx="1" fill="#dc2626"/>
-                    <rect x="100" y="34" width="8" height="8" rx="1" fill="#38bdf8"/>
-                    <circle cx="110" cy="75" r="22" fill="none" stroke="#dc2626" strokeWidth="5"/>
-                    <circle cx="110" cy="75" r="16" fill="none" stroke="#0f172a" strokeWidth="5"/>
-                  </svg>
+                  {accessoriesCat?.iconUrl ? (
+                    <img 
+                      src={accessoriesCat.iconUrl} 
+                      alt={accessoriesCat.categoryName} 
+                      className="w-32 h-32 object-contain"
+                    />
+                  ) : (
+                    <svg viewBox="0 0 160 160" className="w-32 h-32 object-contain" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="20" y="115" width="120" height="14" rx="2" fill="#94a3b8" stroke="#64748b" strokeWidth="2"/>
+                      <polygon points="35,115 50,65 65,115" fill="#cbd5e1" stroke="#64748b" strokeWidth="2"/>
+                      <rect x="60" y="30" width="40" height="16" rx="4" fill="#0f172a"/>
+                      <rect x="52" y="34" width="8" height="8" rx="1" fill="#dc2626"/>
+                      <rect x="100" y="34" width="8" height="8" rx="1" fill="#38bdf8"/>
+                      <circle cx="110" cy="75" r="22" fill="none" stroke="#dc2626" strokeWidth="5"/>
+                      <circle cx="110" cy="75" r="16" fill="none" stroke="#0f172a" strokeWidth="5"/>
+                    </svg>
+                  )}
                 </div>
 
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                  Solar Accessories
+                  {accessoriesCat?.categoryName || "Solar Accessories"}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   GI mounting structures, MC4 branch connectors, DC cables, and surge lightning arrestors.
