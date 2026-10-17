@@ -14,6 +14,7 @@ import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { LithiumMainPage } from "@/components/lithium/LithiumMainPage";
 import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage";
+import { SolarMainPage } from "@/components/solar/SolarMainPage";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 
@@ -218,6 +219,16 @@ function SubcategoriesPage() {
     }
   }
 
+  if (!category && (categorySlug === "solar" || categorySlug === "solar-solutions" || categorySlug === "solar-power-solutions")) {
+    const rootSolar = data.find((c: any) => {
+      const name = c.categoryName.toLowerCase();
+      return name.includes("solar") && !name.includes("lithium");
+    });
+    if (rootSolar) {
+      category = rootSolar;
+    }
+  }
+
   if (!category) {
     return (
       <ErrorState
@@ -248,6 +259,22 @@ function SubcategoriesPage() {
     if (isLithiumSolar) type = "lithium-inbuilt-solar-inverter-battery";
     if (isLithiumIntegrated) type = "lithium-integrated-inverter-battery";
     return <LithiumSubCategoryPage category={category} type={type} />;
+  }
+
+  // Check if this is the Solar root category
+  const isSolarRoot =
+    (catName === "solar" ||
+     catName === "solar solutions" ||
+     catName === "solar power solutions" ||
+     catName === "solar products" ||
+     categorySlug === "solar" ||
+     categorySlug === "solar-solutions" ||
+     categorySlug === "solar-power-solutions" ||
+     (catName.includes("solar") && sorted.length > 0)) &&
+    !catName.includes("lithium");
+
+  if (isSolarRoot) {
+    return <SolarMainPage category={category} subcategories={sorted} />;
   }
 
   // If this category has subcategories, display subcategory cards
