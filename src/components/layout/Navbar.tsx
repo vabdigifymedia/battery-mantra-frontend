@@ -38,7 +38,6 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isProductDetailPage = pathname.match(/^\/products\/[^\/]+$/);
   const { status, user, signOut, hasRole } = useAuth();
   const isAdmin = hasRole("ADMIN");
   const isPartner = hasRole("PARTNER");
@@ -69,19 +68,19 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full border-b border-transparent bg-background/85 backdrop-blur transition-shadow",
-        scrolled && "border-border shadow-sm",
+        "sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md transition-shadow",
+        scrolled ? "border-b border-border shadow-sm" : "border-b border-border/40",
       )}
     >
       <Container
         size="xl"
-        className="flex items-center justify-between gap-4 py-3 sm:gap-6"
+        className="flex items-center justify-between gap-3 py-2.5 sm:gap-6 sm:py-3"
       >
         <div className="flex min-w-0 items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="xl:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
@@ -89,12 +88,12 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
           </Button>
           <Logo />
           <LocationSelector />
-          <nav aria-label="Primary" className="ml-4 hidden items-center gap-1 lg:flex">
+          <nav aria-label="Primary" className="ml-3 hidden items-center gap-1 xl:flex">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground whitespace-nowrap"
                 activeProps={{ className: "text-foreground bg-muted" }}
               >
                 {l.label}
@@ -103,13 +102,13 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
           </nav>
         </div>
 
-        <form onSubmit={onSearch} className="hidden flex-1 max-w-2xl mx-4 lg:block">
+        <form onSubmit={onSearch} className="hidden flex-1 max-w-xl mx-2 xl:mx-4 lg:block">
           <LiveSearchBox
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onClear={() => setQuery("")}
             onSubmit={handleSearchSubmit}
-            containerClassName="max-w-2xl mx-auto"
+            containerClassName="w-full"
           />
         </form>
 
@@ -199,20 +198,19 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
         </nav>
       </Container>
 
-      {!isProductDetailPage && (
-        <div className="border-t border-border lg:hidden">
-          <Container size="xl" className="py-2.5">
-            <form onSubmit={onSearch}>
-              <LiveSearchBox
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onClear={() => setQuery("")}
-                onSubmit={handleSearchSubmit}
-              />
-            </form>
-          </Container>
-        </div>
-      )}
+      <div className="border-t border-border/50 lg:hidden bg-background">
+        <Container size="xl" className="py-2">
+          <form onSubmit={onSearch} className="w-full">
+            <LiveSearchBox
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onClear={() => setQuery("")}
+              onSubmit={handleSearchSubmit}
+              containerClassName="w-full"
+            />
+          </form>
+        </Container>
+      </div>
 
       <MobileNav open={mobileOpen} onOpenChange={setMobileOpen} links={links} />
     </header>

@@ -64,9 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <div>
-        <Navbar />
-      </div>
+      <Navbar />
       <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">
         {children}
       </main>
