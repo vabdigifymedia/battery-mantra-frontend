@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, adminProductDetailQuery, productListQuery } from "@/queries";
+import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, adminProductDetailQuery, adminProductListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
@@ -351,7 +351,7 @@ function EditProductForm({
   const onSubmit = async (data: FormValues) => {
     // Duplicate Product Check
     try {
-      const allProducts = await queryClient.fetchQuery(productListQuery());
+      const allProducts = await queryClient.fetchQuery(adminProductListQuery());
       if (allProducts) {
         const isDuplicate = allProducts.some(
           p => p.productId !== productId && p.productName.toLowerCase().trim() === data.productName.toLowerCase().trim()

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { productListQuery, rootCategoriesQuery, brandsQuery } from "@/queries";
+import { adminProductListQuery, rootCategoriesQuery, brandsQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
@@ -79,7 +79,7 @@ function SortableProductCard({ product }: { product: any }) {
 
 function AdminProductPriority() {
   const queryClient = useQueryClient();
-  const { data: allProducts, isLoading: isProductsLoading } = useQuery(productListQuery());
+  const { data: allProducts, isLoading: isProductsLoading } = useQuery(adminProductListQuery());
   const { data: categories } = useQuery(rootCategoriesQuery());
   const { data: brands } = useQuery(brandsQuery());
   

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { productListQuery } from "@/queries";
+import { adminProductListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/admin/products/")({
 function AdminProducts() {
   const queryClient = useQueryClient();
   const { data: products, isLoading } = useQuery({
-    ...productListQuery(),
+    ...adminProductListQuery(),
     staleTime: 0,
     refetchOnMount: "always",
   });
@@ -72,6 +72,7 @@ function AdminProducts() {
     mutationFn: (id: string) => adminService.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       toast.success("Product deleted successfully");
     },
     onError: () => toast.error("Failed to delete product"),
@@ -81,6 +82,7 @@ function AdminProducts() {
     mutationFn: (id: string) => adminService.approveProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       toast.success("Product approved and activated!");
     },
     onError: () => toast.error("Failed to approve product"),
