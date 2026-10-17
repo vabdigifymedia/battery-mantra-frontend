@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
-import { productFilterQuery } from "@/queries";
+import { productFilterQuery, brandsQuery } from "@/queries";
 import { ProductCard } from "@/components/products/ProductCard";
 import { CategoryListResponse } from "@/types/dto";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
@@ -43,9 +43,46 @@ interface SolarMainPageProps {
 }
 
 export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
-  // Fetch real products under this solar category
+  // Fetch real brands from backend DB
+  const { data: allBrands } = useQuery(brandsQuery());
+
+  const targetBrandNames = ["Luminous", "Exide", "Microtek", "Livguard"];
+
+  // Fallback logos directly matching Cloudinary URLs from DB to avoid any flicker/delay
+  const partnerBrands = useMemo(() => {
+    const fallbackLogos: Record<string, string> = {
+      Luminous: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901729/1540luminous-logo-600x315_gl1xj9.png",
+      Exide: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901728/898logo_png_jmaikg.png",
+      Microtek: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901740/4392LOGO_m6nnnx.png",
+      Livguard: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901733/2370Logo_axhvin.jpg",
+    };
+
+    return targetBrandNames.map((name) => {
+      const found = allBrands?.find(
+        (b) => b.brandName.toLowerCase() === name.toLowerCase()
+      );
+      return {
+        brandId: found?.brandId,
+        brandName: found?.brandName || name,
+        brandLogo: found?.brandLogo || fallbackLogos[name],
+      };
+    });
+  }, [allBrands]);
+
+  // Aggregate category IDs (root solar + subcategories) so products tagged under any of them are automatically fetched
+  const categoryIds = useMemo(() => {
+    const ids = [category.categoryId];
+    subcategories.forEach((s) => {
+      if (s.categoryId && !ids.includes(s.categoryId)) {
+        ids.push(s.categoryId);
+      }
+    });
+    return ids;
+  }, [category.categoryId, subcategories]);
+
+  // Fetch real products under this solar category & its subcategories
   const { data: productsData, isLoading: isProductsLoading } = useQuery(
-    productFilterQuery({ categoryId: [category.categoryId], size: 8 })
+    productFilterQuery({ categoryId: categoryIds, size: 8 })
   );
   const products = productsData?.content || [];
 
@@ -183,15 +220,38 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </a>
               </div>
 
-              {/* Trust snippet */}
-              <div className="flex items-center gap-4 pt-2 text-xs text-slate-500 font-medium">
-                <div className="flex -space-x-1.5">
-                  <div className="w-6 h-6 rounded-full bg-amber-400 border border-white text-[10px] font-bold text-slate-900 flex items-center justify-center">L</div>
-                  <div className="w-6 h-6 rounded-full bg-emerald-500 border border-white text-[10px] font-bold text-white flex items-center justify-center">T</div>
-                  <div className="w-6 h-6 rounded-full bg-red-500 border border-white text-[10px] font-bold text-white flex items-center justify-center">E</div>
-                  <div className="w-6 h-6 rounded-full bg-blue-600 border border-white text-[10px] font-bold text-white flex items-center justify-center">M</div>
+              {/* Trust snippet with real brand logos */}
+              <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-slate-600 font-medium">
+                <div className="flex -space-x-2 shrink-0 items-center">
+                  {partnerBrands.map((brand) => (
+                    <div 
+                      key={brand.brandName} 
+                      className="w-8 h-8 rounded-full bg-white border-2 border-white shadow-xs flex items-center justify-center p-1 overflow-hidden ring-1 ring-slate-200/90 transition-transform hover:scale-110 hover:z-20"
+                      title={brand.brandName}
+                    >
+                      <img 
+                        src={brand.brandLogo} 
+                        alt={brand.brandName} 
+                        className="w-full h-full object-contain" 
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
-                <span>Authorized dealer for <strong>Luminous, Tata Power, Exide & Microtek</strong></span>
+                <span>
+                  Authorized dealer for{" "}
+                  <strong className="text-slate-900 font-bold">
+                    {partnerBrands.map((b, idx) => (
+                      <span key={b.brandName}>
+                        {b.brandName}
+                        {idx < partnerBrands.length - 2 ? ", " : idx === partnerBrands.length - 2 ? " & " : ""}
+                      </span>
+                    ))}
+                  </strong>
+                </span>
               </div>
             </div>
 
@@ -531,7 +591,7 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
               </div>
               <h3 className="text-base font-bold text-slate-900">Top Trusted Brands</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Partnered directly with Luminous, Tata Power Solar, Microtek, Exide, Livguard, and Eastman for guaranteed original hardware.
+                Partnered directly with Luminous, Microtek, Exide, Livguard, and Eastman for guaranteed original hardware.
               </p>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-blue-700">
                 <BadgeCheck className="w-4 h-4" /> 100% Original
@@ -958,7 +1018,7 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 uppercase tracking-wider">
-                      Tata Power Solar
+                      Livguard Solar
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/50">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> In Stock
@@ -990,7 +1050,7 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                   </div>
 
                   <h3 className="text-sm font-bold text-slate-900 mt-1 line-clamp-2 leading-snug group-hover:text-red-600 transition-colors">
-                    Tata Power Solar 550W Bifacial Dual-Glass Solar Module
+                    Livguard 550W Bifacial Dual-Glass Solar Module
                   </h3>
                   <p className="text-[11px] text-slate-500 mt-1">Absorbs sunlight from both front and rear albedo reflections for extra power.</p>
                 </div>
