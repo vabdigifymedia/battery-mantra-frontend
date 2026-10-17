@@ -195,67 +195,24 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
               </div>
             </div>
 
-            {/* Right: Modern Vector Visual with Live Stat Badges */}
+            {/* Right: Modern Visual with Live Stat Badges */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none rounded-2xl overflow-hidden border border-slate-200/90 shadow-md bg-gradient-to-b from-sky-50 to-amber-50/40 p-4">
+              <div className="relative mx-auto max-w-md lg:max-w-none rounded-2xl overflow-hidden border border-slate-200/90 shadow-md bg-gradient-to-b from-sky-50 to-amber-50/40 p-3 sm:p-4">
                 
-                {/* Rooftop Solar Illustration Container */}
-                <div className="relative h-72 sm:h-80 w-full rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center">
-                  <svg viewBox="0 0 500 340" className="w-full h-full object-cover" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#38bdf8"/>
-                        <stop offset="40%" stopColor="#7dd3fc"/>
-                        <stop offset="100%" stopColor="#fef08a"/>
-                      </linearGradient>
-                      <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#0f172a"/>
-                        <stop offset="50%" stopColor="#1e293b"/>
-                        <stop offset="100%" stopColor="#0284c7"/>
-                      </linearGradient>
-                      <radialGradient id="sunGlow" cx="80%" cy="20%" r="50%">
-                        <stop offset="0%" stopColor="#ffffff"/>
-                        <stop offset="20%" stopColor="#fbbf24" stopOpacity="0.9"/>
-                        <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.4"/>
-                        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0"/>
-                      </radialGradient>
-                    </defs>
-                    <rect width="500" height="340" fill="url(#skyGrad)"/>
-                    <circle cx="410" cy="70" r="90" fill="url(#sunGlow)"/>
-                    <circle cx="410" cy="70" r="32" fill="#fffbeb"/>
-
-                    <polygon points="40,240 250,150 460,240 460,340 40,340" fill="#f1f5f9"/>
-                    <polygon points="250,150 460,240 480,250 250,165" fill="#cbd5e1"/>
-                    <polygon points="40,240 250,150 250,165 20,250" fill="#94a3b8"/>
-                    
-                    <g transform="translate(60, 195) skewY(-22) scale(0.85)">
-                      <rect x="0" y="0" width="70" height="45" rx="3" fill="url(#panelGrad)" stroke="#38bdf8" strokeWidth="1.5"/>
-                      <line x1="23" y1="0" x2="23" y2="45" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="47" y1="0" x2="47" y2="45" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="0" y1="22" x2="70" y2="22" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-
-                      <rect x="76" y="0" width="70" height="45" rx="3" fill="url(#panelGrad)" stroke="#38bdf8" strokeWidth="1.5"/>
-                      <line x1="99" y1="0" x2="99" y2="45" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="123" y1="0" x2="123" y2="45" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="76" y1="22" x2="146" y2="22" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-
-                      <rect x="0" y="52" width="70" height="45" rx="3" fill="url(#panelGrad)" stroke="#38bdf8" strokeWidth="1.5"/>
-                      <line x1="23" y1="52" x2="23" y2="97" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="47" y1="52" x2="47" y2="97" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="0" y1="74" x2="70" y2="74" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-
-                      <rect x="76" y="52" width="70" height="45" rx="3" fill="url(#panelGrad)" stroke="#38bdf8" strokeWidth="1.5"/>
-                      <line x1="99" y1="52" x2="99" y2="97" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="123" y1="52" x2="123" y2="97" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                      <line x1="76" y1="74" x2="146" y2="74" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6"/>
-                    </g>
-
-                    <path d="M380 90 L200 210" stroke="#fef08a" strokeWidth="2" strokeDasharray="4 4" opacity="0.7"/>
-                    <path d="M400 110 L280 220" stroke="#fef08a" strokeWidth="2" strokeDasharray="4 4" opacity="0.7"/>
-                  </svg>
+                {/* Rooftop Solar Photo (16:9 Aspect Ratio) */}
+                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center group">
+                  <img 
+                    src="/images/solar/solar-hero.png" 
+                    alt="Modern Solar-Powered Countryside Home" 
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    loading="eager"
+                  />
+                  
+                  {/* Subtle top/bottom ambient shading for badge contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-black/10 pointer-events-none" />
 
                   {/* Live Generation Pill */}
-                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/60 flex items-center gap-2">
+                  <div className="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/60 flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                     <span className="text-xs font-semibold text-slate-800">Clean Power Gen: <strong>4.8 kW/h</strong></span>
                   </div>
