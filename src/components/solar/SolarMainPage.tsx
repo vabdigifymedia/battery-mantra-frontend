@@ -197,19 +197,22 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
 
             {/* Right: Modern Visual with Live Stat Badges */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none rounded-2xl overflow-hidden border border-slate-200/90 shadow-md bg-gradient-to-b from-sky-50 to-amber-50/40 p-3 sm:p-4">
+              <div className="relative mx-auto max-w-md lg:max-w-none rounded-2xl border border-slate-200/90 shadow-md bg-gradient-to-b from-sky-50 to-amber-50/40 p-3 sm:p-4">
                 
                 {/* Rooftop Solar Photo (16:9 Aspect Ratio) */}
-                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center group">
+                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center group shadow-inner">
                   <img 
-                    src="/images/solar/solar-hero.png" 
+                    src="/Modern Solar-Powered Countryside Home.png" 
                     alt="Modern Solar-Powered Countryside Home" 
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                     loading="eager"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/images/solar/solar-hero.png";
+                    }}
                   />
                   
                   {/* Subtle top/bottom ambient shading for badge contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-black/10 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-black/10 pointer-events-none" />
 
                   {/* Live Generation Pill */}
                   <div className="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/60 flex items-center gap-2">
@@ -219,7 +222,7 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 {/* Floating Overlay Card 1: Subsidy */}
-                <div className="absolute -bottom-3 -left-3 bg-white p-3.5 rounded-2xl shadow-lg border border-slate-200 flex items-center gap-3 max-w-[210px]">
+                <div className="absolute -bottom-3.5 -left-3.5 bg-white p-3.5 rounded-2xl shadow-xl border border-slate-200 flex items-center gap-3 max-w-[220px] z-10 transition-transform hover:-translate-y-0.5">
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
                     <Sun className="w-5 h-5" />
                   </div>
@@ -231,7 +234,7 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
                 </div>
 
                 {/* Floating Overlay Card 2: Installations */}
-                <div className="absolute -top-3 -right-3 bg-white p-3 rounded-2xl shadow-lg border border-slate-200 flex items-center gap-2.5">
+                <div className="absolute -top-3.5 -right-3.5 bg-white p-3 rounded-2xl shadow-xl border border-slate-200 flex items-center gap-2.5 z-10 transition-transform hover:-translate-y-0.5">
                   <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
                     <Check className="w-4 h-4 stroke-[3]" />
                   </div>
