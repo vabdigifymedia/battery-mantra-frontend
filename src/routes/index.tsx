@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BatteryCharging, Zap, Instagram } from "lucide-react";
+import { ArrowRight, BatteryCharging, Zap, Instagram, Sun } from "lucide-react";
 import { HeroSection } from "@/components/layout/HeroSection";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -16,6 +16,7 @@ import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { InstagramReelsWidget } from "@/components/home/InstagramReelsWidget";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { LithiumCategoriesWidget } from "@/components/home/LithiumCategoriesWidget";
+import { SolarCategoriesWidget } from "@/components/home/SolarCategoriesWidget";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
   productListQuery,
@@ -65,6 +66,10 @@ function HomePage() {
 
   const lithiumCategory = categories?.find((c) =>
     c.categoryName.toLowerCase().includes("lithium")
+  );
+
+  const solarCategory = categories?.find((c) =>
+    c.categoryName.toLowerCase().includes("solar") && !c.categoryName.toLowerCase().includes("lithium")
   );
 
   const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
@@ -184,6 +189,45 @@ function HomePage() {
                   return !cat.includes("inverter") && !name.includes("inverter");
                 }}
               />
+            </div>
+          </section>
+
+          {/* SOLAR SYSTEMS SECTION */}
+          <section aria-labelledby="solar" className="mt-16 relative overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-emerald-500/10 p-6 sm:p-8">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-500"></div>
+            <SectionHeading
+              eyebrow={
+                <span className="inline-flex items-center gap-1.5 text-amber-700 font-extrabold tracking-[0.2em] text-xs uppercase">
+                  <Sun className="h-3.5 w-3.5 fill-amber-500 text-amber-600 animate-spin-slow" />
+                  CLEAN SOLAR ENERGY · GOVT. SUBSIDY READY
+                </span>
+              }
+              title={
+                <span id="solar">
+                  Power Your Home With The Sun —{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-red-600 to-amber-500">
+                    Complete Solar Solutions
+                  </span>
+                </span>
+              }
+              description="Slash your electricity bills up to 90%. High-efficiency solar panels, smart MPPT inverters, deep-cycle tubular batteries, and heavy-duty mounting kits."
+              action={
+                <div className="flex items-center gap-3">
+                  <div className="hidden lg:block -rotate-3 pr-2">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-bold shadow-xs">
+                      ⚡ Save up to ₹40,000 / year
+                    </span>
+                  </div>
+                  <Button asChild variant="ghost-brand" className="text-amber-800 hover:text-amber-900 hover:bg-amber-100/60 font-semibold">
+                    <Link to="/shop-by-category/$" params={{ _splat: "solar-systems" }}>
+                      Explore Solar Range <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              }
+            />
+            <div className="mt-8 relative z-10">
+              <SolarCategoriesWidget />
             </div>
           </section>
 
