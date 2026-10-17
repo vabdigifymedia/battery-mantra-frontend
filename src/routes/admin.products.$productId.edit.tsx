@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery } from "@/queries";
+import { adminCapacitiesQuery, rootCategoriesQuery, brandsQuery, vehiclesListQuery, adminProductDetailQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
 import { Button } from "@/components/ui/button";
@@ -89,8 +89,7 @@ export const Route = createFileRoute("/admin/products/$productId/edit")({
 function EditProductPage() {
   const { productId } = Route.useParams();
   const { data: product, isLoading, isError } = useQuery({
-    ...productDetailQuery(productId),
-    staleTime: 0,
+    ...adminProductDetailQuery(productId),
     refetchOnMount: "always",
   });
 
@@ -337,6 +336,8 @@ function EditProductForm({
     onSuccess: () => {
       draft.clearDraft();
       toast.success("Product updated successfully!");
+      // Clear ALL product detail caches — both admin and public (with any cityId)
+      queryClient.removeQueries({ queryKey: ["admin", "products", "detail", productId] });
       queryClient.removeQueries({ queryKey: ["products", "detail", productId] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -368,19 +369,19 @@ function EditProductForm({
 
     const payload = {
       productName: data.productName,
-      productDescription: data.productDescription || undefined,
+      productDescription: data.productDescription ?? "",
       productPrice: data.productPrice,
       originalPrice: data.originalPrice || 0,
       exchangeDiscount: data.exchangeDiscount || 0,
-      productStock: data.productStock,
+      productStock: data.productStock ?? 0,
       productImage: data.productImage || undefined,
-      additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
+      additionalImages: data.additionalImages.map(img => img.url).filter(Boolean),
       categoryId: data.categoryId,
       brandId: data.brandId,
-      capacity: data.capacity || undefined,
-      specUnitIds: specUnitIdsList.length > 0 ? specUnitIdsList : undefined,
-      highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : undefined,
-      specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : undefined,
+      capacity: data.capacity ?? "",
+      specUnitIds: specUnitIdsList.length > 0 ? specUnitIdsList : [],
+      highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : [],
+      specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : {},
       isAutoAssignToPartner: data.isAutoAssignToPartner,
       seo: data.seo
     };

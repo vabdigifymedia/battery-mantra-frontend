@@ -65,6 +65,15 @@ export const productDetailQuery = (id: string) => {
   });
 };
 
+/** Admin-specific detail query — omits cityId so backend returns master base prices & stock */
+export const adminProductDetailQuery = (id: string) => {
+  return queryOptions({
+    queryKey: ["admin", "products", "detail", id],
+    queryFn: ({ signal }) => productsService.byId(id, undefined, signal),
+    staleTime: 0,
+  });
+};
+
 export const categoriesQuery = () =>
   queryOptions({
     queryKey: queryKeys.categories.list(),
