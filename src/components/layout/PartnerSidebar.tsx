@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
-import { LayoutDashboard, ShoppingCart, Users, Package, LogOut, Package2 } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Users, Package, LogOut, Package2, KeyRound } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/auth/ChangePasswordDialog";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +29,7 @@ export function PartnerSidebar() {
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const assignedOrdersQuery = useQuery({
     queryKey: ["partner", "orders"],
@@ -84,21 +87,31 @@ export function PartnerSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t">
+      <SidebarFooter className="p-4 border-t space-y-1">
         <div className="mb-2 px-2 text-xs text-muted-foreground truncate">
           Signed in as: <span className="font-medium text-foreground">{user?.username || "Partner"}</span>
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setChangePasswordOpen(true)}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+            >
+              <KeyRound className="h-4 w-4" />
+              <span>Change Password</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
               onClick={handleSignOut}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
               <span>Sign out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit, KeyRound } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/auth/ChangePasswordDialog";
 import {
   Sidebar,
   SidebarContent,
@@ -72,6 +74,7 @@ export function AdminSidebar() {
   const { pathname } = useLocation();
   const { signOut } = useAuth();
   const router = useRouter();
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   // Queries for Notification Badges (Sharing exact queryKeys with pages for instant real-time invalidation)
   const ordersQuery = useQuery({
@@ -277,15 +280,28 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 border-t space-y-1">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => { signOut(); router.navigate({ to: "/login" as any }); }} className="text-destructive hover:bg-destructive/10 hover:text-destructive">
-              <LogOut />
+            <SidebarMenuButton
+              onClick={() => setChangePasswordOpen(true)}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+            >
+              <KeyRound className="h-4 w-4" />
+              <span>Change Password</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => { signOut(); router.navigate({ to: "/login" as any }); }}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
               <span>Sign out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} />
       </SidebarFooter>
     </Sidebar>
   );
