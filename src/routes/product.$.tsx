@@ -59,7 +59,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
-import { formatDeliveryPillText } from "@/lib/delivery";
+import { formatDeliveryPillText, getDeliveryTimeText } from "@/lib/delivery";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
@@ -90,11 +90,8 @@ export const Route = createFileRoute("/product/$")({
     const brandName = product?.brandName || "";
     const categoryName = product?.categoryName || "";
     const productName = product?.productName || "";
-    const deliveryTime = "2-4 Hours"; // default assumed time
-    
-    // We try to pass city_name to resolveTemplateSeo
-    // But since citySlug is just 'delhi', we can capitalize it.
     const cityNameStr = citySlug ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1) : undefined;
+    const deliveryTime = getDeliveryTimeText(null, null, cityNameStr || "Delhi");
     
     // Temporarily override zustand state for this render if citySlug exists,
     // though resolveTemplateSeo internally reads zustand, we can pass it via vars
@@ -494,6 +491,8 @@ export function PdpPage() {
   const cityVal = city?.cityName || "your city";
   const activePriceStr = withExchangePrice > 0 ? withExchangePrice.toString() : (data.productPrice?.toString() || "");
 
+  const resolvedDeliveryTime = getDeliveryTimeText(deliveryTime?.hours, deliveryTime?.days, city?.cityName);
+
   const seoContext = {
     // Grammatically sound primary variables:
     product_name: data.productName,
@@ -501,6 +500,7 @@ export function PdpPage() {
     category_name: data.categoryName || "Battery",
     city_name: cityVal,
     city: cityVal,
+    delivery_time: resolvedDeliveryTime,
     price: activePriceStr,
     warranty: warrantyVal,
     capacity: capacityVal,

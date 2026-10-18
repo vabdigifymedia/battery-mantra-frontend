@@ -134,3 +134,33 @@ export function formatCityDeliveryLabel(cityName?: string | null): string {
   }
   return cityName;
 }
+
+/**
+ * Returns sensible default delivery SLA based on city:
+ * - NCR / Major cities -> "1-2 Hours"
+ * - Other cities -> "2-4 Hours"
+ */
+export function getDefaultDeliveryTime(cityName?: string | null): string {
+  if (!cityName) return "1-2 Hours";
+  const lower = cityName.trim().toLowerCase();
+  const isNcrCity = ["delhi", "noida", "greater noida", "gurgaon", "gurugram", "ghaziabad", "faridabad"].some(
+    (c) => lower.includes(c)
+  );
+  return isNcrCity ? "1-2 Hours" : "2-4 Hours";
+}
+
+/**
+ * Returns formatted delivery duration string with fallback to city-specific default
+ */
+export function getDeliveryTimeText(
+  hours?: string | number | null,
+  days?: string | number | null,
+  cityName?: string | null
+): string {
+  const h = cleanDeliveryString(hours);
+  const d = cleanDeliveryString(days);
+  if ((h && h !== "0") || d) {
+    return formatDeliveryTime(hours, days);
+  }
+  return getDefaultDeliveryTime(cityName);
+}

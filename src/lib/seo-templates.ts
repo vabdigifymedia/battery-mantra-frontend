@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api/client";
 import { useLocationStore } from "@/store/useLocationStore";
+import { getDeliveryTimeText } from "@/lib/delivery";
 import type { PageSeoData } from "@/lib/seo";
 
 export interface SeoTemplate {
@@ -34,6 +35,10 @@ function replaceVars(template: string | undefined | null, vars: Record<string, s
     const regex = new RegExp(`\\{\\{?\\s*${key}\\s*\\}\\}?`, "gi");
     result = result.replace(regex, value || "");
   }
+  // Safety: if template still has unreplaced delivery_time, resolve with fallback
+  if (/\{{1,2}\s*delivery_time\s*\}{1,2}/i.test(result)) {
+    result = result.replace(/\{{1,2}\s*delivery_time\s*\}{1,2}/gi, vars.delivery_time || "1-2 Hours");
+  }
   return result;
 }
 
@@ -54,9 +59,17 @@ export function resolveTemplateSeo(
 ): PageSeoData {
   const city = useLocationStore.getState().city;
   const cityName = vars.city_name || city?.cityName || "";
+  const deliveryTime = vars.delivery_time || getDeliveryTimeText(null, null, cityName);
 
-  // Merge city_name into vars
-  const allVars = { ...vars, city_name: cityName || "India" };
+  // Merge city_name and delivery_time into vars
+  const allVars = {
+    delivery_time: deliveryTime,
+    ...vars,
+    city_name: cityName || "India",
+  };
+  if (!allVars.delivery_time) {
+    allVars.delivery_time = deliveryTime;
+  }
 
   // Pick the right template variant based on city selection
   const suffix = cityName ? "WITH_CITY" : "WITHOUT_CITY";

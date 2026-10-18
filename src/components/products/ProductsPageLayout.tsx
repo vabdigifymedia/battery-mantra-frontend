@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { getDeliveryTimeText } from "@/lib/delivery";
 import {
   productListQuery,
   productFilterInfiniteQuery,
@@ -184,7 +185,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
   let context: Record<string, string> = {
     city_name: city?.cityName || "Delhi / NCR",
-    delivery_time: "1-2 Hours",
+    delivery_time: getDeliveryTimeText(null, null, city?.cityName),
     price_range: priceRangeFormatted,
     price_name: minWithExchange > 0 ? minWithExchange.toString() : "",
     price: minWithExchange > 0 ? minWithExchange.toString() : "",

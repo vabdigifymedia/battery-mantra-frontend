@@ -2,22 +2,35 @@ import { useQuery } from "@tanstack/react-query";
 import { publicFaqsQuery } from "@/queries";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Spinner } from "@/components/feedback/Spinner";
-
+import { useLocationStore } from "@/store/useLocationStore";
+import { getDeliveryTimeText } from "@/lib/delivery";
 import { applySeoTemplate } from "@/lib/utils";
 
 interface DynamicFaqProps {
   pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
-  context: Record<string, string>;
+  context?: Record<string, string>;
   hideHeading?: boolean;
 }
 
-export function DynamicFaq({ pageType, context, hideHeading = false }: DynamicFaqProps) {
+export function DynamicFaq({ pageType, context = {}, hideHeading = false }: DynamicFaqProps) {
   const { data: faqs = [], isLoading } = useQuery(publicFaqsQuery(pageType));
+  const { city } = useLocationStore();
+
+  const cityName = context.city_name || city?.cityName || "your city";
+  const deliveryTime = context.delivery_time || getDeliveryTimeText(null, null, city?.cityName);
+
+  const mergedContext = {
+    city_name: cityName,
+    delivery_time: deliveryTime,
+    ...context,
+  };
+  if (!mergedContext.delivery_time) mergedContext.delivery_time = deliveryTime;
+  if (!mergedContext.city_name) mergedContext.city_name = cityName;
 
   const replacePlaceholders = (text: string) => {
     if (!text) return "";
     // STRICT RULE: Only replace variables enclosed in curly brackets like {price}, {product_name}, {city_name}
-    return applySeoTemplate(text, context);
+    return applySeoTemplate(text, mergedContext);
   };
 
   if (isLoading) {
