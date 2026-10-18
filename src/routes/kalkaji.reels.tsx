@@ -33,7 +33,7 @@ import {
 import type { ReelResponse, CreateReelRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/reels")({
+export const Route = createFileRoute("/kalkaji/reels")({
   component: AdminReels,
 });
 

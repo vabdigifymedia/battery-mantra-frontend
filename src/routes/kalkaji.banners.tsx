@@ -35,7 +35,7 @@ import type { BannerResponse, CreateBannerRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 import { queryKeys } from "@/constants/queryKeys";
 
-export const Route = createFileRoute("/admin/banners")({
+export const Route = createFileRoute("/kalkaji/banners")({
   component: AdminBanners,
 });
 

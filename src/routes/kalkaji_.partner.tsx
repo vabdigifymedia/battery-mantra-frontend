@@ -4,13 +4,13 @@ import { ROLES } from "@/constants/roles";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { PartnerSidebar } from "@/components/layout/PartnerSidebar";
 
-export const Route = createFileRoute("/partner")({
+export const Route = createFileRoute("/kalkaji_/partner")({
   component: PartnerLayout,
 });
 
 function PartnerLayout() {
   return (
-    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/partner/login">
+    <AdminRoute roles={[ROLES.PARTNER]} redirectTo="/kalkaji/partner/login">
       <SidebarProvider>
         <PartnerSidebar />
         <SidebarInset>

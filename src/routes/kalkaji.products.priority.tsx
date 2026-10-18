@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { GripVertical } from "lucide-react";
 
-export const Route = createFileRoute("/admin/products/priority")({
+export const Route = createFileRoute("/kalkaji/products/priority")({
   component: AdminProductPriority,
 });
 

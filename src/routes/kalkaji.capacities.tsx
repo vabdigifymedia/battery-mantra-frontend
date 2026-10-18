@@ -34,7 +34,7 @@ import {
 import type { CapacityResponse, CreateCapacityRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/capacities")({
+export const Route = createFileRoute("/kalkaji/capacities")({
   component: AdminCapacities,
 });
 

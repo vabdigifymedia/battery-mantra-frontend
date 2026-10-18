@@ -34,7 +34,7 @@ import type { CouponResponse, CouponRequest, DiscountType } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 import { format } from "date-fns";
 
-export const Route = createFileRoute("/admin/coupons")({
+export const Route = createFileRoute("/kalkaji/coupons")({
   component: AdminCoupons,
 });
 

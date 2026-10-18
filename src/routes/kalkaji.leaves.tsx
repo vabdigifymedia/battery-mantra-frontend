@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 
-export const Route = createFileRoute("/admin/leaves")({
+export const Route = createFileRoute("/kalkaji/leaves")({
   component: AdminLeaves,
 });
 

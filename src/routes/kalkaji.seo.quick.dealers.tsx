@@ -12,7 +12,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Save } from "lucide-react";
 import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
-export const Route = createFileRoute("/admin/seo/quick/dealers")({
+export const Route = createFileRoute("/kalkaji/seo/quick/dealers")({
   component: SeoQuickDealersPage,
 });
 

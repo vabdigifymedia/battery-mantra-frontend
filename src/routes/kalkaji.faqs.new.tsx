@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { FaqVariableHelper } from "@/components/admin/FaqVariableHelper";
 
-export const Route = createFileRoute("/admin/faqs/new")({
+export const Route = createFileRoute("/kalkaji/faqs/new")({
   component: NewFaq,
 });
 
@@ -38,7 +38,7 @@ function NewFaq() {
     onSuccess: () => {
       toast.success("FAQ created successfully!");
       queryClient.invalidateQueries({ queryKey: ["admin", "faqs"] });
-      navigate({ to: "/admin/faqs" });
+      navigate({ to: "/kalkaji/faqs" });
     },
     onError: () => {
       toast.error("Failed to create FAQ.");
@@ -63,7 +63,7 @@ function NewFaq() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/faqs" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/faqs" })}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -112,7 +112,7 @@ function NewFaq() {
         </div>
 
         <div className="flex justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/faqs" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/faqs" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={createMutation.isPending}>

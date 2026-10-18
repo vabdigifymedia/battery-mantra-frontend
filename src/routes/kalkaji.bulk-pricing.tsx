@@ -12,7 +12,7 @@ import { categoriesService, brandsService } from "@/services/catalog.service";
 import { locationService } from "@/services/location.service";
 import { bulkPricingService } from "@/services/bulk-pricing.service";
 
-export const Route = createFileRoute("/admin/bulk-pricing")({
+export const Route = createFileRoute("/kalkaji/bulk-pricing")({
   component: BulkPricingPage,
 });
 

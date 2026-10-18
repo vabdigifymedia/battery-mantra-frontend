@@ -29,11 +29,11 @@ const searchSchema = z.object({
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/partner_/login")({
+export const Route = createFileRoute("/kalkaji_/partner_/login")({
   validateSearch: searchSchema,
   loader: async ({ context }) => {
     try {
-      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/partner/login"));
+      const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/kalkaji/partner/login"));
       return { pageSeo };
     } catch {
       return { pageSeo: null };
@@ -53,7 +53,7 @@ import { ROLES, type Role } from "@/constants/roles";
 function LoginPage() {
   const router = useRouter();
   const { setSession } = useAuth();
-  const { redirect } = useSearch({ from: "/partner_/login" });
+  const { redirect } = useSearch({ from: "/kalkaji_/partner_/login" });
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<Values>({
@@ -99,9 +99,9 @@ function LoginPage() {
       toast.success("Welcome back");
 
       if (role === "ADMIN") {
-        router.navigate({ to: "/admin" as any });
+        router.navigate({ to: "/kalkaji" as any });
       } else if (role === "PARTNER") {
-        router.navigate({ to: "/partner" as any });
+        router.navigate({ to: "/kalkaji/partner" as any });
       } else if (redirect) {
         const [path, query] = redirect.split("?");
         if (query) {

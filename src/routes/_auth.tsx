@@ -13,7 +13,7 @@ function AuthLayout() {
   if (status === "authenticated") {
     const isAdmin = user?.roles.includes("ADMIN");
     const isPartner = user?.roles.includes("PARTNER");
-    const redirectTo = isAdmin ? "/admin" : isPartner ? "/partner" : "/";
+    const redirectTo = isAdmin ? "/kalkaji" : isPartner ? "/kalkaji/partner" : "/";
     return <Navigate to={redirectTo} />;
   }
   return (

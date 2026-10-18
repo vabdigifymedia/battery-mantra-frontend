@@ -39,7 +39,7 @@ import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import type { BrandResponse, BrandRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/brands")({
+export const Route = createFileRoute("/kalkaji/brands")({
   component: AdminBrands,
 });
 
@@ -401,7 +401,7 @@ function AdminBrands() {
                   Brand descriptions and authorized dealer content are managed per Category (e.g., Inverter Battery vs Car Battery) under <strong>Brand Contents</strong>.
                 </p>
                 <Link 
-                  to="/admin/brand-contents" 
+                  to="/kalkaji/brand-contents" 
                   className="inline-flex items-center gap-1 text-primary font-medium hover:underline pt-0.5"
                 >
                   Manage Category Descriptions in Brand Contents &rarr;

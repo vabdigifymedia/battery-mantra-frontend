@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { useState, useEffect } from "react";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/kalkaji/")({
   component: AdminDashboard,
 });
 
@@ -210,17 +210,17 @@ function AdminDashboard() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Button asChild variant="default" className="shadow-sm">
-          <Link to="/admin/products/new">
+          <Link to="/kalkaji/products/new">
             <Plus className="mr-2 h-4 w-4" /> Add New Product
           </Link>
         </Button>
         <Button asChild variant="outline" className="shadow-sm bg-card">
-          <Link to="/admin/orders">
+          <Link to="/kalkaji/orders">
             <Package className="mr-2 h-4 w-4 text-blue-500" /> View All Orders
           </Link>
         </Button>
         <Button asChild variant="outline" className="shadow-sm bg-card">
-          <Link to="/admin/users">
+          <Link to="/kalkaji/users">
             <UsersRound className="mr-2 h-4 w-4 text-purple-500" /> Manage Users
           </Link>
         </Button>
@@ -234,7 +234,7 @@ function AdminDashboard() {
               <p className="text-sm text-muted-foreground mt-1">The 5 most recent purchases from your store.</p>
             </div>
             <Button asChild variant="ghost" size="sm" className="hidden sm:flex hover:bg-background">
-              <Link to="/admin/orders">
+              <Link to="/kalkaji/orders">
                 View All <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>

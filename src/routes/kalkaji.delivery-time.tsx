@@ -10,7 +10,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 
-export const Route = createFileRoute("/admin/delivery-time")({
+export const Route = createFileRoute("/kalkaji/delivery-time")({
   component: AdminDeliveryTime,
 });
 

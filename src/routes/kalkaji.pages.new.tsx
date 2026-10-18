@@ -25,7 +25,7 @@ const RESERVED_SLUGS = [
   "brand-dealer", "contact", "about",
 ];
 
-export const Route = createFileRoute("/admin/pages/new")({
+export const Route = createFileRoute("/kalkaji/pages/new")({
   component: NewPage,
 });
 
@@ -67,7 +67,7 @@ function NewPage() {
       draft.clearDraft();
       toast.success("Page created successfully");
       queryClient.invalidateQueries({ queryKey: ["admin", "cms-pages"] });
-      navigate({ to: "/admin/pages" });
+      navigate({ to: "/kalkaji/pages" });
     },
     onError: () => {
       toast.error("Failed to create page");
@@ -95,7 +95,7 @@ function NewPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6 pb-12">
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/pages" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/pages" })}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -351,7 +351,7 @@ function NewPage() {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/pages" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/pages" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={mutation.isPending}>

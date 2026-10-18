@@ -14,7 +14,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { FaqVariableHelper } from "@/components/admin/FaqVariableHelper";
 import type { FaqResponse } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/faqs/$id/edit")({
+export const Route = createFileRoute("/kalkaji/faqs/$id/edit")({
   component: EditFaq,
 });
 
@@ -66,7 +66,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
     onSuccess: () => {
       toast.success("FAQ updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["admin", "faqs"] });
-      navigate({ to: "/admin/faqs" });
+      navigate({ to: "/kalkaji/faqs" });
     },
     onError: () => {
       toast.error("Failed to update FAQ.");
@@ -91,7 +91,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/faqs" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/faqs" })}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -152,7 +152,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
         </div>
 
         <div className="pt-4 flex items-center justify-end gap-3 border-t">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/faqs" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/faqs" })}>
             Cancel
           </Button>
           <Button type="submit" variant="brand" disabled={updateMutation.isPending}>

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Save, AlertCircle, RotateCcw } from "lucide-react";
 import type { BulkProductUpdateRequest, ProductListResponse } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/quick-edit")({
+export const Route = createFileRoute("/kalkaji/quick-edit")({
   component: BulkPricingPage,
 });
 

@@ -51,7 +51,7 @@ import {
 import type { VehicleResponse, CreateVehicleRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/vehicles")({
+export const Route = createFileRoute("/kalkaji/vehicles")({
   component: AdminVehicles,
 });
 

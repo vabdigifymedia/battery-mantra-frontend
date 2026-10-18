@@ -31,7 +31,7 @@ import { toSlug } from "@/lib/utils";
 import type { BrandContentRequest, BrandContentResponse } from "@/types/dto";
 import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
-export const Route = createFileRoute("/admin/brand-contents")({
+export const Route = createFileRoute("/kalkaji/brand-contents")({
   component: AdminBrandContentsPage,
 });
 

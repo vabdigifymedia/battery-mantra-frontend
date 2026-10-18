@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/admin/faqs/")({
+export const Route = createFileRoute("/kalkaji/faqs/")({
   component: AdminFaqsList,
 });
 
@@ -34,7 +34,7 @@ function AdminFaqsList() {
           <p className="text-muted-foreground">Manage dynamic FAQs for all pages.</p>
         </div>
         <Button asChild>
-          <Link to="/admin/faqs/new">
+          <Link to="/kalkaji/faqs/new">
             <Plus className="mr-2 h-4 w-4" /> Add FAQ
           </Link>
         </Button>
@@ -89,7 +89,7 @@ function AdminFaqsList() {
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild>
-                        <Link to="/admin/faqs/$id/edit" params={{ id: faq.faqId }}>
+                        <Link to="/kalkaji/faqs/$id/edit" params={{ id: faq.faqId }}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>

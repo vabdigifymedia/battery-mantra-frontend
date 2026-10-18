@@ -43,7 +43,7 @@ const FOOTER_GROUPS: FooterGroup[] = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const isDashboardPage = pathname.startsWith("/admin") || pathname.startsWith("/partner") || pathname.startsWith("/account");
+  const isDashboardPage = pathname.startsWith("/kalkaji") || pathname.startsWith("/account");
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password");
 
   if (isDashboardPage || isAuthPage) {

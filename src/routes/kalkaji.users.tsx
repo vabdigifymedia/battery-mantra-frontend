@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/kalkaji/users")({
   component: AdminUsers,
 });
 

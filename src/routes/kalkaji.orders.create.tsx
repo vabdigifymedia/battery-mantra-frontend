@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Search, Plus, MapPin } from "lucide-react";
 import type { AdminCreateOrderRequest, AdminCreateCustomerRequest } from "@/services/admin.service";
 
-export const Route = createFileRoute("/admin/orders/create")({
+export const Route = createFileRoute("/kalkaji/orders/create")({
   component: AdminCreateOrder,
 });
 
@@ -66,7 +66,7 @@ function AdminCreateOrder() {
     mutationFn: (data: AdminCreateOrderRequest) => adminService.createOrder(data),
     onSuccess: () => {
       toast.success("Order created successfully!");
-      navigate({ to: "/admin/orders" });
+      navigate({ to: "/kalkaji/orders" });
     },
     onError: (err: any) => {
       toast.error(err.message || "Failed to create order");
@@ -132,7 +132,7 @@ function AdminCreateOrder() {
     <div className="space-y-8 pb-10">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link to="/admin/orders">
+          <Link to="/kalkaji/orders">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

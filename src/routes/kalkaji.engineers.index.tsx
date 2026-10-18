@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/engineers/")({
+export const Route = createFileRoute("/kalkaji/engineers/")({
   component: EngineersPage,
 });
 
@@ -98,7 +98,7 @@ function EngineersPage() {
           <p className="text-muted-foreground">Manage direct company technicians and partner-assigned engineers.</p>
         </div>
         <Button asChild>
-          <Link to="/admin/engineers/new">
+          <Link to="/kalkaji/engineers/new">
             <Plus className="mr-2 h-4 w-4" /> Add Engineer
           </Link>
         </Button>
@@ -249,7 +249,7 @@ function EngineersPage() {
                       <td className="p-4 align-middle text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon" asChild>
-                            <Link to={`/admin/engineers/${engineer.id}/edit`}>
+                            <Link to="/kalkaji/engineers/$id/edit" params={{ id: engineer.id }}>
                               <Edit className="h-4 w-4" />
                               <span className="sr-only">Edit</span>
                             </Link>

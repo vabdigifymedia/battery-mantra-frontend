@@ -14,7 +14,7 @@ import { Save } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 
-export const Route = createFileRoute("/admin/seo/quick/manufacturers")({
+export const Route = createFileRoute("/kalkaji/seo/quick/manufacturers")({
   component: SeoQuickManufacturersPage,
 });
 

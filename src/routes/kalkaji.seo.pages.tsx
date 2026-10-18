@@ -28,7 +28,7 @@ import {
 
 import { Textarea } from "@/components/ui/textarea";
 
-export const Route = createFileRoute("/admin/seo/pages")({
+export const Route = createFileRoute("/kalkaji/seo/pages")({
   component: SeoPagesPage,
 });
 

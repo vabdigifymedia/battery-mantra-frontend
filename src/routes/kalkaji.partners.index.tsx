@@ -23,7 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PartnerProfile } from "@/services/partner.service";
 
-export const Route = createFileRoute("/admin/partners/")({
+export const Route = createFileRoute("/kalkaji/partners/")({
   component: PartnersPage,
 });
 
@@ -76,7 +76,7 @@ function PartnersPage() {
           <p className="text-muted-foreground">Manage city partners and their assignments.</p>
         </div>
         <Button asChild>
-          <Link to="/admin/partners/new">
+          <Link to="/kalkaji/partners/new">
             <Plus className="mr-2 h-4 w-4" /> Add Partner
           </Link>
         </Button>
@@ -159,7 +159,7 @@ function PartnersPage() {
                     <td className="p-4 align-middle text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/admin/partners/${partner.id}/edit`}>
+                          <Link to="/kalkaji/partners/$id/edit" params={{ id: partner.id }}>
                             <Edit className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Link>

@@ -14,7 +14,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
-export const Route = createFileRoute("/admin/engineers/$id/edit")({
+export const Route = createFileRoute("/kalkaji/engineers/$id/edit")({
   component: EditEngineerPage,
 });
 
@@ -73,7 +73,7 @@ function EditEngineerPage() {
     try {
       await engineerService.update(id, values as any);
       toast.success("Engineer updated successfully");
-      navigate({ to: "/admin/engineers" });
+      navigate({ to: "/kalkaji/engineers" });
     } catch (e: any) {
       toast.error(e.message || "Failed to update engineer");
     }
@@ -91,7 +91,7 @@ function EditEngineerPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <h2 className="text-2xl font-bold">Engineer not found</h2>
-        <Button className="mt-4" onClick={() => navigate({ to: "/admin/engineers" })}>
+        <Button className="mt-4" onClick={() => navigate({ to: "/kalkaji/engineers" })}>
           Go Back
         </Button>
       </div>
@@ -101,7 +101,7 @@ function EditEngineerPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/engineers" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/engineers" })}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -164,7 +164,7 @@ function EditEngineerPage() {
         </div>
 
         <div className="flex justify-end gap-4 border-t pt-6">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/engineers" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/engineers" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>

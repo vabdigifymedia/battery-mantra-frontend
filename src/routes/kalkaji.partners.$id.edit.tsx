@@ -15,7 +15,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
-export const Route = createFileRoute("/admin/partners/$id/edit")({
+export const Route = createFileRoute("/kalkaji/partners/$id/edit")({
   component: EditPartnerPage,
 });
 
@@ -82,7 +82,7 @@ function EditPartnerPage() {
     try {
       await partnerService.update(id, values);
       toast.success("Partner updated successfully");
-      navigate({ to: "/admin/partners" });
+      navigate({ to: "/kalkaji/partners" });
     } catch (e: any) {
       toast.error(e.message || "Failed to update partner");
     }
@@ -112,7 +112,7 @@ function EditPartnerPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <h2 className="text-2xl font-bold">Partner not found</h2>
-        <Button className="mt-4" onClick={() => navigate({ to: "/admin/partners" })}>
+        <Button className="mt-4" onClick={() => navigate({ to: "/kalkaji/partners" })}>
           Go Back
         </Button>
       </div>
@@ -122,7 +122,7 @@ function EditPartnerPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/partners" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/partners" })}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -217,7 +217,7 @@ function EditPartnerPage() {
         </div>
 
         <div className="flex justify-end gap-4 border-t pt-6">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/partners" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/partners" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>

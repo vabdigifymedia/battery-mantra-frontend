@@ -27,7 +27,7 @@ const RESERVED_SLUGS = [
   "brand-dealer", "contact", "about",
 ];
 
-export const Route = createFileRoute("/admin/pages/$pageId/edit")({
+export const Route = createFileRoute("/kalkaji/pages/$pageId/edit")({
   component: EditPage,
 });
 
@@ -97,7 +97,7 @@ function EditPage() {
       draft.clearDraft();
       toast.success("Page updated successfully");
       queryClient.invalidateQueries({ queryKey: ["admin", "cms-pages"] });
-      navigate({ to: "/admin/pages" });
+      navigate({ to: "/kalkaji/pages" });
     },
     onError: () => {
       toast.error("Failed to update page");
@@ -140,7 +140,7 @@ function EditPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4">
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/pages" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/pages" })}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -394,7 +394,7 @@ function EditPage() {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/pages" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/pages" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={mutation.isPending}>

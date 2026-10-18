@@ -34,7 +34,7 @@ import {
 import type { FuelResponse, CreateFuelRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/fuels")({
+export const Route = createFileRoute("/kalkaji/fuels")({
   component: AdminFuels,
 });
 

@@ -34,7 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import type { CityDto, CreateCityRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/locations")({
+export const Route = createFileRoute("/kalkaji/locations")({
   component: AdminLocations,
 });
 

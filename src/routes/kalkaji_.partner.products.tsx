@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Tag, Search, Clock, CheckCircle, Package, MapPin } from "lucide-react";
 import type { ProductListResponse, CityPricingDto } from "@/types/dto";
 
-export const Route = createFileRoute("/partner/products")({
+export const Route = createFileRoute("/kalkaji_/partner/products")({
   component: PartnerProductsPage,
 });
 

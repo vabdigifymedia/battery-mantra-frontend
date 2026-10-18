@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Copy, MapPin, Phone, Mail, Calendar, Package2, User, Filter } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
-import { getStatusLabel } from "./admin.orders.index";
+import { getStatusLabel } from "./kalkaji.orders.index";
 
-export const Route = createFileRoute("/partner/orders")({
+export const Route = createFileRoute("/kalkaji_/partner/orders")({
   component: PartnerOrdersPage,
 });
 

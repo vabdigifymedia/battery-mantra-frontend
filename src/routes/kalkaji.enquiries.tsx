@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { EnquiryStatus, EnquiryResponse } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/enquiries")({
+export const Route = createFileRoute("/kalkaji/enquiries")({
   component: AdminEnquiries,
 });
 

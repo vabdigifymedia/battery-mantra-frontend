@@ -42,7 +42,7 @@ import type { ManufacturerResponse, CreateManufacturerRequest, UpdateManufacture
 import { ApiError } from "@/lib/api/errors";
 import { queryKeys } from "@/constants/queryKeys";
 
-export const Route = createFileRoute("/admin/manufacturers")({
+export const Route = createFileRoute("/kalkaji/manufacturers")({
   component: AdminManufacturers,
 });
 

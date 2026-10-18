@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Package, Clock, CheckCircle2, TrendingUp, ArrowRight, Package2, Users, Wallet, Store } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
-export const Route = createFileRoute("/partner/")({
+export const Route = createFileRoute("/kalkaji_/partner/")({
   component: PartnerOverviewDashboard,
 });
 
@@ -59,7 +59,7 @@ function PartnerOverviewDashboard() {
           <p className="text-muted-foreground">Monitor performance, assigned orders, and key metrics.</p>
         </div>
         <Button asChild variant="brand" className="gap-2">
-          <Link to="/partner/orders">
+          <Link to="/kalkaji/partner/orders">
             Manage All Orders <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
@@ -120,7 +120,7 @@ function PartnerOverviewDashboard() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" size="sm" className="w-full text-xs">
-              <Link to="/partner/orders">Manage Orders</Link>
+              <Link to="/kalkaji/partner/orders">Manage Orders</Link>
             </Button>
           </CardContent>
         </Card>
@@ -136,7 +136,7 @@ function PartnerOverviewDashboard() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" size="sm" className="w-full text-xs">
-              <Link to="/partner/engineers">Manage Engineers</Link>
+              <Link to="/kalkaji/partner/engineers">Manage Engineers</Link>
             </Button>
           </CardContent>
         </Card>
@@ -150,7 +150,7 @@ function PartnerOverviewDashboard() {
             <CardDescription>Latest orders assigned to your branch</CardDescription>
           </div>
           <Button asChild variant="ghost" size="sm" className="gap-1 text-xs">
-            <Link to="/partner/orders">
+            <Link to="/kalkaji/partner/orders">
               View All <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </Button>

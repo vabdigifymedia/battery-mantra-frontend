@@ -3,7 +3,7 @@ import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminRoute } from "@/guards/AdminRoute";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/kalkaji")({
   component: AdminLayout,
 });
 

@@ -10,7 +10,7 @@ import { engineerService } from "@/services/engineer.service";
 import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 
-export const Route = createFileRoute("/admin/engineers/new")({
+export const Route = createFileRoute("/kalkaji/engineers/new")({
   component: NewEngineerPage,
 });
 
@@ -46,7 +46,7 @@ function NewEngineerPage() {
     try {
       await engineerService.create(values as any);
       toast.success("Engineer created successfully");
-      navigate({ to: "/admin/engineers" });
+      navigate({ to: "/kalkaji/engineers" });
     } catch (e: any) {
       toast.error(e.message || "Failed to create engineer");
     }
@@ -55,7 +55,7 @@ function NewEngineerPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/engineers" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/engineers" })}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -100,7 +100,7 @@ function NewEngineerPage() {
         </div>
 
         <div className="flex justify-end gap-4 border-t pt-6">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/engineers" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/engineers" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>

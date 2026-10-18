@@ -82,7 +82,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const Route = createFileRoute("/admin/products/$productId/edit")({
+export const Route = createFileRoute("/kalkaji/products/$productId/edit")({
   component: EditProductPage,
 });
 
@@ -341,7 +341,7 @@ function EditProductForm({
       queryClient.removeQueries({ queryKey: ["products", "detail", productId] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      navigate({ to: "/admin/products" as any });
+      navigate({ to: "/kalkaji/products" as any });
     },
     onError: (e: any) => {
       toast.error(e.response?.data?.message || "Failed to update product");
@@ -399,7 +399,7 @@ function EditProductForm({
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-24">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/products" as any })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/products" as any })}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -846,7 +846,7 @@ function EditProductForm({
 
       {/* STICKY ACTION BAR */}
       <div className="fixed bottom-0 left-0 right-0 sm:left-64 z-10 border-t bg-background/80 backdrop-blur-xl p-4 shadow-lg flex items-center justify-end gap-3 px-6 lg:px-8">
-        <Button variant="outline" type="button" onClick={() => navigate({ to: "/admin/products" as any })}>
+        <Button variant="outline" type="button" onClick={() => navigate({ to: "/kalkaji/products" as any })}>
           Cancel
         </Button>
         <Button type="submit" form="product-form" disabled={updateMutation.isPending} className="min-w-[140px]">

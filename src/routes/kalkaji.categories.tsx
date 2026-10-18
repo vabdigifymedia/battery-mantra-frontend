@@ -40,7 +40,7 @@ import { CategoryReorderModal } from "@/components/admin/CategoryReorderModal";
 import type { CategoryListResponse, CreateCategoryRequest } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/categories")({
+export const Route = createFileRoute("/kalkaji/categories")({
   component: AdminCategories,
 });
 

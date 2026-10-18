@@ -16,7 +16,7 @@ import { partnerService } from "@/services/partner.service";
 import { engineerService } from "@/services/engineer.service";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/orders/")({
+export const Route = createFileRoute("/kalkaji/orders/")({
   component: AdminOrders,
 });
 
@@ -422,7 +422,7 @@ function AdminOrders() {
           <p className="text-muted-foreground mt-1">Review, process and update customer orders.</p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <Link to="/admin/orders/create">
+          <Link to="/kalkaji/orders/create">
             <Button variant="default" className="shrink-0 font-semibold shadow-sm">
               + Create Order
             </Button>

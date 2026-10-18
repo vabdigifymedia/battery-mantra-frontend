@@ -40,7 +40,7 @@ import type {
 } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
-export const Route = createFileRoute("/admin/specifications")({
+export const Route = createFileRoute("/kalkaji/specifications")({
   component: AdminSpecifications,
 });
 

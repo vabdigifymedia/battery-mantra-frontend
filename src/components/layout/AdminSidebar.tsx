@@ -23,49 +23,49 @@ import { ChevronRight, Search } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Coupons", href: "/admin/coupons", icon: Ticket },
-  { name: "Categories", href: "/admin/categories", icon: Layers },
-  { name: "Brands", href: "/admin/brands", icon: Tag },
-  { name: "Specifications", href: "/admin/specifications", icon: ClipboardList },
-  { name: "Vehicles", href: "/admin/vehicles", icon: Car },
-  { name: "Fuels", href: "/admin/fuels", icon: Fuel },
-  { name: "R/L Codes", href: "/admin/capacities", icon: Battery },
-  { name: "Manufacturers", href: "/admin/manufacturers", icon: Factory },
-  { name: "Locations", href: "/admin/locations", icon: MapPin },
-  { name: "Delivery Time", href: "/admin/delivery-time", icon: Truck },
-  { name: "CMS Pages", href: "/admin/pages", icon: FileText },
-  { name: "FAQs", href: "/admin/faqs", icon: HelpCircle },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Engineers", href: "/admin/engineers", icon: Users },
-  { name: "Leave Requests", href: "/admin/leaves", icon: CalendarRange },
-  { name: "Partners", href: "/admin/partners", icon: Users },
-  { name: "Banners", href: "/admin/banners", icon: Image },
-  { name: "Instagram Reels", href: "/admin/reels", icon: Instagram },
-  { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
-  { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
+  { name: "Dashboard", href: "/kalkaji", icon: LayoutDashboard },
+  { name: "Orders", href: "/kalkaji/orders", icon: ShoppingCart },
+  { name: "Coupons", href: "/kalkaji/coupons", icon: Ticket },
+  { name: "Categories", href: "/kalkaji/categories", icon: Layers },
+  { name: "Brands", href: "/kalkaji/brands", icon: Tag },
+  { name: "Specifications", href: "/kalkaji/specifications", icon: ClipboardList },
+  { name: "Vehicles", href: "/kalkaji/vehicles", icon: Car },
+  { name: "Fuels", href: "/kalkaji/fuels", icon: Fuel },
+  { name: "R/L Codes", href: "/kalkaji/capacities", icon: Battery },
+  { name: "Manufacturers", href: "/kalkaji/manufacturers", icon: Factory },
+  { name: "Locations", href: "/kalkaji/locations", icon: MapPin },
+  { name: "Delivery Time", href: "/kalkaji/delivery-time", icon: Truck },
+  { name: "CMS Pages", href: "/kalkaji/pages", icon: FileText },
+  { name: "FAQs", href: "/kalkaji/faqs", icon: HelpCircle },
+  { name: "Users", href: "/kalkaji/users", icon: Users },
+  { name: "Engineers", href: "/kalkaji/engineers", icon: Users },
+  { name: "Leave Requests", href: "/kalkaji/leaves", icon: CalendarRange },
+  { name: "Partners", href: "/kalkaji/partners", icon: Users },
+  { name: "Banners", href: "/kalkaji/banners", icon: Image },
+  { name: "Instagram Reels", href: "/kalkaji/reels", icon: Instagram },
+  { name: "Callbacks", href: "/kalkaji/callbacks", icon: PhoneCall },
+  { name: "Enquiries", href: "/kalkaji/enquiries", icon: MessageSquare },
 ];
 
 const productNavigation = [
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Product Priority", href: "/admin/products/priority", icon: ArrowUpDown },
-  { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
-  { name: "Price Value", href: "/admin/quick-edit", icon: IndianRupee },
+  { name: "Products", href: "/kalkaji/products", icon: Package },
+  { name: "Product Priority", href: "/kalkaji/products/priority", icon: ArrowUpDown },
+  { name: "Pricing %", href: "/kalkaji/bulk-pricing", icon: Percent },
+  { name: "Price Value", href: "/kalkaji/quick-edit", icon: IndianRupee },
 ];
 
 const seoNavigation = [
-  { name: "SEO Pages", href: "/admin/seo/pages", icon: Globe },
-  { name: "Brand Contents", href: "/admin/brand-contents", icon: FileEdit },
+  { name: "SEO Pages", href: "/kalkaji/seo/pages", icon: Globe },
+  { name: "Brand Contents", href: "/kalkaji/brand-contents", icon: FileEdit },
   { name: "Google Products Feed", href: `${env.API_BASE_URL || 'http://localhost:8080'}/api/seo/google-feed.xml`, icon: Package, external: true },
 ];
 
 const seoQuickNavigation = [
-  { name: "Brands", href: "/admin/seo/quick/brands" },
-  { name: "Manufacturers", href: "/admin/seo/quick/manufacturers" },
-  { name: "Categories", href: "/admin/seo/quick/categories" },
-  { name: "Products", href: "/admin/seo/quick/products" },
-  { name: "Dealers", href: "/admin/seo/quick/dealers" },
+  { name: "Brands", href: "/kalkaji/seo/quick/brands" },
+  { name: "Manufacturers", href: "/kalkaji/seo/quick/manufacturers" },
+  { name: "Categories", href: "/kalkaji/seo/quick/categories" },
+  { name: "Products", href: "/kalkaji/seo/quick/products" },
+  { name: "Dealers", href: "/kalkaji/seo/quick/dealers" },
 ];
 
 export function AdminSidebar() {
@@ -117,17 +117,17 @@ export function AdminSidebar() {
   const pendingProductsCount = pendingProductsQuery.data?.length || 0;
 
   const getBadgeCount = (href: string) => {
-    if (href === "/admin/orders") return newOrdersCount;
-    if (href === "/admin/callbacks") return pendingCallbacksCount;
-    if (href === "/admin/enquiries") return pendingEnquiriesCount;
-    if (href === "/admin/products") return pendingProductsCount;
+    if (href === "/kalkaji/orders") return newOrdersCount;
+    if (href === "/kalkaji/callbacks") return pendingCallbacksCount;
+    if (href === "/kalkaji/enquiries") return pendingEnquiriesCount;
+    if (href === "/kalkaji/products") return pendingProductsCount;
     return 0;
   };
 
   return (
     <Sidebar variant="inset">
       <SidebarHeader className="p-4">
-        <Link to="/admin" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-primary">
+        <Link to="/kalkaji" className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-primary">
           BatteryMantra
           <span className="text-xs font-normal text-muted-foreground uppercase tracking-widest ml-2">Admin</span>
         </Link>
@@ -139,7 +139,7 @@ export function AdminSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navigation.map((item) => {
-                const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                const isActive = pathname === item.href || (item.href !== "/kalkaji" && pathname.startsWith(item.href));
                 const badgeCount = getBadgeCount(item.href);
 
                 return (
@@ -178,7 +178,7 @@ export function AdminSidebar() {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {productNavigation.map((item) => {
-                        const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                        const isActive = pathname === item.href || (item.href !== "/kalkaji" && pathname.startsWith(item.href));
                         const badgeCount = getBadgeCount(item.href);
                         return (
                           <SidebarMenuSubItem key={item.name}>

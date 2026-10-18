@@ -12,7 +12,7 @@ import { ChevronLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 
-export const Route = createFileRoute("/admin/partners/new")({
+export const Route = createFileRoute("/kalkaji/partners/new")({
   component: NewPartnerPage,
 });
 
@@ -55,7 +55,7 @@ function NewPartnerPage() {
     try {
       await partnerService.create(values);
       toast.success("Partner created successfully");
-      navigate({ to: "/admin/partners" });
+      navigate({ to: "/kalkaji/partners" });
     } catch (e: any) {
       toast.error(e.message || "Failed to create partner");
     }
@@ -76,7 +76,7 @@ function NewPartnerPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/partners" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/kalkaji/partners" })}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -153,7 +153,7 @@ function NewPartnerPage() {
         </div>
 
         <div className="flex justify-end gap-4 border-t pt-6">
-          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/partners" })}>
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/kalkaji/partners" })}>
             Cancel
           </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>

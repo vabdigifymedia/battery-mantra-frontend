@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import type { CallbackStatus } from "@/types/dto";
 
-export const Route = createFileRoute("/admin/callbacks")({
+export const Route = createFileRoute("/kalkaji/callbacks")({
   component: AdminCallbacks,
 });
 

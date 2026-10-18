@@ -9,7 +9,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Edit, Plus, Trash2, ExternalLink, Monitor, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/pages/")({
+export const Route = createFileRoute("/kalkaji/pages/")({
   component: AdminPages,
 });
 
@@ -75,7 +75,7 @@ function AdminPages() {
           <p className="text-muted-foreground">Manage dynamic content pages like About Us, Privacy Policy.</p>
         </div>
         <Button asChild>
-          <Link to="/admin/pages/new">
+          <Link to="/kalkaji/pages/new">
             <Plus className="mr-2 h-4 w-4" />
             Add Page
           </Link>
@@ -160,7 +160,7 @@ function AdminPages() {
                         </a>
                       </Button>
                       <Button variant="ghost" size="icon" asChild title="Edit page">
-                        <Link to="/admin/pages/$pageId/edit" params={{ pageId: page.pageId }}>
+                        <Link to="/kalkaji/pages/$pageId/edit" params={{ pageId: page.pageId }}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
