@@ -12,7 +12,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/shop/c/$categorySlug/$citySlug")({
@@ -29,13 +29,14 @@ export const Route = createFileRoute("/shop/c/$categorySlug/$citySlug")({
     return { categories, templates };
   },
   head: ({ loaderData, params }) => {
-    const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
+      { category_name: categoryName, delivery_time: "2-4 Hours" },
       (category as any)?.seo,
       {
         title: `${categoryName} Online | Buy 100% Genuine Battery`,

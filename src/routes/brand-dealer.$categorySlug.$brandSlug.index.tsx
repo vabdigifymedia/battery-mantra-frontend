@@ -10,7 +10,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { locationService } from "@/services/location.service";
 import { useLocationStore } from "@/store/useLocationStore";
@@ -48,23 +48,23 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       brand = brandMatchesFirst;
       brandName = brand.brandName;
       cityName = secondSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      categoryName = "Batteries";
+      categoryName = "Battery";
     } else if (brandMatchesSecond) {
       // Pattern: /brand-dealer/:categorySlug/:brandSlug (e.g. /brand-dealer/car-battery/exide)
       brand = brandMatchesSecond;
       brandName = brand.brandName;
       category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === firstSlug);
-      categoryName = category?.categoryName || firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      categoryName = toSingularCategory(category?.categoryName || firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     } else {
       brandName = secondSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      categoryName = firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      categoryName = toSingularCategory(firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     }
 
     const defaultTitle = cityName
       ? `${brandName} Authorized Dealer in ${cityName}`
       : `${brandName} ${categoryName} Authorized Dealer Online`;
     const defaultDesc = cityName
-      ? `Buy 100% Genuine ${brandName} Batteries from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
+      ? `Buy 100% Genuine ${brandName} Battery from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
       : `Buy 100% Genuine ${brandName} ${categoryName} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`;
 
     const seo = resolveTemplateSeo(
@@ -72,7 +72,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       loaderData?.templates,
       {
         brand_name: brand?.brandName || brandName,
-        category_name: category?.categoryName || categoryName,
+        category_name: categoryName,
         city_name: cityName,
         delivery_time: "2-4 Hours",
       },

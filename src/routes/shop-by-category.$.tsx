@@ -10,7 +10,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { ErrorState } from "@/components/feedback/ErrorState";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { LithiumMainPage } from "@/components/lithium/LithiumMainPage";
 import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryPage";
@@ -286,7 +286,7 @@ function SubcategoriesPage() {
     return (
       <div>
         <PageHeader
-          title={category.categoryName}
+          title={toSingularCategory(category.categoryName)}
           description="Select a subcategory to view products."
         />
         <Container size="xl" className="py-8">

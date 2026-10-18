@@ -9,7 +9,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
@@ -162,20 +162,20 @@ export function CategoryManufacturersPage({ categorySlug, citySlug }: { category
               __html: applySeoTemplate(category.categoryDescription, {
                 city: city?.cityName || "Delhi / NCR",
                 city_name: city?.cityName || "Delhi / NCR",
-                category: categoryName,
-                category_name: categoryName,
+                category: toSingularCategory(categoryName),
+                category_name: toSingularCategory(categoryName),
               }) 
             }}
           />
         )}
 
-        <SeoCityLinks productName={categoryName} baseUrl={`/manufacturers/${categorySlug}`} />
+        <SeoCityLinks productName={toSingularCategory(categoryName)} baseUrl={`/manufacturers/${categorySlug}`} />
       </Container>
 
       <GlobalFaqSection
         pageType="MANUFACTURER"
         context={{
-          category_name: categoryName,
+          category_name: toSingularCategory(categoryName),
         }}
       />
     </div>

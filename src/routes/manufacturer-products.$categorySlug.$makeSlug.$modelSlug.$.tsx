@@ -12,7 +12,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$")({
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
       : (modelSlug || "");
       
     const model = rawModel ? rawModel.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
-    const categoryName = categorySlug ? categorySlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "Car Batteries";
+    const categoryName = toSingularCategory(categorySlug ? categorySlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "Car Battery");
 
     // City from splat (e.g. /manufacturer-products/.../noida) or undefined
     const citySlug = _splat || undefined;

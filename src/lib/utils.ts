@@ -35,3 +35,23 @@ export function applySeoTemplate(template?: string | null, context: Record<strin
   }
   return result;
 }
+
+/**
+ * Converts plural product category phrases to singular for natural grammar in headings and titles.
+ * e.g. "Car Batteries" -> "Car Battery", "Inverter Batteries" -> "Inverter Battery"
+ */
+export function toSingularCategory(text?: string | null): string {
+  if (!text) return "";
+  return text
+    .replace(/\bBatteries\b/g, "Battery")
+    .replace(/\bbatteries\b/g, "battery")
+    .replace(/\bBATTERIES\b/g, "BATTERY")
+    .replace(/\bInverters\b/g, "Inverter")
+    .replace(/\binverters\b/g, "inverter")
+    .replace(/\bINVERTERS\b/g, "INVERTER")
+    .replace(/\bPanels\b/g, "Panel")
+    .replace(/\bpanels\b/g, "panel")
+    .replace(/\bPANELS\b/g, "PANEL")
+    .trim();
+}
+

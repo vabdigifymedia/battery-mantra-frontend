@@ -43,7 +43,7 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { useLocationStore } from "@/store/useLocationStore";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 
 import { productSearchSchema, type ProductSearchState } from "@/lib/schemas/productSearchSchema";
 
@@ -194,13 +194,13 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
 
   if (vehicle) {
     pageType = "BRAND_MODEL";
-    context = { ...context, model_name: vehicle.model, brand_name: vehicle.make, category_name: category?.categoryName || "Battery" };
+    context = { ...context, model_name: vehicle.model, brand_name: vehicle.make, category_name: toSingularCategory(category?.categoryName) || "Battery" };
   } else if (brand) {
     pageType = "BRAND";
-    context = { ...context, brand_name: brand.brandName, category_name: category?.categoryName || "Battery" };
+    context = { ...context, brand_name: brand.brandName, category_name: toSingularCategory(category?.categoryName) || "Battery" };
   } else if (category) {
     pageType = "CATEGORY";
-    context = { ...context, category_name: category.categoryName };
+    context = { ...context, category_name: toSingularCategory(category.categoryName) };
   }
 
   const handleFilterChange = (newFilters: ProductFilterState) => {
@@ -234,7 +234,15 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
         </aside>
 
         <div className="min-w-0">
-          <DynamicSearchBanner search={{ ...search, vehicleId: activeVehicleId }} isDealerPage={isDealerPage} />
+          <DynamicSearchBanner
+            search={{
+              ...search,
+              vehicleId: activeVehicleId,
+              categoryId: effectiveCategoryIds,
+              brandId: effectiveBrandIds,
+            }}
+            isDealerPage={isDealerPage}
+          />
           <div className="mb-4 flex items-center justify-between gap-3">
             <Drawer>
               <DrawerTrigger asChild>
@@ -424,7 +432,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                     : pageType === "BRAND"
                       ? context.brand_name
                       : ""
-                  } ${context.category_name || "Batteries"} offered`}
+                  } ${context.category_name || "Battery"} offered`}
               />
               <SeoCityLinks
                 productName={`${pageType === "BRAND_MODEL"
@@ -432,7 +440,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                     : pageType === "BRAND"
                       ? context.brand_name
                       : ""
-                  } ${context.category_name || "Batteries"}`.trim()}
+                  } ${context.category_name || "Battery"}`.trim()}
                 baseUrl={baseUrl}
               />
             </>

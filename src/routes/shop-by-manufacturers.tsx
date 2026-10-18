@@ -7,7 +7,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/shop-by-manufacturers")({
     return { categories, templates };
   },
   head: ({ loaderData }) => {
-    const categoryName = "Car Batteries";
+    const categoryName = "Car Battery";
     const category = loaderData?.categories?.find((c: any) =>
       /(^|-)car(-|$)/.test(toSlug(c.categoryName)) || /(^|\s)car(\s|$)/i.test(c.categoryName)
     );
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/shop-by-manufacturers")({
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
+      { category_name: toSingularCategory(category?.categoryName || categoryName), delivery_time: "2-4 Hours" },
       (category as any)?.seo,
       {
         title: `Shop by Car Battery Manufacturers | Battery Mantra`,
@@ -71,7 +71,7 @@ function ShopByManufacturersPage() {
     return undefined;
   };
   const category = categories ? findCategory(categories) : undefined;
-  const categoryName = category?.categoryName || "Car Batteries";
+  const categoryName = toSingularCategory(category?.categoryName || "Car Battery");
 
   // Load manufacturers for car batteries
   const { data: categoryMfrs, isLoading: isLoadingCatMfrs } = useQuery({

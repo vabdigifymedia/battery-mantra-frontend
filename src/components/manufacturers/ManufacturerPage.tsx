@@ -7,7 +7,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { useLocationStore } from "@/store/useLocationStore";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { BannerLayout } from "@/components/products/DynamicSearchBanner";
 
 const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
@@ -49,8 +49,8 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
         </nav>
 
         <BannerLayout 
-          title={`${manufacturer?.name || exactMake} ${categoryName}`}
-          subtitle={`With Battery Mantra, get ${manufacturer?.name || exactMake} ${categoryName} at best price`}
+          title={`${manufacturer?.name || exactMake} ${toSingularCategory(categoryName)}`}
+          subtitle={`With Battery Mantra, get ${manufacturer?.name || exactMake} ${toSingularCategory(categoryName)} at best price`}
           imageUrl={manufacturer?.logoUrl || ""}
           brandNameHeader={manufacturer?.name || exactMake}
           brandLogoUrl={manufacturer?.logoUrl || ""}

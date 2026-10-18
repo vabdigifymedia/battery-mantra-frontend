@@ -12,7 +12,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$citySlug")({
@@ -30,17 +30,18 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
     return { brands, categories, templates };
   },
   head: ({ loaderData, params }) => {
-    const categoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const cityName = params.citySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 
     // Provide dealer specific SEO
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
-      { brand_name: brand?.brandName || brandName, category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours", city_name: cityName },
+      { brand_name: brand?.brandName || brandName, category_name: categoryName, delivery_time: "2-4 Hours", city_name: cityName },
       (brand as any)?.seo,
       {
         title: `${brandName} ${categoryName} Authorized Dealer in ${cityName}`,

@@ -7,7 +7,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
-import { applySeoTemplate } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -27,17 +27,18 @@ export const Route = createFileRoute("/brands/$categorySlug/")({
     return { categories, templates };
   },
   head: ({ loaderData, params }) => {
-    const categoryName = params.categorySlug
+    const rawCategoryName = params.categorySlug
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: category?.categoryName || categoryName, delivery_time: "2-4 Hours" },
+      { category_name: categoryName, delivery_time: "2-4 Hours" },
       (category as any)?.seo, // The category's own SEO
       {
         title: `Shop by ${categoryName} Brands | Battery Mantra`,

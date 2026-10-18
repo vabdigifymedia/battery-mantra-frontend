@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { brandsQuery, categoriesQuery, vehiclesListQuery } from "@/queries";
 import { useLocationStore } from "@/store/useLocationStore";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee } from "lucide-react";
+import { toSingularCategory } from "@/lib/utils";
 
 export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isDealerPage?: boolean }) {
   const { city } = useLocationStore();
@@ -20,10 +21,14 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   const { data: allBrands } = useQuery(brandsQuery()); // Fetch all to resolve slug
   
   if (!catId && search.category && typeof search.category === 'string' && !isMultiCat && categories) {
-    const searchSlug = search.category;
+    const searchSlug = search.category.toLowerCase().trim();
     const findCatBySlug = (cats: any[]): any => {
       for (const c of cats) {
-        if ((c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')) === searchSlug) return c;
+        const catSlug = (c.categorySlug || c.categoryName.toLowerCase().replace(/\s+/g, '-')).toLowerCase().trim();
+        if (
+          catSlug === searchSlug ||
+          catSlug.replace(/-batteries$/, "-battery") === searchSlug.replace(/-batteries$/, "-battery")
+        ) return c;
         if (c.subCategories && c.subCategories.length > 0) {
           const found = findCatBySlug(c.subCategories);
           if (found) return found;
@@ -71,7 +76,8 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   let brandNameHeader = "";
   let brandLogoUrl = "";
 
-  const catName = category?.categoryName || (search.productType === "inverter" ? "Inverter" : search.productType === "solar" ? "Solar" : "Battery");
+  const singularCatName = toSingularCategory(category?.categoryName);
+  const catName = singularCatName || (search.productType === "inverter" ? "Inverter" : search.productType === "solar" ? "Solar Battery" : "Battery");
 
   if (vehicle) {
     title = isDealerPage 
@@ -84,19 +90,20 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
     const matchedBrand = brands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase()) || allBrands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase());
     if (matchedBrand) brandLogoUrl = matchedBrand.brandLogo || "";
   } else if (brand && category) {
+    const displayCategory = singularCatName;
     title = isDealerPage
-      ? `${brand.brandName} ${category.categoryName} Dealer in ${locationName}`
-      : `${brand.brandName} ${category.categoryName} Price in ${locationName}`;
-    subtitle = `With Battery Mantra, get ${brand.brandName} ${category.categoryName} at best price`;
+      ? `${brand.brandName} ${displayCategory} Dealer in ${locationName}`
+      : `${brand.brandName} ${displayCategory} Price in ${locationName}`;
+    subtitle = `With Battery Mantra, get ${brand.brandName} ${displayCategory} at best price`;
     imageUrl = brand.brandLogo || category.iconUrl || "";
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (brand) {
     const productTypeLabel = search.productType === "inverter" 
-      ? "Inverters" 
+      ? "Inverter" 
       : search.productType === "solar" 
-      ? "Solar Batteries" 
-      : "Batteries";
+      ? "Solar Battery" 
+      : "Battery";
     title = isDealerPage
       ? `${brand.brandName} ${productTypeLabel} Dealer in ${locationName}`
       : `${brand.brandName} ${productTypeLabel} Price in ${locationName}`;
@@ -105,12 +112,13 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (category) {
+    const displayCategory = singularCatName;
     title = isDealerPage
-      ? `${category.categoryName} Dealer in ${locationName}`
-      : `${category.categoryName} Price in ${locationName}`;
-    subtitle = `With Battery Mantra, get ${category.categoryName} at best price`;
+      ? `${displayCategory} Dealer in ${locationName}`
+      : `${displayCategory} Price in ${locationName}`;
+    subtitle = `With Battery Mantra, get ${displayCategory} at best price`;
     imageUrl = category.iconUrl || "";
-    brandNameHeader = category.categoryName;
+    brandNameHeader = displayCategory;
   }
 
   // Determine dynamic theme colors based on category or name
@@ -198,16 +206,16 @@ export function BannerLayout({
                 <img src={brandLogoUrl} alt={brandNameHeader} className="h-4 sm:h-5 md:h-6 w-auto object-contain mix-blend-multiply" />
               )}
               <span className={`${currentTheme.text} font-extrabold tracking-wider uppercase text-[10px] sm:text-xs md:text-sm`}>
-                {brandNameHeader}
+                {toSingularCategory(brandNameHeader)}
               </span>
             </div>
           )}
           
           <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-black uppercase text-slate-900 leading-tight">
-            {title}
+            {toSingularCategory(title)}
           </h1>
           <p className="text-slate-600 font-medium text-[10px] sm:text-xs md:text-base mt-1 md:mt-2 max-w-2xl">
-            {subtitle}
+            {toSingularCategory(subtitle)}
           </p>
         </div>
       </div>

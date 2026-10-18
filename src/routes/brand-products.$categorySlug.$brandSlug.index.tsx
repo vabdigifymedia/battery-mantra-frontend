@@ -10,7 +10,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/")({
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
     });
 
     const displayBrandName = brand?.brandName || brandName;
-    const displayCategoryName = category?.categoryName || categoryName;
+    const displayCategoryName = toSingularCategory(category?.categoryName || categoryName);
 
     // Use specific CMS Page SEO first, then entity SEO, then templates
     const seo = resolveTemplateSeo(
