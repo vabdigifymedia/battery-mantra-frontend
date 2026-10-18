@@ -63,17 +63,6 @@ function LoginPage() {
         .
       </p>
 
-      <div className="text-center text-sm">
-        <p className="text-muted-foreground">Are you a Partner or Admin?</p>
-        <div className="mt-2 flex items-center justify-center gap-4">
-          <Link to="/partner/login" className="text-brand font-medium hover:underline">
-            Partner Login
-          </Link>
-          <Link to="/admin/login" className="text-brand font-medium hover:underline">
-            Admin Login
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
