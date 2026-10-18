@@ -81,7 +81,7 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-6 md:gap-8 md:grid-cols-2">
         {/* Left Side: Form Fields */}
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -167,19 +167,20 @@ export function AddressForm({ initialData, onSubmit, onCancel, isSubmitting }: A
         </div>
 
         {/* Right Side: Map */}
-        <div className="flex flex-col h-full min-h-[300px]">
+        <div className="flex flex-col min-h-0">
           <label className="text-sm font-medium text-foreground mb-2 block">Pin Exact Location (Optional but recommended)</label>
-          <div className="flex-1 w-full h-full">
+          <div className="w-full">
             <LocationPicker value={deliveryCoords} onChange={handleLocationChange} />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+      {/* Sticky Bottom Actions */}
+      <div className="sticky bottom-0 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 p-3.5 sm:p-5 bg-background/95 backdrop-blur-md border-t flex items-center justify-end gap-3 z-30 shadow-xs">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} className="flex-1 sm:flex-none">
           Cancel
         </Button>
-        <Button type="submit" variant="brand" disabled={isSubmitting}>
+        <Button type="submit" variant="brand" disabled={isSubmitting} className="flex-1 sm:flex-none min-w-[130px]">
           {isSubmitting ? <Spinner size="sm" className="mr-2" /> : null}
           {initialData ? "Update Address" : "Save Address"}
         </Button>

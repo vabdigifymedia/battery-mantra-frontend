@@ -66,11 +66,11 @@ export function AddressModal({ open, onOpenChange, addressToEdit }: AddressModal
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] lg:max-w-[900px] p-0 overflow-hidden bg-background">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle>{isEditing ? "Edit Address" : "Add New Address"}</DialogTitle>
+      <DialogContent className="fixed z-50 inset-0 h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0 rounded-none border-0 p-0 flex flex-col bg-background sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:h-auto sm:max-h-[88vh] sm:w-full sm:max-w-[650px] lg:max-w-[900px] sm:rounded-2xl sm:border shadow-2xl">
+        <DialogHeader className="px-4 py-3.5 sm:px-6 sm:py-4 border-b shrink-0 flex flex-row items-center justify-between bg-background pr-12">
+          <DialogTitle className="text-base sm:text-lg font-bold">{isEditing ? "Edit Address" : "Add New Address"}</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-4 max-h-[85vh] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 overscroll-contain">
           {open && (
             <AddressForm
               initialData={addressToEdit ?? undefined}

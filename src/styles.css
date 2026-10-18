@@ -317,4 +317,39 @@
   }
 }
 
+/* Google Maps Autocomplete dropdown fix inside dialogs and mobile screens */
+.pac-container {
+  z-index: 99999 !important;
+  border-radius: 12px;
+  margin-top: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.pac-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-top-color: var(--border);
+  color: var(--foreground);
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background-color: var(--muted);
+}
+
+.pac-item-query {
+  font-size: 13px;
+  color: var(--foreground);
+}
+
+.pac-matched {
+  font-weight: 700;
+  color: var(--primary);
+}
+
 

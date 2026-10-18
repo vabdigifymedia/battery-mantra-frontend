@@ -35,12 +35,46 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     onChangeRef.current(newCoords);
   }, []);
 
+  const requestCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLocating(true);
+    setGeoError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const newCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        updateCoordinates(newCoords);
+        mapRef.current?.panTo(newCoords);
+        mapRef.current?.setZoom(17);
+        setIsLocating(false);
+      },
+      (err) => {
+        console.warn("Geolocation error:", err.code, err.message);
+        let msg = "Location access denied. Please drag the pin or search.";
+        if (err.code === 2) msg = "Location unavailable. Please search or drag the pin.";
+        if (err.code === 3) msg = "Location request timed out. Try again.";
+        setGeoError(msg);
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }, [updateCoordinates]);
+
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-    if (!value) {
-      requestCurrentLocation();
+    // Only auto-locate if permission was already granted previously so we don't trigger a jarring popup during modal opening
+    if (!value && typeof navigator !== "undefined" && "permissions" in navigator) {
+      navigator.permissions?.query({ name: "geolocation" as any }).then((result) => {
+        if (result.state === "granted") {
+          requestCurrentLocation();
+        }
+      }).catch(() => {});
     }
-  }, [value]);
+  }, [value, requestCurrentLocation]);
 
   const onMapUnmount = useCallback(() => {
     mapRef.current = null;
@@ -77,35 +111,6 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     }
   }, [updateCoordinates]);
 
-  const requestCurrentLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation is not supported by your browser");
-      return;
-    }
-
-    setIsLocating(true);
-    setGeoError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const newCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        updateCoordinates(newCoords);
-        mapRef.current?.panTo(newCoords);
-        mapRef.current?.setZoom(17);
-        setIsLocating(false);
-      },
-      (err) => {
-        console.warn("Geolocation error:", err.code, err.message);
-        let msg = "Location access denied. Please drag the pin or search.";
-        if (err.code === 2) msg = "Location unavailable. Please search or drag the pin.";
-        if (err.code === 3) msg = "Location request timed out. Try again.";
-        setGeoError(msg);
-        setIsLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
-  }, [updateCoordinates]);
-
   if (loadError) {
     return (
       <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 text-sm">
@@ -128,16 +133,18 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       {/* Header + Search bar + locate button */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <MapPin className="h-4 w-4 text-primary" />
-            <span>Pin Delivery Location</span>
-            <span className="text-[11px] font-normal text-muted-foreground">(Drag pin or tap on map)</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+              <MapPin className="h-4 w-4 text-primary shrink-0" />
+              <span className="truncate">Pin Delivery Location</span>
+            </div>
+            <span className="text-[11px] font-normal text-muted-foreground hidden sm:inline">(Drag pin or tap on map)</span>
           </div>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-8 gap-1.5 text-xs shrink-0"
+            className="h-8 gap-1.5 text-xs shrink-0 font-medium"
             onClick={requestCurrentLocation}
             disabled={isLocating}
           >
@@ -175,7 +182,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       )}
 
       {/* Map container */}
-      <div className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm w-full h-[350px]">
+      <div className="relative z-0 overflow-hidden rounded-xl border border-border shadow-sm w-full h-[220px] sm:h-[260px] md:h-[300px] lg:h-[340px]">
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={coords}
@@ -188,6 +195,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             mapTypeControl: false,
             fullscreenControl: false,
             zoomControl: true,
+            gestureHandling: "cooperative",
           }}
         >
           <Marker
