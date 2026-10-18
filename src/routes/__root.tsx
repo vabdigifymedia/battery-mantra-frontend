@@ -4,7 +4,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -143,17 +142,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const location = useLocation();
 
-  // Track SPA route changes in Google Analytics
+  // Track SPA route changes in Google Analytics (client-only)
   useEffect(() => {
     if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
       (window as any).gtag("config", "G-BBDZD3KEND", {
-        page_path: location.pathname + location.search,
+        page_path: window.location.pathname + window.location.search,
         page_title: document.title,
       });
     }
-  }, [location.pathname, location.search]);
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
