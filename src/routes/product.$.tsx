@@ -23,6 +23,7 @@ import { ShareProductModal } from "@/components/products/ShareProductModal";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
 import { cn, applySeoTemplate, toSlug } from "@/lib/utils";
+import { trackAddToCart } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -314,6 +315,12 @@ export function PdpPage() {
     mutationFn: () => cartService.add({ productId: data.productId, quantity: qty, exchangeOldBattery: isExchange }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+      trackAddToCart({
+        productId: data.productId,
+        productName: data.productName,
+        brandName: data.brandName,
+        productPrice: isExchange ? withExchangePrice : data.productPrice,
+      });
       toast.success(`Added ${qty} × ${data.productName} to cart`);
     },
     onError: (e) => {

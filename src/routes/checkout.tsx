@@ -25,6 +25,7 @@ import { loadRazorpayScript } from "@/lib/razorpay";
 import { env } from "@/lib/utils/env";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
+import { trackPurchase } from "@/lib/analytics";
 
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
@@ -84,6 +85,11 @@ function CheckoutPage() {
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
       qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+      trackPurchase({
+        orderId: order.orderId,
+        totalAmount: order.totalAmount || 0,
+        items: (order as any).orderItems || [],
+      });
       toast.success("Order placed successfully");
       navigate({ to: "/orders/$orderId", params: { orderId: order.orderId } });
     },
@@ -152,6 +158,16 @@ function CheckoutPage() {
             });
             qc.invalidateQueries({ queryKey: queryKeys.cart.all });
             qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+            trackPurchase({
+              orderId: verifyRes.orderId || orderRes.orderId,
+              totalAmount: orderRes.amount ? orderRes.amount / 100 : 0,
+              items: items.map((it: any) => ({
+                id: it.product.productId,
+                name: it.product.productName,
+                price: it.product.productPrice,
+                quantity: it.quantity,
+              })),
+            });
             toast.success("Payment successful! Order confirmed.");
             navigate({ to: "/orders/$orderId", params: { orderId: verifyRes.orderId || orderRes.orderId } });
           } catch (e) {
