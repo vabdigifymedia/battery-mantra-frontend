@@ -367,6 +367,15 @@ function EditProductForm({
 
     const specUnitIdsList = Object.values(data.specUnitIds).filter(Boolean);
 
+    const updatedCityPrices = product.cityPrices && product.cityPrices.length > 0
+      ? product.cityPrices.map((cp: any) => ({
+          cityId: cp.cityId,
+          price: cp.price,
+          exchangeDiscount: data.exchangeDiscount || 0,
+          stock: cp.stock ?? 1000
+        }))
+      : undefined;
+
     const payload = {
       productName: data.productName,
       productDescription: data.productDescription ?? "",
@@ -383,7 +392,8 @@ function EditProductForm({
       highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : [],
       specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : {},
       isAutoAssignToPartner: data.isAutoAssignToPartner,
-      seo: data.seo
+      seo: data.seo,
+      cityPrices: updatedCityPrices,
     };
 
     updateMutation.mutate(payload);

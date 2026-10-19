@@ -60,7 +60,24 @@ export const productDetailQuery = (id: string) => {
   const cityId = useLocationStore.getState().city?.cityId;
   return queryOptions({
     queryKey: queryKeys.products.detail(id, cityId),
-    queryFn: ({ signal }) => productsService.byId(id, cityId, signal),
+    queryFn: async ({ signal }) => {
+      const product = await productsService.byId(id, cityId, signal);
+      // Fallback: If city pricing has exchangeDiscount = 0, but master product has exchangeDiscount > 0
+      if (cityId && (product.exchangeDiscount ?? 0) <= 0) {
+        try {
+          const masterProduct = await productsService.byId(id, undefined, signal);
+          if ((masterProduct.exchangeDiscount ?? 0) > 0) {
+            return {
+              ...product,
+              exchangeDiscount: masterProduct.exchangeDiscount,
+            };
+          }
+        } catch {
+          // ignore fallback error
+        }
+      }
+      return product;
+    },
     staleTime: 60_000,
   });
 };
