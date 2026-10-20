@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,15 @@ import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
 import { useLocationStore } from "@/store/useLocationStore";
-import type { ApplyCouponResponse } from "@/types/dto";
+import type { ApplyCouponResponse, CityDto } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
 import { loadRazorpayScript } from "@/lib/razorpay";
 import { env } from "@/lib/utils/env";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
 import { trackPurchase } from "@/lib/analytics";
+import { locationService } from "@/services/location.service";
+import { LocationModal } from "@/components/location/LocationModal";
 
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
@@ -58,8 +60,8 @@ function CheckoutPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { city: locationCity } = useLocationStore();
-  const cart = useQuery(cartQuery(status === "authenticated", locationCity?.cityId));
+  const { city: locationCity, setLocation } = useLocationStore();
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   
   const [activeStep, setActiveStep] = useState<number>(2);
   const [addressId, setAddressId] = useState<string>(search.addressId ?? "");
@@ -69,10 +71,93 @@ function CheckoutPage() {
 
   const { data: addresses } = useQuery(addressesQuery(status === "authenticated"));
   const selectedAddress = addresses?.find((a) => a.addressId === addressId);
+  const hasValidAddress = /^[0-9a-fA-F-]{36}$/.test(addressId);
+  const postalCode = selectedAddress?.postalCode?.trim() ?? "";
+
+  // Public serviceable cities query
+  const { data: publicCities } = useQuery({
+    queryKey: ["locations", "public-cities"],
+    queryFn: () => locationService.getPublicCities(),
+  });
+
+  // Verify serviceability of the selected address pincode
+  const pincodeCheck = useQuery({
+    queryKey: ["locations", "check-pincode", postalCode],
+    queryFn: () => locationService.checkPincode(postalCode),
+    enabled: Boolean(hasValidAddress && postalCode && postalCode.length >= 6),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Resolve destination delivery city from pincode check or public cities fallback
+  const resolvedDeliveryCity: CityDto | null = useMemo(() => {
+    if (!selectedAddress) return null;
+    if (pincodeCheck.data?.serviceable && pincodeCheck.data?.city) {
+      return pincodeCheck.data.city;
+    }
+    if (publicCities && selectedAddress.city) {
+      const normalizedAddrCity = selectedAddress.city.trim().toLowerCase();
+      const matched = publicCities.find(
+        (c) => c.cityName.trim().toLowerCase() === normalizedAddrCity
+      );
+      if (matched) return matched;
+    }
+    return pincodeCheck.data?.city || null;
+  }, [selectedAddress, pincodeCheck.data, publicCities]);
+
+  // Option C: Strict serviceability check
+  const isAddressServiceable: boolean = useMemo(() => {
+    if (!selectedAddress) return true;
+    if (pincodeCheck.data) {
+      return Boolean(pincodeCheck.data.serviceable);
+    }
+    if (pincodeCheck.isError && publicCities && selectedAddress.city) {
+      const normalizedAddrCity = selectedAddress.city.trim().toLowerCase();
+      return publicCities.some((c) => c.cityName.trim().toLowerCase() === normalizedAddrCity);
+    }
+    return true;
+  }, [selectedAddress, pincodeCheck.data, pincodeCheck.isError, publicCities]);
+
+  const isCheckingServiceability = Boolean(
+    hasValidAddress && postalCode.length >= 6 && pincodeCheck.isLoading
+  );
+
+  const isUnserviceable = Boolean(
+    hasValidAddress && !isCheckingServiceability && !isAddressServiceable
+  );
+
+  // Option A: Destination city vs browsing city mismatch
+  const isCityMismatch = Boolean(
+    hasValidAddress &&
+    !isUnserviceable &&
+    resolvedDeliveryCity &&
+    locationCity &&
+    resolvedDeliveryCity.cityName.trim().toLowerCase() !== locationCity.cityName.trim().toLowerCase()
+  );
+
+  // Effective city for pricing: Destination Delivery City takes precedence over browsing location
+  const effectiveCity = Boolean(hasValidAddress && !isUnserviceable && resolvedDeliveryCity)
+    ? resolvedDeliveryCity
+    : locationCity;
+
+  // Real-time cart query fetched using effective delivery city ID
+  const cart = useQuery(cartQuery(status === "authenticated", effectiveCity?.cityId));
 
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const handleSyncBrowsingCity = () => {
+    if (resolvedDeliveryCity && selectedAddress) {
+      setLocation(selectedAddress.postalCode, true, resolvedDeliveryCity);
+      toast.success(`Browsing location updated to ${resolvedDeliveryCity.cityName}`);
+    }
+  };
+
+  const handleChangeAddress = () => {
+    setActiveStep(2);
+    const el = document.getElementById("checkout-step-2");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const checkout = useMutation({
     mutationFn: () => ordersService.checkout({ 
@@ -83,7 +168,7 @@ function CheckoutPage() {
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       latitude: selectedAddress?.latitude,
       longitude: selectedAddress?.longitude,
-      selectedCity: locationCity?.cityName || undefined,
+      selectedCity: effectiveCity?.cityName || locationCity?.cityName || undefined,
     }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
@@ -108,7 +193,7 @@ function CheckoutPage() {
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       latitude: selectedAddress?.latitude,
       longitude: selectedAddress?.longitude,
-      selectedCity: locationCity?.cityName || undefined,
+      selectedCity: effectiveCity?.cityName || locationCity?.cityName || undefined,
     }),
   });
 
@@ -118,6 +203,11 @@ function CheckoutPage() {
   });
 
   const handlePlaceOrder = async () => {
+    if (isUnserviceable) {
+      toast.error("Delivery is unavailable for the selected address.");
+      return;
+    }
+
     if (paymentMethod === "COD") {
       checkout.mutate();
       return;
@@ -201,7 +291,9 @@ function CheckoutPage() {
   const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
   const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
   
-  const totalAmount = appliedCoupon ? appliedCoupon.finalTotal : baseTotalAmount;
+  const totalAmount = appliedCoupon
+    ? Math.max(0, baseTotalAmount - (appliedCoupon.discountAmount ?? 0))
+    : baseTotalAmount;
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -228,6 +320,7 @@ function CheckoutPage() {
     setCouponInput("");
     toast.success("Coupon removed");
   };
+
   if (!cart.isLoading && items.length === 0) {
     return (
       <Container size="lg" className="py-12">
@@ -244,11 +337,10 @@ function CheckoutPage() {
     );
   }
 
-  const hasValidAddress = /^[0-9a-fA-F-]{36}$/.test(addressId);
   const hasValidDelivery = deliveryMethod !== "HOME_INSTALLATION" || installationDate !== "";
   
   const isProcessing = checkout.isPending || createRazorpayOrder.isPending || verifyRazorpayPayment.isPending;
-  const canPlace = hasValidAddress && items.length > 0 && !isProcessing && hasValidDelivery;
+  const canPlace = hasValidAddress && !isUnserviceable && !isCheckingServiceability && items.length > 0 && !isProcessing && hasValidDelivery;
 
   return (
     <div className="bg-muted/20 min-h-screen pb-16">
@@ -277,17 +369,66 @@ function CheckoutPage() {
             active={activeStep === 2} 
             completed={activeStep > 2}
             onEdit={() => setActiveStep(2)}
-            summary={hasValidAddress ? "Address selected" : ""}
+            summary={
+              hasValidAddress
+                ? isUnserviceable
+                  ? "Delivery Unavailable"
+                  : resolvedDeliveryCity?.cityName
+                  ? `${resolvedDeliveryCity.cityName} (${selectedAddress?.postalCode})`
+                  : "Address selected"
+                : ""
+            }
           >
             <AddressSelector value={addressId} onChange={setAddressId} />
+
+            {/* Serviceability / Price Adjustment Notices */}
+            {hasValidAddress && (
+              <div className="mt-5 space-y-4">
+                {isCheckingServiceability && (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-muted bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
+                    <Spinner size="sm" />
+                    <span>Verifying delivery network serviceability for {postalCode}...</span>
+                  </div>
+                )}
+
+                {isUnserviceable && (
+                  <ServiceabilityWarningCTA
+                    postalCode={selectedAddress?.postalCode}
+                    cityName={selectedAddress?.city}
+                    onChangeAddress={handleChangeAddress}
+                    onViewCities={() => setIsLocationModalOpen(true)}
+                  />
+                )}
+
+                {isCityMismatch && resolvedDeliveryCity && (
+                  <DestinationPricingNoticeCTA
+                    deliveryCityName={resolvedDeliveryCity.cityName}
+                    browsingCityName={locationCity?.cityName}
+                    postalCode={selectedAddress?.postalCode}
+                    onSyncLocation={handleSyncBrowsingCity}
+                    onChangeAddress={handleChangeAddress}
+                  />
+                )}
+              </div>
+            )}
+
             <div className="mt-6">
               <Button 
                 variant="brand" 
                 size="lg" 
-                disabled={!hasValidAddress} 
+                disabled={!hasValidAddress || isUnserviceable || isCheckingServiceability} 
                 onClick={() => setActiveStep(3)}
               >
-                Deliver Here
+                {isCheckingServiceability ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Checking Area...
+                  </>
+                ) : isUnserviceable ? (
+                  "Delivery Unavailable"
+                ) : (
+                  "Deliver Here"
+                )}
               </Button>
             </div>
           </CheckoutStep>
@@ -415,6 +556,17 @@ function CheckoutPage() {
               </p>
             )}
 
+            {isUnserviceable && (
+              <div className="mt-6">
+                <ServiceabilityWarningCTA
+                  postalCode={selectedAddress?.postalCode}
+                  cityName={selectedAddress?.city}
+                  onChangeAddress={handleChangeAddress}
+                  onViewCities={() => setIsLocationModalOpen(true)}
+                />
+              </div>
+            )}
+
             <div className="mt-8 flex justify-end pt-4 border-t">
               <Button
                 variant="brand"
@@ -424,7 +576,13 @@ function CheckoutPage() {
                 onClick={handlePlaceOrder}
               >
                 {isProcessing ? <Spinner size="sm" className="mr-2" /> : <CheckCircle2 className="mr-2 h-5 w-5" />}
-                {paymentMethod === "ONLINE" ? "Pay Now" : "Place Order"}
+                {isUnserviceable
+                  ? "Delivery Unavailable"
+                  : isCheckingServiceability
+                  ? "Checking Serviceability..."
+                  : paymentMethod === "ONLINE"
+                  ? "Pay Now"
+                  : "Place Order"}
               </Button>
             </div>
           </CheckoutStep>
@@ -433,10 +591,49 @@ function CheckoutPage() {
 
         {/* RIGHT COLUMN: STICKY ORDER SUMMARY */}
         <aside className="sticky top-24 rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-          <div className="bg-muted/30 border-b p-5">
+          <div className="bg-muted/30 border-b p-5 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wide">Price Details</h2>
+            {effectiveCity && (
+              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {effectiveCity.cityName}
+              </span>
+            )}
           </div>
           <div className="p-5">
+            {/* Context Notices in Summary */}
+            {isUnserviceable && (
+              <div className="mb-4 rounded-xl border border-rose-300 bg-rose-50/80 p-3 text-xs text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0" />
+                  <span>Delivery Unavailable</span>
+                </div>
+                <p className="mt-1 text-[11px] text-rose-800 dark:text-rose-300">
+                  Pincode {selectedAddress?.postalCode} is outside our active delivery area.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleChangeAddress}
+                  className="mt-2 font-semibold text-rose-700 underline underline-offset-2 dark:text-rose-400 block"
+                >
+                  Change delivery address
+                </button>
+              </div>
+            )}
+
+            {!isUnserviceable && isCityMismatch && resolvedDeliveryCity && (
+              <div className="mb-4">
+                <DestinationPricingNoticeCTA
+                  compact
+                  deliveryCityName={resolvedDeliveryCity.cityName}
+                  browsingCityName={locationCity?.cityName}
+                  postalCode={selectedAddress?.postalCode}
+                  onSyncLocation={handleSyncBrowsingCity}
+                  onChangeAddress={handleChangeAddress}
+                />
+              </div>
+            )}
+
             <dl className="space-y-4 text-sm">
               <div className="flex justify-between text-foreground">
                 <dt>Price ({items.length} items)</dt>
@@ -514,11 +711,167 @@ function CheckoutPage() {
           </div>
         </aside>
       </Container>
+
+      {/* Serviceable Locations Explorer Modal */}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
     </div>
   );
 }
 
 // Subcomponents
+
+function ServiceabilityWarningCTA({
+  postalCode,
+  cityName,
+  onChangeAddress,
+  onViewCities,
+}: {
+  postalCode?: string;
+  cityName?: string;
+  onChangeAddress: () => void;
+  onViewCities: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-rose-300 bg-rose-50/80 p-5 shadow-sm dark:border-rose-900/60 dark:bg-rose-950/20 animate-in fade-in slide-in-from-top-1">
+      <div className="flex flex-col sm:flex-row items-start gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
+          <AlertTriangle className="h-6 w-6" />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-200/80 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-rose-900 dark:bg-rose-900/60 dark:text-rose-200">
+            Delivery Unavailable
+          </div>
+          <h3 className="text-base font-bold text-rose-950 dark:text-rose-100">
+            We do not deliver to this address yet
+          </h3>
+          <p className="text-sm leading-relaxed text-rose-800 dark:text-rose-300">
+            Our technician dispatch and battery installation network does not currently cover{" "}
+            <span className="font-semibold text-rose-950 dark:text-rose-100">
+              {postalCode ? `Pincode ${postalCode}` : ""} {cityName ? `(${cityName})` : ""}
+            </span>
+            . Please select another delivery address or check our active service cities.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 pt-3">
+            <Button
+              type="button"
+              variant="brand"
+              size="sm"
+              onClick={onChangeAddress}
+              className="bg-rose-600 hover:bg-rose-700 text-white shadow-sm"
+            >
+              Change Delivery Address
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onViewCities}
+              className="border-rose-300 text-rose-900 hover:bg-rose-100/60 dark:border-rose-800 dark:text-rose-200"
+            >
+              View Serviceable Cities
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DestinationPricingNoticeCTA({
+  deliveryCityName,
+  browsingCityName,
+  postalCode,
+  onSyncLocation,
+  onChangeAddress,
+  compact = false,
+}: {
+  deliveryCityName: string;
+  browsingCityName?: string;
+  postalCode?: string;
+  onSyncLocation: () => void;
+  onChangeAddress?: () => void;
+  compact?: boolean;
+}) {
+  if (compact) {
+    return (
+      <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/30">
+        <div className="flex items-start gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+            <MapPin className="h-4 w-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="inline-block rounded-full bg-blue-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:bg-blue-900/60 dark:text-blue-200">
+                Destination Pricing
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-blue-900 dark:text-blue-200 font-medium">
+              Prices recalculated for <span className="font-bold">{deliveryCityName}</span> delivery
+              {browsingCityName ? ` (browsing from ${browsingCityName})` : ""}.
+            </p>
+            <button
+              type="button"
+              onClick={onSyncLocation}
+              className="mt-2 text-xs font-semibold text-blue-700 hover:text-blue-900 dark:text-blue-400 underline underline-offset-2 flex items-center gap-1"
+            >
+              <RefreshCw className="h-3 w-3" /> Set {deliveryCityName} as default city
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-card p-5 shadow-sm dark:border-blue-900/50 dark:bg-blue-950/20 animate-in fade-in slide-in-from-top-1">
+      <div className="flex flex-col sm:flex-row items-start gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 shadow-xs">
+          <MapPin className="h-6 w-6" />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-200/80 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-900 dark:bg-blue-900/60 dark:text-blue-200">
+            Pricing Updated For {deliveryCityName}
+          </div>
+          <h3 className="text-base font-bold text-foreground">
+            Order total adjusted for your delivery destination
+          </h3>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Battery prices, scrap exchange discounts, and technician dispatch are based on inventory in{" "}
+            <span className="font-semibold text-foreground">{deliveryCityName}</span>
+            {postalCode ? ` (${postalCode})` : ""} rather than{" "}
+            <span className="font-semibold text-foreground">{browsingCityName || "your browsing city"}</span>.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 pt-3">
+            <Button
+              type="button"
+              size="sm"
+              variant="default"
+              onClick={onSyncLocation}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Set {deliveryCityName} as Browsing City
+            </Button>
+            {onChangeAddress && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={onChangeAddress}
+                className="border-border text-foreground hover:bg-muted"
+              >
+                Change Address
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CheckoutStep({ 
   index, 
@@ -538,7 +891,7 @@ function CheckoutStep({
   summary?: React.ReactNode;
 }) {
   return (
-    <div className={`rounded-xl overflow-hidden transition-all duration-300 border bg-card ${active ? 'shadow-md ring-1 ring-primary/20 border-primary' : 'border-border'}`}>
+    <div id={`checkout-step-${index}`} className={`rounded-xl overflow-hidden transition-all duration-300 border bg-card ${active ? 'shadow-md ring-1 ring-primary/20 border-primary' : 'border-border'}`}>
       <div 
         className={`flex items-center justify-between p-4 sm:p-5 transition-colors ${active ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground'} ${completed && !active ? 'cursor-pointer hover:bg-muted/30' : ''}`}
         onClick={() => { if (completed && !active && onEdit) onEdit(); }}
@@ -604,3 +957,4 @@ function PaymentOption({
     </button>
   );
 }
+
