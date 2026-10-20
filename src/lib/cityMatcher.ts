@@ -1,41 +1,74 @@
 import type { CityDto } from "@/types/dto";
 
 /**
- * Common Indian city aliases, synonyms, and sub-regions mapped to standardized city identifiers.
+ * Serviceable cities and their verified aliases, sub-regions, and colloquial variations.
+ * Specifically configured for Battery Mantra active operational cities:
+ * Ghaziabad, Delhi, Faridabad, Modinagar, Lucknow, Kanpur, Ballabgarh, Bengaluru,
+ * Agra, Meerut, Mathura, Bahadurgarh, Katra, Noida Extension, Greater Noida, Noida, Gurgaon.
  */
 const CITY_ALIASES: Record<string, string[]> = {
-  delhi: [
+  // --- Noida Tri-Zone (kept strictly separated) ---
+  "noida": [
+    "noida city",
+    "gautam buddha nagar",
+    "gautam budh nagar",
+    "gb nagar",
+    "g b nagar",
+    "sector 62",
+    "sector 18",
+  ],
+  "greater noida": [
+    "gr noida",
+    "gr. noida",
+    "greaternoida",
+    "greater noida authority",
+    "pari chowk",
+    "knowledge park",
+    "surajpur",
+    "kasna",
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "omega",
+  ],
+  "noida extension": [
+    "noida ext",
+    "noida extn",
+    "noida-ext",
+    "noidaextension",
+    "greater noida west",
+    "gr noida west",
+    "gr. noida west",
+    "gaur city",
+    "char murti",
+  ],
+
+  // --- Delhi NCR Hubs ---
+  "delhi": [
     "new delhi",
     "delhi ncr",
-    "ncr",
+    "dilli",
     "south delhi",
     "north delhi",
     "west delhi",
     "east delhi",
     "central delhi",
-    "dilli",
     "ndls",
   ],
-  gurgaon: [
+  "gurgaon": [
     "gurugram",
     "gurgoan",
     "gurgao",
     "gurgram",
-    "dlf",
-    "sohna",
     "manesar",
+    "sohna",
+    "dlf",
+    "cyber city",
+    "golf course road",
+    "palam vihar",
   ],
-  noida: [
-    "greater noida",
-    "gr noida",
-    "gautam buddha nagar",
-    "gautam budh nagar",
-    "gb nagar",
-    "g b nagar",
-    "noida extension",
-    "noida ext",
-  ],
-  ghaziabad: [
+  "ghaziabad": [
     "gaziabad",
     "gaziyabad",
     "gzb",
@@ -44,43 +77,73 @@ const CITY_ALIASES: Record<string, string[]> = {
     "vaishali",
     "vasundhara",
     "loni",
-    "modinagar",
+    "raj nagar",
+    "raj nagar extension",
+    "crossings republik",
+    "kavi nagar",
   ],
-  faridabad: [
+  "modinagar": [
+    "modi nagar",
+    "modinagr",
+  ],
+  "faridabad": [
     "fbd",
-    "ballabgarh",
-    "ballabhgarh",
     "nit faridabad",
+    "old faridabad",
+    "faridabd",
   ],
-  bangalore: [
-    "bengaluru",
+  "ballabgarh": [
+    "ballabhgarh",
+    "balabgarh",
+    "ballabgadh",
+  ],
+  "bahadurgarh": [
+    "bahadur garh",
+    "bahadurgadh",
+  ],
+
+  // --- Uttar Pradesh & Other Hubs ---
+  "lucknow": [
+    "lko",
+    "lakhnau",
+    "gomti nagar",
+    "alambagh",
+    "hazratganj",
+    "indira nagar",
+  ],
+  "kanpur": [
+    "knp",
+    "cawnpore",
+  ],
+  "agra": [
+    "taj nagari",
+  ],
+  "meerut": [
+    "merut",
+    "mrt",
+  ],
+  "mathura": [
+    "vrindavan",
+    "mathura vrindavan",
+  ],
+
+  // --- Jammu & Kashmir ---
+  "katra": [
+    "katra jammu",
+    "vaishno devi",
+    "vaishnodevi",
+    "mata vaishno devi",
+  ],
+
+  // --- South Hub ---
+  "bengaluru": [
+    "bangalore",
     "blr",
-  ],
-  mumbai: [
-    "bombay",
-    "navi mumbai",
-    "thane",
-    "kalyan",
-  ],
-  hyderabad: [
-    "secunderabad",
-    "cyberabad",
-    "hyd",
-  ],
-  kolkata: [
-    "calcutta",
-  ],
-  chennai: [
-    "madras",
-  ],
-  pune: [
-    "poona",
-    "pcmc",
-    "pimpri",
-    "chinchwad",
-  ],
-  jaipur: [
-    "pink city",
+    "whitefield",
+    "koramangala",
+    "electronic city",
+    "indiranagar",
+    "hsr layout",
   ],
 };
 
@@ -132,11 +195,11 @@ export function stringSimilarity(a: string, b: string): number {
 
 /**
  * Matches an input address city against a list of serviceable public cities.
- * Uses a multi-tiered pipeline:
- * 1. Exact normalized match
- * 2. Alias / synonym dictionary match
- * 3. Substring & word token overlap match
- * 4. Fuzzy Levenshtein match with typo tolerance
+ *
+ * CRITICAL RULE:
+ * Candidate cities are sorted by string length DESCENDING so specific multi-word
+ * cities ("greater noida", "noida extension", "ballabgarh", "modinagar") are
+ * evaluated BEFORE shorter substrings ("noida", "delhi", etc.).
  */
 export function matchCity(
   inputCity?: string | null,
@@ -147,30 +210,41 @@ export function matchCity(
   const cleanInput = normalizeCityName(inputCity);
   if (!cleanInput) return null;
 
-  // Pre-normalize public city names
-  const normalizedCities = publicCities.map((c) => ({
-    city: c,
-    cleanName: normalizeCityName(c.cityName),
-  }));
+  // Pre-normalize and sort candidates by length DESCENDING
+  // This ensures "greater noida" and "noida extension" match before "noida"
+  const normalizedCities = publicCities
+    .map((c) => ({
+      city: c,
+      cleanName: normalizeCityName(c.cityName),
+    }))
+    .sort((a, b) => b.cleanName.length - a.cleanName.length);
 
-  // --- PASS 1: Exact match on normalized name ---
+  // --- PASS 1: Exact Match ---
   for (const item of normalizedCities) {
     if (item.cleanName === cleanInput) {
       return item.city;
     }
   }
 
-  // --- PASS 2: Known Aliases & Synonyms ---
+  // --- PASS 2: Known Aliases & Specific Sub-region Dictionaries ---
+  // Check multi-word aliases first, length-descending
   for (const item of normalizedCities) {
     const key = item.cleanName;
-    const aliases = CITY_ALIASES[key] || [];
+    const aliases = (CITY_ALIASES[key] || []).sort((a, b) => b.length - a.length);
 
-    // Check if input equals an alias of this city
+    // Exact alias match
     if (aliases.includes(cleanInput)) {
       return item.city;
     }
 
-    // Check if input alias matches city
+    // Check if cleanInput contains any multi-word alias (e.g. "gaur city" in "gaur city 1")
+    for (const alias of aliases) {
+      if (cleanInput === alias || cleanInput.startsWith(alias + " ") || cleanInput.endsWith(" " + alias) || cleanInput.includes(" " + alias + " ")) {
+        return item.city;
+      }
+    }
+
+    // Reverse check: alias list mapping
     for (const [aliasKey, aliasList] of Object.entries(CITY_ALIASES)) {
       if (aliasKey === cleanInput && aliasList.includes(item.cleanName)) {
         return item.city;
@@ -178,64 +252,87 @@ export function matchCity(
     }
   }
 
-  // --- PASS 3: Word Token Overlap & Substring Containment ---
-  const inputTokens = cleanInput.split(" ").filter((t) => t.length >= 3);
-
+  // --- PASS 3: Phrase / Substring Containment (Multi-word before Single-word) ---
   for (const item of normalizedCities) {
-    // Check if cleanInput contains the city name as a standalone word/phrase
-    if (
-      cleanInput.includes(item.cleanName) ||
-      item.cleanName.includes(cleanInput)
-    ) {
-      return item.city;
-    }
-
-    // Check if any significant token in input matches city name
-    for (const token of inputTokens) {
-      if (token === item.cleanName) {
+    // Exact word boundary or full containment for multi-word cities
+    if (item.cleanName.includes(" ")) {
+      if (
+        cleanInput === item.cleanName ||
+        cleanInput.includes(item.cleanName)
+      ) {
         return item.city;
       }
-      // Check token against aliases
-      const aliases = CITY_ALIASES[item.cleanName] || [];
-      if (aliases.includes(token)) {
-        return item.city;
+    } else {
+      // Single-word cities (like "noida", "delhi"):
+      // Only match if it's a discrete word, NOT preceded by "greater" or followed by "extension"
+      const words = cleanInput.split(" ");
+      const hasWord = words.includes(item.cleanName);
+
+      if (hasWord) {
+        // Guard against matching "noida" when the input actually mentions "greater noida" or "noida extension"
+        if (item.cleanName === "noida") {
+          const hasGreaterNoida = cleanInput.includes("greater noida") || cleanInput.includes("gr noida");
+          const hasNoidaExt = cleanInput.includes("noida extension") || cleanInput.includes("noida ext") || cleanInput.includes("greater noida west");
+          if (!hasGreaterNoida && !hasNoidaExt) {
+            return item.city;
+          }
+        } else if (item.cleanName === "faridabad") {
+          if (!cleanInput.includes("ballabgarh") && !cleanInput.includes("ballabhgarh")) {
+            return item.city;
+          }
+        } else if (item.cleanName === "ghaziabad") {
+          if (!cleanInput.includes("modinagar") && !cleanInput.includes("modi nagar")) {
+            return item.city;
+          }
+        } else {
+          return item.city;
+        }
       }
     }
   }
 
   // --- PASS 4: Fuzzy Levenshtein Typo Tolerance ---
-  // Compare cleanInput and individual tokens against cleanName with max distance
   let bestMatch: CityDto | null = null;
   let highestScore = 0;
+
+  const inputTokens = cleanInput.split(" ").filter((t) => t.length >= 3);
 
   for (const item of normalizedCities) {
     const target = item.cleanName;
     const maxLen = Math.max(cleanInput.length, target.length);
-
-    // Dynamic distance threshold: 1 for short words (<=5), 2 for medium (6-10), 3 for long
     const allowedDist = target.length <= 5 ? 1 : target.length <= 10 ? 2 : 3;
 
     // Direct comparison
     const dist = levenshteinDistance(cleanInput, target);
     const score = (maxLen - dist) / maxLen;
 
-    if (dist <= allowedDist && score >= 0.72) {
+    if (dist <= allowedDist && score >= 0.74) {
       if (score > highestScore) {
         highestScore = score;
         bestMatch = item.city;
       }
     }
 
-    // Also compare input tokens against target (e.g. "Noyda" in "Noyda Sec 62")
-    for (const token of inputTokens) {
-      const tokenDist = levenshteinDistance(token, target);
-      const tokenScore = (Math.max(token.length, target.length) - tokenDist) / Math.max(token.length, target.length);
-      const tokenAllowed = target.length <= 5 ? 1 : 2;
+    // Token comparison for single-word targets (e.g. "Noyda" in "Noyda Sec 62")
+    if (!target.includes(" ")) {
+      for (const token of inputTokens) {
+        // Skip token comparison if token is "greater" or "extension"
+        if (token === "greater" || token === "extension") continue;
 
-      if (tokenDist <= tokenAllowed && tokenScore >= 0.72) {
-        if (tokenScore > highestScore) {
-          highestScore = tokenScore;
-          bestMatch = item.city;
+        const tokenDist = levenshteinDistance(token, target);
+        const tokenMaxLen = Math.max(token.length, target.length);
+        const tokenScore = (tokenMaxLen - tokenDist) / tokenMaxLen;
+        const tokenAllowed = target.length <= 5 ? 1 : 2;
+
+        if (tokenDist <= tokenAllowed && tokenScore >= 0.74) {
+          // Guard for noida typos: if input contains "greater", don't match "noida"
+          if (target === "noida" && (cleanInput.includes("greater") || cleanInput.includes("extension"))) {
+            continue;
+          }
+          if (tokenScore > highestScore) {
+            highestScore = tokenScore;
+            bestMatch = item.city;
+          }
         }
       }
     }
