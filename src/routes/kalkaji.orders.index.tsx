@@ -11,7 +11,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye } from "lucide-react";
+import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye, AlertTriangle, Globe } from "lucide-react";
 import { partnerService } from "@/services/partner.service";
 import { engineerService } from "@/services/engineer.service";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
@@ -27,6 +27,21 @@ const STATUS_READY = ["PROCESSING"];
 const STATUS_DISPATCHED = ["SHIPPED", "OUT_FOR_DELIVERY"];
 const STATUS_DELIVERED = ["DELIVERED", "INSTALLED"];
 const STATUS_CANCELLED = ["CANCELLED"];
+
+export const checkCityMismatch = (selectedCity?: string, shippingAddress?: string) => {
+  if (!selectedCity || !shippingAddress) return false;
+  const sel = selectedCity.trim().toLowerCase();
+  const addr = shippingAddress.toLowerCase();
+  
+  if (addr.includes(sel)) return false;
+  
+  // Synonyms and variations
+  if ((sel.includes("gurgaon") || sel.includes("gurugram")) && (addr.includes("gurgaon") || addr.includes("gurugram"))) return false;
+  if ((sel.includes("delhi") || sel.includes("ncr")) && addr.includes("delhi")) return false;
+  if ((sel.includes("bangalore") || sel.includes("bengaluru")) && (addr.includes("bangalore") || addr.includes("bengaluru"))) return false;
+  
+  return true;
+};
 
 export const getStatusLabel = (status: string) => {
   switch (status) {
@@ -142,8 +157,10 @@ function AdminOrders() {
     }
   };
 
-  const formatRelativeTime = (dateString: string) => {
+  const formatRelativeTime = (dateString?: string) => {
+    if (!dateString) return "—";
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "—";
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
@@ -206,7 +223,7 @@ function AdminOrders() {
                           </button>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
-                          {order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''} • ₹{order.totalAmount.toLocaleString()}
+                          {(order.orderItems?.length || 0)} item{(order.orderItems?.length || 0) === 1 ? '' : 's'} • ₹{order.totalAmount.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -266,6 +283,18 @@ function AdminOrders() {
                             <MapPin className="h-3 w-3 mr-1 shrink-0" />
                             <span className="truncate">{order.shippingAddress?.split(',').pop()?.trim() || "No Address"}</span>
                           </div>
+                          {order.selectedCity && (
+                            <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                🌐 {order.selectedCity}
+                              </span>
+                              {checkCityMismatch(order.selectedCity, order.shippingAddress) && (
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                                  <AlertTriangle className="h-2.5 w-2.5" /> Mismatch
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -273,7 +302,7 @@ function AdminOrders() {
                   <TableCell>
                     <p className="text-sm font-medium">{formatRelativeTime(order.placedAt)}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {new Date(order.placedAt).toLocaleDateString()}
+                      {order.placedAt ? new Date(order.placedAt).toLocaleDateString() : "—"}
                     </p>
                   </TableCell>
                   <TableCell>
@@ -348,7 +377,7 @@ function AdminOrders() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-primary">₹{order.totalAmount.toLocaleString()}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{(order.orderItems?.length || 0)} item{(order.orderItems?.length || 0) === 1 ? '' : 's'}</p>
                 </div>
               </div>
 
@@ -380,6 +409,18 @@ function AdminOrders() {
                     <p className="text-xs text-muted-foreground truncate">
                       {order.shippingAddress?.split(',').pop()?.trim() || "No Address"}
                     </p>
+                    {order.selectedCity && (
+                      <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                          🌐 {order.selectedCity}
+                        </span>
+                        {checkCityMismatch(order.selectedCity, order.shippingAddress) && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                            <AlertTriangle className="h-2.5 w-2.5" /> Mismatch
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -530,6 +571,27 @@ function AdminOrders() {
                         {new Date(selectedOrder.installationDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                       </div>
                     )}
+                    {/* Selected City vs Shipping Address Check */}
+                    <div className="rounded-lg bg-muted/60 p-2.5 border text-xs space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-muted-foreground flex items-center gap-1.5">
+                          <Globe className="h-3.5 w-3.5 text-primary shrink-0" />
+                          Website Selected City:
+                        </span>
+                        <span className="font-semibold text-foreground px-2 py-0.5 rounded bg-background border shadow-2xs">
+                          {selectedOrder.selectedCity || "Not recorded / Prior Order"}
+                        </span>
+                      </div>
+                      {checkCityMismatch(selectedOrder.selectedCity, selectedOrder.shippingAddress) && (
+                        <div className="flex items-start gap-1.5 p-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs mt-1">
+                          <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                          <div>
+                            <span className="font-bold">City Mismatch Warning:</span> Customer selected <strong>"{selectedOrder.selectedCity}"</strong> on website, but the delivery address below appears to be for a different city. Please confirm with the customer before processing.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex items-start gap-2 text-muted-foreground">
                       <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
                       <span className="leading-relaxed">{selectedOrder.shippingAddress || "No Address Provided"}</span>
@@ -609,7 +671,7 @@ function AdminOrders() {
               <div className="space-y-3">
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Order Items</h3>
                 <div className="rounded-xl border bg-card divide-y">
-                  {selectedOrder.orderItems.map((item, idx) => (
+                  {(selectedOrder.orderItems || []).map((item, idx) => (
                     <div key={idx} className="p-4 flex items-center gap-4">
                       {item.productImage ? (
                         <img src={item.productImage} alt={item.productName} className="h-12 w-12 rounded object-cover border" />
@@ -620,10 +682,10 @@ function AdminOrders() {
                       )}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm truncate">{item.productName}</h4>
-                        <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity} × ₹{item.priceAtPurchase.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity} × ₹{(item.priceAtPurchase ?? 0).toLocaleString()}</p>
                       </div>
                       <div className="font-semibold text-sm">
-                        ₹{item.subtotal.toLocaleString()}
+                        ₹{(item.subtotal ?? ((item.priceAtPurchase ?? 0) * item.quantity)).toLocaleString()}
                       </div>
                     </div>
                   ))}

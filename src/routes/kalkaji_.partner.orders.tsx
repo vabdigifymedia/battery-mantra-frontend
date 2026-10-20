@@ -9,10 +9,10 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, MapPin, Phone, Mail, Calendar, Package2, User, Filter } from "lucide-react";
+import { Copy, MapPin, Phone, Mail, Calendar, Package2, User, Filter, AlertTriangle, Globe } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
-import { getStatusLabel } from "./kalkaji.orders.index";
+import { getStatusLabel, checkCityMismatch } from "./kalkaji.orders.index";
 
 export const Route = createFileRoute("/kalkaji_/partner/orders")({
   component: PartnerOrdersPage,
@@ -177,6 +177,18 @@ function PartnerOrdersPage() {
                   <TableCell>
                     <div className="font-medium">{order.customerName}</div>
                     <div className="text-xs text-muted-foreground">{order.shippingAddress?.substring(0, 30)}...</div>
+                    {order.selectedCity && (
+                      <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                          🌐 {order.selectedCity}
+                        </span>
+                        {checkCityMismatch(order.selectedCity, order.shippingAddress) && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                            <AlertTriangle className="h-2.5 w-2.5" /> Mismatch
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Select
@@ -261,6 +273,23 @@ function PartnerOrdersPage() {
                   <h3 className="font-semibold flex items-center gap-2">
                     <MapPin className="h-4 w-4" /> Delivery Address
                   </h3>
+                  <div className="rounded-lg bg-muted/60 p-2 border text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Globe className="h-3.5 w-3.5 text-primary shrink-0" />
+                        Website Selected City:
+                      </span>
+                      <span className="font-semibold text-foreground px-2 py-0.5 rounded bg-background border">
+                        {selectedOrder.selectedCity || "Not recorded"}
+                      </span>
+                    </div>
+                    {checkCityMismatch(selectedOrder.selectedCity, selectedOrder.shippingAddress) && (
+                      <div className="flex items-start gap-1.5 p-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs mt-1">
+                        <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <span><strong>Mismatch:</strong> Customer selected "{selectedOrder.selectedCity}" on website, but delivery address may belong to another city.</span>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                     {selectedOrder.shippingAddress}
                   </p>

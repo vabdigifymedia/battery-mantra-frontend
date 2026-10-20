@@ -19,6 +19,7 @@ import { cartQuery, addressesQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
+import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
 import { loadRazorpayScript } from "@/lib/razorpay";
@@ -58,6 +59,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const cart = useQuery(cartQuery(status === "authenticated"));
+  const { city: locationCity } = useLocationStore();
   
   const [activeStep, setActiveStep] = useState<number>(2);
   const [addressId, setAddressId] = useState<string>(search.addressId ?? "");
@@ -81,6 +83,7 @@ function CheckoutPage() {
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       latitude: selectedAddress?.latitude,
       longitude: selectedAddress?.longitude,
+      selectedCity: locationCity?.cityName || undefined,
     }),
     onSuccess: (order) => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
@@ -105,6 +108,7 @@ function CheckoutPage() {
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       latitude: selectedAddress?.latitude,
       longitude: selectedAddress?.longitude,
+      selectedCity: locationCity?.cityName || undefined,
     }),
   });
 

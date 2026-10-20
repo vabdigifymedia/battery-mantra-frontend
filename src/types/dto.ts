@@ -393,6 +393,7 @@ export type CheckoutRequest = {
   couponCode?: string;
   latitude?: number;
   longitude?: number;
+  selectedCity?: string;
 };
 export type CreateRazorpayOrderRequest = {
   addressId: UUID;
@@ -401,6 +402,7 @@ export type CreateRazorpayOrderRequest = {
   couponCode?: string;
   latitude?: number;
   longitude?: number;
+  selectedCity?: string;
 };
 export type RazorpayOrderResponse = {
   razorpayOrderId: string;
@@ -453,6 +455,7 @@ export type OrderResponse = {
   deliveryAgentName?: string;
   deliveryAgentPhone?: string;
   deliverySecurityCode?: string;
+  selectedCity?: string;
 };
 
 /* ---------- Capacities (Battery RL) ---------- */
