@@ -9,9 +9,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye, AlertTriangle, Globe } from "lucide-react";
+import {
+  Copy,
+  Truck,
+  Wrench,
+  Search,
+  MapPin,
+  Calendar,
+  User,
+  Phone,
+  Mail,
+  Eye,
+  AlertTriangle,
+  Globe,
+  XCircle,
+} from "lucide-react";
 import { partnerService } from "@/services/partner.service";
 import { engineerService } from "@/services/engineer.service";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
@@ -62,6 +83,7 @@ function AdminOrders() {
   const { data: orders = [], isLoading } = useQuery(adminOrdersQuery());
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
+  const [cancelTargetOrder, setCancelTargetOrder] = useState<OrderResponse | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const prevOrdersCountRef = useRef(orders.length);
 
@@ -76,10 +98,19 @@ function AdminOrders() {
   }, [orders.length]);
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
-      adminService.updateOrderStatus(orderId, { orderStatus: status }),
+    mutationFn: ({
+      orderId,
+      status,
+      cancellationReason,
+    }: {
+      orderId: string;
+      status: OrderStatus;
+      cancellationReason?: string;
+    }) =>
+      adminService.updateOrderStatus(orderId, { orderStatus: status, cancellationReason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      setCancelTargetOrder(null);
       toast.success("Order status updated");
     },
     onError: () => toast.error("Failed to update order status"),
@@ -306,7 +337,21 @@ function AdminOrders() {
                     </p>
                   </TableCell>
                   <TableCell>
-                    {order.assignedPartner ? (
+                    {order.orderStatus === "CANCELLED" ? (
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold border bg-red-500/10 text-red-600 border-red-500/20">
+                          <XCircle className="h-3 w-3 shrink-0" /> Cancelled
+                        </span>
+                        <p className="text-[10px] text-muted-foreground truncate max-w-[150px]">
+                          By: <strong className="text-foreground">{order.cancelledBy || "Unknown"}</strong>
+                        </p>
+                        {order.cancellationReason && (
+                          <p className="text-[10px] text-muted-foreground italic truncate max-w-[150px]" title={order.cancellationReason}>
+                            "{order.cancellationReason}"
+                          </p>
+                        )}
+                      </div>
+                    ) : order.assignedPartner ? (
                       <div className="space-y-1">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
                           {getStatusLabel(order.orderStatus)}
@@ -318,9 +363,13 @@ function AdminOrders() {
                     ) : (
                       <Select
                         value={order.orderStatus}
-                        onValueChange={(val) =>
-                          updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
-                        }
+                        onValueChange={(val) => {
+                          if (val === "CANCELLED") {
+                            setCancelTargetOrder(order);
+                          } else {
+                            updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus });
+                          }
+                        }}
                         disabled={updateStatusMutation.isPending}
                       >
                         <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
@@ -426,24 +475,45 @@ function AdminOrders() {
               </div>
 
               <div className="flex items-center gap-2 pt-3 border-t">
-                <Select
-                  defaultValue={order.orderStatus}
-                  onValueChange={(val) =>
-                    updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
-                  }
-                  disabled={updateStatusMutation.isPending}
-                >
-                  <SelectTrigger className={`flex-1 h-9 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ORDER_STATUSES.map((s) => (
-                      <SelectItem key={s} value={s} className="text-xs font-medium">
-                        {s.replace(/_/g, ' ')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {order.orderStatus === "CANCELLED" ? (
+                  <div className="flex-1 rounded-lg bg-red-500/10 border border-red-500/20 p-2 text-xs">
+                    <div className="flex items-center gap-1.5 font-semibold text-red-600">
+                      <XCircle className="h-3.5 w-3.5 shrink-0" />
+                      Order Cancelled
+                    </div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      Cancelled By: <strong className="text-foreground">{order.cancelledBy || "N/A"}</strong>
+                    </div>
+                    {order.cancellationReason && (
+                      <div className="text-[11px] text-muted-foreground italic truncate mt-0.5" title={order.cancellationReason}>
+                        "{order.cancellationReason}"
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Select
+                    defaultValue={order.orderStatus}
+                    onValueChange={(val) => {
+                      if (val === "CANCELLED") {
+                        setCancelTargetOrder(order);
+                      } else {
+                        updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus });
+                      }
+                    }}
+                    disabled={updateStatusMutation.isPending}
+                  >
+                    <SelectTrigger className={`flex-1 h-9 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ORDER_STATUSES.map((s) => (
+                        <SelectItem key={s} value={s} className="text-xs font-medium">
+                          {s.replace(/_/g, ' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button variant="outline" className="h-9 w-9 p-0 shrink-0 border-border" onClick={() => setSelectedOrder(order)}>
                   <Eye className="h-4 w-4 text-muted-foreground" />
                 </Button>
@@ -530,6 +600,25 @@ function AdminOrders() {
               </DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
+              {selectedOrder.orderStatus === "CANCELLED" && (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-red-600">
+                    <XCircle className="h-5 w-5 shrink-0" />
+                    <span>Order Was Cancelled</span>
+                    {selectedOrder.cancelledBy && (
+                      <span className="ml-auto inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-red-200 dark:bg-red-900/50 text-red-800 dark:text-red-200">
+                        By {selectedOrder.cancelledBy}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-foreground">
+                    <span className="font-semibold text-muted-foreground">Reason Recorded: </span>
+                    <span className="italic font-medium">
+                      {selectedOrder.cancellationReason || "No specific reason was provided"}
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Customer Details</h3>
@@ -711,6 +800,154 @@ function AdminOrders() {
           </DialogContent>
         </Dialog>
       )}
+
+      {cancelTargetOrder && (
+        <AdminCancelOrderDialog
+          order={cancelTargetOrder}
+          isOpen={!!cancelTargetOrder}
+          onClose={() => setCancelTargetOrder(null)}
+          isCancelling={updateStatusMutation.isPending}
+          onConfirm={(reason) =>
+            updateStatusMutation.mutate({
+              orderId: cancelTargetOrder.orderId,
+              status: "CANCELLED",
+              cancellationReason: reason,
+            })
+          }
+        />
+      )}
     </div>
+  );
+}
+
+const ADMIN_CANCELLATION_REASONS = [
+  "Out of stock / Battery model unavailable",
+  "Delivery address unserviceable / Outside delivery area",
+  "Customer requested cancellation via phone/support",
+  "Customer unreachable / Unverified phone number",
+  "Suspected fraudulent / Duplicate order",
+  "Pricing or vehicle-battery mismatch",
+  "Other operational reason",
+];
+
+function AdminCancelOrderDialog({
+  order,
+  isOpen,
+  onClose,
+  isCancelling,
+  onConfirm,
+}: {
+  order: OrderResponse;
+  isOpen: boolean;
+  onClose: () => void;
+  isCancelling: boolean;
+  onConfirm: (reason: string) => void;
+}) {
+  const [selectedReason, setSelectedReason] = useState(ADMIN_CANCELLATION_REASONS[0]);
+  const [customRemarks, setCustomRemarks] = useState("");
+
+  const handleConfirm = () => {
+    const finalReason = customRemarks.trim()
+      ? `${selectedReason} - ${customRemarks.trim()}`
+      : selectedReason;
+    onConfirm(finalReason);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !isCancelling && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+            <XCircle className="h-6 w-6" />
+          </div>
+          <DialogTitle className="text-center text-lg font-bold">
+            Cancel Order #{order.orderId?.slice(0, 8)}
+          </DialogTitle>
+          <DialogDescription className="text-center text-xs">
+            Select an operational reason. This will be recorded under fulfillment audit and sent to the customer via SMS/notification.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Operational Reason
+            </label>
+            <div className="space-y-2">
+              {ADMIN_CANCELLATION_REASONS.map((reason) => {
+                const isSelected = selectedReason === reason;
+                return (
+                  <button
+                    key={reason}
+                    type="button"
+                    onClick={() => setSelectedReason(reason)}
+                    className={`w-full text-left p-3 rounded-lg border text-xs font-medium transition-colors flex items-center justify-between ${
+                      isSelected
+                        ? "border-primary bg-primary/5 text-foreground shadow-2xs"
+                        : "border-border hover:bg-muted/50 text-muted-foreground"
+                    }`}
+                  >
+                    <span>{reason}</span>
+                    <span
+                      className={`h-4 w-4 rounded-full border flex items-center justify-center shrink-0 ml-2 ${
+                        isSelected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-muted-foreground/30"
+                      }`}
+                    >
+                      {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-foreground">
+              Internal Remarks / Notes (Optional)
+            </label>
+            <Input
+              value={customRemarks}
+              onChange={(e) => setCustomRemarks(e.target.value)}
+              placeholder="e.g., Customer confirmed on 9876543210 they got it locally"
+              className="text-xs"
+              disabled={isCancelling}
+            />
+          </div>
+
+          <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5 text-[11px] text-amber-800 dark:text-amber-300">
+            <strong>Stock Auto-Restore:</strong> The inventory reserved for this order will be automatically restored upon cancellation.
+          </div>
+        </div>
+
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            disabled={isCancelling}
+            onClick={onClose}
+          >
+            Keep Order Active
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            className="flex-1"
+            disabled={isCancelling}
+            onClick={handleConfirm}
+          >
+            {isCancelling ? (
+              <>
+                <Spinner size="sm" className="mr-2" /> Cancelling...
+              </>
+            ) : (
+              "Confirm Cancellation"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

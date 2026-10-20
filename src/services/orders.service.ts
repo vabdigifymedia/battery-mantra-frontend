@@ -9,6 +9,9 @@ export const ordersService = {
     apiFetch<OrderResponse>(endpoints.orders.byId(orderId), { signal }),
   checkout: (body: CheckoutRequest) =>
     apiFetch<OrderResponse>(endpoints.orders.checkout, { method: "POST", body }),
-  cancel: (orderId: string) =>
-    apiFetch<OrderResponse>(endpoints.orders.cancel(orderId), { method: "DELETE" }),
+  cancel: (orderId: string, reason?: string) =>
+    apiFetch<OrderResponse>(endpoints.orders.cancel(orderId), {
+      method: "POST",
+      body: reason ? { reason } : undefined,
+    }),
 };

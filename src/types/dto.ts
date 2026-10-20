@@ -456,6 +456,8 @@ export type OrderResponse = {
   deliveryAgentPhone?: string;
   deliverySecurityCode?: string;
   selectedCity?: string;
+  cancellationReason?: string;
+  cancelledBy?: string;
 };
 
 /* ---------- Capacities (Battery RL) ---------- */
@@ -524,6 +526,11 @@ export type BulkProductUpdateRequest = {
 
 export type OrderStatusUpdateRequest = {
   orderStatus: OrderStatus;
+  cancellationReason?: string;
+};
+
+export type CancelOrderRequest = {
+  reason: string;
 };
 
 /* ---------- Addresses ---------- */
