@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import { trackPurchase } from "@/lib/analytics";
 import { locationService } from "@/services/location.service";
 import { LocationModal } from "@/components/location/LocationModal";
+import { matchCity } from "@/lib/cityMatcher";
 
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
@@ -88,37 +89,47 @@ function CheckoutPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Resolve destination delivery city from pincode check or public cities fallback
+  // Priority 1: Match the user's explicit delivery address city with public serviceable cities.
+  // Handles typos, fuzzy matching, and aliases (e.g. "Noida", "Gautam Budh Nagar", "Gurugram" -> "Gurgaon", "New Delhi" -> "Delhi")
+  const matchedCityByAddress = useMemo(() => {
+    if (!selectedAddress?.city || !publicCities?.length) return null;
+    return matchCity(selectedAddress.city, publicCities);
+  }, [selectedAddress?.city, publicCities]);
+
+  // Resolve destination delivery city:
+  // 1. Matched city from customer's address takes top priority (e.g. "Noida" overrides 201301 pincode mapping)
+  // 2. Fallback to city returned by pincode check if city name couldn't be resolved
   const resolvedDeliveryCity: CityDto | null = useMemo(() => {
     if (!selectedAddress) return null;
+    if (matchedCityByAddress) {
+      return matchedCityByAddress;
+    }
     if (pincodeCheck.data?.serviceable && pincodeCheck.data?.city) {
       return pincodeCheck.data.city;
     }
-    if (publicCities && selectedAddress.city) {
-      const normalizedAddrCity = selectedAddress.city.trim().toLowerCase();
-      const matched = publicCities.find(
-        (c) => c.cityName.trim().toLowerCase() === normalizedAddrCity
-      );
-      if (matched) return matched;
-    }
     return pincodeCheck.data?.city || null;
-  }, [selectedAddress, pincodeCheck.data, publicCities]);
+  }, [selectedAddress, matchedCityByAddress, pincodeCheck.data]);
 
   // Option C: Strict serviceability check
+  // If matched against a known serviceable public city, the address is confirmed serviceable
+  // Otherwise, defer to pincode serviceability check
   const isAddressServiceable: boolean = useMemo(() => {
     if (!selectedAddress) return true;
+    if (matchedCityByAddress) return true;
     if (pincodeCheck.data) {
       return Boolean(pincodeCheck.data.serviceable);
     }
-    if (pincodeCheck.isError && publicCities && selectedAddress.city) {
-      const normalizedAddrCity = selectedAddress.city.trim().toLowerCase();
-      return publicCities.some((c) => c.cityName.trim().toLowerCase() === normalizedAddrCity);
+    if (pincodeCheck.isError) {
+      return false;
     }
     return true;
-  }, [selectedAddress, pincodeCheck.data, pincodeCheck.isError, publicCities]);
+  }, [selectedAddress, matchedCityByAddress, pincodeCheck.data, pincodeCheck.isError]);
 
   const isCheckingServiceability = Boolean(
-    hasValidAddress && postalCode.length >= 6 && pincodeCheck.isLoading
+    hasValidAddress &&
+    !matchedCityByAddress &&
+    postalCode.length >= 6 &&
+    pincodeCheck.isLoading
   );
 
   const isUnserviceable = Boolean(
@@ -131,7 +142,8 @@ function CheckoutPage() {
     !isUnserviceable &&
     resolvedDeliveryCity &&
     locationCity &&
-    resolvedDeliveryCity.cityName.trim().toLowerCase() !== locationCity.cityName.trim().toLowerCase()
+    (resolvedDeliveryCity.cityId !== locationCity.cityId ||
+      resolvedDeliveryCity.cityName.trim().toLowerCase() !== locationCity.cityName.trim().toLowerCase())
   );
 
   // Effective city for pricing: Destination Delivery City takes precedence over browsing location
