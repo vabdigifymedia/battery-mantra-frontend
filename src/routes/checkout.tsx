@@ -58,8 +58,8 @@ function CheckoutPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const cart = useQuery(cartQuery(status === "authenticated"));
   const { city: locationCity } = useLocationStore();
+  const cart = useQuery(cartQuery(status === "authenticated", locationCity?.cityId));
   
   const [activeStep, setActiveStep] = useState<number>(2);
   const [addressId, setAddressId] = useState<string>(search.addressId ?? "");

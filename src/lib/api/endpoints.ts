@@ -72,7 +72,8 @@ export const endpoints = {
     byId: (id: string) => `/api/vehicles/${encodeURIComponent(id)}`,
   },
   cart: {
-    get: "/api/cart",
+    get: (cityId?: string) =>
+      cityId ? `/api/cart?cityId=${encodeURIComponent(cityId)}` : "/api/cart",
     add: "/api/cart/add",
     updateItem: (cartItemId: string) =>
       `/api/cart/items/${encodeURIComponent(cartItemId)}`,

@@ -7,8 +7,8 @@ import type {
 } from "@/types/dto";
 
 export const cartService = {
-  get: (signal?: AbortSignal) =>
-    apiFetch<CartResponse>(endpoints.cart.get, { signal }),
+  get: (cityId?: string, signal?: AbortSignal) =>
+    apiFetch<CartResponse>(endpoints.cart.get(cityId), { signal }),
   add: (body: AddToCartRequest) =>
     apiFetch<CartResponse>(endpoints.cart.add, { method: "POST", body }),
   update: (cartItemId: string, body: UpdateCartItemRequest) =>

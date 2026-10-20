@@ -173,13 +173,15 @@ export const vehiclesSearchQuery = (params: { make?: string; model?: string }) =
     enabled: !!(params.make || params.model),
   });
 
-export const cartQuery = (enabled: boolean) =>
-  queryOptions({
-    queryKey: queryKeys.cart.current(),
-    queryFn: ({ signal }) => cartService.get(signal),
+export const cartQuery = (enabled: boolean, cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
+  return queryOptions({
+    queryKey: queryKeys.cart.current(cityId),
+    queryFn: ({ signal }) => cartService.get(cityId, signal),
     enabled,
     staleTime: 15_000,
   });
+};
 
 export const ordersListQuery = (enabled: boolean) =>
   queryOptions({

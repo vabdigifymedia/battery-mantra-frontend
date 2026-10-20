@@ -18,6 +18,7 @@ import { cartService } from "@/services/cart.service";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
 import { buildPageHead } from "@/lib/seo";
+import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/shopping-cart")({
   loader: async ({ context }) => {
@@ -44,10 +45,11 @@ export const Route = createFileRoute("/shopping-cart")({
 
 function CartPage() {
   const { status } = useAuth();
+  const { city } = useLocationStore();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const enabled = status === "authenticated";
-  const { data, isLoading, isError, refetch } = useQuery(cartQuery(enabled));
+  const { data, isLoading, isError, refetch } = useQuery(cartQuery(enabled, city?.cityId));
 
   const update = useMutation({
     mutationFn: ({ id, qty }: { id: string; qty: number }) =>

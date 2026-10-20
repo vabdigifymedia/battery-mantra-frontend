@@ -45,7 +45,7 @@ export const queryKeys = {
   },
   cart: {
     all: ["cart"] as const,
-    current: () => [...queryKeys.cart.all, "current"] as const,
+    current: (cityId?: string) => [...queryKeys.cart.all, "current", cityId ?? "default"] as const,
   },
   orders: {
     all: ["orders"] as const,
