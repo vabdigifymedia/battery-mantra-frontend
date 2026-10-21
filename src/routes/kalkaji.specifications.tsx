@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,6 +37,7 @@ import type {
   SpecCategoryResponse,
   SpecAttributeResponse,
   SpecUnitResponse,
+  CategoryListResponse,
 } from "@/types/dto";
 import { ApiError } from "@/lib/api/errors";
 
@@ -65,8 +66,26 @@ function AdminSpecifications() {
   const { data: rootCategories = [], isLoading: isLoadingCats } = useQuery(rootCategoriesQuery());
 
   // State: product category selection
+  const [selectedRootId, setSelectedRootId] = useState<string>("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
+
+  const selectedRootCategory = rootCategories.find((c) => c.categoryId === selectedRootId);
+
+  const subCategoryOptions = useMemo(() => {
+    if (!selectedRootCategory || !selectedRootCategory.subCategories) return [];
+    const list: { id: string; name: string; level: number }[] = [];
+    function traverse(cats: CategoryListResponse[], level: number) {
+      for (const cat of cats) {
+        list.push({ id: cat.categoryId, name: cat.categoryName, level });
+        if (cat.subCategories && cat.subCategories.length > 0) {
+          traverse(cat.subCategories, level + 1);
+        }
+      }
+    }
+    traverse(selectedRootCategory.subCategories, 1);
+    return list;
+  }, [selectedRootCategory]);
 
   // State: drill-down navigation
   const [drillLevel, setDrillLevel] = useState<DrillLevel>("categories");
@@ -217,10 +236,27 @@ function AdminSpecifications() {
   });
 
   // ---------- Handlers ----------
-  const handleCategorySelect = (catId: string) => {
-    const cat = rootCategories.find((c) => c.categoryId === catId);
-    setSelectedCategoryId(catId);
-    setSelectedCategoryName(cat?.categoryName || "");
+  const handleRootCategorySelect = (rootId: string) => {
+    const root = rootCategories.find((c) => c.categoryId === rootId);
+    setSelectedRootId(rootId);
+    setSelectedCategoryId(rootId);
+    setSelectedCategoryName(root?.categoryName || "");
+    setDrillLevel("categories");
+    setSelectedSpecCategory(null);
+    setSelectedAttribute(null);
+  };
+
+  const handleSubCategorySelect = (catId: string) => {
+    if (catId === selectedRootId) {
+      setSelectedCategoryId(selectedRootId);
+      setSelectedCategoryName(selectedRootCategory?.categoryName || "");
+    } else {
+      const sub = subCategoryOptions.find((s) => s.id === catId);
+      setSelectedCategoryId(catId);
+      setSelectedCategoryName(
+        selectedRootCategory ? `${selectedRootCategory.categoryName} > ${sub?.name}` : sub?.name || ""
+      );
+    }
     setDrillLevel("categories");
     setSelectedSpecCategory(null);
     setSelectedAttribute(null);
@@ -352,20 +388,51 @@ function AdminSpecifications() {
       {/* Category Selector */}
       <Card className="shadow-sm">
         <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <label className="text-sm font-medium text-muted-foreground shrink-0">Product Category:</label>
-            <Select value={selectedCategoryId} onValueChange={handleCategorySelect}>
-              <SelectTrigger className="sm:max-w-xs">
-                <SelectValue placeholder="Select a product category..." />
-              </SelectTrigger>
-              <SelectContent>
-                {rootCategories.map((root) => (
-                  <SelectItem key={root.categoryId} value={root.categoryId}>{root.categoryName}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-wrap">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground shrink-0">Category:</label>
+              <Select value={selectedRootId} onValueChange={handleRootCategorySelect}>
+                <SelectTrigger className="w-full sm:w-[220px]">
+                  <SelectValue placeholder="Select a category..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {rootCategories.map((root) => (
+                    <SelectItem key={root.categoryId} value={root.categoryId}>{root.categoryName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedRootCategory && subCategoryOptions.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <label className="text-sm font-medium text-muted-foreground shrink-0">Subcategory:</label>
+                <Select value={selectedCategoryId} onValueChange={handleSubCategorySelect}>
+                  <SelectTrigger className="w-full sm:w-[260px]">
+                    <SelectValue placeholder="Select a subcategory..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={selectedRootId}>
+                      Base Category ({selectedRootCategory.categoryName})
+                    </SelectItem>
+                    {subCategoryOptions.map((sub) => (
+                      <SelectItem key={sub.id} value={sub.id}>
+                        {"\u00A0\u00A0".repeat(sub.level - 1)}{sub.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             {selectedCategoryName && (
-              <Badge variant="secondary" className="text-xs shrink-0">{selectedCategoryName}</Badge>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="secondary" className="text-xs shrink-0">{selectedCategoryName}</Badge>
+                {selectedCategoryId !== selectedRootId && (
+                  <Badge variant="outline" className="text-[11px] text-primary border-primary/30 shrink-0">
+                    Subcategory
+                  </Badge>
+                )}
+              </div>
             )}
           </div>
         </CardContent>

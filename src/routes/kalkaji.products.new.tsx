@@ -19,6 +19,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { SpecGroupDto, SpecAttributeDto, SpecUnitDto } from "@/types/dto";
 import { generateSlug } from "@/lib/utils";
@@ -137,6 +138,17 @@ function AddProductPage() {
     queryFn: () => adminService.getCategorySpecTemplate(categoryId),
     enabled: !!categoryId,
   });
+
+  const { data: parentSpecTemplate, isLoading: isParentSpecLoading } = useQuery({
+    queryKey: ["admin", "specs", "template", selectedRootId],
+    queryFn: () => adminService.getCategorySpecTemplate(selectedRootId),
+    enabled: !!selectedRootId && selectedRootId !== categoryId,
+  });
+
+  const effectiveSpecTemplate = (specTemplate?.specGroups && specTemplate.specGroups.length > 0)
+    ? specTemplate
+    : parentSpecTemplate;
+  const isSpecLoadingEffective = isSpecLoading || (selectedRootId !== categoryId && !specTemplate?.specGroups?.length && isParentSpecLoading);
 
   const { fields: additionalImageFields, append: appendImage, remove: removeImage } = useFieldArray({
     control: form.control,
@@ -361,7 +373,14 @@ function AddProductPage() {
           <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Specifications</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  Specifications
+                  {effectiveSpecTemplate === parentSpecTemplate && selectedRootId !== categoryId && effectiveSpecTemplate?.specGroups?.length ? (
+                    <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                      Inherited from {selectedRootCat?.categoryName}
+                    </Badge>
+                  ) : null}
+                </CardTitle>
                 <CardDescription>Select values and highlight up to 6 key features with custom icons.</CardDescription>
               </div>
               <div className="text-sm font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
@@ -373,14 +392,14 @@ function AddProductPage() {
                 <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
                   Select a category to load specifications.
                 </div>
-              ) : isSpecLoading ? (
+              ) : isSpecLoadingEffective ? (
                 <div className="text-center py-6 text-sm text-muted-foreground">Loading specifications...</div>
-              ) : !specTemplate || specTemplate.specGroups.length === 0 ? (
+              ) : !effectiveSpecTemplate || effectiveSpecTemplate.specGroups.length === 0 ? (
                 <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
                   No specifications configured for this category.
                 </div>
               ) : (
-                specTemplate.specGroups.map((group: SpecGroupDto) => (
+                effectiveSpecTemplate.specGroups.map((group: SpecGroupDto) => (
                   <div key={group.specCategoryId} className="space-y-4">
                     <h3 className="font-semibold text-sm border-b pb-1">{group.specCategoryName}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
