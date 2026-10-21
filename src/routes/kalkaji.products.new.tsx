@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
-import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank, Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +60,7 @@ const formSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   brandId: z.string().min(1, "Brand is required"),
   capacity: z.string().optional(),
+  searchKeywords: z.string().optional(),
   specUnitIds: z.record(z.string(), z.string()).default({}),
   highlightedSpecAttributeIds: z.array(z.string()).default([]),
   specAttributeIcons: z.record(z.string(), z.string()).default({}),
@@ -111,6 +112,7 @@ function AddProductPage() {
       productImage: "",
       additionalImages: [],
       capacity: "",
+      searchKeywords: "",
       specUnitIds: {},
       highlightedSpecAttributeIds: [],
       specAttributeIcons: {},
@@ -210,6 +212,7 @@ function AddProductPage() {
       categoryId: data.categoryId,
       brandId: data.brandId,
       capacity: data.capacity || undefined,
+      searchKeywords: data.searchKeywords?.trim() || undefined,
       specUnitIds: specUnitIdsList.length > 0 ? specUnitIdsList : undefined,
       highlightedSpecAttributeIds: data.highlightedSpecAttributeIds.length > 0 ? data.highlightedSpecAttributeIds : undefined,
       specAttributeIcons: Object.keys(data.specAttributeIcons).length > 0 ? data.specAttributeIcons : undefined,
@@ -279,6 +282,33 @@ function AddProductPage() {
                     </div>
                   )}
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Search Keywords & Synonyms</CardTitle>
+                  <CardDescription>
+                    Add alternate spellings, vehicle models, common typos, and colloquial keywords so customers find this product instantly.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="searchKeywords">Keywords / Tags (Comma-separated)</Label>
+                <AutoResizeTextarea
+                  id="searchKeywords"
+                  placeholder="e.g. swift battery, wagon r 35ah, invetar batri, exid 35l, choti batti, i10 grand battery, amaron 45"
+                  {...form.register("searchKeywords")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Comma-separated keywords or phrases. When customers search using typos, vehicle names, or slang, this product will be matched and shown in live search results.
+                </p>
               </div>
             </CardContent>
           </Card>

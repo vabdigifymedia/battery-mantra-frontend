@@ -232,6 +232,7 @@ export type ProductListResponse = {
   categoryBrandDisplayOrder?: number;
   displayOrder?: number; // legacy
   highlights?: string;
+  searchKeywords?: string;
   isAutoAssignToPartner?: boolean;
   isApproved?: boolean;
   createdByPartnerId?: UUID;
@@ -272,6 +273,7 @@ export type ProductDetailResponse = {
   compatibleVehicles?: VehicleResponse[];
   cityPrices?: CityPricingDto[];
   highlights?: string;
+  searchKeywords?: string;
   isApproved?: boolean;
   isAutoAssignToPartner?: boolean;
   createdByPartnerId?: UUID;
@@ -502,6 +504,7 @@ export type CreateProductRequest = {
   compatibleVehicleIds?: string[];
   specs?: Record<string, unknown>;
   capacity?: string;
+  searchKeywords?: string;
   globalDisplayOrder?: number;
   categoryDisplayOrder?: number;
   brandDisplayOrder?: number;
