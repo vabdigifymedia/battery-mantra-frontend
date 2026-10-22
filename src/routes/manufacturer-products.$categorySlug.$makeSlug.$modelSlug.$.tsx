@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { locationService } from "@/services/location.service";
 import { useLocationStore } from "@/store/useLocationStore";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
@@ -8,6 +8,7 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   vehiclesListQuery,
+  manufacturersListQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
+    void context.queryClient.prefetchQuery(manufacturersListQuery());
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
     const templates = await context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => []);
     return { templates };
@@ -88,27 +90,137 @@ function VehicleProductsPage() {
     }
   }, [_splat, city?.cityName, pincode, setLocation]);
 
-  // Load all vehicles to find the matching one
+  // Load vehicles and manufacturers
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
+  const { data: manufacturers } = useQuery(manufacturersListQuery());
+
+  // Find the exact vehicle matching the slugs
+  const matchingVehicle = useMemo(() => {
+    if (!vehicles || vehicles.length === 0) return undefined;
+
+    // 1. Identify manufacturer / make candidates
+    const matchedMfr = manufacturers?.find(m => toSlug(m.name) === makeSlug);
+    const mfrNameSlug = matchedMfr ? toSlug(matchedMfr.name) : "";
+
+    const isMakeMatch = (vMake: string) => {
+      const vMakeSlug = toSlug(vMake);
+      if (!vMakeSlug) return false;
+      return (
+        vMakeSlug === makeSlug ||
+        (mfrNameSlug && vMakeSlug === mfrNameSlug) ||
+        makeSlug.startsWith(vMakeSlug) ||
+        vMakeSlug.startsWith(makeSlug)
+      );
+    };
+
+    // Filter by make if any match
+    const makeVehicles = vehicles.filter(v => isMakeMatch(v.make));
+    const searchPool = makeVehicles.length > 0 ? makeVehicles : vehicles;
+
+    // Extract raw model slug by removing make prefix
+    const rawModelSlug = modelSlug && modelSlug.startsWith(makeSlug + "-")
+      ? modelSlug.slice(makeSlug.length + 1)
+      : (modelSlug || "");
+
+    const rawModelSlugNoMfr = mfrNameSlug && rawModelSlug.startsWith(mfrNameSlug + "-")
+      ? rawModelSlug.slice(mfrNameSlug.length + 1)
+      : rawModelSlug;
+
+    // Prefer vehicle type matching category (e.g. CAR for car-batteries)
+    const isCar = /(^|-)car(-|$)/.test(categorySlug);
+    const isBike = /(^|-)bike(-|$)/.test(categorySlug);
+    const targetType = isCar ? "CAR" : isBike ? "BIKE" : null;
+
+    const sortByTargetType = (a: any, b: any) => {
+      if (!targetType) return 0;
+      if (a.vehicleType === targetType && b.vehicleType !== targetType) return -1;
+      if (b.vehicleType === targetType && a.vehicleType !== targetType) return 1;
+      return 0;
+    };
+
+    const sortedPool = [...searchPool].sort(sortByTargetType);
+
+    // Priority 1: Exact match with fuel (e.g. kia-motors-corporation-carnival-diesel or carnival-diesel)
+    const matchWithFuel = sortedPool.find(v => {
+      const vMakeSlug = toSlug(v.make);
+      const vModelSlug = toSlug(v.model);
+      const vFuelSlug = toSlug(v.fuelName || "");
+      if (!vFuelSlug) return false;
+
+      // Full slugs
+      if (
+        modelSlug === `${vMakeSlug}-${vModelSlug}-${vFuelSlug}` ||
+        modelSlug === `${makeSlug}-${vModelSlug}-${vFuelSlug}` ||
+        (mfrNameSlug && modelSlug === `${mfrNameSlug}-${vModelSlug}-${vFuelSlug}`)
+      ) {
+        return true;
+      }
+
+      // Raw model slugs
+      if (
+        rawModelSlug === `${vModelSlug}-${vFuelSlug}` ||
+        rawModelSlugNoMfr === `${vModelSlug}-${vFuelSlug}`
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (matchWithFuel) return matchWithFuel;
+
+    // Priority 2: Exact match on model (without fuel, or where v.model already includes fuel)
+    const matchModelOnly = sortedPool.find(v => {
+      const vMakeSlug = toSlug(v.make);
+      const vModelSlug = toSlug(v.model);
+
+      if (
+        modelSlug === `${vMakeSlug}-${vModelSlug}` ||
+        modelSlug === `${makeSlug}-${vModelSlug}` ||
+        (mfrNameSlug && modelSlug === `${mfrNameSlug}-${vModelSlug}`)
+      ) {
+        return true;
+      }
+
+      if (rawModelSlug === vModelSlug || rawModelSlugNoMfr === vModelSlug) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (matchModelOnly) return matchModelOnly;
+
+    // Priority 3: Model slug partial/prefix match
+    const matchFuzzy = sortedPool.find(v => {
+      const vModelSlug = toSlug(v.model);
+      if (!vModelSlug) return false;
+      return rawModelSlug.startsWith(vModelSlug) || vModelSlug.startsWith(rawModelSlug);
+    });
+
+    return matchFuzzy;
+  }, [vehicles, manufacturers, makeSlug, modelSlug, categorySlug]);
+
+  const vehicleIdOverride = matchingVehicle?.vehicleId;
+
+  // Inject category from route param so ProductsPageLayout only returns items for this category
+  const activeSearch = useMemo(() => ({
+    ...search,
+    category: categorySlug,
+  }), [search, categorySlug]);
 
   if (isLoading) {
     return <FullPageLoader />;
   }
 
-  // Find the exact vehicle matching the slugs
-  // We match by slugifying the backend make and model
-  const matchingVehicle = vehicles?.find(v => {
-    const vMakeSlug = toSlug(v.make);
-    const vModelSlug = toSlug(`${v.make}-${v.model}`);
-    return vMakeSlug === makeSlug && vModelSlug === modelSlug;
-  });
-
-  const vehicleIdOverride = matchingVehicle?.vehicleId;
-
   return (
     <ProductsPageLayout 
-      search={search}
-      onSearchChange={(newSearch) => navigate({ search: { ...search, ...newSearch, page: newSearch.page ?? search.page } })}
+      search={activeSearch}
+      onSearchChange={(newSearch) => {
+        // Strip the category from query params so the URL remains clean and unchanged
+        const { category, ...cleanSearch } = newSearch;
+        navigate({ search: { ...search, ...cleanSearch, page: newSearch.page ?? search.page } });
+      }}
       hideCategoryFilter={true}
       vehicleIdOverride={vehicleIdOverride}
       baseUrl={`/manufacturer-products/${makeSlug ? categorySlug : ""}/${makeSlug}/${modelSlug}`}

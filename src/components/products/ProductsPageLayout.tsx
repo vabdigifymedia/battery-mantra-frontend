@@ -78,7 +78,15 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     const findId = (cats: any[]) => {
       for (const cat of cats) {
         const catSlug = cat.categorySlug || cat.categoryName.toLowerCase().replace(/\s+/g, '-');
-        if (slugs.includes(catSlug)) ids.push(cat.categoryId);
+        const isMatch = slugs.includes(catSlug) || slugs.some(s => {
+          const normS = s.replace(/-batteries$/, '-battery');
+          const normC = catSlug.replace(/-batteries$/, '-battery');
+          if (normS === normC) return true;
+          if (/(^|-)car(-|$)/.test(s) && /(^|\s)car(\s|$)/i.test(cat.categoryName)) return true;
+          if (/(^|-)bike(-|$)/.test(s) && /(^|\s)bike(\s|$)/i.test(cat.categoryName)) return true;
+          return false;
+        });
+        if (isMatch) ids.push(cat.categoryId);
         if (cat.subCategories) findId(cat.subCategories);
       }
     };
