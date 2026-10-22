@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
-import { toSlug, getVehicleSlug } from "@/lib/utils";
+import { toSlug, getVehicleSlug, cleanVehicleSlug } from "@/lib/utils";
 import { vehiclesListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Car, Upload, Search } from "lucide-react";
+import { Trash2, Plus, Edit, Car, Upload, Search, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
@@ -220,11 +220,13 @@ function AdminVehicles() {
   const openEditModal = (vehicle: any) => {
     setEditingVehicle(vehicle);
     const matchedMfr = manufacturers.find(m => m.id === vehicle.manufacturerId || m.name.toLowerCase() === vehicle.make?.toLowerCase());
+    const rawSlug = vehicle.slug || getVehicleSlug(vehicle);
+    const resolvedSlug = cleanVehicleSlug(rawSlug);
     form.reset({
       vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make || matchedMfr?.name || "",
       model: vehicle.model,
-      slug: vehicle.slug || getVehicleSlug(vehicle),
+      slug: resolvedSlug,
       fuelId: vehicle.fuelId || "",
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
@@ -271,7 +273,7 @@ function AdminVehicles() {
 
   const onSubmit = form.handleSubmit((values) => {
     const fallbackSlug = toSlug(`${values.make}-${values.model}`);
-    const finalSlug = (values.slug || "").trim() ? toSlug(values.slug) : fallbackSlug;
+    const finalSlug = cleanVehicleSlug((values.slug || "").trim() ? toSlug(values.slug) : fallbackSlug);
 
     const data: any = {
       vehicleType: values.vehicleType,
@@ -338,6 +340,41 @@ function AdminVehicles() {
     reader.readAsText(file);
   };
 
+  const vehiclesWithBadSlugs = (vehicles || []).filter(
+    (v) => v.slug && v.slug !== cleanVehicleSlug(v.slug)
+  );
+  const [isFixingSlugs, setIsFixingSlugs] = useState(false);
+
+  const handleFixAllSlugs = async () => {
+    if (vehiclesWithBadSlugs.length === 0) return;
+    setIsFixingSlugs(true);
+    let fixedCount = 0;
+    try {
+      for (const v of vehiclesWithBadSlugs) {
+        const cleanSlug = cleanVehicleSlug(v.slug);
+        await adminService.updateVehicle(v.vehicleId, {
+          vehicleType: v.vehicleType,
+          make: v.make,
+          model: v.model,
+          slug: cleanSlug,
+          fuelId: v.fuelId || undefined,
+          imageUrl: v.imageUrl || undefined,
+          capacity: v.capacity || undefined,
+          categoryId: v.categoryId || undefined,
+          manufacturerId: v.manufacturerId || undefined,
+          description: v.description || undefined,
+        });
+        fixedCount++;
+      }
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+      toast.success(`Successfully fixed ${fixedCount} vehicle slug(s) in the database!`);
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Failed to update vehicle slugs");
+    } finally {
+      setIsFixingSlugs(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -354,6 +391,33 @@ function AdminVehicles() {
           </Button>
         </div>
       </div>
+
+      {/* Duplicate Slug Warning & 1-Click Auto-Fix */}
+      {vehiclesWithBadSlugs.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
+            <div className="text-sm">
+              <span className="font-semibold">Notice: </span>
+              Found <strong>{vehiclesWithBadSlugs.length}</strong> vehicle(s) with duplicate fuel suffix in database (e.g. <code className="font-mono text-xs bg-amber-200/60 dark:bg-amber-900/50 px-1 py-0.5 rounded">/{vehiclesWithBadSlugs[0].slug}</code>).
+            </div>
+          </div>
+          <Button
+            size="sm"
+            disabled={isFixingSlugs}
+            onClick={handleFixAllSlugs}
+            className="h-8 bg-amber-600 hover:bg-amber-700 text-white shrink-0 self-start sm:self-auto"
+          >
+            {isFixingSlugs ? (
+              <>
+                <Spinner size="sm" className="mr-1.5" /> Fixing in DB...
+              </>
+            ) : (
+              `Auto-Fix ${vehiclesWithBadSlugs.length} Slug(s) in DB`
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Search Input Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -512,7 +576,7 @@ function AdminVehicles() {
                     <TableCell>
                       <div className="font-medium text-foreground">{vehicle.model}</div>
                       <div className="text-xs text-muted-foreground font-mono">
-                        /{vehicle.slug || getVehicleSlug(vehicle)}
+                        /{cleanVehicleSlug(vehicle.slug) || getVehicleSlug(vehicle)}
                       </div>
                     </TableCell>
                     <TableCell>{vehicle.fuelName || "N/A"}</TableCell>
@@ -618,7 +682,7 @@ function AdminVehicles() {
                       )}
                     </div>
                     <div className="text-[11px] text-muted-foreground font-mono mt-1 truncate">
-                      /{vehicle.slug || getVehicleSlug(vehicle)}
+                      /{cleanVehicleSlug(vehicle.slug) || getVehicleSlug(vehicle)}
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-1 mt-2">
