@@ -10,7 +10,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug, toSingularCategory } from "@/lib/utils";
+import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { locationService } from "@/services/location.service";
 import { useLocationStore } from "@/store/useLocationStore";
@@ -34,8 +34,8 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
     const firstSlug = params.categorySlug.toLowerCase();
     const secondSlug = params.brandSlug.toLowerCase();
 
-    const brandMatchesFirst = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === firstSlug);
-    const brandMatchesSecond = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === secondSlug);
+    const brandMatchesFirst = loaderData?.brands?.find((b: any) => getBrandSlug(b) === firstSlug || toSlug(b.brandName) === firstSlug);
+    const brandMatchesSecond = loaderData?.brands?.find((b: any) => getBrandSlug(b) === secondSlug || toSlug(b.brandName) === secondSlug);
 
     let brand = null;
     let category = null;
@@ -101,8 +101,8 @@ function DealerBrandProductsPage() {
   const firstSlug = categorySlug.toLowerCase();
   const secondSlug = brandSlug.toLowerCase();
 
-  const brandMatchesFirst = brands?.find((b: any) => toSlug(b.brandName) === firstSlug);
-  const brandMatchesSecond = brands?.find((b: any) => toSlug(b.brandName) === secondSlug);
+  const brandMatchesFirst = brands?.find((b: any) => getBrandSlug(b) === firstSlug || toSlug(b.brandName) === firstSlug);
+  const brandMatchesSecond = brands?.find((b: any) => getBrandSlug(b) === secondSlug || toSlug(b.brandName) === secondSlug);
 
   const isBrandCity = Boolean(brandMatchesFirst);
 

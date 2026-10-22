@@ -7,7 +7,7 @@ import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { useLocationStore } from "@/store/useLocationStore";
-import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory, getVehicleSlug } from "@/lib/utils";
 import { BannerLayout } from "@/components/products/DynamicSearchBanner";
 
 const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
@@ -69,7 +69,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
               <Link
                 key={model.vehicleId}
                 to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
-                params={{ categorySlug, makeSlug, modelSlug: toSlug(`${model.make}-${model.model}`), _splat: "" }}
+                params={{ categorySlug, makeSlug, modelSlug: getVehicleSlug(model), _splat: "" }}
                 className="snap-start"
               >
                 <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-4 text-center h-full">

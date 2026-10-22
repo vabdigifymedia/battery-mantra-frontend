@@ -55,3 +55,21 @@ export function toSingularCategory(text?: string | null): string {
     .trim();
 }
 
+/**
+ * Resolves a brand's URL slug, prioritizing custom saved slug, then SEO slug, then fallback to brandName slug.
+ */
+export function getBrandSlug(b?: { slug?: string; seo?: { slug?: string }; brandName?: string } | null): string {
+  if (!b) return "";
+  return (b.seo?.slug || b.slug || toSlug(b.brandName)).trim();
+}
+
+/**
+ * Resolves a vehicle's URL slug, prioritizing custom saved slug, then fallback to make-model-fuel.
+ */
+export function getVehicleSlug(v?: { slug?: string; make?: string; model?: string; fuelName?: string } | null): string {
+  if (!v) return "";
+  if (v.slug && v.slug.trim()) return v.slug.trim();
+  const fuel = v.fuelName ? `-${toSlug(v.fuelName)}` : "";
+  return `${toSlug(v.make)}-${toSlug(v.model)}${fuel}`;
+}
+

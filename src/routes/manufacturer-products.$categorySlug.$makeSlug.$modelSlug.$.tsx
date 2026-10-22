@@ -140,6 +140,21 @@ function VehicleProductsPage() {
 
     const sortedPool = [...searchPool].sort(sortByTargetType);
 
+    // Priority 0: Exact match by vehicle.slug (dedicated DB slug)
+    const matchBySavedSlug = sortedPool.find(v => {
+      if (!v.slug) return false;
+      const s = toSlug(v.slug);
+      return (
+        s === modelSlug ||
+        s === rawModelSlug ||
+        s === rawModelSlugNoMfr ||
+        `${makeSlug}-${s}` === modelSlug ||
+        (mfrNameSlug && `${mfrNameSlug}-${s}` === modelSlug)
+      );
+    });
+
+    if (matchBySavedSlug) return matchBySavedSlug;
+
     // Priority 1: Exact match with fuel (e.g. kia-motors-corporation-carnival-diesel or carnival-diesel)
     const matchWithFuel = sortedPool.find(v => {
       const vMakeSlug = toSlug(v.make);

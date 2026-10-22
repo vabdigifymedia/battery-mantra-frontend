@@ -6,7 +6,7 @@ import { SearchBox } from "./SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery, vehiclesListQuery } from "@/queries";
 import { Price } from "@/components/common/Price";
-import { cn } from "@/lib/utils";
+import { cn, toSlug, getVehicleSlug } from "@/lib/utils";
 
 type LiveSearchBoxProps = {
   value: string;
@@ -223,7 +223,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       params={{ 
                         categorySlug: getVehicleCategorySlug(v.categoryId), 
                         makeSlug: toSlug(v.make), 
-                        modelSlug: toSlug(`${v.make}-${v.model}`),
+                        modelSlug: getVehicleSlug(v),
                         _splat: ""
                       }}
                       onClick={() => setIsOpen(false)}

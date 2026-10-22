@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
+import { toSlug, getVehicleSlug } from "@/lib/utils";
 import { vehiclesListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -59,6 +60,7 @@ const vehicleSchema = z.object({
   vehicleType: z.enum(["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
   make: z.string().trim().min(1, "Make is required"),
   model: z.string().trim().min(1, "Model is required"),
+  slug: z.string().optional(),
   fuelId: z.string().optional().or(z.literal("")),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   capacity: z.string().optional(),
@@ -120,10 +122,15 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
       if (matchedCat) categoryId = matchedCat.categoryId;
     }
 
+    const rawSlug = row.slug || row.Slug;
+    const fuelPart = fuelTypeName ? `-${toSlug(fuelTypeName)}` : "";
+    const finalSlug = rawSlug ? toSlug(rawSlug) : `${toSlug(make)}-${toSlug(model)}${fuelPart}`;
+
     results.push({
       vehicleType,
       make,
       model,
+      slug: finalSlug,
       fuelId: fuelId || undefined,
       imageUrl: row.image_url || row.imageUrl || undefined,
       capacity: row.capacity || undefined,
@@ -178,12 +185,25 @@ function AdminVehicles() {
     },
   });
 
+  const watchedMake = form.watch("make");
+  const watchedModel = form.watch("model");
+  const watchedFuelId = form.watch("fuelId");
+
+  useEffect(() => {
+    if (!editingVehicle && (watchedMake || watchedModel)) {
+      const matchedFuel = dbFuels.find((f: any) => f.fuelId === watchedFuelId);
+      const fuelPart = matchedFuel?.fuelName ? `-${toSlug(matchedFuel.fuelName)}` : "";
+      form.setValue("slug", `${toSlug(watchedMake)}-${toSlug(watchedModel)}${fuelPart}`);
+    }
+  }, [watchedMake, watchedModel, watchedFuelId, editingVehicle, dbFuels, form]);
+
   const openAddModal = () => {
     setEditingVehicle(null);
     form.reset({
       vehicleType: "CAR",
       make: "",
       model: "",
+      slug: "",
       fuelId: "",
       imageUrl: "",
       capacity: "",
@@ -200,6 +220,7 @@ function AdminVehicles() {
       vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make || matchedMfr?.name || "",
       model: vehicle.model,
+      slug: vehicle.slug || getVehicleSlug(vehicle),
       fuelId: vehicle.fuelId || "",
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
@@ -245,10 +266,16 @@ function AdminVehicles() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
+    const matchedFuel = dbFuels.find((f: any) => f.fuelId === values.fuelId);
+    const fuelPart = matchedFuel?.fuelName ? `-${toSlug(matchedFuel.fuelName)}` : "";
+    const fallbackSlug = `${toSlug(values.make)}-${toSlug(values.model)}${fuelPart}`;
+    const finalSlug = (values.slug || "").trim() ? toSlug(values.slug) : fallbackSlug;
+
     const data: any = {
       vehicleType: values.vehicleType,
       make: values.make,
       model: values.model,
+      slug: finalSlug,
       fuelId: values.fuelId || undefined,
       imageUrl: values.imageUrl || undefined,
       capacity: values.capacity || undefined,
@@ -407,7 +434,12 @@ function AdminVehicles() {
                       </span>
                     </TableCell>
                     <TableCell className="font-medium">{vehicle.make}</TableCell>
-                    <TableCell>{vehicle.model}</TableCell>
+                    <TableCell>
+                      <div className="font-medium text-foreground">{vehicle.model}</div>
+                      <div className="text-xs text-muted-foreground font-mono">
+                        /{vehicle.slug || getVehicleSlug(vehicle)}
+                      </div>
+                    </TableCell>
                     <TableCell>{vehicle.fuelName || "N/A"}</TableCell>
                     <TableCell>{vehicle.capacity || "-"}</TableCell>
                     <TableCell className="text-right">
@@ -487,6 +519,9 @@ function AdminVehicles() {
                           {vehicle.capacity}
                         </span>
                       )}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground font-mono mt-1 truncate">
+                      /{vehicle.slug || getVehicleSlug(vehicle)}
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-1 mt-2">
@@ -663,6 +698,10 @@ function AdminVehicles() {
                   </Select>
                 )}
               />
+            </FormField>
+
+            <FormField label="Vehicle URL Slug (Optional)" htmlFor="slug" error={form.formState.errors.slug?.message}>
+              <Input id="slug" {...form.register("slug")} placeholder="Leave blank to auto-generate (e.g. kia-carnival-diesel)" />
             </FormField>
 
             <div className="space-y-2">

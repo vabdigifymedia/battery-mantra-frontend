@@ -13,7 +13,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug, toSingularCategory } from "@/lib/utils";
+import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/$citySlug")({
@@ -54,7 +54,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/$
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
     const category = loaderData?.categories?.find((c: any) => {
       const s = toSlug(c.categoryName);
       return (
@@ -139,7 +139,7 @@ function CityBrandProductsPage() {
     );
   });
 
-  const matchingBrand = brands?.find((b) => toSlug(b.brandName) === brandSlug);
+  const matchingBrand = brands?.find((b) => getBrandSlug(b) === brandSlug || toSlug(b.brandName) === brandSlug);
 
   const activeSearch = {
     ...search,

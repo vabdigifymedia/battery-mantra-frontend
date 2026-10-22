@@ -43,7 +43,7 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { useLocationStore } from "@/store/useLocationStore";
-import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
+import { applySeoTemplate, toSingularCategory, getBrandSlug } from "@/lib/utils";
 
 import { productSearchSchema, type ProductSearchState } from "@/lib/schemas/productSearchSchema";
 
@@ -114,7 +114,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     if (!search.brand) return undefined;
     const slugs = search.brand.split(',');
     return brandsList
-      .filter(b => slugs.includes(b.brandName.toLowerCase().replace(/\s+/g, '-')))
+      .filter(b => {
+        const bSlug = getBrandSlug(b);
+        const bNameSlug = b.brandName ? b.brandName.toLowerCase().replace(/\s+/g, '-') : '';
+        return slugs.includes(bSlug) || slugs.includes(bNameSlug);
+      })
       .map(b => b.brandId);
   }, [search.brand, brandsList]);
 

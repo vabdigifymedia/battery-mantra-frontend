@@ -9,7 +9,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-dealer/$brandSlug")({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/brand-dealer/$brandSlug")({
   },
   head: ({ loaderData, params }) => {
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
     
     const seo = resolveTemplateSeo(
       "DEALER",

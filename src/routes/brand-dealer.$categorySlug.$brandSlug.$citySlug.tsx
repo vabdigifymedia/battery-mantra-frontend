@@ -12,7 +12,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug, toSingularCategory } from "@/lib/utils";
+import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$citySlug")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
     const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const cityName = params.citySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
     const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 

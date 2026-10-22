@@ -22,7 +22,7 @@ import { AskQuotationModal, CorporateEnquiryModal } from "@/components/products/
 import { ShareProductModal } from "@/components/products/ShareProductModal";
 import { ProductDeliveryInfoBox } from "@/components/products/ProductDeliveryInfoBox";
 import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
-import { cn, applySeoTemplate, toSlug } from "@/lib/utils";
+import { cn, applySeoTemplate, toSlug, getVehicleSlug } from "@/lib/utils";
 import { trackAddToCart } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1229,7 +1229,7 @@ export function PdpPage() {
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
                       makeSlug: toSlug(v.make),
-                      modelSlug: toSlug(`${v.make}-${v.model}`),
+                      modelSlug: getVehicleSlug(v),
                       _splat: ""
                     }}
                     className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors"

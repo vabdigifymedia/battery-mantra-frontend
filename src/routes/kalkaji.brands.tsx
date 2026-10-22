@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
@@ -104,6 +104,14 @@ function AdminBrands() {
     },
   });
 
+  const watchedBrandName = form.watch("brandName");
+  
+  useEffect(() => {
+    if (!editingBrand && watchedBrandName) {
+      form.setValue("seo.slug", generateSlug(watchedBrandName));
+    }
+  }, [watchedBrandName, editingBrand, form]);
+
   const openAddModal = () => {
     setEditingBrand(null);
     form.reset({
@@ -133,7 +141,11 @@ function AdminBrands() {
   const openEditModal = (brand: any) => {
     setEditingBrand(brand);
     
-    let newSeo = { ...(brand.seo || {}) };
+    const currentSlug = brand.seo?.slug || brand.slug || generateSlug(brand.brandName || "");
+    let newSeo = { 
+      ...(brand.seo || {}),
+      slug: currentSlug,
+    };
     
     if (templates && templates.length > 0) {
       const templateWithoutCity = templates.find((t: any) => t.templateType === "BRAND_WITHOUT_CITY");
@@ -201,13 +213,18 @@ function AdminBrands() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
+    const finalSlug = (values.seo?.slug || "").trim() || generateSlug(values.brandName);
     const payload: any = {
       brandName: values.brandName,
       brandLogo: values.brandLogo,
       description: values.description,
       dealerDescription: values.dealerDescription,
       featured: values.featured,
-      seo: editingBrand ? values.seo : { slug: generateSlug(values.brandName) },
+      slug: finalSlug,
+      seo: {
+        ...(values.seo || {}),
+        slug: finalSlug,
+      },
     };
     if (editingBrand) {
       editMutation.mutate({ id: editingBrand.brandId, data: payload });
@@ -262,7 +279,12 @@ function AdminBrands() {
                       <Tag className="h-6 w-6 text-muted-foreground" />
                     )}
                   </TableCell>
-                  <TableCell className="font-medium">{brand.brandName}</TableCell>
+                  <TableCell>
+                    <div className="font-medium text-foreground">{brand.brandName}</div>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      /{brand.seo?.slug || brand.slug || generateSlug(brand.brandName)}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {brand.featured ? (
                       <span className="rounded bg-primary-soft px-2 py-1 text-xs font-medium text-primary">Yes</span>

@@ -92,6 +92,7 @@ export type VehicleResponse = {
   categoryId?: UUID;
   manufacturerId?: UUID;
   description?: string;
+  slug?: string;
 };
 export type CreateVehicleRequest = {
   vehicleType: VehicleType;
@@ -103,6 +104,7 @@ export type CreateVehicleRequest = {
   categoryId?: UUID;
   manufacturerId?: UUID;
   description?: string;
+  slug?: string;
 };
 
 
@@ -115,6 +117,14 @@ export type BrandResponse = {
   dealerDescription?: string;
   featured?: boolean;
   productCount?: number;
+  slug?: string;
+  seo?: {
+    slug?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    [key: string]: any;
+  };
 };
 export type BrandRequest = {
   brandName: string;
@@ -122,6 +132,14 @@ export type BrandRequest = {
   description?: string;
   dealerDescription?: string;
   featured?: boolean;
+  slug?: string;
+  seo?: {
+    slug?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    [key: string]: any;
+  };
 };
 
 /* ---------- Brand Contents (Category + Brand Specific) ---------- */

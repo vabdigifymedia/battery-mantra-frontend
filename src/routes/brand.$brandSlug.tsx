@@ -11,7 +11,7 @@ import {
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
-import { toSlug } from "@/lib/utils";
+import { toSlug, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { Container } from "@/components/layout/Container";
 import { ChevronRight, Car, Zap, BatteryCharging, Tag, Sparkles } from "lucide-react";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/brand/$brandSlug")({
   },
   head: ({ loaderData, params }) => {
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brands?.find((b: any) => toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
     
     const seo = resolveTemplateSeo(
       "BRAND",
@@ -68,7 +68,7 @@ function BrandProductsPage() {
   const { data: categories = [] } = useQuery(categoriesQuery());
   const { data: allProducts = [] } = useQuery(productListQuery());
 
-  const matchingBrand = brands?.find(b => toSlug(b.brandName) === brandSlug);
+  const matchingBrand = brands?.find(b => getBrandSlug(b) === brandSlug || toSlug(b.brandName) === brandSlug);
   const brandName = matchingBrand?.brandName || brandSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   // Compute categories that actually have products for this brand
