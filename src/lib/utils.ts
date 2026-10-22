@@ -64,12 +64,11 @@ export function getBrandSlug(b?: { slug?: string; seo?: { slug?: string }; brand
 }
 
 /**
- * Resolves a vehicle's URL slug, prioritizing custom saved slug, then fallback to make-model-fuel.
+ * Resolves a vehicle's URL slug, prioritizing custom saved slug, then fallback to make-model.
  */
-export function getVehicleSlug(v?: { slug?: string; make?: string; model?: string; fuelName?: string } | null): string {
+export function getVehicleSlug(v?: { slug?: string; make?: string; model?: string } | null): string {
   if (!v) return "";
   if (v.slug && v.slug.trim()) return v.slug.trim();
-  const fuel = v.fuelName ? `-${toSlug(v.fuelName)}` : "";
-  return `${toSlug(v.make)}-${toSlug(v.model)}${fuel}`;
+  return toSlug(`${v.make || ""}-${v.model || ""}`);
 }
 

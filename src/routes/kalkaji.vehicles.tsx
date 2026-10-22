@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
+import { Trash2, Plus, Edit, Car, Upload, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
@@ -123,8 +123,7 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
     }
 
     const rawSlug = row.slug || row.Slug;
-    const fuelPart = fuelTypeName ? `-${toSlug(fuelTypeName)}` : "";
-    const finalSlug = rawSlug ? toSlug(rawSlug) : `${toSlug(make)}-${toSlug(model)}${fuelPart}`;
+    const finalSlug = rawSlug ? toSlug(rawSlug) : toSlug(`${make}-${model}`);
 
     results.push({
       vehicleType,
@@ -152,6 +151,7 @@ function AdminVehicles() {
 
   const [activeTab, setActiveTab] = useState("ALL");
   const [activeMake, setActiveMake] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
@@ -169,9 +169,16 @@ function AdminVehicles() {
 
   const availableMakes = Array.from(new Set(typeFilteredVehicles?.map(v => v.make) ?? [])).sort();
 
-  const filteredVehicles = activeMake === "ALL"
+  const makeFilteredVehicles = activeMake === "ALL"
     ? typeFilteredVehicles
     : typeFilteredVehicles?.filter(v => v.make === activeMake);
+
+  const filteredVehicles = makeFilteredVehicles?.filter((v) => {
+    if (!searchQuery.trim()) return true;
+    const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const target = `${v.make || ""} ${v.model || ""} ${v.slug || ""} ${v.fuelName || ""} ${v.capacity || ""} ${v.vehicleType || ""}`.toLowerCase();
+    return terms.every((term) => target.includes(term));
+  });
 
   const totalPages = Math.ceil((filteredVehicles?.length || 0) / PAGE_SIZE);
   const paginatedVehicles = filteredVehicles?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -187,15 +194,12 @@ function AdminVehicles() {
 
   const watchedMake = form.watch("make");
   const watchedModel = form.watch("model");
-  const watchedFuelId = form.watch("fuelId");
 
   useEffect(() => {
     if (!editingVehicle && (watchedMake || watchedModel)) {
-      const matchedFuel = dbFuels.find((f: any) => f.fuelId === watchedFuelId);
-      const fuelPart = matchedFuel?.fuelName ? `-${toSlug(matchedFuel.fuelName)}` : "";
-      form.setValue("slug", `${toSlug(watchedMake)}-${toSlug(watchedModel)}${fuelPart}`);
+      form.setValue("slug", toSlug(`${watchedMake}-${watchedModel}`));
     }
-  }, [watchedMake, watchedModel, watchedFuelId, editingVehicle, dbFuels, form]);
+  }, [watchedMake, watchedModel, editingVehicle, form]);
 
   const openAddModal = () => {
     setEditingVehicle(null);
@@ -266,9 +270,7 @@ function AdminVehicles() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    const matchedFuel = dbFuels.find((f: any) => f.fuelId === values.fuelId);
-    const fuelPart = matchedFuel?.fuelName ? `-${toSlug(matchedFuel.fuelName)}` : "";
-    const fallbackSlug = `${toSlug(values.make)}-${toSlug(values.model)}${fuelPart}`;
+    const fallbackSlug = toSlug(`${values.make}-${values.model}`);
     const finalSlug = (values.slug || "").trim() ? toSlug(values.slug) : fallbackSlug;
 
     const data: any = {
@@ -338,12 +340,12 @@ function AdminVehicles() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight">Vehicles</h2>
           <p className="text-muted-foreground">Manage compatible vehicles for batteries.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={() => setIsImportOpen(true)}>
             <Upload className="mr-2 h-4 w-4" /> Import CSV
           </Button>
@@ -351,6 +353,54 @@ function AdminVehicles() {
             <Plus className="mr-2 h-4 w-4" /> Add Vehicle
           </Button>
         </div>
+      </div>
+
+      {/* Search Input Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search make, model, slug, fuel, capacity..."
+            className="pl-9 pr-9 h-10 w-full bg-background"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setCurrentPage(1);
+              }}
+              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              title="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>
+              Found <strong>{filteredVehicles?.length || 0}</strong> {filteredVehicles?.length === 1 ? "vehicle" : "vehicles"}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => {
+                setSearchQuery("");
+                setCurrentPage(1);
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+        )}
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); setCurrentPage(1); }} className="w-full">
@@ -410,8 +460,33 @@ function AdminVehicles() {
                 </TableRow>
               ) : !filteredVehicles?.length ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                    No vehicles found in this category.
+                  <TableCell colSpan={7} className="h-28 text-center text-muted-foreground">
+                    {searchQuery ? (
+                      <div className="space-y-2 py-3">
+                        <p className="font-medium text-foreground">No vehicles found matching "{searchQuery}"</p>
+                        <p className="text-xs text-muted-foreground">
+                          {activeTab !== "ALL" || activeMake !== "ALL"
+                            ? "Try searching across all vehicle categories and brands."
+                            : "Check your spelling or try a different search keyword."}
+                        </p>
+                        {(activeTab !== "ALL" || activeMake !== "ALL") && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 text-xs mt-1"
+                            onClick={() => {
+                              setActiveTab("ALL");
+                              setActiveMake("ALL");
+                              setCurrentPage(1);
+                            }}
+                          >
+                            View in All Vehicles
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      "No vehicles found in this category."
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -486,7 +561,29 @@ function AdminVehicles() {
               <Spinner size="sm" className="mr-2" /> Loading...
             </div>
           ) : !filteredVehicles?.length ? (
-            <div className="text-center py-12 text-muted-foreground">No vehicles found.</div>
+            <div className="text-center py-12 text-muted-foreground">
+              {searchQuery ? (
+                <div className="space-y-2">
+                  <p className="font-medium text-foreground">No vehicles found matching "{searchQuery}"</p>
+                  {(activeTab !== "ALL" || activeMake !== "ALL") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs mt-1"
+                      onClick={() => {
+                        setActiveTab("ALL");
+                        setActiveMake("ALL");
+                        setCurrentPage(1);
+                      }}
+                    >
+                      View in All Vehicles
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                "No vehicles found."
+              )}
+            </div>
           ) : (
             paginatedVehicles?.map((vehicle) => (
               <div key={vehicle.vehicleId} className="rounded-xl border bg-card p-4 shadow-sm flex gap-3">
@@ -560,13 +657,19 @@ function AdminVehicles() {
         </div>
 
         {/* PAGINATION */}
-        {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
-              <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredVehicles?.length || 0)}</span> of{" "}
-              <span className="font-medium">{filteredVehicles?.length}</span> results
-            </p>
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            {filteredVehicles && filteredVehicles.length > 0 ? (
+              <>
+                Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
+                <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredVehicles.length)}</span> of{" "}
+                <span className="font-medium">{filteredVehicles.length}</span> {filteredVehicles.length === 1 ? "vehicle" : "vehicles"}
+              </>
+            ) : (
+              <span>0 vehicles found</span>
+            )}
+          </p>
+          {totalPages > 1 && (
             <Pagination className="w-auto mx-0">
               <PaginationContent>
                 <PaginationItem>
@@ -586,8 +689,8 @@ function AdminVehicles() {
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
-          </div>
-        )}
+          )}
+        </div>
       </Tabs>
 
       {/* SINGLE ADD / EDIT MODAL */}
