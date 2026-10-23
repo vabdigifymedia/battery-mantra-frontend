@@ -189,6 +189,8 @@ function AdminVehicles() {
       vehicleType: "CAR",
       make: "",
       model: "",
+      slug: "",
+      description: "",
     },
   });
 
@@ -213,6 +215,7 @@ function AdminVehicles() {
       capacity: "",
       categoryId: "",
       manufacturerId: "",
+      description: "",
     });
     setIsModalOpen(true);
   };
@@ -231,6 +234,7 @@ function AdminVehicles() {
       capacity: vehicle.capacity || "",
       categoryId: vehicle.categoryId || "",
       manufacturerId: vehicle.manufacturerId || matchedMfr?.id || "",
+      description: vehicle.description || "",
     });
     setIsModalOpen(true);
   };
