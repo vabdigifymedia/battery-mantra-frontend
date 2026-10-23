@@ -339,44 +339,6 @@ function AdminVehicles() {
     reader.readAsText(file);
   };
 
-  // Check vehicles whose slug in DB differs from default toSlug(`${make} ${model}`)
-  const nonDefaultVehicles = (vehicles || []).filter((v) => {
-    if (!v.slug) return false;
-    const defaultSlug = toSlug(`${v.make} ${v.model}`);
-    return v.slug !== defaultSlug;
-  });
-  const [isResettingSlugs, setIsResettingSlugs] = useState(false);
-
-  const handleResetToDefaultSlugs = async () => {
-    if (nonDefaultVehicles.length === 0) return;
-    setIsResettingSlugs(true);
-    let updatedCount = 0;
-    try {
-      for (const v of nonDefaultVehicles) {
-        const defaultSlug = toSlug(`${v.make} ${v.model}`);
-        await adminService.updateVehicle(v.vehicleId, {
-          vehicleType: v.vehicleType,
-          make: v.make,
-          model: v.model,
-          slug: defaultSlug,
-          fuelId: v.fuelId || undefined,
-          imageUrl: v.imageUrl || undefined,
-          capacity: v.capacity || undefined,
-          categoryId: v.categoryId || undefined,
-          manufacturerId: v.manufacturerId || undefined,
-          description: v.description || undefined,
-        });
-        updatedCount++;
-      }
-      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-      toast.success(`Successfully set default slug for ${updatedCount} vehicle(s) in database!`);
-    } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to update vehicle slugs");
-    } finally {
-      setIsResettingSlugs(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -393,35 +355,6 @@ function AdminVehicles() {
           </Button>
         </div>
       </div>
-
-      {/* Non-Default Slug Notification & 1-Click Set to Default */}
-      {nonDefaultVehicles.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border bg-muted/40 text-foreground">
-          <div className="flex items-center gap-2.5">
-            <RotateCcw className="h-4 w-4 text-primary shrink-0" />
-            <div className="text-sm">
-              <span>
-                Found <strong>{nonDefaultVehicles.length}</strong> vehicle(s) with non-standard slug in database (e.g. <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">/{nonDefaultVehicles[0].slug}</code> → default: <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">/{toSlug(`${nonDefaultVehicles[0].make} ${nonDefaultVehicles[0].model}`)}</code>).
-              </span>
-            </div>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={isResettingSlugs}
-            onClick={handleResetToDefaultSlugs}
-            className="h-8 shrink-0 self-start sm:self-auto text-xs"
-          >
-            {isResettingSlugs ? (
-              <>
-                <Spinner size="sm" className="mr-1.5" /> Updating in DB...
-              </>
-            ) : (
-              `Set ${nonDefaultVehicles.length} Slug(s) to Default in DB`
-            )}
-          </Button>
-        </div>
-      )}
 
       {/* Search Input Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
