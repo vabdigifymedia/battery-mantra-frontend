@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
-import { toSlug, getVehicleSlug, cleanVehicleSlug } from "@/lib/utils";
+import { toSlug, getVehicleSlug } from "@/lib/utils";
 import { vehiclesListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Car, Upload, Search, AlertTriangle } from "lucide-react";
+import { Trash2, Plus, Edit, Car, Upload, Search, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
@@ -123,7 +123,7 @@ const parseCSV = (text: string, dbFuels: any[] = [], manufacturers: any[] = [], 
     }
 
     const rawSlug = row.slug || row.Slug;
-    const finalSlug = rawSlug ? toSlug(rawSlug) : toSlug(`${make}-${model}`);
+    const finalSlug = rawSlug ? toSlug(rawSlug) : toSlug(`${make} ${model}`);
 
     results.push({
       vehicleType,
@@ -197,7 +197,7 @@ function AdminVehicles() {
 
   useEffect(() => {
     if (!editingVehicle && (watchedMake || watchedModel)) {
-      form.setValue("slug", toSlug(`${watchedMake}-${watchedModel}`));
+      form.setValue("slug", toSlug(`${watchedMake} ${watchedModel}`));
     }
   }, [watchedMake, watchedModel, editingVehicle, form]);
 
@@ -220,13 +220,12 @@ function AdminVehicles() {
   const openEditModal = (vehicle: any) => {
     setEditingVehicle(vehicle);
     const matchedMfr = manufacturers.find(m => m.id === vehicle.manufacturerId || m.name.toLowerCase() === vehicle.make?.toLowerCase());
-    const rawSlug = vehicle.slug || getVehicleSlug(vehicle);
-    const resolvedSlug = cleanVehicleSlug(rawSlug);
+    const defaultSlug = toSlug(`${vehicle.make || matchedMfr?.name || ""} ${vehicle.model || ""}`);
     form.reset({
       vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make || matchedMfr?.name || "",
       model: vehicle.model,
-      slug: resolvedSlug,
+      slug: vehicle.slug || defaultSlug,
       fuelId: vehicle.fuelId || "",
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
@@ -272,8 +271,8 @@ function AdminVehicles() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    const fallbackSlug = toSlug(`${values.make}-${values.model}`);
-    const finalSlug = cleanVehicleSlug((values.slug || "").trim() ? toSlug(values.slug) : fallbackSlug);
+    const defaultSlug = toSlug(`${values.make} ${values.model}`);
+    const finalSlug = (values.slug || "").trim() ? toSlug(values.slug) : defaultSlug;
 
     const data: any = {
       vehicleType: values.vehicleType,
@@ -340,23 +339,26 @@ function AdminVehicles() {
     reader.readAsText(file);
   };
 
-  const vehiclesWithBadSlugs = (vehicles || []).filter(
-    (v) => v.slug && v.slug !== cleanVehicleSlug(v.slug)
-  );
-  const [isFixingSlugs, setIsFixingSlugs] = useState(false);
+  // Check vehicles whose slug in DB differs from default toSlug(`${make} ${model}`)
+  const nonDefaultVehicles = (vehicles || []).filter((v) => {
+    if (!v.slug) return false;
+    const defaultSlug = toSlug(`${v.make} ${v.model}`);
+    return v.slug !== defaultSlug;
+  });
+  const [isResettingSlugs, setIsResettingSlugs] = useState(false);
 
-  const handleFixAllSlugs = async () => {
-    if (vehiclesWithBadSlugs.length === 0) return;
-    setIsFixingSlugs(true);
-    let fixedCount = 0;
+  const handleResetToDefaultSlugs = async () => {
+    if (nonDefaultVehicles.length === 0) return;
+    setIsResettingSlugs(true);
+    let updatedCount = 0;
     try {
-      for (const v of vehiclesWithBadSlugs) {
-        const cleanSlug = cleanVehicleSlug(v.slug);
+      for (const v of nonDefaultVehicles) {
+        const defaultSlug = toSlug(`${v.make} ${v.model}`);
         await adminService.updateVehicle(v.vehicleId, {
           vehicleType: v.vehicleType,
           make: v.make,
           model: v.model,
-          slug: cleanSlug,
+          slug: defaultSlug,
           fuelId: v.fuelId || undefined,
           imageUrl: v.imageUrl || undefined,
           capacity: v.capacity || undefined,
@@ -364,14 +366,14 @@ function AdminVehicles() {
           manufacturerId: v.manufacturerId || undefined,
           description: v.description || undefined,
         });
-        fixedCount++;
+        updatedCount++;
       }
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-      toast.success(`Successfully fixed ${fixedCount} vehicle slug(s) in the database!`);
+      toast.success(`Successfully set default slug for ${updatedCount} vehicle(s) in database!`);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to update vehicle slugs");
     } finally {
-      setIsFixingSlugs(false);
+      setIsResettingSlugs(false);
     }
   };
 
@@ -392,28 +394,30 @@ function AdminVehicles() {
         </div>
       </div>
 
-      {/* Duplicate Slug Warning & 1-Click Auto-Fix */}
-      {vehiclesWithBadSlugs.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+      {/* Non-Default Slug Notification & 1-Click Set to Default */}
+      {nonDefaultVehicles.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border bg-muted/40 text-foreground">
           <div className="flex items-center gap-2.5">
-            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
+            <RotateCcw className="h-4 w-4 text-primary shrink-0" />
             <div className="text-sm">
-              <span className="font-semibold">Notice: </span>
-              Found <strong>{vehiclesWithBadSlugs.length}</strong> vehicle(s) with duplicate fuel suffix in database (e.g. <code className="font-mono text-xs bg-amber-200/60 dark:bg-amber-900/50 px-1 py-0.5 rounded">/{vehiclesWithBadSlugs[0].slug}</code>).
+              <span>
+                Found <strong>{nonDefaultVehicles.length}</strong> vehicle(s) with non-standard slug in database (e.g. <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">/{nonDefaultVehicles[0].slug}</code> → default: <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">/{toSlug(`${nonDefaultVehicles[0].make} ${nonDefaultVehicles[0].model}`)}</code>).
+              </span>
             </div>
           </div>
           <Button
             size="sm"
-            disabled={isFixingSlugs}
-            onClick={handleFixAllSlugs}
-            className="h-8 bg-amber-600 hover:bg-amber-700 text-white shrink-0 self-start sm:self-auto"
+            variant="outline"
+            disabled={isResettingSlugs}
+            onClick={handleResetToDefaultSlugs}
+            className="h-8 shrink-0 self-start sm:self-auto text-xs"
           >
-            {isFixingSlugs ? (
+            {isResettingSlugs ? (
               <>
-                <Spinner size="sm" className="mr-1.5" /> Fixing in DB...
+                <Spinner size="sm" className="mr-1.5" /> Updating in DB...
               </>
             ) : (
-              `Auto-Fix ${vehiclesWithBadSlugs.length} Slug(s) in DB`
+              `Set ${nonDefaultVehicles.length} Slug(s) to Default in DB`
             )}
           </Button>
         </div>
@@ -576,7 +580,7 @@ function AdminVehicles() {
                     <TableCell>
                       <div className="font-medium text-foreground">{vehicle.model}</div>
                       <div className="text-xs text-muted-foreground font-mono">
-                        /{cleanVehicleSlug(vehicle.slug) || getVehicleSlug(vehicle)}
+                        /{vehicle.slug || getVehicleSlug(vehicle)}
                       </div>
                     </TableCell>
                     <TableCell>{vehicle.fuelName || "N/A"}</TableCell>
@@ -682,7 +686,7 @@ function AdminVehicles() {
                       )}
                     </div>
                     <div className="text-[11px] text-muted-foreground font-mono mt-1 truncate">
-                      /{cleanVehicleSlug(vehicle.slug) || getVehicleSlug(vehicle)}
+                      /{vehicle.slug || getVehicleSlug(vehicle)}
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-1 mt-2">
@@ -867,8 +871,32 @@ function AdminVehicles() {
               />
             </FormField>
 
-            <FormField label="Vehicle URL Slug (Optional)" htmlFor="slug" error={form.formState.errors.slug?.message}>
-              <Input id="slug" {...form.register("slug")} placeholder="Leave blank to auto-generate (e.g. kia-carnival-diesel)" />
+            <FormField label="Vehicle URL Slug" htmlFor="slug" error={form.formState.errors.slug?.message}>
+              <div className="flex gap-2">
+                <Input
+                  id="slug"
+                  {...form.register("slug")}
+                  placeholder="e.g. audi-a3-diesel"
+                  className="flex-1 font-mono text-sm"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const make = form.getValues("make");
+                    const model = form.getValues("model");
+                    form.setValue("slug", toSlug(`${make} ${model}`));
+                  }}
+                  title="Reset to default Make + Model slug"
+                  className="shrink-0 text-xs"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" /> Default
+                </Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Default: <code>/{toSlug(`${form.watch("make") || "make"} ${form.watch("model") || "model"}`)}</code>. Admin can customize if needed.
+              </p>
             </FormField>
 
             <div className="space-y-2">

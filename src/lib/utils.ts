@@ -64,25 +64,14 @@ export function getBrandSlug(b?: { slug?: string; seo?: { slug?: string }; brand
 }
 
 /**
- * Sanitizes a vehicle slug by removing duplicate trailing fuel suffixes or words.
- * Example: 'audi-a3-petrol-petrol' -> 'audi-a3-petrol'
- */
-export function cleanVehicleSlug(slug?: string | null): string {
-  if (!slug) return "";
-  let cleaned = slug.trim().toLowerCase();
-  // Remove duplicate fuel suffixes (e.g. -petrol-petrol -> -petrol)
-  cleaned = cleaned.replace(/-(petrol|diesel|cng|lpg|electric|hybrid)-(petrol|diesel|cng|lpg|electric|hybrid)$/i, "-$1");
-  // Remove repeated trailing word (e.g. -foo-foo -> -foo)
-  cleaned = cleaned.replace(/-([a-z0-9]+)-\1$/i, "-$1");
-  return cleaned;
-}
-
-/**
- * Resolves a vehicle's URL slug, prioritizing custom saved slug, then fallback to make-model.
+ * Resolves a vehicle's URL slug, prioritizing custom saved slug, then default to make + model name.
+ * Examples:
+ * - Make: "Audi", Model: "A3 Diesel" -> "audi-a3-diesel"
+ * - Make: "BMW", Model: "5 Series 530i" -> "bmw-5-series-530i"
  */
 export function getVehicleSlug(v?: { slug?: string; make?: string; model?: string } | null): string {
   if (!v) return "";
-  const raw = (v.slug && v.slug.trim()) ? v.slug.trim() : toSlug(`${v.make || ""}-${v.model || ""}`);
-  return cleanVehicleSlug(raw);
+  if (v.slug && v.slug.trim()) return toSlug(v.slug);
+  return toSlug(`${v.make || ""} ${v.model || ""}`);
 }
 
