@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
     nitro({
-      preset: "vercel",
+      preset: "node-server",
       routeRules: {
         '/api/**': { proxy: 'https://200.97.165.54.nip.io/api/**' }
       }
