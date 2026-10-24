@@ -10,16 +10,16 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
 
   // Handle categoryId arrays if present
   // If multiple categories are passed, it's a general search (e.g. all batteries), so we don't pin the banner to just the first category
-  const isMultiCat = Array.isArray(search.categoryId) 
-    ? search.categoryId.length > 1 
+  const isMultiCat = Array.isArray(search.categoryId)
+    ? search.categoryId.length > 1
     : typeof search.category === 'string' && search.category.includes(',');
-    
+
   let catId = isMultiCat ? null : (Array.isArray(search.categoryId) ? search.categoryId[0] : search.categoryId);
   let brndId = Array.isArray(search.brandId) ? search.brandId[0] : search.brandId;
 
   const { data: categories } = useQuery(categoriesQuery());
   const { data: allBrands } = useQuery(brandsQuery()); // Fetch all to resolve slug
-  
+
   if (!catId && search.category && typeof search.category === 'string' && !isMultiCat && categories) {
     const searchSlug = search.category.toLowerCase().trim();
     const findCatBySlug = (cats: any[]): any => {
@@ -49,7 +49,7 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const brand = brndId ? (brands?.find((b: any) => b.brandId === brndId) || allBrands?.find((b: any) => b.brandId === brndId)) : null;
-  
+
   // Recursively search for category in case it's a subcategory
   let category: any = null;
   if (catId && categories) {
@@ -80,13 +80,13 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   const catName = singularCatName || (search.productType === "inverter" ? "Inverter" : search.productType === "solar" ? "Solar Battery" : "Battery");
 
   if (vehicle) {
-    title = isDealerPage 
-      ? `${vehicle.make} ${vehicle.model} ${catName} Dealer in ${locationName}`
-      : `${vehicle.make} ${vehicle.model} ${catName} Price in ${locationName}`;
-    subtitle = `With Battery Mantra, get ${vehicle.make} ${vehicle.model} ${catName} at best price`;
+    title = isDealerPage
+      ? `${vehicle.model} ${catName} Dealer in ${locationName}`
+      : `${vehicle.model} ${catName} Price in ${locationName}`;
+    subtitle = `With Battery Mantra, get ${vehicle.model} ${catName} at best price`;
     imageUrl = vehicle.imageUrl || "/images/placeholders/car-placeholder.png";
     brandNameHeader = vehicle.make;
-    // Attempt to find brand logo if vehicle make matches a brand
+
     const matchedBrand = brands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase()) || allBrands?.find((b: any) => b.brandName?.toLowerCase() === vehicle.make?.toLowerCase());
     if (matchedBrand) brandLogoUrl = matchedBrand.brandLogo || "";
   } else if (brand && category) {
@@ -99,11 +99,11 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
     brandNameHeader = brand.brandName;
     brandLogoUrl = brand.brandLogo || "";
   } else if (brand) {
-    const productTypeLabel = search.productType === "inverter" 
-      ? "Inverter" 
-      : search.productType === "solar" 
-      ? "Solar Battery" 
-      : "Battery";
+    const productTypeLabel = search.productType === "inverter"
+      ? "Inverter"
+      : search.productType === "solar"
+        ? "Solar Battery"
+        : "Battery";
     title = isDealerPage
       ? `${brand.brandName} ${productTypeLabel} Dealer in ${locationName}`
       : `${brand.brandName} ${productTypeLabel} Price in ${locationName}`;
@@ -124,19 +124,19 @@ export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isD
   // Determine dynamic theme colors based on category or name
   let theme = "red"; // default theme for cars
   const searchString = `${catName} ${vehicle?.make || ''} ${vehicle?.model || ''} ${search.productType || ''}`.toLowerCase();
-  
+
   if (searchString.includes("inverter") || searchString.includes("tubular") || searchString.includes("solar")) {
     theme = "blue";
   }
 
   return (
-    <BannerLayout 
-      title={title} 
-      subtitle={subtitle} 
-      imageUrl={imageUrl} 
-      brandNameHeader={brandNameHeader} 
-      brandLogoUrl={brandLogoUrl} 
-      theme={theme as any} 
+    <BannerLayout
+      title={title}
+      subtitle={subtitle}
+      imageUrl={imageUrl}
+      brandNameHeader={brandNameHeader}
+      brandLogoUrl={brandLogoUrl}
+      theme={theme as any}
     />
   );
 }
@@ -184,20 +184,20 @@ export function BannerLayout({
 
   return (
     <div className={`mb-6 rounded-3xl overflow-hidden bg-gradient-to-br shadow-sm border border-border/40 ${currentTheme.bg}`}>
-      
+
       {/* Top Section: Image + Content */}
       <div className="flex flex-row items-center gap-3 sm:gap-4 md:gap-6 p-4 md:p-8">
         {/* Left: Main Image */}
         {imageUrl && (
           <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-64 md:h-40 shrink-0 flex items-center justify-center p-1 md:p-2">
-            <img 
-              src={imageUrl} 
-              alt={title} 
+            <img
+              src={imageUrl}
+              alt={title}
               className="w-full h-full object-contain mix-blend-multiply"
             />
           </div>
         )}
-        
+
         {/* Right: Text Content */}
         <div className="flex flex-col items-start text-left flex-1">
           {brandNameHeader && (
@@ -210,7 +210,7 @@ export function BannerLayout({
               </span>
             </div>
           )}
-          
+
           <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-black uppercase text-slate-900 leading-tight">
             {toSingularCategory(title)}
           </h1>
@@ -223,38 +223,38 @@ export function BannerLayout({
       {/* Bottom Section: Trust Badges */}
       <div className={`${currentTheme.stripBg} border-t p-3 md:p-4`}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4 max-w-5xl mx-auto">
-          
+
           <div className="flex items-center gap-2 md:gap-3">
             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
               <ShieldCheck className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">100% Compatible<br/>Batteries</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">100% Compatible<br />Batteries</span>
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
               <Award className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Genuine Quality<br/>Assured</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Genuine Quality<br />Assured</span>
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
               <Truck className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Free Installation<br/>at Doorstep</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Free Installation<br />at Doorstep</span>
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${currentTheme.iconBg} flex items-center justify-center shrink-0`}>
               <BadgeIndianRupee className={`w-4 h-4 md:w-5 md:h-5 ${currentTheme.text}`} />
             </div>
-            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Best Price<br/>Guarantee</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-slate-800 leading-tight">Best Price<br />Guarantee</span>
           </div>
 
         </div>
       </div>
-      
+
     </div>
   );
 }
