@@ -17,7 +17,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
 
   const { data: manufacturers } = useQuery(manufacturersListQuery());
   const manufacturer = manufacturers?.find(m => toSlug(m.name) === makeSlug);
-  
+
   const { data: allVehicles } = useQuery(vehiclesListQuery());
   const exactMake = manufacturer?.name || allVehicles?.find(v => toSlug(v.make) === makeSlug)?.make || makeSlug;
 
@@ -48,7 +48,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
           <span className="text-foreground font-medium">{manufacturer?.name || exactMake}</span>
         </nav>
 
-        <BannerLayout 
+        <BannerLayout
           title={`${manufacturer?.name || exactMake} ${toSingularCategory(categoryName)}`}
           subtitle={`With Battery Mantra, get ${manufacturer?.name || exactMake} ${toSingularCategory(categoryName)} at best price`}
           imageUrl={manufacturer?.logoUrl || ""}
@@ -75,9 +75,9 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
                 <GradientBlobCard className="flex flex-col items-center justify-center gap-3 p-4 text-center h-full">
                   <div className="h-24 w-full flex items-center justify-center p-2">
                     {model.imageUrl ? (
-                      <img 
-                        src={model.imageUrl} 
-                        alt={model.model} 
+                      <img
+                        src={model.imageUrl}
+                        alt={model.model}
                         className="h-full object-contain transition-transform group-hover:scale-105"
                       />
                     ) : (
@@ -87,7 +87,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
                     )}
                   </div>
                   <span className="text-sm font-semibold text-foreground line-clamp-2">
-                    {model.make} {model.model}
+                    {model.model}
                   </span>
                 </GradientBlobCard>
               </Link>
@@ -101,9 +101,9 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
         )}
 
         {manufacturer?.description ? (
-          <div 
+          <div
             className="prose prose-sm md:prose-base max-w-none mt-12 mb-10 text-muted-foreground"
-            dangerouslySetInnerHTML={{ 
+            dangerouslySetInnerHTML={{
               __html: applySeoTemplate(manufacturer.description, {
                 city: city?.cityName || "Delhi / NCR",
                 city_name: city?.cityName || "Delhi / NCR",
@@ -111,7 +111,7 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
                 manufacturer_name: manufacturer.name || exactMake,
                 category: categoryName,
                 category_name: categoryName,
-              }) 
+              })
             }}
           />
         ) : (
@@ -122,13 +122,13 @@ export function ManufacturerPage({ categorySlug, makeSlug }: { categorySlug: str
 
         <SeoCityLinks productName={`${manufacturer?.name || exactMake} ${categoryName}`} baseUrl={`/manufacturers/${categorySlug}/${makeSlug}`} />
       </Container>
-      
-      <GlobalFaqSection 
-        pageType="MANUFACTURER" 
+
+      <GlobalFaqSection
+        pageType="MANUFACTURER"
         context={{
           manufacturer_name: manufacturer?.name || exactMake,
           category_name: categoryName
-        }} 
+        }}
       />
     </div>
   );
