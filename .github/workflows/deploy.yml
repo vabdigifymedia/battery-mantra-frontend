@@ -18,6 +18,9 @@ jobs:
         timeout: 180s
         script_stop: true
         script: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node 2>/dev/null | tail -n 1)/bin"
           cd /root/battery-mantra-frontend
           git fetch origin main
           git reset --hard origin/main
