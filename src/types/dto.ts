@@ -7,9 +7,9 @@ export type UUID = string;
 
 /* ---------- Auth ---------- */
 export type LoginRequest = { username: string; password: string };
-export type LoginResponse = { 
+export type LoginResponse = {
   token: string;
-  refreshToken: string; 
+  refreshToken: string;
   id: UUID;
   role: string;
   name?: string;
@@ -370,9 +370,9 @@ export type ApplyCouponResponse = {
 };
 
 /* ---------- Cart ---------- */
-export type AddToCartRequest = { 
+export type AddToCartRequest = {
 
-  productId: UUID; 
+  productId: UUID;
   quantity: number;
   exchangeOldBattery?: boolean;
 };
@@ -638,19 +638,19 @@ export interface EnquiryResponse {
   id: number;
   enquiryType: EnquiryType;
   status: EnquiryStatus;
-  
+
   // Quotation specific
   name?: string;
   quantity?: string;
   message?: string;
-  
+
   // Corporate specific
   companyName?: string;
   contactPerson?: string;
   gstin?: string;
   estimatedQty?: string;
   notes?: string;
-  
+
   // Common fields
   mobileNumber: string;
   email?: string;
@@ -705,7 +705,7 @@ export interface PincodeCheckResponse {
 }
 
 export interface FaqRequest {
-  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "MANUFACTURER_MODEL" | "PRODUCT";
   title: string;
   description: string;
   isActive: boolean;
@@ -713,7 +713,7 @@ export interface FaqRequest {
 
 export interface FaqResponse {
   faqId: string;
-  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "MANUFACTURER_MODEL" | "PRODUCT";
   title: string;
   description: string;
   isActive: boolean;

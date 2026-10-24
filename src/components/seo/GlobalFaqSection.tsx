@@ -2,7 +2,7 @@ import { DynamicFaq } from "@/components/seo/DynamicFaq";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Container } from "@/components/layout/Container";
 interface GlobalFaqSectionProps {
-  pageType?: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  pageType?: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "MANUFACTURER_MODEL" | "PRODUCT";
   context?: Record<string, string>;
 }
 

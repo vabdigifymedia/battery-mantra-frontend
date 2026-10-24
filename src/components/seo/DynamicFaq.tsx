@@ -7,7 +7,7 @@ import { getDeliveryTimeText } from "@/lib/delivery";
 import { applySeoTemplate } from "@/lib/utils";
 
 interface DynamicFaqProps {
-  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  pageType: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "MANUFACTURER_MODEL" | "PRODUCT";
   context?: Record<string, string>;
   hideHeading?: boolean;
 }
@@ -51,9 +51,9 @@ export function DynamicFaq({ pageType, context = {}, hideHeading = false }: Dyna
               {replacePlaceholders(faq.title)}
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
-              <div 
+              <div
                 className="prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: replacePlaceholders(faq.description) }} 
+                dangerouslySetInnerHTML={{ __html: replacePlaceholders(faq.description) }}
               />
             </AccordionContent>
           </AccordionItem>

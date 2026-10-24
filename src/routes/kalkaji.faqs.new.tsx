@@ -20,14 +20,14 @@ const PAGE_TYPES = [
   { value: "CATEGORY", label: "Category" },
   { value: "MANUFACTURER", label: "Manufacturer" },
   { value: "BRAND", label: "Brand" },
-  { value: "BRAND_MODEL", label: "Manufacturer Model" },
+  { value: "MANUFACTURER_MODEL", label: "Manufacturer Model" },
   { value: "PRODUCT", label: "Product" },
 ];
 
 function NewFaq() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   const [pageType, setPageType] = useState<any>("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -51,7 +51,7 @@ function NewFaq() {
       toast.error("Please fill in all required fields");
       return;
     }
-    
+
     createMutation.mutate({
       pageType,
       title,
@@ -91,11 +91,11 @@ function NewFaq() {
 
         <div className="space-y-2">
           <Label>Title (Question) <span className="text-destructive">*</span></Label>
-          <AutoResizeTextarea 
-            value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g. What is the price of {product_name} in {city_name}?" 
-            required 
+          <AutoResizeTextarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. What is the price of {product_name} in {city_name}?"
+            required
           />
           <p className="text-xs text-muted-foreground">
             Use curly brackets for variables, e.g. <code className="bg-muted px-1 py-0.5 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{price}`}</code>.
@@ -104,9 +104,9 @@ function NewFaq() {
 
         <div className="space-y-2">
           <Label>Description (Answer) <span className="text-destructive">*</span></Label>
-          <RichTextEditor 
-            value={description} 
-            onChange={setDescription} 
+          <RichTextEditor
+            value={description}
+            onChange={setDescription}
             placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, {price}, etc."
           />
         </div>

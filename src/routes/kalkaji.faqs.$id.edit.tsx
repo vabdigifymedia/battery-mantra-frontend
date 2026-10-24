@@ -23,13 +23,13 @@ const PAGE_TYPES = [
   { value: "CATEGORY", label: "Category" },
   { value: "MANUFACTURER", label: "Manufacturer" },
   { value: "BRAND", label: "Brand" },
-  { value: "BRAND_MODEL", label: "Manufacturer Model" },
+  { value: "MANUFACTURER_MODEL", label: "Manufacturer Model" },
   { value: "PRODUCT", label: "Product" },
 ];
 
 function EditFaq() {
   const { id } = Route.useParams();
-  
+
   const { data: faqs, isLoading } = useQuery({
     ...adminFaqsQuery(),
     staleTime: 0,
@@ -79,7 +79,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
       toast.error("Please fill in all required fields");
       return;
     }
-    
+
     updateMutation.mutate({
       pageType,
       title,
@@ -120,11 +120,11 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
 
         <div className="space-y-2">
           <Label>Question (Title) <span className="text-destructive">*</span></Label>
-          <AutoResizeTextarea 
-            value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g. What is the price of {product_name} in {city_name}?" 
-            required 
+          <AutoResizeTextarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. What is the price of {product_name} in {city_name}?"
+            required
           />
           <p className="text-xs text-muted-foreground">
             Use curly brackets for variables, e.g. <code className="bg-muted px-1 py-0.5 rounded">{`{product_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{city_name}`}</code>, <code className="bg-muted px-1 py-0.5 rounded">{`{price}`}</code>.
@@ -133,7 +133,7 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
 
         <div className="space-y-2">
           <Label>Answer (Description) <span className="text-destructive">*</span></Label>
-          <RichTextEditor 
+          <RichTextEditor
             value={description}
             onChange={setDescription}
             placeholder="Provide a detailed answer. Use dynamic tags like {category_name}, {brand_name}, {price}, etc."
@@ -141,8 +141,8 @@ function EditFaqForm({ faq, id }: { faq: any; id: string }) {
         </div>
 
         <div className="flex items-center gap-2 pt-2">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             id="isActive"
             checked={isActive}
             onChange={(e) => setIsActive(e.target.checked)}

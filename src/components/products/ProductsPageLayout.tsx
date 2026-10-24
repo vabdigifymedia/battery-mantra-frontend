@@ -194,7 +194,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     ? (minWithExchange === maxWithExchange ? `₹${minWithExchange.toLocaleString()}` : `₹${minWithExchange.toLocaleString()} - ₹${maxWithExchange.toLocaleString()}`)
     : "";
 
-  let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
+  let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "MANUFACTURER_MODEL" = "UNIVERSAL";
   let context: Record<string, string> = {
     city_name: city?.cityName || "Delhi / NCR",
     delivery_time: getDeliveryTimeText(null, null, city?.cityName),
@@ -205,7 +205,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   };
 
   if (vehicle) {
-    pageType = "BRAND_MODEL";
+    pageType = "MANUFACTURER_MODEL";
     context = { ...context, model_name: vehicle.model, brand_name: vehicle.make, category_name: toSingularCategory(category?.categoryName) || "Battery" };
   } else if (brand) {
     pageType = "BRAND";
@@ -394,7 +394,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             />
           )}
 
-          {pageType === "BRAND_MODEL" && (
+          {pageType === "MANUFACTURER_MODEL" && (
             <div className="prose prose-sm md:prose-base max-w-none my-8 text-muted-foreground border-t pt-8">
               {vehicle?.description ? (
                 <div
@@ -449,19 +449,19 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             <>
               <SeoPriceTable
                 products={products}
-                title={`Price List, Capacity, Warranty Details for Best ${pageType === "BRAND_MODEL"
-                    ? `${context.brand_name} ${context.model_name}`
-                    : pageType === "BRAND"
-                      ? context.brand_name
-                      : ""
+                title={`Price List, Capacity, Warranty Details for Best ${pageType === "MANUFACTURER_MODEL"
+                  ? `${context.brand_name} ${context.model_name}`
+                  : pageType === "BRAND"
+                    ? context.brand_name
+                    : ""
                   } ${context.category_name || "Battery"} offered`}
               />
               <SeoCityLinks
-                productName={`${pageType === "BRAND_MODEL"
-                    ? `${context.brand_name} ${context.model_name}`
-                    : pageType === "BRAND"
-                      ? context.brand_name
-                      : ""
+                productName={`${pageType === "MANUFACTURER_MODEL"
+                  ? `${context.brand_name} ${context.model_name}`
+                  : pageType === "BRAND"
+                    ? context.brand_name
+                    : ""
                   } ${context.category_name || "Battery"}`.trim()}
                 baseUrl={baseUrl}
               />

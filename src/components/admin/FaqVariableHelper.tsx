@@ -35,7 +35,7 @@ const VARIABLES_BY_PAGE_TYPE: Record<string, VariableDef[]> = {
     { key: "{price}", label: "Starting Price (With Exchange)", highlight: true },
     { key: "{delivery_time}", label: "Delivery Time" },
   ],
-  BRAND_MODEL: [
+  MANUFACTURER_MODEL: [
     { key: "{brand_name}", label: "Car Make (e.g. Maruti)" },
     { key: "{model_name}", label: "Car Model (e.g. Swift)" },
     { key: "{category_name}", label: "Category Name" },
@@ -102,11 +102,10 @@ export function FaqVariableHelper({ pageType }: FaqVariableHelperProps) {
               type="button"
               onClick={() => handleCopy(v.key)}
               title={`Click to copy ${v.key}`}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-mono transition-all border shadow-2xs ${
-                v.highlight
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-mono transition-all border shadow-2xs ${v.highlight
                   ? "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
                   : "bg-background text-foreground border-border hover:bg-accent hover:border-primary/40"
-              }`}
+                }`}
             >
               <span className="font-bold">{v.key}</span>
               <span className="text-[11px] font-sans opacity-70">({v.label})</span>
