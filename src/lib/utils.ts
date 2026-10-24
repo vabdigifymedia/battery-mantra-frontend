@@ -24,6 +24,11 @@ export function applySeoTemplate(template?: string | null, context: Record<strin
   if (!template) return "";
   let result = template;
   for (const [key, value] of Object.entries(context)) {
+    // If value already starts with currency symbol (₹), avoid double symbols (e.g. ₹{price_lowest} -> ₹₹4,500)
+    if (value && /^\s*₹/.test(value)) {
+      const regexWithCurrency = new RegExp(`(?:₹|Rs\\.?|INR\\s*)\\s*\\{{1,2}\\s*${key}\\s*\\}{1,2}`, 'gi');
+      result = result.replace(regexWithCurrency, value);
+    }
     // Matches both {key} and {{key}} with optional whitespace inside
     const regex = new RegExp(`\\{{1,2}\\s*${key}\\s*\\}{1,2}`, 'gi');
     result = result.replace(regex, value || "");
