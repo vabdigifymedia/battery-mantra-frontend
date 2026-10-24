@@ -18,7 +18,7 @@ jobs:
         timeout: 180s
         script_stop: true
         script: |
-          cd /root/battery-mantra/battery-mantra-frontend
+          cd /root/battery-mantra-frontend
           git fetch origin main
           git reset --hard origin/main
           npm install
