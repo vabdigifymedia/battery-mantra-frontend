@@ -110,6 +110,8 @@ export const endpoints = {
     unassignPartner: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/unassign-partner`,
     assignEngineer: (orderId: string, engineerId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/assign-engineer?engineerId=${encodeURIComponent(engineerId)}`,
     unassignEngineer: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/unassign-engineer`,
+    updateCustomer: (userId: string) => `/api/admin/customers/${encodeURIComponent(userId)}`,
+    updateOrder: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}`,
     products: {
       create: "/api/admin/products",
       update: (id: string) => `/api/admin/products/id/${encodeURIComponent(id)}`,

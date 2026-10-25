@@ -4,8 +4,12 @@ import { useState } from "react";
 import { adminUsersQuery } from "@/queries";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Pencil } from "lucide-react";
+import { AdminEditCustomerModal } from "@/components/admin/AdminEditCustomerModal";
+import type { UserResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/kalkaji/users")({
   component: AdminUsers,
@@ -14,6 +18,7 @@ export const Route = createFileRoute("/kalkaji/users")({
 function AdminUsers() {
   const { data: users, isLoading } = useQuery(adminUsersQuery());
   const [activeTab, setActiveTab] = useState("ALL");
+  const [editingCustomer, setEditingCustomer] = useState<UserResponse | null>(null);
   
   const filteredUsers = users?.filter((user: any) => activeTab === "ALL" || user.role === activeTab) || [];
 
@@ -21,8 +26,8 @@ function AdminUsers() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="font-display text-3xl font-bold tracking-tight">Users</h2>
-          <p className="text-muted-foreground">Manage your store's users and roles.</p>
+          <h2 className="font-display text-3xl font-bold tracking-tight">Users & Customers</h2>
+          <p className="text-muted-foreground">Manage your store's users, customer profiles, and roles.</p>
         </div>
         
         <Tabs defaultValue="ALL" value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
@@ -42,22 +47,23 @@ function AdminUsers() {
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Username</TableHead>
+              <TableHead>Username / Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Joined</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   <Spinner size="sm" className="inline-block mr-2" /> Loading users...
                 </TableCell>
               </TableRow>
             ) : !filteredUsers.length ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   No users found for this role.
                 </TableCell>
               </TableRow>
@@ -65,7 +71,7 @@ function AdminUsers() {
               filteredUsers.map((user: any) => (
                 <TableRow key={user.userId}>
                   <TableCell className="font-mono text-xs">{user.userId.slice(0, 8)}</TableCell>
-                  <TableCell>{user.username || user.name}</TableCell>
+                  <TableCell className="font-medium">{user.username || user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
@@ -73,6 +79,17 @@ function AdminUsers() {
                     </Badge>
                   </TableCell>
                   <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-1 text-xs hover:bg-muted"
+                      onClick={() => setEditingCustomer(user)}
+                    >
+                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>Edit</span>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -105,12 +122,31 @@ function AdminUsers() {
               
               <div className="flex justify-between items-center text-xs text-muted-foreground pt-3 border-t">
                 <span className="font-mono">ID: {user.userId.slice(0, 8)}</span>
-                <span>Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</span>
+                <div className="flex items-center gap-2">
+                  <span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs px-2 gap-1"
+                    onClick={() => setEditingCustomer(user)}
+                  >
+                    <Pencil className="h-3 w-3" /> Edit
+                  </Button>
+                </div>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Edit Customer Modal */}
+      {editingCustomer && (
+        <AdminEditCustomerModal
+          customer={editingCustomer}
+          isOpen={!!editingCustomer}
+          onClose={() => setEditingCustomer(null)}
+        />
+      )}
     </div>
   );
 }

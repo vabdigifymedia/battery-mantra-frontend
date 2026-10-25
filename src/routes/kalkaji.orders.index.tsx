@@ -32,9 +32,11 @@ import {
   AlertTriangle,
   Globe,
   XCircle,
+  Pencil,
 } from "lucide-react";
 import { partnerService } from "@/services/partner.service";
 import { engineerService } from "@/services/engineer.service";
+import { AdminEditOrderModal } from "@/components/admin/AdminEditOrderModal";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/kalkaji/orders/")({
@@ -83,6 +85,7 @@ function AdminOrders() {
   const { data: orders = [], isLoading } = useQuery(adminOrdersQuery());
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
+  const [editingOrder, setEditingOrder] = useState<OrderResponse | null>(null);
   const [cancelTargetOrder, setCancelTargetOrder] = useState<OrderResponse | null>(null);
   const [pendingEngineerSwitch, setPendingEngineerSwitch] = useState<{
     engineerId: string;
@@ -245,7 +248,7 @@ function AdminOrders() {
               <TableHead>Fulfillment</TableHead>
               <TableHead>Date & Time</TableHead>
               <TableHead className="w-[180px]">Status Update</TableHead>
-              <TableHead className="w-[80px]"></TableHead>
+              <TableHead className="w-[90px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -413,9 +416,23 @@ function AdminOrders() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details">
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      {!["DELIVERED", "INSTALLED", "CANCELLED"].includes(order.orderStatus) && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-muted text-muted-foreground hover:text-foreground"
+                          onClick={() => setEditingOrder(order)}
+                          aria-label="Edit Order"
+                          title="Edit Order"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details" title="View Order Details">
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -541,7 +558,12 @@ function AdminOrders() {
                     </SelectContent>
                   </Select>
                 )}
-                <Button variant="outline" className="h-9 w-9 p-0 shrink-0 border-border" onClick={() => setSelectedOrder(order)}>
+                {!["DELIVERED", "INSTALLED", "CANCELLED"].includes(order.orderStatus) && (
+                  <Button variant="outline" className="h-9 w-9 p-0 shrink-0 border-border" onClick={() => setEditingOrder(order)} title="Edit Order">
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                )}
+                <Button variant="outline" className="h-9 w-9 p-0 shrink-0 border-border" onClick={() => setSelectedOrder(order)} title="View Order">
                   <Eye className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </div>
@@ -621,9 +643,22 @@ function AdminOrders() {
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center justify-between pr-8">
                 <span>Order #{selectedOrder.orderId?.slice(0, 8)}</span>
-                <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getStatusColor(selectedOrder.orderStatus)}`}>
-                  {selectedOrder.orderStatus.replace(/_/g, ' ')}
-                </span>
+                <div className="flex items-center gap-2">
+                  {!["DELIVERED", "INSTALLED", "CANCELLED"].includes(selectedOrder.orderStatus) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs px-2.5 gap-1.5 font-semibold"
+                      onClick={() => setEditingOrder(selectedOrder)}
+                    >
+                      <Pencil className="h-3 w-3" /> Edit Order
+                    </Button>
+                  )}
+                  <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getStatusColor(selectedOrder.orderStatus)}`}>
+                    {selectedOrder.orderStatus.replace(/_/g, ' ')}
+                  </span>
+                </div>
               </DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
@@ -933,6 +968,19 @@ function AdminOrders() {
               cancellationReason: reason,
             })
           }
+        />
+      )}
+
+      {editingOrder && (
+        <AdminEditOrderModal
+          order={editingOrder}
+          isOpen={!!editingOrder}
+          onClose={() => setEditingOrder(null)}
+          onSuccess={(updatedOrder) => {
+            if (selectedOrder && selectedOrder.orderId === updatedOrder.orderId) {
+              setSelectedOrder(updatedOrder);
+            }
+          }}
         />
       )}
     </div>

@@ -48,11 +48,43 @@ export interface AdminCreateCustomerRequest {
   pincode: string;
 }
 
-export interface AdminOrderItemRequest {
+export interface AdminUpdateCustomerRequest {
+  name: string;
+  phone: string;
+  email?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+}
+
+export interface AdminUpdateOrderItemRequest {
   productId: string;
   quantity: number;
   exchangeOldBattery: boolean;
 }
+
+export interface AdminUpdateOrderRequest {
+  recipientName: string;
+  recipientPhone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state?: string;
+  pincode: string;
+  items: AdminUpdateOrderItemRequest[];
+  manualDiscount?: number;
+  totalAmount: number;
+  deliveryMethod: string;
+  installationDate?: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  engineerNotes?: string;
+  selectedCity?: string;
+}
+
+export type AdminOrderItemRequest = AdminUpdateOrderItemRequest;
 
 export interface AdminCreateOrderRequest {
   customerId: string;
@@ -101,11 +133,15 @@ export const adminService = {
   getAllUsers: () => apiFetch<UserResponse[]>(endpoints.admin.users, { method: "GET" }),
   createCustomer: (body: AdminCreateCustomerRequest) => 
     apiFetch<UserResponse>("/api/admin/customers", { method: "POST", body }),
+  updateCustomer: (userId: string, body: AdminUpdateCustomerRequest) =>
+    apiFetch<UserResponse>(endpoints.admin.updateCustomer(userId), { method: "PUT", body }),
 
   // Orders
   getAllOrders: () => apiFetch<OrderResponse[]>(endpoints.admin.orders, { method: "GET" }),
   createOrder: (body: AdminCreateOrderRequest) => 
     apiFetch<OrderResponse>("/api/admin/orders", { method: "POST", body }),
+  updateOrder: (orderId: string, body: AdminUpdateOrderRequest) =>
+    apiFetch<OrderResponse>(endpoints.admin.updateOrder(orderId), { method: "PUT", body }),
   updateOrderStatus: (orderId: UUID, body: OrderStatusUpdateRequest) => 
     apiFetch<OrderResponse>(endpoints.admin.updateOrderStatus(orderId), { method: "PATCH", body }),
   assignPartner: (orderId: string, partnerId: string) =>
