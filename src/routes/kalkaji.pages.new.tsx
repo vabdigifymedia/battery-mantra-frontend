@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cmsService, CreateCmsPageRequest } from "@/services/cms.service";
 import { useForm, Controller } from "react-hook-form";
@@ -32,10 +32,11 @@ export const Route = createFileRoute("/kalkaji/pages/new")({
 function NewPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const searchParams = useSearch({ strict: false }) as { defaultSlug?: string; defaultTitle?: string };
 
   const { register, handleSubmit, control, formState: { errors }, watch, reset, setError, clearErrors } = useForm<CreateCmsPageRequest>({
     defaultValues: {
-      title: "",
+      title: searchParams?.defaultTitle || "",
       subTitle: "",
       image1: "",
       image2: "",
@@ -43,7 +44,7 @@ function NewPage() {
       content2: "",
       isActive: true,
       seo: {
-        slug: "",
+        slug: searchParams?.defaultSlug || "",
         metaTitle: "",
         metaDescription: "",
         metaKeywords: "",

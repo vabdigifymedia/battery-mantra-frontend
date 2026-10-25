@@ -82,6 +82,40 @@ function AdminPages() {
         </Button>
       </div>
 
+      {/* Home About Page Quick-Edit Banner */}
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm text-foreground">Home Page About & SEO Content</span>
+            <Badge variant="outline" className="text-[10px] font-mono border-primary/30 text-primary">
+              Slug: home-about
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controls the multi-brand intro, doorstep fitment highlight, and rich SEO text block displayed on the Home Page.
+          </p>
+        </div>
+        {pages?.some((p) => p.seo?.slug === "home-about") ? (
+          <Button asChild size="sm" variant="default" className="shrink-0 shadow-sm">
+            <Link
+              to="/kalkaji/pages/$pageId/edit"
+              params={{ pageId: pages.find((p) => p.seo?.slug === "home-about")!.pageId }}
+            >
+              <Edit className="h-3.5 w-3.5 mr-1.5" /> Edit Home About
+            </Link>
+          </Button>
+        ) : (
+          <Button asChild size="sm" variant="brand" className="shrink-0 shadow-sm">
+            <Link
+              to="/kalkaji/pages/new"
+              search={{ defaultSlug: "home-about", defaultTitle: "Welcome to Battery Mantra" } as any}
+            >
+              <Plus className="h-3.5 w-3.5 mr-1.5" /> Customize Home About
+            </Link>
+          </Button>
+        )}
+      </div>
+
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
@@ -110,7 +144,16 @@ function AdminPages() {
             ) : (
               pages.map((page) => (
                 <TableRow key={page.pageId}>
-                  <TableCell className="font-medium">{page.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <span>{page.title}</span>
+                      {page.seo?.slug === "home-about" && (
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                          Home Page About
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">/{page.seo?.slug || page.pageId}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1.5">

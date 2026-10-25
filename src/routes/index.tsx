@@ -18,6 +18,8 @@ import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { LithiumCategoriesWidget } from "@/components/home/LithiumCategoriesWidget";
 import { SolarCategoriesWidget } from "@/components/home/SolarCategoriesWidget";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
+import { HomeAboutSeoSection } from "@/components/home/HomeAboutSeoSection";
+import { cmsService } from "@/services/cms.service";
 import {
   productListQuery,
   rootCategoriesQuery,
@@ -36,6 +38,17 @@ export const Route = createFileRoute("/")({
     void context.queryClient.prefetchQuery(featuredBrandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
     void context.queryClient.prefetchQuery(bannersListQuery());
+    void context.queryClient.prefetchQuery({
+      queryKey: ["cms-page", "home-about"],
+      queryFn: async () => {
+        try {
+          const page = await cmsService.getPageBySlug("home-about");
+          return page && page.isActive !== false ? page : null;
+        } catch {
+          return null;
+        }
+      },
+    });
     try {
       const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/"));
       return { pageSeo };
@@ -351,6 +364,8 @@ function HomePage() {
               <WhyChooseUs />
             </div>
           </section>
+
+          <HomeAboutSeoSection />
         </Container>
       </div>
 
