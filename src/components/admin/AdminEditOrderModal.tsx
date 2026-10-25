@@ -82,8 +82,9 @@ export function AdminEditOrderModal({
   const [items, setItems] = useState<EditableOrderItem[]>([]);
   const [deliveryMethod, setDeliveryMethod] = useState("HOME_INSTALLATION");
   const [installationDate, setInstallationDate] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [paymentStatus, setPaymentStatus] = useState("PENDING");
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
+  const [paymentStatus, setPaymentStatus] = useState<"PENDING" | "PAID" | "FAILED" | "REFUNDED">("PENDING");
+  const [paymentMode, setPaymentMode] = useState<string>("UPI");
   const [manualDiscount, setManualDiscount] = useState<number>(0);
   const [engineerNotes, setEngineerNotes] = useState("");
 
@@ -96,35 +97,52 @@ export function AdminEditOrderModal({
       setRecipientName(order.customerName || "");
       setRecipientPhone(order.customerPhone || "");
 
-      // Address parsing
-      const addr = order.shippingAddress;
-      if (typeof addr === "object" && addr !== null) {
+      // Address parsing: Read structured fields directly from backend first
+      if (order.addressLine1 || order.city) {
+        setAddressLine1(order.addressLine1 || "");
+        setAddressLine2(order.addressLine2 || "");
+        setCity(order.city || order.selectedCity || "");
+        setState(order.state || "");
+        setPincode(order.postalCode || (order as any).pincode || "");
+      } else if (typeof order.shippingAddress === "object" && order.shippingAddress !== null) {
+        const addr = order.shippingAddress;
         setAddressLine1(addr.addressLine1 || addr.line1 || "");
         setAddressLine2(addr.addressLine2 || addr.line2 || "");
         setCity(addr.city || order.selectedCity || "");
         setState(addr.state || "");
-        setPincode(addr.pincode || "");
-      } else if (typeof addr === "string") {
-        const parts = addr.split(",").map((s) => s.trim());
-        const pinMatch = addr.match(/\b\d{6}\b/);
+        setPincode(addr.pincode || addr.postalCode || "");
+      } else {
+        // Clean fallback ignoring trailing "India"
+        const rawAddr = typeof order.shippingAddress === "string" ? order.shippingAddress : "";
+        const parts = rawAddr.split(",").map((s) => s.trim()).filter((s) => s.toLowerCase() !== "india" && s.length > 0);
+        const pinMatch = rawAddr.match(/\b\d{6}\b/);
         setPincode(pinMatch ? pinMatch[0] : "");
         setCity(order.selectedCity || (parts.length >= 2 ? parts[parts.length - 2] : ""));
-        setState(parts.length >= 3 ? parts[parts.length - 1].replace(/\b\d{6}\b/, "").trim() : "");
+        setState(parts.length >= 1 ? parts[parts.length - 1].replace(/\b\d{6}\b/, "").trim() : "");
         setAddressLine1(parts[0] || "");
         setAddressLine2(parts.slice(1, Math.max(1, parts.length - 2)).join(", "));
-      } else {
-        setAddressLine1("");
-        setAddressLine2("");
-        setCity(order.selectedCity || "");
-        setState("");
-        setPincode("");
       }
 
       setSelectedCity(order.selectedCity || "");
       setDeliveryMethod(order.deliveryMethod || "HOME_INSTALLATION");
       setInstallationDate(order.installationDate ? order.installationDate.split("T")[0] : "");
-      setPaymentMethod(order.paymentMethod || "COD");
-      setPaymentStatus(order.paymentStatus || "PENDING");
+
+      const initialMethod = (order.paymentMethod?.toUpperCase() === "ONLINE" ? "ONLINE" : "COD") as "COD" | "ONLINE";
+      setPaymentMethod(initialMethod);
+
+      const rawStatus = (order.paymentStatus || "").toUpperCase();
+      const initialStatus: "PENDING" | "PAID" | "FAILED" | "REFUNDED" = 
+        rawStatus === "PAID" || rawStatus === "COMPLETED" 
+          ? "PAID" 
+          : rawStatus === "FAILED" 
+          ? "FAILED" 
+          : rawStatus === "REFUNDED" 
+          ? "REFUNDED" 
+          : "PENDING";
+      setPaymentStatus(initialStatus);
+
+      setPaymentMode(order.paymentMode || (initialMethod === "ONLINE" ? "UPI" : "CASH"));
+
       setManualDiscount(order.exchangeDiscount || 0);
       setEngineerNotes((order as any).engineerNotes || "");
 
@@ -299,6 +317,7 @@ export function AdminEditOrderModal({
       installationDate: installationDate || undefined,
       paymentMethod,
       paymentStatus,
+      paymentMode: paymentMode || (paymentMethod === "ONLINE" ? "UPI" : "CASH"),
       engineerNotes: engineerNotes.trim() || undefined,
       selectedCity: selectedCity || city.trim() || undefined,
     };
@@ -620,40 +639,105 @@ export function AdminEditOrderModal({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Payment Method</Label>
-                    <Select
-                      value={paymentMethod}
-                      onValueChange={setPaymentMethod}
-                      disabled={isLocked || updateOrderMutation.isPending}
-                    >
-                      <SelectTrigger className="text-xs font-medium">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="COD">Cash On Delivery (COD)</SelectItem>
-                        <SelectItem value="ONLINE">Online Payment (Razorpay / UPI)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="rounded-xl border border-border/80 bg-background/50 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-primary" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      Payment & Billing Details
+                    </span>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Payment Status</Label>
-                    <Select
-                      value={paymentStatus}
-                      onValueChange={setPaymentStatus}
-                      disabled={isLocked || updateOrderMutation.isPending}
-                    >
-                      <SelectTrigger className="text-xs font-medium">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="PENDING">PENDING</SelectItem>
-                        <SelectItem value="COMPLETED">COMPLETED / PAID</SelectItem>
-                        <SelectItem value="FAILED">FAILED</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Payment Method */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold">Payment Method</Label>
+                      <Select
+                        value={paymentMethod}
+                        onValueChange={(val: "COD" | "ONLINE") => {
+                          setPaymentMethod(val);
+                          if (val === "COD") {
+                            setPaymentMode("CASH");
+                          } else if (paymentMode === "CASH") {
+                            setPaymentMode("UPI");
+                          }
+                        }}
+                        disabled={isLocked || updateOrderMutation.isPending}
+                      >
+                        <SelectTrigger className="text-xs font-medium">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="COD">Cash On Delivery (COD)</SelectItem>
+                          <SelectItem value="ONLINE">Online Payment (ONLINE)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Payment Status */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold">Payment Status</Label>
+                      <Select
+                        value={paymentStatus}
+                        onValueChange={(val: "PENDING" | "PAID" | "FAILED" | "REFUNDED") => setPaymentStatus(val)}
+                        disabled={isLocked || updateOrderMutation.isPending}
+                      >
+                        <SelectTrigger className="text-xs font-medium">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PAID">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                              <span className="text-emerald-700 dark:text-emerald-400 font-semibold">PAID</span>
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="PENDING">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-amber-500" />
+                              <span className="text-amber-700 dark:text-amber-400 font-semibold">PENDING</span>
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="FAILED">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-red-500" />
+                              <span className="text-red-700 dark:text-red-400 font-semibold">FAILED</span>
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="REFUNDED">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-blue-500" />
+                              <span className="text-blue-700 dark:text-blue-400 font-semibold">REFUNDED</span>
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Payment Mode */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold flex items-center justify-between">
+                        <span>Payment Mode</span>
+                        {paymentMethod === "ONLINE" && (
+                          <span className="text-[10px] text-primary font-medium">Online Mode</span>
+                        )}
+                      </Label>
+                      <Select
+                        value={paymentMode}
+                        onValueChange={setPaymentMode}
+                        disabled={isLocked || updateOrderMutation.isPending}
+                      >
+                        <SelectTrigger className="text-xs font-medium">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="UPI">UPI (GooglePay / PhonePe / Paytm)</SelectItem>
+                          <SelectItem value="CARD">Card (Debit / Credit)</SelectItem>
+                          <SelectItem value="NET_BANKING">Net Banking</SelectItem>
+                          <SelectItem value="WALLET">Digital Wallet</SelectItem>
+                          <SelectItem value="CASH">Cash / COD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 

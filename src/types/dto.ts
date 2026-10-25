@@ -457,6 +457,11 @@ export type OrderResponse = {
   orderId: UUID;
   orderStatus: OrderStatus | string;
   shippingAddress?: any;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
@@ -466,6 +471,7 @@ export type OrderResponse = {
   deliveryMethod?: string;
   paymentMethod?: string;
   paymentStatus?: string;
+  paymentMode?: string;
   assignedPartner?: any;
   assignedEngineer?: any;
   installationDate?: string;
@@ -478,6 +484,32 @@ export type OrderResponse = {
   selectedCity?: string;
   cancellationReason?: string;
   cancelledBy?: string;
+};
+
+export type AdminUpdateOrderItemRequest = {
+  productId: string;
+  quantity: number;
+  exchangeOldBattery: boolean;
+};
+
+export type AdminUpdateOrderRequest = {
+  recipientName: string;
+  recipientPhone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state?: string;
+  pincode: string;
+  items: AdminUpdateOrderItemRequest[];
+  manualDiscount?: number;
+  totalAmount: number;
+  deliveryMethod: string;
+  installationDate?: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  paymentMode?: string;
+  engineerNotes?: string;
+  selectedCity?: string;
 };
 
 /* ---------- Capacities (Battery RL) ---------- */

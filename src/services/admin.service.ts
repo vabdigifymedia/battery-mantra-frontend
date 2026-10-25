@@ -80,6 +80,7 @@ export interface AdminUpdateOrderRequest {
   installationDate?: string;
   paymentMethod: string;
   paymentStatus: string;
+  paymentMode?: string;
   engineerNotes?: string;
   selectedCity?: string;
 }
