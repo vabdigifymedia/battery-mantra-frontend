@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { cmsService } from "@/services/cms.service";
+import { Link } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
 import {
   ShieldCheck,
-  Truck,
-  Wrench,
   CreditCard,
   Zap,
   CheckCircle2,
@@ -16,39 +13,43 @@ import {
   Award,
   Clock,
   Sparkles,
+  Wrench,
+  Truck,
+  ArrowRight,
+  PhoneCall,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const HIGHLIGHT_CARDS = [
   {
     icon: Award,
-    title: "One-Stop Battery Store",
-    desc: "Complete range of car batteries, home inverter batteries, lithium packs, and solar solutions under one roof.",
+    title: "One-Stop Solution",
+    desc: "Order home UPS and automotive batteries online or via phone in simple steps. Battery Mantra is your single destination for complete power backup solutions.",
   },
   {
     icon: ShieldCheck,
     title: "100% Genuine Top Brands",
-    desc: "Authorized dealer for Exide, Amaron, Luminous, Livguard, SF Sonic, and Microtek with brand warranty.",
+    desc: "Authorized partner for Exide, Amaron, Luminous, Livguard, Microtek, and SF Sonic with authentic brand replacement warranty.",
   },
   {
     icon: Clock,
-    title: "Fast 60-Min Delivery & Fitment",
-    desc: "Lightning-fast doorstep delivery and professional installation with zero hidden charges.",
+    title: "FREE Delivery & 60-Min Fitment",
+    desc: "Lightning-fast doorstep delivery and certified technician installation within 60 minutes with zero extra delivery or labour charges.",
   },
   {
     icon: CreditCard,
     title: "Convenient Payment Options",
-    desc: "Pay securely after installation via Cash on Delivery, UPI, Debit/Credit Card, Net Banking, or EMI.",
+    desc: "Pay securely after installation via Cash on Delivery (COD), UPI, Paytm, Debit/Credit Card, Net Banking, or flexible EMI options.",
   },
   {
     icon: Wrench,
-    title: "Experienced & Certified Experts",
-    desc: "Dedicated technicians ensure safe terminal setup, electrical checks, and optimal battery health.",
+    title: "Experienced & Skilled Experts",
+    desc: "Proficient team of technicians ensuring safe terminal fitment, electrical load balancing, and battery health diagnostics.",
   },
   {
     icon: Zap,
     title: "Maximum Scrap Battery Value",
-    desc: "Exchange your old dead battery to get instant cash discount and government-compliant green recycling.",
+    desc: "Exchange your old dead battery to get instant cash discounts on your new purchase with certified eco-friendly green recycling.",
   },
 ];
 
@@ -56,34 +57,20 @@ export function HomeAboutSeoSection() {
   const [isExpanded, setIsExpanded] = useState(false);
   const currentCity = useLocationStore((state) => state.city?.cityName);
 
-  const { data: cmsPage } = useQuery({
-    queryKey: ["cms-page", "home-about"],
-    queryFn: async () => {
-      try {
-        const page = await cmsService.getPageBySlug("home-about");
-        return page && page.isActive !== false ? page : null;
-      } catch {
-        return null;
-      }
-    },
-    staleTime: 5 * 60_000,
-  });
-
   const cityLabel = currentCity ? ` in ${currentCity}` : " in India";
-  const defaultBannerImage = "/images/home_about_banner.jpg";
-  const bannerImage = cmsPage?.image1 || defaultBannerImage;
+  const cityDeliveryText = currentCity ? `in ${currentCity}` : "in Noida & across Delhi NCR";
 
   return (
     <section aria-labelledby="about-battery-mantra" className="mt-16 md:mt-24">
-      {/* Top Split Section: Visual Graphic + Welcome Lead */}
       <div className="rounded-3xl border border-border/80 bg-card/60 backdrop-blur-sm p-6 sm:p-8 lg:p-10 shadow-sm overflow-hidden">
+        {/* Top Split Section: Visual Graphic + Welcome Lead */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Column: Visual Promo Banner Card */}
           <div className="lg:col-span-5 relative group">
             <div className="relative rounded-2xl overflow-hidden border border-border shadow-lg aspect-4/3 w-full bg-slate-950">
               <img
-                src={bannerImage}
-                alt="Battery Mantra multi-brand battery store"
+                src="/images/home_about_banner.jpg"
+                alt="Battery Mantra multi-brand car and inverter battery store"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
               />
@@ -116,6 +103,7 @@ export function HomeAboutSeoSection() {
                   <span className="bg-white/15 px-2 py-0.5 rounded">Amaron</span>
                   <span className="bg-white/15 px-2 py-0.5 rounded">Luminous</span>
                   <span className="bg-white/15 px-2 py-0.5 rounded">Livguard</span>
+                  <span className="bg-white/15 px-2 py-0.5 rounded">Microtek</span>
                   <span className="bg-white/15 px-2 py-0.5 rounded">SF Sonic</span>
                 </div>
               </div>
@@ -133,68 +121,69 @@ export function HomeAboutSeoSection() {
               id="about-battery-mantra"
               className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground leading-snug"
             >
-              {cmsPage?.title || (
-                <>
-                  Best & Affordable Car & Inverter Batteries
-                  <span className="text-primary">{cityLabel}</span>
-                </>
-              )}
+              Best & Affordable Car & Inverter Batteries
+              <span className="text-primary">{cityLabel}</span>
             </h2>
 
-            {cmsPage?.subTitle && (
-              <p className="text-sm font-semibold text-muted-foreground mt-2">
-                {cmsPage.subTitle}
-              </p>
-            )}
+            <p className="text-sm font-semibold text-muted-foreground mt-2">
+              Doorstep Battery Delivery, Installation & Old Scrap Exchange
+            </p>
 
-            {/* CMS Content vs Fallback Content */}
-            {cmsPage?.content ? (
-              <div
-                className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed mt-4"
-                dangerouslySetInnerHTML={{ __html: cmsPage.content }}
-              />
-            ) : (
-              <div className="text-muted-foreground text-sm sm:text-base leading-relaxed mt-4 space-y-3">
-                <p>
-                  Are you looking for a robust, reliable power backup solution for your home, office, or vehicle?
-                  At <strong className="text-foreground font-semibold">Battery Mantra</strong>, we offer a comprehensive range of genuine automotive and inverter batteries at guaranteed pocket-friendly prices.
-                </p>
-                <p>
-                  Right after placing your order online or via phone, your battery is dispatched directly to your doorstep with <strong className="text-foreground font-semibold">free delivery & professional fitment within 60 minutes</strong>{cityLabel}. Every product comes with an authentic manufacturer warranty and instant scrap exchange discounts.
-                </p>
-              </div>
-            )}
+            <div className="text-muted-foreground text-sm sm:text-base leading-relaxed mt-4 space-y-3">
+              <p>
+                Are you looking for a robust power backup solution as an{" "}
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: "inverter-and-battery-combo" }}
+                  className="text-primary font-medium underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors"
+                >
+                  inverter and battery combo
+                </Link>
+                ? At <strong className="text-foreground font-semibold">Battery Mantra</strong>, a trusted online store, you can find the best inverter batteries and vehicle power packs at pocket-friendly rates. Our offered home UPS batteries are the perfect choice for your home & office to withstand regular power cuts.
+              </p>
+              <p>
+                When you check the price of batteries on our website, you discover unbeatable rates compared to traditional suppliers. Right after ordering your{" "}
+                <Link
+                  to="/shop-by-category/$"
+                  params={{ _splat: "inverter-battery" }}
+                  className="text-primary font-medium underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors"
+                >
+                  inverter battery
+                </Link>
+                , it is delivered to your doorstep within 60 minutes {cityDeliveryText} with no extra delivery charges. You can order our high-performance tubular batteries either online or via phone.
+              </p>
+            </div>
 
             {/* Key Quick Points Checklist */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-6 pt-6 border-t border-border">
               <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-foreground">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>100% Factory-Fresh Stock with Brand Warranty</span>
+                <span>100% Genuine Tubular & Car Batteries</span>
               </div>
               <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-foreground">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>Zero Installation or Delivery Charges</span>
+                <span>FREE Doorstep Delivery & 60-Min Fitment</span>
               </div>
               <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-foreground">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>Old Battery Scrap Exchange Discount</span>
+                <span>Maximum Scrap Battery Exchange Value</span>
               </div>
               <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-foreground">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>Multiple Convenient Payment Modes</span>
+                <span>Flexible Payments: Cash, UPI, Cards & EMI</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Feature Cards Grid */}
+        {/* Feature Cards Grid: How Is Battery Mantra Best Option For You? */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="text-center max-w-2xl mx-auto mb-8">
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-              Why Battery Mantra is the Best Option For You
+              How Is Battery Mantra the Best Option For You?
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1.5">
-              Serving thousands of satisfied residential, commercial, and automotive customers every month.
+              Facing regular power cuts or need a dependable car battery? Battery Mantra supports you with top-rated products at guaranteed discount prices.
             </p>
           </div>
 
@@ -225,41 +214,90 @@ export function HomeAboutSeoSection() {
               isExpanded ? "max-h-[3000px] opacity-100" : "max-h-36 opacity-90"
             )}
           >
-            {cmsPage?.content2 ? (
-              <div
-                className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed space-y-4"
-                dangerouslySetInnerHTML={{ __html: cmsPage.content2 }}
-              />
-            ) : (
-              <div className="text-xs sm:text-sm text-muted-foreground space-y-4 leading-relaxed">
-                <div>
-                  <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
-                    Enjoy Uninterrupted Battery Services During Power Cuts{cityLabel}
-                  </h4>
-                  <p>
-                    Being a premier online battery and power backup store, Battery Mantra ensures inverter and car battery prices remain transparent and accessible to everyone. We source directly from certified manufacturers including Luminous, Exide, Amaron, Livguard, Microtek, and SF Sonic. Whether you require a heavy-duty tall tubular battery for extended home power cuts or a maintenance-free AGM battery for your car, our store guarantees best-in-market rates with comprehensive warranty support.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
-                    How We Help You Choose the Ideal Battery Solution
-                  </h4>
-                  <p>
-                    Navigating electrical loads and AH capacity ratings can be daunting. Our seasoned battery specialists help assess your household wattage requirements—from ceiling fans and refrigerators to computers and lights—ensuring you select the exact inverter-battery combination that delivers maximum backup hours without overloading your system.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
-                    Eco-Friendly Old Battery Scrap Disposal
-                  </h4>
-                  <p>
-                    Lead-acid batteries pose environmental hazards if disposed of carelessly. Battery Mantra is committed to eco-friendly recycling protocols. When you exchange your old battery with us, you receive an upfront cash discount applied immediately at checkout, while your old unit is handed over to government-authorized smelters for safe lead recovery.
-                  </p>
-                </div>
+            <div className="text-xs sm:text-sm text-muted-foreground space-y-5 leading-relaxed">
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
+                  Enjoy Uninterrupted Battery Services During Power Cuts{cityLabel}
+                </h4>
+                <p>
+                  Being a leading online battery store{cityLabel}, Battery Mantra has made home inverters and power backup solutions truly affordable so that anyone can easily buy them. Our rendered batteries are sourced directly from certified manufacturers, such as{" "}
+                  <Link
+                    to="/brand/$brandSlug"
+                    params={{ brandSlug: "luminous" }}
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    Luminous inverter battery
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/brand/$brandSlug"
+                    params={{ brandSlug: "exide" }}
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    Exide battery
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/brand/$brandSlug"
+                    params={{ brandSlug: "amaron" }}
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    Amaron battery
+                  </Link>
+                  , Microtek, SF Sonic, Tata Green, Okaya, Livguard, and Livfast. This guarantees that you reap the advantages of extremely competitive prices while enjoying direct access to premium quality products during power outages.
+                </p>
               </div>
-            )}
+
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
+                  Affordable Combos, GST-Inclusive Pricing & Transparent Billing
+                </h4>
+                <p>
+                  The{" "}
+                  <Link
+                    to="/shop-by-category/$"
+                    params={{ _splat: "inverter-and-battery-combo" }}
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    price of Luminous inverter with battery combos
+                  </Link>{" "}
+                  is accessible to everyone seeking high quality at low prices. We are one of India's fastest-growing stored energy suppliers, dedicated to providing complete guidance and amazing batteries at highly competitive price points. We are admired by our customers for supplying quality{" "}
+                  <Link
+                    to="/shop-by-manufacturers"
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    car batteries near me
+                  </Link>{" "}
+                  and fulfilling the heavy demands of residential and industrial clients. Our{" "}
+                  <Link
+                    to="/shop-by-category/$"
+                    params={{ _splat: "inverter-battery" }}
+                    className="text-primary font-medium underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
+                  >
+                    inverter battery prices
+                  </Link>{" "}
+                  quoted on the web or by phone are thoroughly inclusive of GST.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
+                  Full Replacement Warranty & Reliable Customer Support
+                </h4>
+                <p>
+                  We render every inverter for home and office with an excellent manufacturer replacement warranty so you can enjoy uninterrupted power services with peace of mind. Check our updated price catalogs to know the exact pricing of current models. Having served thousands of residential and commercial customers, our durable tubular battery solutions remain in high demand.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-foreground mb-1.5">
+                  Eco-Friendly Old Battery Scrap Disposal
+                </h4>
+                <p>
+                  Turn your spent or dead batteries into instant cash savings! When you select the scrap battery exchange option, our delivery technician securely collects your old battery and deducts the exchange value directly from your final bill. All scrap units are channeled to authorized smelters for responsible, eco-friendly green recycling.
+                </p>
+              </div>
+            </div>
 
             {/* Gradient overlay when collapsed */}
             {!isExpanded && (
