@@ -84,6 +84,10 @@ function AdminOrders() {
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [cancelTargetOrder, setCancelTargetOrder] = useState<OrderResponse | null>(null);
+  const [pendingEngineerSwitch, setPendingEngineerSwitch] = useState<{
+    engineerId: string;
+    engineerName: string;
+  } | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const prevOrdersCountRef = useRef(orders.length);
 
@@ -110,6 +114,7 @@ function AdminOrders() {
       adminService.updateOrderStatus(orderId, { orderStatus: status, cancellationReason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       setCancelTargetOrder(null);
       toast.success("Order status updated");
     },
@@ -134,7 +139,8 @@ function AdminOrders() {
       adminService.assignPartner(orderId, partnerId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
-      toast.success("Partner assigned successfully");
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Order reassigned successfully");
     },
     onError: (err: any) => toast.error(err?.message || "Failed to assign partner"),
   });
@@ -144,9 +150,30 @@ function AdminOrders() {
       adminService.assignEngineer(orderId, engineerId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
-      toast.success("Engineer assigned successfully");
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Order reassigned successfully");
     },
     onError: (err: any) => toast.error(err?.message || "Failed to assign engineer"),
+  });
+
+  const unassignPartnerMutation = useMutation({
+    mutationFn: (orderId: string) => adminService.unassignPartner(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Partner unassigned successfully");
+    },
+    onError: (err: any) => toast.error(err?.message || "Failed to unassign partner"),
+  });
+
+  const unassignEngineerMutation = useMutation({
+    mutationFn: (orderId: string) => adminService.unassignEngineer(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Engineer unassigned successfully");
+    },
+    onError: (err: any) => toast.error(err?.message || "Failed to unassign engineer"),
   });
 
   const filteredOrders = orders.filter((o) =>
@@ -589,7 +616,7 @@ function AdminOrders() {
       </Tabs>
 
       {selectedOrder && (
-        <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+        <Dialog open={!!selectedOrder} onOpenChange={(open) => { if (!open) { setSelectedOrder(null); setPendingEngineerSwitch(null); } }}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center justify-between pr-8">
@@ -694,21 +721,45 @@ function AdminOrders() {
                   <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Partner Assignment</h3>
                   <div className="rounded-xl border bg-card p-3.5 space-y-2">
                     <p className="text-xs text-muted-foreground">Assign or reassign to local partner store for fulfillment.</p>
+                    {selectedOrder.assignedEngineer && (
+                      <div className="flex items-start gap-1.5 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-800 dark:text-blue-300 text-xs">
+                        <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                        <span className="leading-snug">
+                          Assigning a Partner will reassign from Direct Engineer to Partner fulfillment.
+                        </span>
+                      </div>
+                    )}
                     <Select
-                      value={selectedOrder.assignedPartner?.id || ""}
+                      value={selectedOrder.assignedPartner?.id || "unassigned"}
                       onValueChange={(val) => {
-                        assignPartnerMutation.mutate({ orderId: selectedOrder.orderId, partnerId: val });
-                        const p = partners.find(p => p.id === val);
-                        if (p) setSelectedOrder({ ...selectedOrder, assignedPartner: p as any });
+                        if (val === "unassigned") {
+                          if (selectedOrder.assignedPartner) {
+                            unassignPartnerMutation.mutate(selectedOrder.orderId);
+                            setSelectedOrder({ ...selectedOrder, assignedPartner: null });
+                          }
+                          return;
+                        }
+                        if (val !== selectedOrder.assignedPartner?.id) {
+                          assignPartnerMutation.mutate({ orderId: selectedOrder.orderId, partnerId: val });
+                          const p = partners.find((p) => p.id === val);
+                          if (p) {
+                            setSelectedOrder({ ...selectedOrder, assignedPartner: p as any, assignedEngineer: null });
+                          }
+                        }
                       }}
-                      disabled={assignPartnerMutation.isPending}
+                      disabled={assignPartnerMutation.isPending || unassignPartnerMutation.isPending}
                     >
                       <SelectTrigger className="w-full text-xs font-medium">
                         <SelectValue placeholder="Select Partner" />
                       </SelectTrigger>
                       <SelectContent>
-                        {partners.map(p => (
-                          <SelectItem key={p.id} value={p.id}>{p.businessName} ({p.operatingCities.map(c => c.cityName).join(", ")})</SelectItem>
+                        <SelectItem value="unassigned" className="text-muted-foreground italic">
+                          -- Clear / Unassign Partner --
+                        </SelectItem>
+                        {partners.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.businessName} ({p.operatingCities?.map((c) => c.cityName).join(", ") || ""})
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -717,43 +768,59 @@ function AdminOrders() {
 
                 <div className="space-y-2">
                   <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">Direct Engineer Assignment</h3>
-                  {selectedOrder.assignedPartner ? (
-                    <div className="rounded-xl border bg-amber-500/10 border-amber-500/20 p-3.5 space-y-1">
-                      <p className="text-xs font-semibold text-amber-700">Handed over to Partner</p>
-                      <p className="text-[11px] text-amber-600 leading-relaxed">
-                        Order is assigned to <strong>{selectedOrder.assignedPartner.businessName}</strong>. Engineer assignment & fulfillment are managed by the partner branch.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border bg-card p-3.5 space-y-2">
-                      <p className="text-xs text-muted-foreground">Assign a Direct Admin technician for installation/delivery.</p>
-                      <Select
-                        value={selectedOrder.assignedEngineer?.id || ""}
-                        onValueChange={(val) => {
+                  <div className="rounded-xl border bg-card p-3.5 space-y-2">
+                    <p className="text-xs text-muted-foreground">Assign a Direct Admin technician for installation/delivery.</p>
+                    {selectedOrder.assignedPartner && (
+                      <div className="flex items-start gap-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs">
+                        <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <span className="leading-snug">
+                          Reassigning to a Direct Engineer will remove the order from Partner fulfillment ({selectedOrder.assignedPartner.businessName}).
+                        </span>
+                      </div>
+                    )}
+                    <Select
+                      value={selectedOrder.assignedEngineer?.id || "unassigned"}
+                      onValueChange={(val) => {
+                        if (val === "unassigned") {
+                          if (selectedOrder.assignedEngineer) {
+                            unassignEngineerMutation.mutate(selectedOrder.orderId);
+                            setSelectedOrder({ ...selectedOrder, assignedEngineer: null });
+                          }
+                          return;
+                        }
+                        const eng = adminEngineers.find((e) => e.id === val);
+                        const engName = eng ? (eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer")) : "Engineer";
+                        if (selectedOrder.assignedPartner) {
+                          setPendingEngineerSwitch({ engineerId: val, engineerName: engName });
+                        } else {
                           assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
-                          const eng = adminEngineers.find(e => e.id === val);
                           if (eng) setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any });
-                        }}
-                        disabled={assignEngineerMutation.isPending}
-                      >
-                        <SelectTrigger className="w-full text-xs font-medium">
-                          <SelectValue placeholder="Select Direct Engineer" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {adminEngineers.length === 0 ? (
-                            <div className="p-2 text-xs text-muted-foreground">No Direct Admin engineers found</div>
-                          ) : (
-                            adminEngineers.map(eng => {
-                              const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
-                              return (
-                                <SelectItem key={eng.id} value={eng.id}>{name} ({eng.city || "Admin Staff"})</SelectItem>
-                              );
-                            })
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
+                        }
+                      }}
+                      disabled={assignEngineerMutation.isPending || unassignEngineerMutation.isPending}
+                    >
+                      <SelectTrigger className="w-full text-xs font-medium">
+                        <SelectValue placeholder="Select Direct Engineer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned" className="text-muted-foreground italic">
+                          -- Clear / Unassign Engineer --
+                        </SelectItem>
+                        {adminEngineers.length === 0 ? (
+                          <div className="p-2 text-xs text-muted-foreground">No Direct Admin engineers found</div>
+                        ) : (
+                          adminEngineers.map((eng) => {
+                            const name = eng.firstName && eng.lastName ? `${eng.firstName} ${eng.lastName}` : (eng.fullName || "Engineer");
+                            return (
+                              <SelectItem key={eng.id} value={eng.id}>
+                                {name} ({eng.city || "Admin Staff"})
+                              </SelectItem>
+                            );
+                          })
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
@@ -797,6 +864,58 @@ function AdminOrders() {
                 </div>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {pendingEngineerSwitch && selectedOrder && (
+        <Dialog open={!!pendingEngineerSwitch} onOpenChange={(open) => !open && setPendingEngineerSwitch(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <DialogTitle className="text-center text-lg font-bold">
+                Switch to Direct Engineer Fulfillment?
+              </DialogTitle>
+              <DialogDescription className="text-center text-xs">
+                Reassigning to a Direct Engineer will remove the order from Partner fulfillment{selectedOrder.assignedPartner?.businessName ? ` (${selectedOrder.assignedPartner.businessName})` : ""}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-2 text-xs text-muted-foreground text-center">
+              Assigning <strong className="text-foreground">{pendingEngineerSwitch.engineerName}</strong> as the Direct Technician for Order #{selectedOrder.orderId?.slice(0, 8)}.
+            </div>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                disabled={assignEngineerMutation.isPending}
+                onClick={() => setPendingEngineerSwitch(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={assignEngineerMutation.isPending}
+                onClick={() => {
+                  const val = pendingEngineerSwitch.engineerId;
+                  const eng = adminEngineers.find((e) => e.id === val);
+                  assignEngineerMutation.mutate({ orderId: selectedOrder.orderId, engineerId: val });
+                  setSelectedOrder({ ...selectedOrder, assignedEngineer: eng as any, assignedPartner: null });
+                  setPendingEngineerSwitch(null);
+                }}
+              >
+                {assignEngineerMutation.isPending ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" /> Assigning...
+                  </>
+                ) : (
+                  "Confirm Switch"
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}

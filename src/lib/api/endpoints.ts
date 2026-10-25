@@ -107,6 +107,9 @@ export const endpoints = {
     upload: "/api/admin/upload",
     updateOrderStatus: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/status`,
     assignPartner: (orderId: string, partnerId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/assign-partner?partnerId=${encodeURIComponent(partnerId)}`,
+    unassignPartner: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/unassign-partner`,
+    assignEngineer: (orderId: string, engineerId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/assign-engineer?engineerId=${encodeURIComponent(engineerId)}`,
+    unassignEngineer: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/unassign-engineer`,
     products: {
       create: "/api/admin/products",
       update: (id: string) => `/api/admin/products/id/${encodeURIComponent(id)}`,
