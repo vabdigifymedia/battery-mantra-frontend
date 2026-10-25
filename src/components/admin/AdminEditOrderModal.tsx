@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService, AdminUpdateOrderRequest, AdminUpdateOrderItemRequest } from "@/services/admin.service";
 import { productsService } from "@/services/products.service";
+import { locationService } from "@/services/location.service";
 import {
   Dialog,
   DialogContent,
@@ -60,10 +61,11 @@ export function AdminEditOrderModal({
 }: AdminEditOrderModalProps) {
   const queryClient = useQueryClient();
 
-  // Load available products for selection
-  const { data: allProducts = [], isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products", "list"],
-    queryFn: () => productsService.list(),
+  // Load public cities to match order city
+  const { data: publicCities = [] } = useQuery({
+    queryKey: ["locations", "public-cities"],
+    queryFn: locationService.getPublicCities,
+    staleTime: 10 * 60_000,
   });
 
   // Active Tab
@@ -78,6 +80,29 @@ export function AdminEditOrderModal({
   const [state, setState] = useState("");
   const [pincode, setPincode] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+
+  // Determine matched city ID from order's selectedCity or city (or current form city)
+  const matchedCityId = useMemo(() => {
+    if (!publicCities.length) return undefined;
+    const targetCity = (selectedCity || city || order?.selectedCity || order?.city || "").trim().toLowerCase();
+    if (!targetCity) return undefined;
+    const found = publicCities.find((c) => {
+      const cName = c.cityName.trim().toLowerCase();
+      return cName === targetCity || targetCity.includes(cName) || cName.includes(targetCity);
+    });
+    return found?.cityId;
+  }, [publicCities, selectedCity, city, order?.selectedCity, order?.city]);
+
+  const matchedCityName = useMemo(() => {
+    if (!matchedCityId || !publicCities.length) return undefined;
+    return publicCities.find((c) => c.cityId === matchedCityId)?.cityName;
+  }, [matchedCityId, publicCities]);
+
+  // Load available products for selection with city-specific pricing
+  const { data: allProducts = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ["products", "list", matchedCityId],
+    queryFn: () => productsService.list(matchedCityId),
+  });
 
   const [items, setItems] = useState<EditableOrderItem[]>([]);
   const [deliveryMethod, setDeliveryMethod] = useState("HOME_INSTALLATION");
@@ -143,7 +168,7 @@ export function AdminEditOrderModal({
 
       setPaymentMode(order.paymentMode || (initialMethod === "ONLINE" ? "UPI" : "CASH"));
 
-      setManualDiscount(order.exchangeDiscount || 0);
+      setManualDiscount(order.discountAmount || 0);
       setEngineerNotes((order as any).engineerNotes || "");
 
       // Populate items
@@ -153,7 +178,7 @@ export function AdminEditOrderModal({
           rawItems.map((it: any) => ({
             productId: it.productId,
             quantity: it.quantity || 1,
-            exchangeOldBattery: Boolean(it.exchangeOldBattery ?? (order.exchangeDiscount && order.exchangeDiscount > 0)),
+            exchangeOldBattery: Boolean(it.exchangeOldBattery),
             productName: it.productName || "Product",
             productPrice: it.priceAtPurchase ?? it.productPrice ?? 0,
             exchangeDiscount: it.exchangeDiscount ?? 0,
@@ -166,11 +191,44 @@ export function AdminEditOrderModal({
     }
   }, [order]);
 
+  // Sync item details (pricing, exchange discount, name) with city-specific catalog when loaded
+  useEffect(() => {
+    if (allProducts.length > 0 && items.length > 0) {
+      setItems((prevItems) => {
+        let hasChanges = false;
+        const updated = prevItems.map((item) => {
+          const prod = allProducts.find((p) => p.productId === item.productId);
+          if (prod) {
+            const newPrice = prod.productPrice;
+            const newDisc = prod.exchangeDiscount ?? 0;
+            const newName = prod.productName;
+            if (
+              item.productPrice !== newPrice ||
+              item.exchangeDiscount !== newDisc ||
+              item.productName !== newName
+            ) {
+              hasChanges = true;
+              return {
+                ...item,
+                productName: newName,
+                productPrice: newPrice,
+                exchangeDiscount: newDisc,
+                productImage: prod.productImage || item.productImage,
+              };
+            }
+          }
+          return item;
+        });
+        return hasChanges ? updated : prevItems;
+      });
+    }
+  }, [allProducts]);
+
   // Calculations
   const calculatedSubtotal = useMemo(() => {
     return items.reduce((sum, it) => {
       const p = allProducts.find((prod) => prod.productId === it.productId);
-      const price = it.productPrice ?? p?.productPrice ?? 0;
+      const price = p?.productPrice ?? it.productPrice ?? 0;
       return sum + price * it.quantity;
     }, 0);
   }, [items, allProducts]);
@@ -179,7 +237,7 @@ export function AdminEditOrderModal({
     return items.reduce((sum, it) => {
       if (!it.exchangeOldBattery) return sum;
       const p = allProducts.find((prod) => prod.productId === it.productId);
-      const disc = it.exchangeDiscount ?? p?.exchangeDiscount ?? 0;
+      const disc = p?.exchangeDiscount ?? it.exchangeDiscount ?? 0;
       return sum + disc * it.quantity;
     }, 0);
   }, [items, allProducts]);
@@ -494,17 +552,24 @@ export function AdminEditOrderModal({
 
               {/* Tab 2: Products & Items */}
               <TabsContent value="items" className="space-y-4 m-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    Replace ordered models, adjust quantities, or toggle old battery scrap exchange.
-                  </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      Replace ordered models, adjust quantities, or toggle old battery scrap exchange.
+                    </p>
+                    {matchedCityName && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20 shrink-0">
+                        City: {matchedCityName}
+                      </span>
+                    )}
+                  </div>
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
                     onClick={handleAddItem}
                     disabled={isLocked || updateOrderMutation.isPending}
-                    className="h-8 text-xs font-semibold gap-1"
+                    className="h-8 text-xs font-semibold gap-1 shrink-0"
                   >
                     <Plus className="h-3.5 w-3.5" /> Add Product
                   </Button>
@@ -513,8 +578,8 @@ export function AdminEditOrderModal({
                 <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                   {items.map((item, idx) => {
                     const matchedProd = allProducts.find((p) => p.productId === item.productId);
-                    const unitPrice = item.productPrice ?? matchedProd?.productPrice ?? 0;
-                    const exchangeDisc = item.exchangeDiscount ?? matchedProd?.exchangeDiscount ?? 0;
+                    const unitPrice = matchedProd?.productPrice ?? item.productPrice ?? 0;
+                    const exchangeDisc = matchedProd?.exchangeDiscount ?? item.exchangeDiscount ?? 0;
                     const itemTotal = (unitPrice - (item.exchangeOldBattery ? exchangeDisc : 0)) * item.quantity;
 
                     return (
@@ -539,6 +604,7 @@ export function AdminEditOrderModal({
                                 {allProducts.map((p) => (
                                   <SelectItem key={p.productId} value={p.productId} className="text-xs">
                                     {p.productName} (₹{p.productPrice.toLocaleString()})
+                                    {p.exchangeDiscount ? ` [Scrap: -₹${p.exchangeDiscount.toLocaleString()}]` : ""}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

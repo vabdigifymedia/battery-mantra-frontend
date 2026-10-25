@@ -476,6 +476,7 @@ export type OrderResponse = {
   assignedEngineer?: any;
   installationDate?: string;
   exchangeDiscount?: number;
+  discountAmount?: number;
   orderItems?: OrderItemResponse[];
   items?: OrderItemResponse[];
   deliveryAgentName?: string;
