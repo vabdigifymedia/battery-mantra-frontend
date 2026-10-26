@@ -7,7 +7,6 @@ const contactSchema = z.object({
   mobile: z.string(),
   email: z.string().optional(),
   message: z.string(),
-  recaptcha: z.string(),
 });
 
 export const sendContactEmail = createServerFn({ method: "POST" })

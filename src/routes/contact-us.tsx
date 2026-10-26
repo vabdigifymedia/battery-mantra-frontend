@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Youtube, AlertCircle } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { sendContactEmail } from "@/server/contact";
@@ -38,7 +37,6 @@ const contactSchema = z.object({
   mobile: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number (10 digits required)"),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   message: z.string().min(10, "Message must be at least 10 characters"),
-  recaptcha: z.string().min(1, "Please complete the reCAPTCHA"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -51,13 +49,12 @@ function ContactUsPage() {
       mobile: "",
       email: "",
       message: "",
-      recaptcha: "",
     },
   });
 
   async function onSubmit(data: ContactFormValues) {
     try {
-      await sendContactEmail(data);
+      await sendContactEmail({ data });
       
       toast.success("Message Sent Successfully!", {
         description: "Our executive will call you soon.",
@@ -202,18 +199,6 @@ function ContactUsPage() {
                 />
                 {form.formState.errors.message && (
                   <p className="text-xs text-red-500 font-medium flex items-center gap-1 mt-1"><AlertCircle className="h-3 w-3" /> {form.formState.errors.message.message}</p>
-                )}
-              </div>
-              
-              <div className="flex flex-col space-y-1.5">
-                <ReCAPTCHA
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                  onChange={(val) => {
-                    form.setValue("recaptcha", val || "", { shouldValidate: true });
-                  }}
-                />
-                {form.formState.errors.recaptcha && (
-                  <p className="text-xs text-red-500 font-medium flex items-center gap-1 mt-1"><AlertCircle className="h-3 w-3" /> {form.formState.errors.recaptcha.message}</p>
                 )}
               </div>
 
