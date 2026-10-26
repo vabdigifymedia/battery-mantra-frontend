@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useState, useEffect, useMemo, startTransition } from "react";
+import { useState, useEffect, useMemo, startTransition, useRef } from "react";
 import { z } from "zod";
 import { 
   Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText, 
@@ -329,12 +329,17 @@ export function PdpPage() {
   });
 
   const search = Route.useSearch();
+  const autoActionHandled = useRef(false);
   
   useEffect(() => {
+    if (autoActionHandled.current) return;
+
     if (status === "authenticated" && search.autoAdd === "true" && inStock && !addToCart.isPending && !addToCart.isSuccess) {
+      autoActionHandled.current = true;
       navigate({ search: (prev: any) => ({ ...prev, autoAdd: undefined }), replace: true } as any);
       addToCart.mutate();
     } else if (status === "authenticated" && search.autoBuy === "true" && inStock && !addToCart.isPending && !addToCart.isSuccess) {
+      autoActionHandled.current = true;
       navigate({ search: (prev: any) => ({ ...prev, autoBuy: undefined }), replace: true } as any);
       addToCart.mutate(undefined, {
         onSuccess: () => navigate({ to: "/checkout" }),
@@ -346,7 +351,8 @@ export function PdpPage() {
     if (blockPurchase) return;
     if (status !== "authenticated") {
       toast.info("Please sign in to add items to your cart.");
-      navigate({ to: "/login", search: { redirect: `/product/${slug}?autoAdd=true` } });
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : `/product/${slug}`;
+      navigate({ to: "/login", search: { redirect: `${currentPath}?autoAdd=true` } });
       return;
     }
     addToCart.mutate();
@@ -355,7 +361,8 @@ export function PdpPage() {
   const onBuyNow = () => {
     if (blockPurchase) return;
     if (status !== "authenticated") {
-      navigate({ to: "/login", search: { redirect: `/product/${slug}?autoBuy=true` } });
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : `/product/${slug}`;
+      navigate({ to: "/login", search: { redirect: `${currentPath}?autoBuy=true` } });
       return;
     }
     addToCart.mutate(undefined, {

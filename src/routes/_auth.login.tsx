@@ -32,7 +32,9 @@ function LoginPage() {
 
   const handleSuccess = () => {
     if (redirect) {
-      router.navigate({ to: redirect as any, replace: true });
+      const [path, query] = redirect.split("?");
+      const params = query ? Object.fromEntries(new URLSearchParams(query)) : undefined;
+      router.navigate({ to: path as any, search: params as any, replace: true });
     } else {
       router.navigate({ to: "/", replace: true });
     }
