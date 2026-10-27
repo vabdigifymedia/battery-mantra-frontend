@@ -9,10 +9,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Image as ImageIcon, Monitor, Smartphone, Globe } from "lucide-react";
+import { Trash2, Plus, Edit, Image as ImageIcon, Monitor, Smartphone, Globe, Layers, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
-import { parseBannerTitle, formatBannerTitle, type BannerDeviceType } from "@/lib/banner-utils";
+import {
+  parseBannerTitle,
+  formatBannerTitle,
+  type BannerDeviceType,
+  type BannerPlacement,
+  BANNER_PLACEMENTS,
+  getPlacementLabel,
+} from "@/lib/banner-utils";
 import {
   Dialog,
   DialogContent,
@@ -42,10 +49,11 @@ export const Route = createFileRoute("/kalkaji/banners")({
 const bannerSchema = z.object({
   title: z.string().optional(),
   imageUrl: z.string().url("Must be a valid URL").min(1, "Image URL is required"),
-  linkUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  linkUrl: z.string().optional().or(z.literal("")),
   isActive: z.boolean().default(true),
   displayOrder: z.coerce.number().default(0),
   deviceType: z.enum(["ALL", "DESKTOP", "MOBILE"]).default("ALL"),
+  placement: z.enum(["HERO", "MID_1", "MID_2", "BOTTOM"]).default("HERO"),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -61,6 +69,7 @@ function AdminBanners() {
   const [editingBanner, setEditingBanner] = useState<BannerResponse | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [deviceFilter, setDeviceFilter] = useState<BannerDeviceType>("ALL");
+  const [placementFilter, setPlacementFilter] = useState<BannerPlacement | "ALL">("ALL");
 
   const form = useForm<BannerFormValues>({
     resolver: zodResolver(bannerSchema) as any,
@@ -71,6 +80,7 @@ function AdminBanners() {
       isActive: true,
       displayOrder: 0,
       deviceType: "ALL",
+      placement: "HERO",
     },
   });
 
@@ -84,6 +94,7 @@ function AdminBanners() {
       isActive: true,
       displayOrder: 0,
       deviceType: "ALL",
+      placement: "HERO",
     });
     setIsModalOpen(true);
   };
@@ -91,7 +102,7 @@ function AdminBanners() {
   const openEditModal = (banner: BannerResponse) => {
     setEditingBanner(banner);
     setShowAdvanced(false);
-    const { deviceType, cleanTitle } = parseBannerTitle(banner.title);
+    const { deviceType, placement, cleanTitle } = parseBannerTitle(banner.title);
     form.reset({
       title: cleanTitle,
       imageUrl: banner.imageUrl,
@@ -99,6 +110,7 @@ function AdminBanners() {
       isActive: banner.isActive ?? true,
       displayOrder: banner.displayOrder ?? 0,
       deviceType,
+      placement,
     });
     setIsModalOpen(true);
   };
@@ -145,7 +157,7 @@ function AdminBanners() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    const finalTitle = formatBannerTitle(values.title, values.deviceType);
+    const finalTitle = formatBannerTitle(values.title, values.deviceType, values.placement);
     const payload: CreateBannerRequest = {
       imageUrl: values.imageUrl,
       linkUrl: values.linkUrl || undefined,
@@ -164,11 +176,16 @@ function AdminBanners() {
   const sortedBanners = [...(banners || [])].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
   const filteredBanners = sortedBanners.filter((banner) => {
-    if (deviceFilter === "ALL") return true;
-    const { deviceType } = parseBannerTitle(banner.title);
-    return deviceType === deviceFilter;
+    const { deviceType, placement } = parseBannerTitle(banner.title);
+    if (placementFilter !== "ALL" && placement !== placementFilter) return false;
+    if (deviceFilter !== "ALL" && deviceType !== deviceFilter) return false;
+    return true;
   });
 
+  const heroCount = sortedBanners.filter((b) => parseBannerTitle(b.title).placement === "HERO").length;
+  const mid1Count = sortedBanners.filter((b) => parseBannerTitle(b.title).placement === "MID_1").length;
+  const mid2Count = sortedBanners.filter((b) => parseBannerTitle(b.title).placement === "MID_2").length;
+  const bottomCount = sortedBanners.filter((b) => parseBannerTitle(b.title).placement === "BOTTOM").length;
   const desktopCount = sortedBanners.filter((b) => parseBannerTitle(b.title).deviceType === "DESKTOP").length;
   const mobileCount = sortedBanners.filter((b) => parseBannerTitle(b.title).deviceType === "MOBILE").length;
 
@@ -221,41 +238,103 @@ function AdminBanners() {
         </div>
       </div>
 
-      {/* Device Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-muted rounded-xl w-fit text-xs font-medium border border-border/50">
-        <button
-          type="button"
-          onClick={() => setDeviceFilter("ALL")}
-          className={`px-3 py-1.5 rounded-lg transition-all ${
-            deviceFilter === "ALL"
-              ? "bg-background text-foreground shadow-xs font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          All Banners ({sortedBanners.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setDeviceFilter("DESKTOP")}
-          className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-            deviceFilter === "DESKTOP"
-              ? "bg-background text-blue-700 shadow-xs font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Monitor className="h-3.5 w-3.5" /> Desktop ({desktopCount})
-        </button>
-        <button
-          type="button"
-          onClick={() => setDeviceFilter("MOBILE")}
-          className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-            deviceFilter === "MOBILE"
-              ? "bg-background text-emerald-700 shadow-xs font-semibold"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Smartphone className="h-3.5 w-3.5" /> Mobile ({mobileCount})
-        </button>
+      {/* Filter Bar (Placement + Device) */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Placement Tabs */}
+        <div className="flex flex-wrap items-center gap-1 p-1 bg-muted rounded-xl text-xs font-medium border border-border/50">
+          <button
+            type="button"
+            onClick={() => setPlacementFilter("ALL")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              placementFilter === "ALL"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All Slots ({sortedBanners.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlacementFilter("HERO")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              placementFilter === "HERO"
+                ? "bg-background text-purple-700 dark:text-purple-400 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Hero Slider ({heroCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlacementFilter("MID_1")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              placementFilter === "MID_1"
+                ? "bg-background text-amber-700 dark:text-amber-400 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Middle 1 ({mid1Count})
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlacementFilter("MID_2")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              placementFilter === "MID_2"
+                ? "bg-background text-blue-700 dark:text-blue-400 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Middle 2 ({mid2Count})
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlacementFilter("BOTTOM")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              placementFilter === "BOTTOM"
+                ? "bg-background text-rose-700 dark:text-rose-400 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Bottom ({bottomCount})
+          </button>
+        </div>
+
+        {/* Device Filter Tabs */}
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-xl text-xs font-medium border border-border/50">
+          <button
+            type="button"
+            onClick={() => setDeviceFilter("ALL")}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              deviceFilter === "ALL"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All Devices
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeviceFilter("DESKTOP")}
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              deviceFilter === "DESKTOP"
+                ? "bg-background text-blue-700 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Monitor className="h-3.5 w-3.5" /> Desktop ({desktopCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeviceFilter("MOBILE")}
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              deviceFilter === "MOBILE"
+                ? "bg-background text-emerald-700 shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Smartphone className="h-3.5 w-3.5" /> Mobile ({mobileCount})
+          </button>
+        </div>
       </div>
 
       {/* Desktop Table */}
@@ -265,6 +344,7 @@ function AdminBanners() {
             <TableRow>
               <TableHead className="w-[120px]">Image</TableHead>
               <TableHead>Title</TableHead>
+              <TableHead>Placement</TableHead>
               <TableHead>Target Device</TableHead>
               <TableHead>Link</TableHead>
               <TableHead>Order</TableHead>
@@ -275,19 +355,19 @@ function AdminBanners() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   <Spinner size="sm" className="inline-block mr-2" /> Loading banners...
                 </TableCell>
               </TableRow>
             ) : !filteredBanners?.length ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  No {deviceFilter !== "ALL" ? deviceFilter.toLowerCase() : ""} banners found.
+                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                  No banners found matching current filters.
                 </TableCell>
               </TableRow>
             ) : (
               filteredBanners.map((banner) => {
-                const { deviceType, cleanTitle } = parseBannerTitle(banner.title);
+                const { deviceType, placement, cleanTitle } = parseBannerTitle(banner.title);
                 return (
                   <TableRow key={banner.bannerId}>
                     <TableCell>
@@ -298,6 +378,25 @@ function AdminBanners() {
                       )}
                     </TableCell>
                     <TableCell className="font-medium">{cleanTitle || <span className="text-muted-foreground italic">None</span>}</TableCell>
+                    <TableCell>
+                      {placement === "HERO" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700 border border-purple-200">
+                          Hero Slider
+                        </span>
+                      ) : placement === "MID_1" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
+                          Middle 1
+                        </span>
+                      ) : placement === "MID_2" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200">
+                          Middle 2
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
+                          Bottom
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {deviceType === "DESKTOP" ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200">

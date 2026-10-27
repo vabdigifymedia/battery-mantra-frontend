@@ -19,16 +19,20 @@ export function BannerCarousel() {
     if (!allBanners.length) return [];
     const target = isMobile ? "MOBILE" : "DESKTOP";
     
+    // Only include HERO banners for the top main slider
+    const heroBanners = allBanners.filter((b) => parseBannerTitle(b.title).placement === "HERO");
+    if (!heroBanners.length) return [];
+
     // Check if there are banners targeting the current device
-    const deviceSpecific = allBanners.filter((b) => parseBannerTitle(b.title).deviceType === target);
+    const deviceSpecific = heroBanners.filter((b) => parseBannerTitle(b.title).deviceType === target);
     // Banners targeting ALL devices
-    const universal = allBanners.filter((b) => parseBannerTitle(b.title).deviceType === "ALL");
+    const universal = heroBanners.filter((b) => parseBannerTitle(b.title).deviceType === "ALL");
 
     const matched = [...deviceSpecific, ...universal].sort(
       (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
     );
 
-    return matched.length > 0 ? matched : allBanners;
+    return matched.length > 0 ? matched : heroBanners;
   }, [allBanners, isMobile]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
