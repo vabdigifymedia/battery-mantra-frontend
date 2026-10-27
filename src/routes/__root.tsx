@@ -71,6 +71,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "BLhIIt94LuNNvyaSro3EIhm19451TXjfTJme8smLRIA" },
       { name: "theme-color", content: "#dc2626", media: "(prefers-color-scheme: light)" },
       { name: "theme-color", content: "#991b1b", media: "(prefers-color-scheme: dark)" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -117,6 +118,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="BLhIIt94LuNNvyaSro3EIhm19451TXjfTJme8smLRIA" />
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* Google tag (gtag.js) */}
