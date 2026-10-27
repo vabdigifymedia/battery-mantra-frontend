@@ -67,7 +67,6 @@ function AdminBanners() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<BannerResponse | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [deviceFilter, setDeviceFilter] = useState<BannerDeviceType>("ALL");
   const [placementFilter, setPlacementFilter] = useState<BannerPlacement | "ALL">("ALL");
 
@@ -86,7 +85,6 @@ function AdminBanners() {
 
   const openAddModal = () => {
     setEditingBanner(null);
-    setShowAdvanced(false);
     form.reset({
       title: "",
       imageUrl: "",
@@ -101,7 +99,6 @@ function AdminBanners() {
 
   const openEditModal = (banner: BannerResponse) => {
     setEditingBanner(banner);
-    setShowAdvanced(false);
     const { deviceType, placement, cleanTitle } = parseBannerTitle(banner.title);
     form.reset({
       title: cleanTitle,
@@ -118,7 +115,6 @@ function AdminBanners() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingBanner(null);
-    setShowAdvanced(false);
     form.reset();
   };
 
@@ -471,7 +467,7 @@ function AdminBanners() {
           </div>
         ) : (
           filteredBanners.map((banner) => {
-            const { deviceType, cleanTitle } = parseBannerTitle(banner.title);
+            const { deviceType, placement, cleanTitle } = parseBannerTitle(banner.title);
             return (
               <div key={banner.bannerId} className="rounded-xl border bg-card p-4 shadow-xs flex flex-col gap-3">
                 <div className="flex items-start gap-4">
@@ -487,7 +483,28 @@ function AdminBanners() {
                   <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
                     <div className="flex justify-between items-start gap-2">
                       <div className="font-semibold truncate">{cleanTitle || <span className="text-muted-foreground italic">Untitled</span>}</div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0 justify-end">
+                        {placement === "HERO" && (
+                          <span className="rounded bg-purple-100 dark:bg-purple-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                            Hero
+                          </span>
+                        )}
+                        {placement === "MID_1" && (
+                          <span className="rounded bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            Mid 1
+                          </span>
+                        )}
+                        {placement === "MID_2" && (
+                          <span className="rounded bg-orange-100 dark:bg-orange-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                            Mid 2
+                          </span>
+                        )}
+                        {placement === "BOTTOM" && (
+                          <span className="rounded bg-indigo-100 dark:bg-indigo-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                            Bottom
+                          </span>
+                        )}
+
                         {deviceType === "DESKTOP" ? (
                           <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700 border border-blue-200 flex items-center gap-1">
                             <Monitor className="h-3 w-3" /> Desktop
@@ -510,9 +527,12 @@ function AdminBanners() {
                     </div>
                     <div className="text-xs text-muted-foreground mt-1 truncate">
                       {banner.linkUrl ? (
-                        <span>Link: {banner.linkUrl}</span>
+                        <span className="text-primary font-medium flex items-center gap-1 truncate">
+                          <LinkIcon className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{banner.linkUrl}</span>
+                        </span>
                       ) : (
-                        <span>No Link</span>
+                        <span className="italic text-muted-foreground/70">No click link</span>
                       )}
                     </div>
                   </div>
@@ -557,17 +577,96 @@ function AdminBanners() {
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[480px]">
+        <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingBanner ? "Edit Banner" : "Add Banner"}</DialogTitle>
+            <DialogTitle>{editingBanner ? "Edit Banner" : "Add New Banner"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={onSubmit} className="space-y-4 pt-4">
+          <form onSubmit={onSubmit} className="space-y-4 pt-2">
+            {/* 1. Placement Selector */}
+            <Controller
+              control={form.control}
+              name="placement"
+              render={({ field }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-foreground">Homepage Placement Slot *</label>
+                    <span className="text-[11px] text-muted-foreground">Select where this banner appears</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("HERO")}
+                      className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
+                        field.value === "HERO"
+                          ? "border-purple-600 bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 ring-1 ring-purple-600 shadow-xs"
+                          : "border-border hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-purple-600 inline-block" /> Top Hero Slider
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">Main auto-rotating top carousel</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("MID_1")}
+                      className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
+                        field.value === "MID_1"
+                          ? "border-amber-600 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 ring-1 ring-amber-600 shadow-xs"
+                          : "border-border hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-amber-600 inline-block" /> Middle Banner 1
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">Below vehicle search & categories</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("MID_2")}
+                      className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
+                        field.value === "MID_2"
+                          ? "border-orange-600 bg-orange-50 dark:bg-orange-950/40 text-orange-900 dark:text-orange-200 ring-1 ring-orange-600 shadow-xs"
+                          : "border-border hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-orange-600 inline-block" /> Middle Banner 2
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">Below top brands / above products</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => field.onChange("BOTTOM")}
+                      className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
+                        field.value === "BOTTOM"
+                          ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 ring-1 ring-indigo-600 shadow-xs"
+                          : "border-border hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-indigo-600 inline-block" /> Bottom Banner
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">Above FAQs & bottom trust section</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* 2. Device Selector */}
             <Controller
               control={form.control}
               name="deviceType"
               render={({ field }) => (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Target Device</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-foreground">Target Device *</label>
+                    <span className="text-[11px] text-muted-foreground">Select device audience</span>
+                  </div>
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
@@ -607,54 +706,100 @@ function AdminBanners() {
                     </button>
                   </div>
 
-                  {/* Dynamic Dimension Callout Box */}
-                  <div className="p-3 rounded-xl border text-xs bg-muted/40 space-y-1">
-                    {field.value === "DESKTOP" && (
-                      <div className="flex items-start gap-2.5 text-blue-950 dark:text-blue-200">
-                        <Monitor className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
-                        <div>
-                          <p className="font-semibold text-blue-900 dark:text-blue-100">Desktop Banner Specifications:</p>
-                          <p className="mt-0.5">• Recommended Resolution: <strong className="font-bold text-blue-700 dark:text-blue-300">1920 × 650 px</strong> (or 1920 × 600 px)</p>
-                          <p className="text-[11px] text-muted-foreground">• Aspect ratio ~16:5. Max size 5MB (WebP/JPG/PNG).</p>
-                        </div>
+                  {/* Dynamic Dimension Callout Box based on placement & device */}
+                  {(() => {
+                    const placement = form.watch("placement");
+                    const dev = field.value;
+                    const isHero = placement === "HERO";
+
+                    return (
+                      <div className="p-3 rounded-xl border text-xs bg-muted/40 space-y-1">
+                        {dev === "DESKTOP" && (
+                          <div className="flex items-start gap-2.5 text-blue-950 dark:text-blue-200">
+                            <Monitor className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                            <div>
+                              <p className="font-semibold text-blue-900 dark:text-blue-100">
+                                {isHero ? "Desktop Hero Specifications:" : "Desktop Mid/Bottom Banner Specs:"}
+                              </p>
+                              <p className="mt-0.5">
+                                • Recommended Resolution:{" "}
+                                <strong className="font-bold text-blue-700 dark:text-blue-300">
+                                  {isHero ? "1920 × 650 px" : "1920 × 350 px (or 1920 × 400 px)"}
+                                </strong>
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                • Format: WebP/JPG/PNG. Max size 5MB.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {dev === "MOBILE" && (
+                          <div className="flex items-start gap-2.5 text-emerald-950 dark:text-emerald-200">
+                            <Smartphone className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                            <div>
+                              <p className="font-semibold text-emerald-900 dark:text-emerald-100">
+                                {isHero ? "Mobile Hero Specifications:" : "Mobile Mid/Bottom Banner Specs:"}
+                              </p>
+                              <p className="mt-0.5">
+                                • Recommended Resolution:{" "}
+                                <strong className="font-bold text-emerald-700 dark:text-emerald-300">
+                                  {isHero ? "1080 × 800 px" : "1080 × 500 px (or 1080 × 450 px)"}
+                                </strong>
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                • Format: WebP/JPG/PNG. Height is optimized for mobile screens.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {dev === "ALL" && (
+                          <div className="flex items-start gap-2.5 text-slate-900 dark:text-slate-200">
+                            <Globe className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                            <div>
+                              <p className="font-semibold text-foreground">
+                                {isHero ? "Universal Hero Specifications:" : "Universal Mid/Bottom Banner Specs:"}
+                              </p>
+                              <p className="mt-0.5">
+                                • Recommended:{" "}
+                                <strong className="font-bold text-primary">
+                                  {isHero ? "1920 × 650 px" : "1920 × 400 px"}
+                                </strong>{" "}
+                                (scales responsively on mobile)
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                • Note: Keep important text & products centered.
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    {field.value === "MOBILE" && (
-                      <div className="flex items-start gap-2.5 text-emerald-950 dark:text-emerald-200">
-                        <Smartphone className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
-                        <div>
-                          <p className="font-semibold text-emerald-900 dark:text-emerald-100">Mobile Banner Specifications:</p>
-                          <p className="mt-0.5">• Recommended Resolution: <strong className="font-bold text-emerald-700 dark:text-emerald-300">1080 × 800 px</strong> (or 1080 × 1000 px)</p>
-                          <p className="text-[11px] text-muted-foreground">• Aspect ratio ~4:3 or 1:1. Max size 5MB (WebP/JPG/PNG).</p>
-                        </div>
-                      </div>
-                    )}
-                    {field.value === "ALL" && (
-                      <div className="flex items-start gap-2.5 text-slate-900 dark:text-slate-200">
-                        <Globe className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                        <div>
-                          <p className="font-semibold text-foreground">Universal Banner Specifications:</p>
-                          <p className="mt-0.5">• Recommended: <strong className="font-bold text-primary">1920 × 650 px</strong> (Desktop) / scales on mobile</p>
-                          <p className="text-[11px] text-muted-foreground">• Note: Keep text & products centered so edges aren't cut off on mobile.</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </div>
               )}
             />
 
+            {/* 3. Image Upload */}
             <Controller
               control={form.control}
               name="imageUrl"
               render={({ field }) => {
                 const devType = form.watch("deviceType");
+                const placement = form.watch("placement");
+                const isHero = placement === "HERO";
+
                 const hintText =
                   devType === "DESKTOP"
-                    ? "Recommended: 1920 × 650 px (Wide banner)"
+                    ? isHero
+                      ? "Recommended: 1920 × 650 px (Wide carousel)"
+                      : "Recommended: 1920 × 350 px (Wide promo banner)"
                     : devType === "MOBILE"
-                    ? "Recommended: 1080 × 800 px or 1080 × 1000 px"
-                    : "Recommended: 1920 × 650 px (Keep focal content centered)";
+                    ? isHero
+                      ? "Recommended: 1080 × 800 px"
+                      : "Recommended: 1080 × 500 px"
+                    : isHero
+                    ? "Recommended: 1920 × 650 px (Center focal content)"
+                    : "Recommended: 1920 × 400 px";
 
                 return (
                   <CloudinaryUpload
@@ -675,42 +820,57 @@ function AdminBanners() {
               }}
             />
 
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 focus:outline-none cursor-pointer"
-            >
-              {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
-            </button>
+            {/* 4. Click Destination Link URL (Prominent & User-Centric) */}
+            <div className="space-y-1.5 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
+              <label htmlFor="linkUrl" className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                <LinkIcon className="h-4 w-4 text-primary" />
+                Click Destination (Banner Link URL)
+              </label>
+              <Input
+                id="linkUrl"
+                {...form.register("linkUrl")}
+                placeholder="/products?category=car-batteries or https://..."
+                className="bg-background"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Where customers will be redirected when clicking this banner. Supports store paths (e.g. <code className="bg-muted px-1 rounded font-mono">/products</code>) or external links (<code className="bg-muted px-1 rounded font-mono">https://...</code>).
+              </p>
+              {form.formState.errors.linkUrl?.message && (
+                <p className="text-xs text-destructive">{form.formState.errors.linkUrl.message}</p>
+              )}
+            </div>
 
-            {showAdvanced && (
-              <div className="space-y-4 border-t border-border pt-4 animate-in fade-in duration-200">
-                <FormField label="Title" htmlFor="title" hint="Optional description (optional)" error={form.formState.errors.title?.message}>
-                  <Input id="title" {...form.register("title")} placeholder="e.g. Diwali Sale" />
-                </FormField>
+            {/* 5. Title & Order */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField label="Campaign Title" htmlFor="title" hint="For internal admin reference" error={form.formState.errors.title?.message}>
+                <Input id="title" {...form.register("title")} placeholder="e.g. Diwali Offer 2026" />
+              </FormField>
 
-                <FormField label="Link URL" htmlFor="linkUrl" hint="Where the banner links to on click (optional)" error={form.formState.errors.linkUrl?.message}>
-                  <Input id="linkUrl" {...form.register("linkUrl")} placeholder="https://... or /products?..." />
-                </FormField>
+              <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers appear first" error={form.formState.errors.displayOrder?.message}>
+                <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
+              </FormField>
+            </div>
 
-                <FormField label="Display Order" htmlFor="displayOrder" required hint="Lower numbers show first" error={form.formState.errors.displayOrder?.message}>
-                  <Input id="displayOrder" type="number" {...form.register("displayOrder")} />
-                </FormField>
+            {/* 6. Active Toggle */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 border">
+              <input
+                type="checkbox"
+                id="isActive"
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                {...form.register("isActive")}
+              />
+              <label htmlFor="isActive" className="text-sm font-medium text-foreground cursor-pointer">
+                Active (Immediately visible on website)
+              </label>
+            </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                  <input type="checkbox" id="isActive" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...form.register("isActive")} />
-                  <label htmlFor="isActive" className="text-sm font-medium text-foreground">Active (Visible on Homepage)</label>
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-3 border-t">
               <Button type="button" variant="ghost" onClick={closeModal}>
                 Cancel
               </Button>
               <Button type="submit" variant="brand" disabled={addMutation.isPending || editMutation.isPending}>
                 {(addMutation.isPending || editMutation.isPending) ? <Spinner size="sm" className="mr-2" /> : null}
-                {editingBanner ? "Update" : "Save"}
+                {editingBanner ? "Update Banner" : "Save Banner"}
               </Button>
             </div>
           </form>

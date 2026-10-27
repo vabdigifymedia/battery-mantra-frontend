@@ -19,6 +19,7 @@ import { LithiumCategoriesWidget } from "@/components/home/LithiumCategoriesWidg
 import { SolarCategoriesWidget } from "@/components/home/SolarCategoriesWidget";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import { HomeAboutSeoSection } from "@/components/home/HomeAboutSeoSection";
+import { PromoBanner } from "@/components/home/PromoBanner";
 import {
   productListQuery,
   rootCategoriesQuery,
@@ -151,6 +152,10 @@ function HomePage() {
             </section>
           )}
 
+          {/* Middle Promo Banner 1 (Slot: MID_1) */}
+          <div className="mt-8 sm:mt-12">
+            <PromoBanner placement="MID_1" />
+          </div>
 
         </Container>
       </div>
@@ -166,6 +171,9 @@ function HomePage() {
               <BrandStrip />
             </div>
           </section>
+
+          {/* Middle Promo Banner 2 (Slot: MID_2) */}
+          <PromoBanner placement="MID_2" />
 
           <section aria-labelledby="featured">
             <SectionHeading
@@ -352,6 +360,9 @@ function HomePage() {
               <WhyChooseUs />
             </div>
           </section>
+
+          {/* Bottom Promo Banner (Slot: BOTTOM) */}
+          <PromoBanner placement="BOTTOM" />
 
           <HomeAboutSeoSection />
         </Container>

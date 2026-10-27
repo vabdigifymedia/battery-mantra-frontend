@@ -52,13 +52,24 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
   // Display the top priority active banner for this slot
   const banner = matchedBanners[0];
   const { cleanTitle } = parseBannerTitle(banner.title);
-  const link = banner.linkUrl?.trim();
-  const isExternal = link && (link.startsWith("http://") || link.startsWith("https://"));
+  const rawLink = banner.linkUrl?.trim() || "";
+
+  const isExternal =
+    rawLink.startsWith("http://") ||
+    rawLink.startsWith("https://") ||
+    rawLink.startsWith("//") ||
+    rawLink.startsWith("tel:") ||
+    rawLink.startsWith("mailto:");
+
+  const normalizedInternalLink = !isExternal && rawLink && !rawLink.startsWith("/")
+    ? `/${rawLink}`
+    : rawLink;
 
   const content = (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl sm:rounded-2xl border bg-muted/20 shadow-xs hover:shadow-md transition-all duration-300",
+        "group relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 shadow-xs hover:shadow-md transition-all duration-300",
+        rawLink && "cursor-pointer",
         className
       )}
     >
@@ -66,7 +77,7 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
         src={banner.imageUrl}
         alt={cleanTitle || "Promotional Banner"}
         className={cn(
-          "w-full h-auto max-h-[140px] sm:max-h-[220px] md:max-h-[300px] object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]",
+          "w-full h-auto max-h-[160px] sm:max-h-[240px] md:max-h-[320px] object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]",
           imageClassName
         )}
         loading="lazy"
@@ -74,17 +85,18 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
     </div>
   );
 
-  if (!link) {
+  if (!rawLink) {
     return content;
   }
 
   if (isExternal) {
     return (
       <a
-        href={link}
+        href={rawLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="block cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xl sm:rounded-2xl"
+        aria-label={cleanTitle || "Promotional Banner"}
+        className="block rounded-xl sm:rounded-2xl focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary transition-transform"
       >
         {content}
       </a>
@@ -93,8 +105,9 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
 
   return (
     <Link
-      to={link as any}
-      className="block cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xl sm:rounded-2xl"
+      to={normalizedInternalLink as any}
+      aria-label={cleanTitle || "Promotional Banner"}
+      className="block rounded-xl sm:rounded-2xl focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary transition-transform"
     >
       {content}
     </Link>
