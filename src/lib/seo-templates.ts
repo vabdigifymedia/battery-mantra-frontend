@@ -39,6 +39,14 @@ function replaceVars(template: string | undefined | null, vars: Record<string, s
   if (/\{{1,2}\s*delivery_time\s*\}{1,2}/i.test(result)) {
     result = result.replace(/\{{1,2}\s*delivery_time\s*\}{1,2}/gi, vars.delivery_time || "1-2 Hours");
   }
+  // Deduplicate accidental repeated manufacturer name (e.g. "Honda Honda Amaze" -> "Honda Amaze")
+  if (vars.manufacturer_name) {
+    const m = vars.manufacturer_name.trim();
+    if (m) {
+      const escaped = m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      result = result.replace(new RegExp(`\\b(${escaped})\\s+\\1\\b`, "gi"), "$1");
+    }
+  }
   return result;
 }
 

@@ -493,28 +493,37 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
                 />
               ) : (
                 <>
-                  <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">
-                    Battery For {context.brand_name} {context.model_name} in {city?.cityName || "Gurgaon"}
-                  </h2>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Battery Solution For {context.brand_name} {context.model_name}
-                  </h3>
-                  <p className="mb-4">
-                    The <strong>{context.brand_name} {context.model_name}</strong> is a stylish and powerful vehicle that requires the best automotive battery for a smooth and hassle-free journey. A healthy battery is crucial to keep your vehicle running efficiently for a long time.
-                  </p>
-                  <p className="mb-6">
-                    You can find the finest batteries from top brands like Exide, Amaron, SF Sonic, and Livguard right here at Battery Mantra. A high-quality battery for your {context.brand_name} {context.model_name} in {city?.cityName || "Gurgaon"} ensures that the vehicle runs perfectly even in harsh weather conditions. It is impossible to drive your {context.brand_name} {context.model_name} safely without a healthy battery.
-                  </p>
+                  {(() => {
+                    const fullVehicleName = context.model_name && context.brand_name && context.model_name.toLowerCase().startsWith(context.brand_name.toLowerCase())
+                      ? context.model_name
+                      : `${context.brand_name || ""} ${context.model_name || ""}`.trim();
+                    return (
+                      <>
+                        <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">
+                          Battery For {fullVehicleName} in {city?.cityName || "Gurgaon"}
+                        </h2>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">
+                          Battery Solution For {fullVehicleName}
+                        </h3>
+                        <p className="mb-4">
+                          The <strong>{fullVehicleName}</strong> is a stylish and powerful vehicle that requires the best automotive battery for a smooth and hassle-free journey. A healthy battery is crucial to keep your vehicle running efficiently for a long time.
+                        </p>
+                        <p className="mb-6">
+                          You can find the finest batteries from top brands like Exide, Amaron, SF Sonic, and Livguard right here at Battery Mantra. A high-quality battery for your {fullVehicleName} in {city?.cityName || "Gurgaon"} ensures that the vehicle runs perfectly even in harsh weather conditions. It is impossible to drive your {fullVehicleName} safely without a healthy battery.
+                        </p>
 
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Buying {context.brand_name} {context.model_name} Battery Online
-                  </h3>
-                  <p className="mb-4">
-                    It is easy to find <strong>{context.brand_name} {context.model_name}</strong> batteries near you through online authorized dealers like Battery Mantra. This platform is perfect for purchasing affordable, premium-quality batteries in {city?.cityName || "Delhi NCR"}. We provide the best offers and discounts for all {context.brand_name} models.
-                  </p>
-                  <p>
-                    Battery Mantra provides home battery delivery within 1-2 Hours of your order. You get benefits like free installation, multiple payment options (cash on delivery, UPI, credit cards), and genuine manufacturer warranties. We provide the best battery replacement services so you do not have to go anywhere to buy a car battery.
-                  </p>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">
+                          Buying {fullVehicleName} Battery Online
+                        </h3>
+                        <p className="mb-4">
+                          It is easy to find <strong>{fullVehicleName}</strong> batteries near you through online authorized dealers like Battery Mantra. This platform is perfect for purchasing affordable, premium-quality batteries in {city?.cityName || "Delhi NCR"}. We provide the best offers and discounts for all {context.brand_name} models.
+                        </p>
+                        <p>
+                          Battery Mantra provides home battery delivery within 1-2 Hours of your order. You get benefits like free installation, multiple payment options (cash on delivery, UPI, credit cards), and genuine manufacturer warranties. We provide the best battery replacement services so you do not have to go anywhere to buy a car battery.
+                        </p>
+                      </>
+                    );
+                  })()}
                 </>
               )}
             </div>
