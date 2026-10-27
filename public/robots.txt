@@ -1,0 +1,16 @@
+# Battery Mantra robots.txt
+User-agent: *
+Allow: /
+
+# Private, user account & admin routes (prevent wasting crawl budget)
+Disallow: /kalkaji/
+Disallow: /kalkaji_/
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /shopping-cart
+Disallow: /wishlist
+Disallow: /_auth/
+
+# Master Sitemap Index
+Sitemap: https://batterymantra.com/sitemap.xml
