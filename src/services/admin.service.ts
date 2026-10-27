@@ -136,6 +136,8 @@ export const adminService = {
     apiFetch<UserResponse>("/api/admin/customers", { method: "POST", body }),
   updateCustomer: (userId: string, body: AdminUpdateCustomerRequest) =>
     apiFetch<UserResponse>(endpoints.admin.updateCustomer(userId), { method: "PUT", body }),
+  deleteUser: (userId: string) =>
+    apiFetch<void>(endpoints.admin.deleteUser(userId), { method: "DELETE" }),
 
   // Orders
   getAllOrders: () => apiFetch<OrderResponse[]>(endpoints.admin.orders, { method: "GET" }),

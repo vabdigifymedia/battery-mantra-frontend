@@ -8,14 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
-import { ArrowLeft, Search, Plus, MapPin } from "lucide-react";
+import { ArrowLeft, Search, Plus, MapPin, Pencil, Phone, Mail, X, User as UserIcon } from "lucide-react";
+import { AdminEditCustomerModal } from "@/components/admin/AdminEditCustomerModal";
 import type { AdminCreateOrderRequest, AdminCreateCustomerRequest } from "@/services/admin.service";
+import type { UserResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/kalkaji/orders/create")({
   component: AdminCreateOrder,
@@ -24,6 +27,8 @@ export const Route = createFileRoute("/kalkaji/orders/create")({
 function AdminCreateOrder() {
   const navigate = useNavigate();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
   const [productSearch, setProductSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<Record<string, { quantity: number; exchange: boolean; originalPrice: number; exchangeDiscount: number }>>({});
   const [discount, setDiscount] = useState<number>(0);
@@ -47,6 +52,22 @@ function AdminCreateOrder() {
   const filteredProducts = useMemo(() => {
     return products.filter(p => p.productName.toLowerCase().includes(productSearch.toLowerCase()));
   }, [products, productSearch]);
+
+  // Selected & Filtered Customers
+  const selectedCustomer = useMemo(() => {
+    return (users as UserResponse[]).find(u => u.userId === selectedCustomerId) || null;
+  }, [users, selectedCustomerId]);
+
+  const filteredCustomers = useMemo(() => {
+    if (!customerSearch.trim()) return users as UserResponse[];
+    const query = customerSearch.toLowerCase().trim();
+    return (users as UserResponse[]).filter((u: any) => {
+      const name = (u.name || u.username || "").toLowerCase();
+      const phone = (u.phone || u.phoneNumber || "").toLowerCase();
+      const email = (u.email || "").toLowerCase();
+      return name.includes(query) || phone.includes(query) || email.includes(query);
+    });
+  }, [users, customerSearch]);
 
   // Mutations
   const createCustomerMutation = useMutation({
@@ -219,25 +240,159 @@ function AdminCreateOrder() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-2">
-                <Label>Select Existing Customer *</Label>
-                {isLoadingUsers ? (
-                  <div className="h-10 flex items-center"><Spinner size="sm" /></div>
-                ) : (
-                  <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Search by name or phone..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map(user => (
-                        <SelectItem key={user.userId} value={user.userId}>
-                          {user.name} ({user.phone || user.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+              {isLoadingUsers ? (
+                <div className="h-24 flex items-center justify-center text-muted-foreground">
+                  <Spinner size="sm" className="mr-2" /> Loading customers...
+                </div>
+              ) : selectedCustomer ? (
+                /* Selected Customer Summary Card */
+                <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
+                        {((selectedCustomer.name || selectedCustomer.username || "C")[0] || "C").toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-base">
+                            {selectedCustomer.name || selectedCustomer.username}
+                          </span>
+                          <Badge variant={selectedCustomer.role === "ADMIN" ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
+                            {selectedCustomer.role}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
+                          {((selectedCustomer as any).phone || selectedCustomer.phoneNumber) && (
+                            <span className="flex items-center gap-1 font-mono">
+                              <Phone className="h-3 w-3" />
+                              {(selectedCustomer as any).phone || selectedCustomer.phoneNumber}
+                            </span>
+                          )}
+                          {selectedCustomer.email && (
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-3 w-3" />
+                              {selectedCustomer.email}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1.5 text-xs shadow-xs"
+                        onClick={() => setIsEditCustomerModalOpen(true)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        <span>Edit Customer</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setSelectedCustomerId("");
+                          setCustomerSearch("");
+                        }}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Customer Address Preview if present */}
+                  {((selectedCustomer as any).addressLine1 || (selectedCustomer as any).addresses?.[0]) && (
+                    <div className="pt-2 border-t text-xs text-muted-foreground flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                      <span className="truncate">
+                        {(selectedCustomer as any).addressLine1 || (selectedCustomer as any).addresses?.[0]?.addressLine1}
+                        {((selectedCustomer as any).city || (selectedCustomer as any).addresses?.[0]?.city) && `, ${(selectedCustomer as any).city || (selectedCustomer as any).addresses?.[0]?.city}`}
+                        {((selectedCustomer as any).pincode || (selectedCustomer as any).addresses?.[0]?.pincode) && ` - ${(selectedCustomer as any).pincode || (selectedCustomer as any).addresses?.[0]?.pincode}`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Search Customer List */
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">Search & Select Customer *</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by customer name, phone number, or email..."
+                        className="pl-9 pr-8 h-10"
+                        value={customerSearch}
+                        onChange={(e) => setCustomerSearch(e.target.value)}
+                        autoFocus={false}
+                      />
+                      {customerSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setCustomerSearch("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {filteredCustomers.length === 0 ? (
+                    <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground space-y-2">
+                      <p>No customers found matching &quot;{customerSearch}&quot;.</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsCustomerModalOpen(true)}
+                        className="h-8 gap-1.5"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Create New Customer
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 max-h-56 overflow-y-auto pr-1 border rounded-md divide-y bg-background/50">
+                      {filteredCustomers.map((user: any) => {
+                        const name = user.name || user.username || "Customer";
+                        const phone = user.phone || user.phoneNumber || "";
+                        const email = user.email || "";
+                        return (
+                          <button
+                            key={user.userId}
+                            type="button"
+                            onClick={() => {
+                              setSelectedCustomerId(user.userId);
+                              setCustomerSearch("");
+                            }}
+                            className="w-full text-left p-2.5 hover:bg-muted/60 transition-colors flex items-center justify-between gap-3 text-sm group"
+                          >
+                            <div className="min-w-0">
+                              <div className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                                {name}
+                              </div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-2 font-mono">
+                                {phone && <span>{phone}</span>}
+                                {email && <span className="font-sans truncate">({email})</span>}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="text-[10px] shrink-0 group-hover:border-primary group-hover:text-primary">
+                              Select
+                            </Badge>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">
+                    {filteredCustomers.length} customer{filteredCustomers.length === 1 ? "" : "s"} available. Click any customer to select.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -301,9 +456,15 @@ function AdminCreateOrder() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <span className={`text-xs font-semibold ${product.stockQuantity > 5 ? 'text-green-600' : 'text-red-600'}`}>
-                                {product.stockQuantity} in stock
-                              </span>
+                              {(() => {
+                                const stock = (product as any).stockQuantity ?? (product as any).productStock;
+                                const isAvailable = stock === undefined || stock > 0;
+                                return (
+                                  <span className={`text-xs font-semibold ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                                    {stock !== undefined ? `${stock} in stock` : 'In stock'}
+                                  </span>
+                                );
+                              })()}
                             </TableCell>
                             <TableCell>
                               <Input 
@@ -438,6 +599,20 @@ function AdminCreateOrder() {
           </Card>
         </div>
       </div>
+
+      {/* Edit Selected Customer Modal */}
+      {isEditCustomerModalOpen && selectedCustomer && (
+        <AdminEditCustomerModal
+          customer={selectedCustomer}
+          isOpen={isEditCustomerModalOpen}
+          onClose={() => setIsEditCustomerModalOpen(false)}
+          onSuccess={(updatedUser) => {
+            refetchUsers();
+            setSelectedCustomerId(updatedUser.userId);
+            setIsEditCustomerModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

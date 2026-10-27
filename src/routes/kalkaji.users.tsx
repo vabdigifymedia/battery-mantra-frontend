@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { AdminEditCustomerModal } from "@/components/admin/AdminEditCustomerModal";
+import { AdminDeleteUserModal } from "@/components/admin/AdminDeleteUserModal";
 import type { UserResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/kalkaji/users")({
@@ -19,6 +20,7 @@ function AdminUsers() {
   const { data: users, isLoading } = useQuery(adminUsersQuery());
   const [activeTab, setActiveTab] = useState("ALL");
   const [editingCustomer, setEditingCustomer] = useState<UserResponse | null>(null);
+  const [deletingCustomer, setDeletingCustomer] = useState<UserResponse | null>(null);
   
   const filteredUsers = users?.filter((user: any) => activeTab === "ALL" || user.role === activeTab) || [];
 
@@ -80,15 +82,26 @@ function AdminUsers() {
                   </TableCell>
                   <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 gap-1 text-xs hover:bg-muted"
-                      onClick={() => setEditingCustomer(user)}
-                    >
-                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span>Edit</span>
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 gap-1 text-xs hover:bg-muted"
+                        onClick={() => setEditingCustomer(user)}
+                      >
+                        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span>Edit</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 gap-1 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => setDeletingCustomer(user)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Delete</span>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -122,7 +135,7 @@ function AdminUsers() {
               
               <div className="flex justify-between items-center text-xs text-muted-foreground pt-3 border-t">
                 <span className="font-mono">ID: {user.userId.slice(0, 8)}</span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</span>
                   <Button
                     variant="outline"
@@ -131,6 +144,14 @@ function AdminUsers() {
                     onClick={() => setEditingCustomer(user)}
                   >
                     <Pencil className="h-3 w-3" /> Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs px-2 gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20"
+                    onClick={() => setDeletingCustomer(user)}
+                  >
+                    <Trash2 className="h-3 w-3" /> Delete
                   </Button>
                 </div>
               </div>
@@ -145,6 +166,15 @@ function AdminUsers() {
           customer={editingCustomer}
           isOpen={!!editingCustomer}
           onClose={() => setEditingCustomer(null)}
+        />
+      )}
+
+      {/* Permanent Delete User Modal */}
+      {deletingCustomer && (
+        <AdminDeleteUserModal
+          user={deletingCustomer}
+          isOpen={!!deletingCustomer}
+          onClose={() => setDeletingCustomer(null)}
         />
       )}
     </div>

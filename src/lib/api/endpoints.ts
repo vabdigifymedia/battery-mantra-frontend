@@ -111,6 +111,7 @@ export const endpoints = {
     assignEngineer: (orderId: string, engineerId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/assign-engineer?engineerId=${encodeURIComponent(engineerId)}`,
     unassignEngineer: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/unassign-engineer`,
     updateCustomer: (userId: string) => `/api/admin/customers/${encodeURIComponent(userId)}`,
+    deleteUser: (userId: string) => `/api/admin/users/${encodeURIComponent(userId)}`,
     updateOrder: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}`,
     products: {
       create: "/api/admin/products",
