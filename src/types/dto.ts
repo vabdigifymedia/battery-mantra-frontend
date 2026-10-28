@@ -242,6 +242,7 @@ export type ProductListResponse = {
   additionalImages?: string[];
   productCategory?: string;
   categoryId?: UUID;
+  categories?: Array<{ categoryId: UUID; categoryName: string; categorySlug?: string }>;
   capacity?: string;
   capacityAh?: string;
   globalDisplayOrder?: number;
@@ -271,6 +272,7 @@ export type ProductDetailResponse = {
   brandId?: UUID;
   categoryName?: string;
   categoryId?: UUID;
+  categories?: Array<{ categoryId: UUID; categoryName: string; categorySlug?: string }>;
   productPrice: number;
   originalPrice?: number;
   exchangeDiscount?: number;
@@ -551,6 +553,7 @@ export type CreateProductRequest = {
   exchangeDiscount?: number;
   productImage?: string;
   categoryId?: UUID;
+  categoryIds?: UUID[];
   brandId?: UUID;
   compatibleVehicleIds?: string[];
   specs?: Record<string, unknown>;

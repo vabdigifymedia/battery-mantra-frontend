@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
-import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank, Search } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight, ShieldCheck, Battery, Zap, Activity, Wrench, Box, Gauge, Sparkles, Award, Clock, Truck, Flame, Cpu, CheckCircle2, RefreshCw, PiggyBank, Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +58,7 @@ const formSchema = z.object({
     url: z.string().url("Must be a valid URL")
   })).default([]),
   categoryId: z.string().min(1, "Category is required"),
+  categoryIds: z.array(z.string()).optional().default([]),
   brandId: z.string().min(1, "Brand is required"),
   capacity: z.string().optional(),
   searchKeywords: z.string().optional(),
@@ -100,6 +101,22 @@ function AddProductPage() {
   const selectedRootCat = rootCategories.find(c => c.categoryId === selectedRootId);
   const subCategories = selectedRootCat?.subCategories || [];
 
+  const allAvailableCategories = useMemo(() => {
+    const list: Array<{ id: string; name: string }> = [];
+    for (const root of rootCategories) {
+      list.push({ id: root.categoryId, name: root.categoryName });
+      if (root.subCategories && root.subCategories.length > 0) {
+        for (const sub of root.subCategories) {
+          list.push({
+            id: sub.categoryId,
+            name: `${root.categoryName} → ${sub.categoryName}`,
+          });
+        }
+      }
+    }
+    return list;
+  }, [rootCategories]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
     defaultValues: {
@@ -111,6 +128,8 @@ function AddProductPage() {
       productStock: 0,
       productImage: "",
       additionalImages: [],
+      categoryId: "",
+      categoryIds: [],
       capacity: "",
       searchKeywords: "",
       specUnitIds: {},
@@ -200,6 +219,10 @@ function AddProductPage() {
     const rootCat = rootCategories.find(c => c.categoryId === data.categoryId);
     const applicable = rootCat ? !/inverter|stabilizer|ups|solar/i.test(rootCat.categoryName) : true;
 
+    const primaryId = data.categoryId;
+    const additionalIds = data.categoryIds || [];
+    const allCategoryIds = Array.from(new Set([primaryId, ...additionalIds].filter(Boolean)));
+
     const payload = {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
@@ -209,7 +232,8 @@ function AddProductPage() {
       productStock: data.productStock,
       productImage: data.productImage || undefined,
       additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
-      categoryId: data.categoryId,
+      categoryId: primaryId,
+      categoryIds: allCategoryIds,
       brandId: data.brandId,
       capacity: data.capacity || undefined,
       searchKeywords: data.searchKeywords?.trim() || undefined,
@@ -224,6 +248,7 @@ function AddProductPage() {
   };
 
   const watchImageUrl = form.watch("productImage");
+  const watchedCategoryIds = form.watch("categoryIds") || [];
   const watchedSpecUnitIds = form.watch("specUnitIds") || {};
   const watchedSpecAttributeIcons = form.watch("specAttributeIcons") || {};
   const watchedHighlightedIds = form.watch("highlightedSpecAttributeIds") || [];
@@ -578,13 +603,16 @@ function AddProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Category <span className="text-red-500">*</span></Label>
+                <div className="flex items-center justify-between">
+                  <Label>Primary Category <span className="text-red-500">*</span></Label>
+                  <span className="text-[10px] text-muted-foreground">Main category (SEO & URL)</span>
+                </div>
                 <Select value={selectedRootId} onValueChange={(val) => {
                   setSelectedRootId(val);
                   form.setValue("categoryId", val, { shouldValidate: true });
                 }}>
                   <SelectTrigger className={form.formState.errors.categoryId ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="Select primary category" />
                   </SelectTrigger>
                   <SelectContent>
                     {rootCategories.map((c) => (
@@ -597,7 +625,7 @@ function AddProductPage() {
 
               {subCategories.length > 0 && (
                 <div className="space-y-2">
-                  <Label>Subcategory</Label>
+                  <Label>Primary Subcategory</Label>
                   <Select
                     value={form.watch("categoryId") !== selectedRootId ? form.watch("categoryId") : ""}
                     onValueChange={(val) => form.setValue("categoryId", val, { shouldValidate: true })}
@@ -613,6 +641,70 @@ function AddProductPage() {
                   </Select>
                 </div>
               )}
+
+              {/* Additional Categories (Multi-Category Support) */}
+              <div className="space-y-2 pt-3 border-t">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold">Additional Categories</Label>
+                  <span className="text-[10px] text-muted-foreground">Optional</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Product will also appear when customers browse these categories.
+                </p>
+
+                {watchedCategoryIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {watchedCategoryIds.map((catId: string) => {
+                      const matched = allAvailableCategories.find((c) => c.id === catId);
+                      if (!matched) return null;
+                      return (
+                        <span
+                          key={catId}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/30"
+                        >
+                          <span>{matched.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = watchedCategoryIds.filter((id: string) => id !== catId);
+                              form.setValue("categoryIds", updated);
+                            }}
+                            className="rounded-full hover:bg-amber-500/20 text-muted-foreground hover:text-foreground cursor-pointer p-0.5"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <Select
+                  value=""
+                  onValueChange={(val) => {
+                    if (val && !watchedCategoryIds.includes(val)) {
+                      form.setValue("categoryIds", [...watchedCategoryIds, val]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-9 text-xs">
+                    <SelectValue placeholder="+ Add another category..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-56">
+                    {allAvailableCategories
+                      .filter(
+                        (c) =>
+                          c.id !== form.watch("categoryId") &&
+                          !watchedCategoryIds.includes(c.id)
+                      )
+                      .map((c) => (
+                        <SelectItem key={c.id} value={c.id} className="text-xs">
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               <div className="space-y-2">
                 <Label>Brand <span className="text-red-500">*</span></Label>
