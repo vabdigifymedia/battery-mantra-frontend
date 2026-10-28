@@ -203,7 +203,8 @@ async function run() {
     `${BASE_URL}/sitemap-products.xml`,
   ]);
   fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), masterIndexXml, "utf8");
-  console.log(`[Sitemap] Created master sitemap.xml index pointing to 5 sub-sitemaps.`);
+  fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap_index.xml"), masterIndexXml, "utf8");
+  console.log(`[Sitemap] Created master sitemap.xml & sitemap_index.xml index pointing to 5 sub-sitemaps.`);
 
   const totalUrls =
     staticUrls.length +
