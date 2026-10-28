@@ -57,9 +57,10 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { data: categories } = useQuery(rootCategoriesQuery());
 
-  const carCategory = categories?.find((c) =>
-    c.categoryName.toLowerCase().includes("car")
-  );
+  const carCategory = categories?.find((c) => {
+    const name = c.categoryName.toLowerCase().trim();
+    return name === "car batteries" || name === "car battery" || (name.includes("car") && !name.includes("golf"));
+  });
   const inverterCategory = categories?.find((c) =>
     c.categoryName.toLowerCase().includes("inverter batter")
   ) || categories?.find((c) =>
@@ -193,9 +194,13 @@ function HomePage() {
               <FeaturedProducts 
                 limit={8} 
                 filterFn={(p) => {
-                  const cat = p.productCategory?.toLowerCase() || "";
-                  const name = p.productName.toLowerCase();
-                  return !cat.includes("inverter") && !name.includes("inverter");
+                  if (carCategory) {
+                    if (p.categoryId === carCategory.categoryId) return true;
+                    if (carCategory.subCategories?.some((s: any) => s.categoryId === p.categoryId)) return true;
+                    if (p.categories?.some((c) => c.categoryId === carCategory.categoryId || carCategory.subCategories?.some((s: any) => s.categoryId === c.categoryId))) return true;
+                  }
+                  const cat = (p.productCategory || "").toLowerCase().trim();
+                  return cat === "car batteries" || cat === "car battery";
                 }}
               />
             </div>

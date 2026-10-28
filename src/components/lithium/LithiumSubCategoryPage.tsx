@@ -21,7 +21,7 @@ export function LithiumSubCategoryPage({
 
   const isSolar = type === "lithium-inbuilt-solar-inverter-battery";
   const isIntegrated = type === "lithium-integrated-inverter-battery";
-  
+
   let config;
   if (isSolar) {
     config = {
@@ -156,7 +156,7 @@ export function LithiumSubCategoryPage({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 mb-1 line-clamp-2 md:line-clamp-none leading-tight pr-4 md:pr-0">
-              Top {category.categoryName}s
+              Top {category.categoryName}
             </h2>
             <p className="text-slate-500 font-medium text-xs md:text-base">Smart. Powerful. Future Ready.</p>
           </div>
