@@ -25,21 +25,21 @@ function FallbackCategoryIcon({ categoryName }: { categoryName: string }) {
   if (name.includes("car")) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
-        <Car className="h-7 w-7 stroke-[1.8]" />
+        <Car className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
   if (name.includes("solar")) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-        <Sun className="h-7 w-7 stroke-[1.8]" />
+        <Sun className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
   if (name.includes("lithium")) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-        <BatteryCharging className="h-7 w-7 stroke-[1.8]" />
+        <BatteryCharging className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
@@ -52,7 +52,7 @@ function FallbackCategoryIcon({ categoryName }: { categoryName: string }) {
   ) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-        <Truck className="h-7 w-7 stroke-[1.8]" />
+        <Truck className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
@@ -63,28 +63,28 @@ function FallbackCategoryIcon({ categoryName }: { categoryName: string }) {
   ) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
-        <Cpu className="h-7 w-7 stroke-[1.8]" />
+        <Cpu className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
   if (name.includes("accessories") || name.includes("part")) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-400">
-        <Wrench className="h-7 w-7 stroke-[1.8]" />
+        <Wrench className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
   if (name.includes("inverter")) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-        <Zap className="h-7 w-7 stroke-[1.8]" />
+        <Zap className="h-8 w-8 stroke-[1.8]" />
       </div>
     );
   }
 
   return (
     <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary/10 text-primary">
-      <Battery className="h-7 w-7 stroke-[1.8]" />
+      <Battery className="h-8 w-8 stroke-[1.8]" />
     </div>
   );
 }
@@ -110,11 +110,11 @@ function CategoryIcon({ iconUrl, name }: { iconUrl?: string | null; name: string
 function CategoryCardItem({ category }: { category: CategoryListResponse }) {
   return (
     <>
-      <div className="relative flex h-[68px] w-[68px] items-center justify-center rounded-2xl border border-border/80 bg-gradient-to-b from-white via-white to-slate-50/80 dark:from-card dark:via-card dark:to-muted/20 p-2.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/40 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
+      <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-border/80 bg-gradient-to-b from-white via-white to-slate-50/80 dark:from-card dark:via-card dark:to-muted/20 p-2.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/40 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
         <CategoryIcon iconUrl={category.iconUrl} name={category.categoryName} />
       </div>
-      <div className="h-[34px] w-full flex items-center justify-center">
-        <span className="text-[11.5px] font-semibold text-center leading-[1.25] tracking-tight text-foreground/90 group-hover:text-primary transition-colors line-clamp-2 px-0.5">
+      <div className="h-[36px] w-full flex items-center justify-center">
+        <span className="text-xs font-semibold text-center leading-[1.25] tracking-tight text-foreground/90 group-hover:text-primary transition-colors line-clamp-2 px-0.5">
           {category.categoryName}
         </span>
       </div>
@@ -127,14 +127,14 @@ export function HomeCategoryPills() {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-background border-b border-border/40 py-3 sm:hidden relative">
+      <div className="w-full bg-background border-b border-border/40 py-3.5 sm:hidden relative">
         <div className="flex w-full items-start gap-3 overflow-x-auto no-scrollbar scrollbar-hide px-4 scroll-px-4 py-1">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5 w-[78px] min-w-[78px] shrink-0">
-              <Skeleton className="h-[68px] w-[68px] rounded-2xl" />
-              <div className="flex flex-col items-center gap-1 w-full pt-0.5">
-                <Skeleton className="h-2.5 w-14 rounded-full" />
-                <Skeleton className="h-2 w-9 rounded-full" />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5 w-[86px] min-w-[86px] shrink-0">
+              <Skeleton className="h-[76px] w-[76px] rounded-2xl" />
+              <div className="flex flex-col items-center gap-1 w-full pt-1">
+                <Skeleton className="h-3 w-16 rounded-full" />
+                <Skeleton className="h-2.5 w-10 rounded-full" />
               </div>
             </div>
           ))}
@@ -148,10 +148,10 @@ export function HomeCategoryPills() {
   const sorted = [...categories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
   const linkClass =
-    "group flex flex-col items-center gap-1.5 w-[78px] min-w-[78px] shrink-0 snap-start active:scale-95 transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-2xl select-none";
+    "group flex flex-col items-center gap-1.5 w-[86px] min-w-[86px] shrink-0 snap-start active:scale-95 transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-2xl select-none";
 
   return (
-    <div className="w-full bg-background border-b border-border/40 py-3 sm:hidden relative">
+    <div className="w-full bg-background border-b border-border/40 py-3.5 sm:hidden relative">
       {/* Subtle edge fade hints */}
       <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-background to-transparent z-10" />
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10" />
@@ -237,7 +237,7 @@ export function HomeCategoryPills() {
         })}
 
         {/* Trailing spacer ensures last category pill isn't flush with edge on full scroll */}
-        <div className="w-2.5 shrink-0 pointer-events-none" aria-hidden="true" />
+        <div className="w-3 shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
     </div>
   );
