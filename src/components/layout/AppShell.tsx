@@ -5,6 +5,7 @@ import { Footer, type FooterGroup } from "./Footer";
 import { FeatureStrip } from "./FeatureStrip";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { EmergencyFAB } from "./EmergencyFAB";
+import { AutoEngagementManager } from "@/components/engagement/AutoEngagementManager";
 
 const FOOTER_GROUPS: FooterGroup[] = [
   {
@@ -72,6 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Footer groups={FOOTER_GROUPS} />
       <MobileBottomNav />
       <EmergencyFAB />
+      <AutoEngagementManager />
     </div>
   );
 }
