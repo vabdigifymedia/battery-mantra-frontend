@@ -48,10 +48,10 @@ export function VehicleStepper({ value, onChange, compact, showSearch = false }:
 
   const formatType = (type: string) => {
     switch (type) {
-      case "CAR": return "Car";
-      case "COMMERCIAL": return "Commercial";
-      case "E_RICKSHAW": return "E-Rickshaw";
-      case "INVERTER": return "Inverter";
+      case "CAR": return "🚗 Car";
+      case "COMMERCIAL": return "🚛 Commercial";
+      case "E_RICKSHAW": return "🛺 E-Rickshaw";
+      case "INVERTER": return "⚡ Inverter";
       default: return type;
     }
   };
@@ -141,18 +141,18 @@ function StepRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-3 sm:p-4">
-      <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3 sm:p-3.5 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600">
         <span
           className={cn(
-            "grid h-5 w-5 place-items-center rounded-full text-[10px]",
-            done ? "bg-success text-success-foreground" : "bg-primary-soft text-primary",
+            "grid h-5 w-5 place-items-center rounded-full text-[10px] font-extrabold shadow-2xs",
+            done ? "bg-emerald-600 text-white" : "bg-primary text-white",
           )}
         >
-          {done ? <Check className="h-3 w-3" /> : stepIndex}
+          {done ? <Check className="h-3 w-3 stroke-[3]" /> : stepIndex}
         </span>
-        {label}
-        <ChevronRight className="h-3 w-3 opacity-50" />
+        <span>{label}</span>
+        <ChevronRight className="h-3 w-3 opacity-40 ml-auto" />
       </div>
       {children}
     </div>
@@ -212,10 +212,10 @@ function Chips({
                 type="button"
                 onClick={() => onSelect(item.id)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer",
                   active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-surface hover:border-primary/40 hover:bg-primary-soft",
+                    ? "border-primary bg-primary text-white shadow-xs shadow-primary/20 ring-1 ring-primary/30"
+                    : "border-gray-200/90 bg-white text-gray-800 hover:border-primary/40 hover:bg-primary/5",
                 )}
               >
                 {item.imageUrl && (

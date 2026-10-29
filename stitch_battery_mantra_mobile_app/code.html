@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><title>Battery Mantra</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;font-family:'Plus Jakarta Sans',sans-serif;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-container-low": "#eff4ff", "on-tertiary-fixed-variant": "#005236", "tertiary-container": "#008259", "tertiary-fixed-dim": "#4edea3", "on-error": "#ffffff", "inverse-surface": "#213145", "on-secondary-container": "#5c647a", "primary-fixed-dim": "#ffb4ab", "surface-container-high": "#dce9ff", "surface-bright": "#f8f9ff", "surface-tint": "#bf0715", "error-container": "#ffdad6", "secondary-fixed-dim": "#bec6e0", "outline": "#916f6b", "on-surface": "#0b1c30", "inverse-on-surface": "#eaf1ff", "surface-container-lowest": "#ffffff", "secondary": "#565e74", "inverse-primary": "#ffb4ab", "tertiary-fixed": "#6ffbbe", "on-surface-variant": "#5c403c", "on-tertiary-fixed": "#002113", "surface-container-highest": "#d3e4fe", "surface-variant": "#d3e4fe", "surface-container": "#e5eeff", "surface": "#f8f9ff", "primary": "#b70011", "outline-variant": "#e6bdb8", "on-secondary-fixed-variant": "#3f465c", "on-secondary-fixed": "#131b2e", "tertiary": "#006645", "on-primary-container": "#fff6f5", "secondary-container": "#dae2fd", "on-primary-fixed": "#410002", "on-tertiary-container": "#e1ffec", "on-background": "#0b1c30", "primary-fixed": "#ffdad6", "on-primary": "#ffffff", "on-primary-fixed-variant": "#93000b", "background": "#f8f9ff", "primary-container": "#dc2626", "on-secondary": "#ffffff", "on-error-container": "#93000a", "on-tertiary": "#ffffff", "error": "#ba1a1a", "secondary-fixed": "#dae2fd", "surface-dim": "#cbdbf5" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-3xl": "3rem", "gutter": "1rem", "space-md": "0.75rem", "space-xs": "0.25rem", "margin-desktop": "2.5rem", "margin": "1rem", "space-lg": "1rem", "space-xl": "1.5rem", "gutter-desktop": "1.5rem", "space-2xl": "2rem", "space-sm": "0.5rem" }, fontFamily: { "headline-xl": ["Plus Jakarta Sans"], "number-badge": ["Plus Jakarta Sans"], "number-price": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, fontSize: { "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "number-badge": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "800" }], "number-price": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.025em", "fontWeight": "800" }], "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.005em", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(11,28,48,0.04)] pt-safe"><div class="h-28 px-4 flex flex-col justify-between py-2"><div class="flex items-center justify-between w-full"><div class="flex items-center gap-2"><button aria-label="Menu" class="w-11 h-11 -ml-1 flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">menu</span></button><img alt="Battery Mantra Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XBogRq178hLkfRJQmph6SmFdM8egRo4Nz2YRskApW_8AM6Nad7r-2FOxH1QIPn1lrhXyc4N17g8Iy1X1WGQKgaReEa43bMP72vkBOqCoOhgYkwj5EZEwm2PWOZbgXV5QOzoRllgQ-agCGQ7wGGbDSnFmKnnK-BruMG61nluhJFkP00WBggJfdhuyCK7Hk7ftuLfFQzY4AeQOHM-a-wZkeMXpmu1e7mxdTRs1CZ_J6w"/><span class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight hidden xs:inline">Battery Mantra</span></div><div class="flex items-center gap-2"><div class="h-11 px-3 rounded-full bg-surface-container-lowest shadow-[0_1px_6px_rgba(11,28,48,0.06)] flex items-center gap-1.5 cursor-pointer"><span class="material-symbols-outlined text-primary text-[16px]">location_on</span><span class="font-label-md text-label-md text-on-surface font-bold truncate max-w-[105px]">Sector 62, Noida</span><span class="material-symbols-outlined text-secondary text-[14px]">arrow_drop_down</span><div class="flex items-center gap-1 ml-1 pl-1.5 bg-tertiary-container/10 py-0.5 px-1.5 rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span><span class="font-label-sm text-label-sm text-tertiary font-extrabold">45m</span></div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="w-full pb-1"><div class="h-11 w-full bg-surface-container-lowest rounded-full shadow-[0_2px_8px_rgba(11,28,48,0.06)] px-3.5 flex items-center gap-2.5"><span class="material-symbols-outlined text-secondary text-[20px]">search</span><span class="font-body-sm text-body-sm text-secondary flex-1 truncate">Search car model (Swift, Creta...) or battery code...</span><button aria-label="Voice Search" class="w-8 h-8 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[20px]">mic</span></button></div></div></div></header><main class="flex flex-col relative w-full pt-28 bg-surface"><div class="flex flex-col w-full pb-20 space-y-4">
+<!-- 1. HORIZONTAL STORY-STYLE CATEGORY TRAY -->
+<section class="w-full pt-2">
+<div class="flex items-center justify-between px-4 mb-2.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight">Browse Solutions</span>
+<span class="font-label-sm text-label-sm text-primary font-bold">All Categories (12)</span>
+</div>
+<div class="flex overflow-x-auto no-scrollbar px-4 space-x-3.5 pb-1">
+<!-- 1: Car Batteries -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-primary text-on-primary font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">Fastest</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Compact isometric high performance 12V automotive lead-acid car battery in bright signature green and black shell casing, isolated clean studio product rendering, crisp dynamic light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMJtkO4xsyyfQBot6Lg271aOSYy7n-tdYpbo7HG2X57MAORO9F2ejNlCGrBLvCcYKh7dfU71EwaNMm2YrOfVXq_xmhjkSj6BbOtFtDu9gkTX3coB8nrlLMjJ5Be1LYb2F3LEDHUnjivw33TBpBg-5eQVvWvaAYZETMDNn7pTTVAFkN-zpkT845jyz2HuEhpxpPBzpvfx9vlCt0CuoOJc5pJg_R_YLSkGREvFPS38A"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">Car<br/>Batteries</span>
+</button>
+<!-- 2: Inverter & UPS -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-tertiary text-on-tertiary font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">Offers</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Modern digital home inverter UPS system unit with sleek LED display and metallic blue tubular tall backup battery pack, studio product render with high contrast lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLV-JB9mWbQNm2GQ9Hyx85tsOafhzCmT0lpYUvjc8NIwmy5uJz3VS8b7O93W88OH0CLdzRTvorgon28ZGYrjnYZXi_Rn_vuE9k4qn9o0bzTfE6OU1Iskq29Yzaw05Qbyl_4i2CozNLjhpqIH1qwHLRLLxoklG3MMAbZUXHiYJ2q817Cndsg8jEI__SJeS8bv8HS4v6eMyzEEU-x_12mFZE9nSz3f9kn4VUpF9fS_Q"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">Inverter &amp;<br/>UPS</span>
+</button>
+<!-- 3: Lithium Power Wall -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-secondary text-on-secondary font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">New Gen</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Ultra modern wall-mounted sleek white lithium energy storage pack with illuminated teal LED state of charge battery indicator bar, clean tech minimalist product visual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaHcb7iAgai7FNsW0MCWJIJKevBf0N-4eBtuEWoEmOMeWmfcHO2-fnnddPnXBTvMUVoHNnv1PEcXb4dX44sfzt3_VWG79YmbHSlMEp7G07uY1dTVQh7Qqh_kg5HVeC1EKF5p3Q177hd3YIMyvka1ekSIc2a3CABuvPmj13-pfXD2-PgIqhSXEaEANxLd3nNlDk69Yrc7XVD9twz77XND39euQ1SJEb32nGbD0mM_c"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">Lithium<br/>Power Wall</span>
+</button>
+<!-- 4: Solar Panels -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-primary text-on-primary font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">Subsidy</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Photovoltaic monocrystalline solar energy panel grid module angled with sun reflection and hybrid mppt controller unit, high detail architectural solar visual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBBA-SbVYssK_a828_DhTrjnbwCyd1wzxQ3W0gd_FsQzFR7RbMEZldtZPQNNTEx7yPq9Jp620_eOh4el4mSe-RF_NNIhyQq7u44cG5_HL1R15dzdSW1suE9yn2hqJT4KzVGlPvzx7vvG-kuUP_d9bb1DXxxYnOUvO_OxJh6XyqAvjuVvxT9c3Dhegr8JHKKI3LFQG3hEkLgbY4wLiJeCueM3S1fDm0Q00Mvh0fI84"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">Solar Panels<br/>&amp; Kits</span>
+</button>
+<!-- 5: Commercial Vehicles -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-inverse-surface text-inverse-on-surface font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">Heavy</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Heavy duty commercial heavy haul truck and bus dual battery 24V rugged casing with thick terminal lugs, commercial fleet grade hardware studio visual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUDXQ_ZWvEf-IVSIUbosWW5EdcPRQxPk62gM9i7raI7QE4tcISt17U5CE8tnUx7sduFhtmZnmWg_hoVmop3ujmlg3aIM9d6UVwQpw6SeuA4DCG9PbAeDewnMptTu_b7Cd_9cLl-NbH1FQ--hMHR3NgWbfHYUw65ZA91jsaCnnwECnw99msza05k5tkLgYccyPzg705fUx2tF36PAADmSHWDFk8ViaaqxRTTDy9sFM"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">Commercial<br/>Vehicles</span>
+</button>
+<!-- 6: 2-Wheeler -->
+<button class="flex flex-col items-center shrink-0 w-[72px] text-center group cursor-pointer">
+<div class="relative w-16 h-16 rounded-2xl bg-gradient-to-b from-surface-container-lowest to-surface-container shadow-sm flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="absolute -top-1.5 -right-1 bg-tertiary text-on-tertiary font-number-badge text-number-badge px-1.5 py-0.5 rounded-full shadow-xs">15-Min</span>
+<img class="w-10 h-10 object-contain drop-shadow-sm" data-alt="Compact maintenance free VRLA AGM motorcycle and scooter battery with red terminal caps, studio isolated product photograph on pure white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmxEb86NqhkjKIC6UMnndhwNKYeCU7WNZ2-Okk0A9b1EsFm4YUS3MOQ87KS48NFqn7_0Opbh3jzL0CAE9qcoOTi1gt0iVJNV11V7mxMph7cwDLsnno5mCMLD_t80iRR70imFRHc_Q4CC8iTYswIR86ViuRjj-byN09l16LuW8Ht7FgdzOAN0uLtQcU8fygolrsMyj9B5KuyIuGRJ8jkf-kug5_nrZR8yIiwZZWxSo"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1.5 leading-tight">2-Wheeler<br/>Batteries</span>
+</button>
+</div>
+</section>
+<!-- 2. EMERGENCY 45-MIN ROADSIDE DISPATCH CARD -->
+<section class="px-4">
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-inverse-surface via-inverse-surface to-primary text-on-primary p-4 shadow-xl">
+<!-- Ambient background visual element -->
+<div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-primary/20 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col space-y-3">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-fixed text-[20px] animate-pulse">emergency_home</span>
+<span class="font-headline-sm text-headline-sm text-on-primary font-extrabold tracking-tight leading-tight">Stuck on Road?</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-md">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed opacity-80"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-fixed"></span>
+</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed font-bold tracking-tight">Active in Noida</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/90 font-medium leading-relaxed">
+          Certified mobile technician arrives in <strong class="text-tertiary-fixed">45 mins</strong> with genuine OE battery, calibrated alternator tester &amp; jumper cables.
+        </p>
+<!-- SOS Quick Button -->
+<a class="relative overflow-hidden flex items-center justify-between w-full h-12 px-4 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-extrabold shadow-[0_8px_20px_-4px_rgba(220,38,38,0.5)] active:scale-[0.98] transition-transform" href="#sos-dispatch">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<span>Dispatch SOS Express Tech</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm bg-on-primary/20 px-2 py-0.5 rounded-full">
+<span>45m ETA</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</div>
+</a>
+<!-- Reassurance strip -->
+<div class="grid grid-cols-3 gap-1 pt-1 text-center font-label-sm text-label-sm text-inverse-on-surface/80">
+<div class="flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-tertiary-fixed text-[14px]">check_circle</span>
+<span>Free Doorstep</span>
+</div>
+<div class="flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-tertiary-fixed text-[14px]">check_circle</span>
+<span>100% Genuine</span>
+</div>
+<div class="flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-tertiary-fixed text-[14px]">check_circle</span>
+<span>₹1k Old Scrap</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. SMART 3-STEP BATTERY FINDER WIDGET -->
+<section class="px-4">
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm space-y-3.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">manage_search</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-extrabold">Instant Fitment Finder</h2>
+<p class="font-body-sm text-body-sm text-secondary">Zero mismatches • 100% Factory warranty fit</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm bg-tertiary-container/15 text-tertiary font-extrabold px-2 py-0.5 rounded-full">Step 1 of 3</span>
+</div>
+<!-- Vehicle Segment Switcher Tabs -->
+<div class="grid grid-cols-3 p-1 rounded-xl bg-surface-container gap-1">
+<button class="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-bold shadow-xs transition-all" id="tab-car">
+<span class="material-symbols-outlined text-[16px]">directions_car</span>
+<span>Car</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 py-2 rounded-lg text-secondary hover:text-on-surface font-label-sm text-label-sm font-bold transition-all" id="tab-bike">
+<span class="material-symbols-outlined text-[16px]">two_wheeler</span>
+<span>Bike</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 py-2 rounded-lg text-secondary hover:text-on-surface font-label-sm text-label-sm font-bold transition-all" id="tab-inverter">
+<span class="material-symbols-outlined text-[16px]">solar_power</span>
+<span>Inverter</span>
+</button>
+</div>
+<!-- Cascading Select Pickers -->
+<div class="space-y-2.5">
+<!-- 1. Make -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low text-on-surface cursor-pointer active:bg-surface-container">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">directions_car_filled</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Step 1 • Make / Brand</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Maruti Suzuki</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">expand_more</span>
+</div>
+<!-- 2. Model -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low text-on-surface cursor-pointer active:bg-surface-container">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">model_training</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Step 2 • Vehicle Model</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Swift (2018 - Present)</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">expand_more</span>
+</div>
+<!-- 3. Fuel -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low text-on-surface cursor-pointer active:bg-surface-container">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">local_gas_station</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Step 3 • Fuel Variant</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Petrol / CNG (1.2L DualJet)</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">expand_more</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full h-13 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_-4px_rgba(220,38,38,0.35)] active:scale-[0.98] transition-all">
+<span>Find Exact Compatible Batteries (6 Options)</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- 4. PROMOTIONAL HERO BANNER CAROUSEL -->
+<section class="px-4">
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-inverse-surface p-4 text-on-primary shadow-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col max-w-[65%] space-y-1">
+<span class="w-fit font-number-badge text-number-badge uppercase tracking-wider bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded-full font-extrabold">
+            Monsoon Road Safety Deal
+          </span>
+<h3 class="font-headline-sm text-headline-sm font-extrabold leading-tight text-on-primary">
+            Exchange &amp; Save up to ₹1,200
+          </h3>
+<p class="font-body-sm text-body-sm text-primary-fixed font-medium">
+            Get up to 66 Months Warranty on Amaron &amp; Exide batteries with certified free installation.
+          </p>
+</div>
+<div class="relative flex items-center justify-center shrink-0 w-24 h-24">
+<div class="absolute inset-0 bg-primary-fixed/20 rounded-full blur-xl"></div>
+<img class="relative z-10 w-20 h-20 object-contain drop-shadow-lg" data-alt="Heavy duty automotive red and black lithium hybrid starter battery showing golden battery terminals and warranty shield badge in bright illumination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwqxIDepdLyJRq4q41S39H_yJEPiQJkkRH1C4yu5wFi2np80g0vebXiHs5jB3KSADjtTTDJexND8iyQ-ucucHoq9wwW7fKSGDpi8jSrdq04yBiPlOUOd3IFY8tqoc3sQYs4KbDRwmxxXQv13i89FWUHboXK4xMSON6xk5wrJpmkelonvMRLL_o34SkqbVNNvmH9m74OZeYlJUBwdbzgdgnRLy8k5ZlWwjWn0QuRyw"/>
+</div>
+</div>
+<!-- Dots indicator -->
+<div class="flex items-center justify-center gap-1.5 mt-3 pt-2">
+<span class="w-5 h-1.5 rounded-full bg-on-primary"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary/40"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary/40"></span>
+</div>
+</div>
+</section>
+<!-- 5. POPULAR CAR MAKER CHIPS -->
+<section class="w-full">
+<div class="flex items-center justify-between px-4 mb-2.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]">directions_car</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-extrabold">Shop by Car Make</span>
+</div>
+<a class="font-label-sm text-label-sm text-primary font-bold flex items-center gap-0.5" href="#">
+<span>View 40+</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Quick car brand horizontal row -->
+<div class="flex overflow-x-auto no-scrollbar px-4 space-x-3">
+<!-- Maruti -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">MS</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Maruti</span>
+</div>
+<!-- Hyundai -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">HY</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Hyundai</span>
+</div>
+<!-- Tata -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">TA</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Tata</span>
+</div>
+<!-- Mahindra -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">MH</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Mahindra</span>
+</div>
+<!-- Toyota -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">TY</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Toyota</span>
+</div>
+<!-- Honda -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">HD</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Honda</span>
+</div>
+<!-- Kia -->
+<div class="flex flex-col items-center shrink-0 w-16 text-center cursor-pointer group">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-xs flex items-center justify-center p-2 group-active:scale-95 transition-transform">
+<span class="font-headline-sm text-headline-sm font-extrabold text-secondary">KIA</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-1 truncate w-full">Kia</span>
+</div>
+</div>
+</section>
+<!-- 6. TRENDING AUTOMOTIVE BATTERIES (2-Column E-Commerce Grid) -->
+<section class="px-4 space-y-3">
+<div class="flex flex-col space-y-2">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-extrabold">Top Rated Car Batteries</h2>
+<span class="font-label-sm text-label-sm text-tertiary font-bold bg-tertiary-container/10 px-2 py-0.5 rounded-full">45m Delivery</span>
+</div>
+<!-- Brand Filter Tabs -->
+<div class="flex overflow-x-auto no-scrollbar gap-1.5 pb-1">
+<button class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-bold shrink-0">All Fits (24)</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-sm text-label-sm font-bold shrink-0 hover:bg-surface-container">Amaron</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-sm text-label-sm font-bold shrink-0 hover:bg-surface-container">Exide</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-sm text-label-sm font-bold shrink-0 hover:bg-surface-container">Livguard</button>
+</div>
+</div>
+<!-- 2x2 Grid -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Product 1 -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 flex flex-col justify-between shadow-sm relative group">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-number-badge text-number-badge bg-tertiary text-on-tertiary font-extrabold px-1.5 py-0.5 rounded-md">55M Warranty</span>
+<span class="font-number-badge text-number-badge bg-primary-fixed text-on-primary-fixed-variant font-extrabold px-1.5 py-0.5 rounded-md">Bestseller</span>
+</div>
+<div class="h-28 w-full flex items-center justify-center p-1 relative">
+<img class="max-h-full max-w-full object-contain" data-alt="Amaron Flo high endurance green automotive battery with heavy terminal posts, detailed studio render." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCZtv_6Ee-U0lzUJfrvY6jKzcgudoAs1EIpH6pMbaEuZWeGeYxOVub1sPzBnNu9gN294a2AMGEYMpVdHwh-2HDldMxD1AYIS1CqZs50exhlmGJqvua4zOMh3_naHOvHW-eRLjx6fYodacNIa8muX2kY_uScaG1Fu7gZXpJwLkvs2MN0pH8m6P9nrnpZFzka_HyZvUJ3wCvUEhKjD-eCYOgEq39DndsTYhFgxSXG5Y"/>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-primary font-extrabold">Amaron Flo</div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold line-clamp-1 leading-tight">Flo 35Ah (AAM-FL)</h4>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">4.9</span>
+<span class="font-label-sm text-label-sm text-secondary">(1.8k)</span>
+</div>
+</div>
+</div>
+<div class="pt-2 mt-2 space-y-2">
+<div class="space-y-0.5">
+<div class="flex items-baseline gap-1.5">
+<span class="font-number-price text-number-price text-primary font-extrabold">₹3,849</span>
+<span class="font-body-sm text-body-sm text-secondary line-through">₹4,799</span>
+</div>
+<div class="font-number-badge text-number-badge text-tertiary font-bold bg-tertiary-container/10 px-1.5 py-0.5 rounded-md w-fit">
+              Save ₹950 w/ Scrap
+            </div>
+</div>
+<button class="w-full h-9 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-bold flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add to Cart</span>
+</button>
+</div>
+</div>
+<!-- Product 2 -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 flex flex-col justify-between shadow-sm relative group">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-number-badge text-number-badge bg-tertiary text-on-tertiary font-extrabold px-1.5 py-0.5 rounded-md">66M Warranty</span>
+<span class="font-number-badge text-number-badge bg-secondary-container text-on-secondary-container font-extrabold px-1.5 py-0.5 rounded-md">OE Fitted</span>
+</div>
+<div class="h-28 w-full flex items-center justify-center p-1 relative">
+<img class="max-h-full max-w-full object-contain" data-alt="Exide Epiq red and dark grey automotive replacement battery with clean top cover and factory seal stickers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCY44UDWpfw2QpbCP_grvoH9VWc_cSnr4xJPCyNdbvDVfl5pGK72UKpsVyF1oD2NsIwRlAfdMTGKJVqUf6gXEfS4bIaroGesf3dLNFlRejxcfDMlEpzu7mfPtMDpldzkUjoXqisTJnL0HIEfSLTkwDW7Y5jQB3wv_8qDlPQH5dcFqaeqDo7PAwf4yfXQRXKiMR16pGsS90kTKCmOeddGrwkqGdDHALjzjchML7S_A"/>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-primary font-extrabold">Exide Epiq</div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold line-clamp-1 leading-tight">Epiq 35Ah (DIN35)</h4>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">4.8</span>
+<span class="font-label-sm text-label-sm text-secondary">(2.4k)</span>
+</div>
+</div>
+</div>
+<div class="pt-2 mt-2 space-y-2">
+<div class="space-y-0.5">
+<div class="flex items-baseline gap-1.5">
+<span class="font-number-price text-number-price text-primary font-extrabold">₹4,199</span>
+<span class="font-body-sm text-body-sm text-secondary line-through">₹5,100</span>
+</div>
+<div class="font-number-badge text-number-badge text-tertiary font-bold bg-tertiary-container/10 px-1.5 py-0.5 rounded-md w-fit">
+              Save ₹900 w/ Scrap
+            </div>
+</div>
+<button class="w-full h-9 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-bold flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add to Cart</span>
+</button>
+</div>
+</div>
+<!-- Product 3 -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 flex flex-col justify-between shadow-sm relative group">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-number-badge text-number-badge bg-tertiary text-on-tertiary font-extrabold px-1.5 py-0.5 rounded-md">60M Warranty</span>
+<span class="font-number-badge text-number-badge bg-surface-container text-secondary font-extrabold px-1.5 py-0.5 rounded-md">Heavy Duty</span>
+</div>
+<div class="h-28 w-full flex items-center justify-center p-1 relative">
+<img class="max-h-full max-w-full object-contain" data-alt="Livguard Zing car battery in deep orange and black durable casing with fast cranking power indicator." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ23huF9IlJ0osCinSVWucPs-eAgQeKvzwgCKQoyAFk0dKl1fpxEDBnX1Qfysyry4ERSbAEeid6JlFS8ifoNfDhxclEG10TmuZwuxqFBIugRX482eZH2skcJnmCV0P_kNr-PT1wxU7zTuyWtYigoQbFAdHxFsCuCU5MeDtcnRwPTDgGhWzsTK156_2WhfAV54sA5nahZH-AkjTEc5VvK5iPfAjG0qiQ2VgRyNaVyo"/>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-primary font-extrabold">Livguard Zing</div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold line-clamp-1 leading-tight">Zing 45Ah (LG45R)</h4>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">4.7</span>
+<span class="font-label-sm text-label-sm text-secondary">(890)</span>
+</div>
+</div>
+</div>
+<div class="pt-2 mt-2 space-y-2">
+<div class="space-y-0.5">
+<div class="flex items-baseline gap-1.5">
+<span class="font-number-price text-number-price text-primary font-extrabold">₹4,499</span>
+<span class="font-body-sm text-body-sm text-secondary line-through">₹5,350</span>
+</div>
+<div class="font-number-badge text-number-badge text-tertiary font-bold bg-tertiary-container/10 px-1.5 py-0.5 rounded-md w-fit">
+              Save ₹1,100 w/ Scrap
+            </div>
+</div>
+<button class="w-full h-9 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-bold flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add to Cart</span>
+</button>
+</div>
+</div>
+<!-- Product 4 -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 flex flex-col justify-between shadow-sm relative group">
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-number-badge text-number-badge bg-secondary text-on-secondary font-extrabold px-1.5 py-0.5 rounded-md">36M Warranty</span>
+<span class="font-number-badge text-number-badge bg-primary-fixed text-on-primary-fixed-variant font-extrabold px-1.5 py-0.5 rounded-md">Budget Pick</span>
+</div>
+<div class="h-28 w-full flex items-center justify-center p-1 relative">
+<img class="max-h-full max-w-full object-contain" data-alt="Exide Mileage compact car battery in bright red container with handle and factory warranty sticker." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmGqw9n06EB--c-yYCSYda6shtleofV7PkuUB2DGpVkuEdQ6ttRpm6zdCKbc7-v0bkWx1SCE-61ldfMW7g0I3rb7yaTw0aJtTOh0zW4wWTCcAXzWYSJRyZJzJpQ721TYfAbep6mQSmV30kII8albhML_tYn4mU0-C359nBrbQMwlanF0WVFDIYSZY9S0tjmrqu5R9ReOmZBYmnf5QWfSiUOnszT-nnZooYMNCOjSo"/>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-primary font-extrabold">Exide Mileage</div>
+<h4 class="font-label-md text-label-md text-on-surface font-bold line-clamp-1 leading-tight">ML35R (35Ah)</h4>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">4.7</span>
+<span class="font-label-sm text-label-sm text-secondary">(1.2k)</span>
+</div>
+</div>
+</div>
+<div class="pt-2 mt-2 space-y-2">
+<div class="space-y-0.5">
+<div class="flex items-baseline gap-1.5">
+<span class="font-number-price text-number-price text-primary font-extrabold">₹3,299</span>
+<span class="font-body-sm text-body-sm text-secondary line-through">₹3,999</span>
+</div>
+<div class="font-number-badge text-number-badge text-tertiary font-bold bg-tertiary-container/10 px-1.5 py-0.5 rounded-md w-fit">
+              Save ₹700 w/ Scrap
+            </div>
+</div>
+<button class="w-full h-9 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-bold flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add to Cart</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. TOP BATTERY BRANDS AUTHORIZED PARTNERS -->
+<section class="px-4">
+<div class="bg-surface-container-lowest rounded-2xl p-3 shadow-xs space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-extrabold uppercase tracking-wide">Direct Authorized Dealerships</span>
+<div class="flex items-center gap-1 text-tertiary font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>100% Genuine OE</span>
+</div>
+</div>
+<div class="grid grid-cols-5 gap-2 items-center text-center">
+<div class="p-1.5 rounded-xl bg-surface-container-low font-label-sm text-label-sm font-extrabold text-secondary">AMARON</div>
+<div class="p-1.5 rounded-xl bg-surface-container-low font-label-sm text-label-sm font-extrabold text-secondary">EXIDE</div>
+<div class="p-1.5 rounded-xl bg-surface-container-low font-label-sm text-label-sm font-extrabold text-secondary">LIVGUARD</div>
+<div class="p-1.5 rounded-xl bg-surface-container-low font-label-sm text-label-sm font-extrabold text-secondary">LUMINOUS</div>
+<div class="p-1.5 rounded-xl bg-surface-container-low font-label-sm text-label-sm font-extrabold text-secondary">SF SONIC</div>
+</div>
+</div>
+</section>
+<!-- 8. CUSTOMER TRUST & SCRAP VALUE CALCULATOR BANNER -->
+<section class="px-4">
+<div class="bg-gradient-to-br from-surface-container-lowest via-surface-container-lowest to-surface-container-high rounded-2xl p-4 shadow-sm space-y-3">
+<div class="flex items-start gap-3">
+<div class="w-12 h-12 rounded-2xl bg-tertiary-container/15 text-tertiary shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">currency_rupee_circle</span>
+</div>
+<div class="space-y-1">
+<span class="font-number-badge text-number-badge bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded-full font-bold uppercase">Green Recycling</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-extrabold leading-tight">Got a Dead Battery? Don't Throw It!</h3>
+<p class="font-body-sm text-body-sm text-secondary font-medium">
+            Get instant ₹600 to ₹1,500 cash rebate adjusted directly at your doorstep with certified pollution-board compliant disposal.
+          </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[18px]">recycling</span>
+<span class="font-label-sm text-label-sm text-on-surface font-extrabold">Instant Doorstep Cash Off</span>
+</div>
+<button class="h-10 px-4 rounded-xl bg-inverse-surface text-inverse-on-surface font-label-sm text-label-sm font-extrabold flex items-center gap-1 active:scale-95 transition-transform">
+<span>Check Scrap Rate</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 9. CUSTOMER REVIEWS & 45-MIN PROMISE STRIP -->
+<section class="px-4 space-y-3">
+<!-- Milestone counter banner -->
+<div class="bg-surface-container rounded-2xl p-4 text-center space-y-1">
+<div class="flex items-center justify-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+<span class="font-headline-sm text-headline-sm font-extrabold text-on-surface">2,50,000+ Fitted</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">
+        Serving Delhi NCR, Gurgaon, Noida, Ghaziabad &amp; 20+ metro regions daily.
+      </p>
+<div class="grid grid-cols-3 gap-2 pt-3">
+<div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center">
+<div class="flex items-center gap-0.5 text-amber-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-extrabold text-on-surface">4.9/5</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">Google Rating</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center">
+<div class="flex items-center gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+<span class="font-label-md text-label-md font-extrabold text-on-surface">45 Mins</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">Avg Delivery</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center">
+<div class="flex items-center gap-0.5 text-tertiary">
+<span class="material-symbols-outlined text-[16px]">health_and_safety</span>
+<span class="font-label-md text-label-md font-extrabold text-on-surface">Free Check</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">Alternator Test</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Interactive Segment Switcher
+  const tabCar = document.getElementById('tab-car');
+  const tabBike = document.getElementById('tab-bike');
+  const tabInverter = document.getElementById('tab-inverter');
+
+  const tabs = [tabCar, tabBike, tabInverter];
+
+  function setActiveTab(active) {
+    tabs.forEach(tab => {
+      if (tab === active) {
+        tab.className = "flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-bold shadow-xs transition-all";
+      } else {
+        tab.className = "flex items-center justify-center gap-1.5 py-2 rounded-lg text-secondary hover:text-on-surface font-label-sm text-label-sm font-bold transition-all";
+      }
+    });
+  }
+
+  if (tabCar && tabBike && tabInverter) {
+    tabCar.addEventListener('click', () => setActiveTab(tabCar));
+    tabBike.addEventListener('click', () => setActiveTab(tabBike));
+    tabInverter.addEventListener('click', () => setActiveTab(tabInverter));
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/95 backdrop-blur-xl shadow-[0_-4px_24px_rgba(11,28,48,0.06)]" data-active-classes="text-primary font-bold"><div class="flex justify-around items-center h-16 px-1 relative"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 transition-all text-primary font-bold" data-path="home-feed" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Home</span><span class="w-1.5 h-1.5 rounded-full bg-primary mt-0.5"></span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-secondary hover:text-on-surface transition-all" data-path="categories" href="#"><span class="material-symbols-outlined text-[24px]">grid_view</span><span class="font-label-sm text-label-sm mt-0.5">Categories</span></a><div class="relative -top-5 flex flex-col items-center"><a class="w-14 h-14 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(220,38,38,0.45)] active:scale-95 transition-transform" data-path="sos-emergency-dispatch" href="#"><span class="material-symbols-outlined text-[28px] animate-pulse">bolt</span></a><span class="font-label-sm text-label-sm text-primary font-extrabold mt-1 tracking-tight">SOS 45m</span></div><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-secondary hover:text-on-surface transition-all" data-path="vehicle-finder" href="#"><span class="material-symbols-outlined text-[24px]">directions_car</span><span class="font-label-sm text-label-sm mt-0.5">Finder</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-secondary hover:text-on-surface transition-all relative" data-path="account-and-cart" href="#"><div class="relative"><span class="material-symbols-outlined text-[24px]">shopping_bag</span><span class="absolute -top-1 -right-2 bg-primary text-on-primary font-number-badge text-number-badge w-4 h-4 rounded-full flex items-center justify-center">2</span></div><span class="font-label-sm text-label-sm mt-0.5">Cart / Profile</span></a></div></nav></body></html>
