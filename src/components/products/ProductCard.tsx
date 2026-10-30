@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import type { ProductListResponse } from "@/types/dto";
 import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
-import { cityDeliveryTimesQuery, categoriesQuery } from "@/queries";
+import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
 import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -98,20 +98,67 @@ export function ProductCard({
   const totalSavings = basePriceForSavings - exchangePrice;
   const showSavings = totalSavings > 0;
 
-  // Determine capacity to display on card badge
-  const displayCapacity = useMemo(() => {
-    const extractAh = (text: unknown): string | null => {
-      if (!text || typeof text !== "string") return null;
-      const m = text.match(/(?:\b|\()(\d+)\s*\)?\s*Ah\b/i);
-      if (m) {
-        const num = parseInt(m[1], 10);
-        if (num >= 2 && num <= 500) return `${num} Ah`;
-      }
-      return null;
-    };
+  // Helper to extract clean "XX Ah" strictly
+  const extractAh = (text: unknown): string | null => {
+    if (!text || typeof text !== "string") return null;
+    const m = text.match(/(?:\b|\()(\d+)\s*\)?\s*Ah\b/i);
+    if (m) {
+      const num = parseInt(m[1], 10);
+      if (num >= 2 && num <= 500) return `${num} Ah`;
+    }
+    return null;
+  };
 
-    // 1. Direct capacityAh field (if valid Ah or pure number)
-    if ('capacityAh' in product && (product as any).capacityAh) {
+  // Helper to strictly scan specifications array for battery capacity
+  const extractFromSpecs = (specDetails?: any[]): string | null => {
+    if (!Array.isArray(specDetails) || specDetails.length === 0) return null;
+    const invalidAttrs = /load|inverter|reserve|tank|surge|gross/i;
+
+    // 1. Primary: check battery capacity specific attributes
+    for (const s of specDetails) {
+      if (!s || !s.attributeName || !s.value) continue;
+      const attr = s.attributeName.toLowerCase();
+      if (invalidAttrs.test(attr)) continue;
+
+      if (
+        attr === "capacity" ||
+        attr.includes("battery capacity") ||
+        attr.includes("nominal capacity") ||
+        attr.includes("rated capacity") ||
+        attr.includes("capacity (in ah)") ||
+        attr.includes("capacity in ah") ||
+        attr.includes("capacity (ah)") ||
+        attr.includes("inbuilt battery")
+      ) {
+        const fromSpec = extractAh(s.value);
+        if (fromSpec) return fromSpec;
+        const numOnly = String(s.value).match(/^\s*(\d+)\s*$/);
+        if (numOnly) {
+          const n = parseInt(numOnly[1], 10);
+          if (n >= 2 && n <= 500) return `${n} Ah`;
+        }
+      }
+    }
+
+    // 2. Secondary: any spec value containing explicit "XX Ah" (excluding invalid attributes)
+    for (const s of specDetails) {
+      if (!s || !s.attributeName || !s.value) continue;
+      if (invalidAttrs.test(s.attributeName)) continue;
+      const fromSpec = extractAh(s.value);
+      if (fromSpec) return fromSpec;
+    }
+
+    return null;
+  };
+
+  // 1. Direct from product.specDetails (if passed in full product detail)
+  const directSpecCapacity = useMemo(() => {
+    return extractFromSpecs((product as any).specDetails);
+  }, [product]);
+
+  // 2. Direct from capacityAh / capacity field (if already contains Ah or DIN number)
+  const directFieldCapacity = useMemo(() => {
+    if ("capacityAh" in product && (product as any).capacityAh) {
       const fromField = extractAh((product as any).capacityAh);
       if (fromField) return fromField;
       const rawNum = String((product as any).capacityAh).trim();
@@ -121,49 +168,6 @@ export function ProductCard({
       }
     }
 
-    // 2. Product name (e.g. "Microtek ... 100Ah Lithium", "Amaron 35 Ah")
-    const fromName = extractAh(product.productName);
-    if (fromName) return fromName;
-
-    // 3. specDetails — strictly ignore load capacity, inverter capacity, reserve capacity etc.
-    if ('specDetails' in product && Array.isArray((product as any).specDetails)) {
-      const invalidAttrs = /load|inverter|reserve|tank|surge|gross/i;
-
-      // Check battery capacity attributes first
-      for (const s of (product as any).specDetails) {
-        if (!s || !s.attributeName || !s.value) continue;
-        const attr = s.attributeName.toLowerCase();
-        if (invalidAttrs.test(attr)) continue;
-
-        if (
-          attr === 'capacity' ||
-          attr.includes('battery capacity') ||
-          attr.includes('nominal capacity') ||
-          attr.includes('rated capacity') ||
-          attr.includes('capacity (in ah)') ||
-          attr.includes('capacity in ah') ||
-          attr.includes('capacity (ah)')
-        ) {
-          const fromSpec = extractAh(s.value);
-          if (fromSpec) return fromSpec;
-          const numOnly = String(s.value).match(/^\s*(\d+)\s*$/);
-          if (numOnly) {
-            const n = parseInt(numOnly[1], 10);
-            if (n >= 2 && n <= 500) return `${n} Ah`;
-          }
-        }
-      }
-
-      // Secondary: any other spec with explicit "XX Ah" (excluding invalid attributes)
-      for (const s of (product as any).specDetails) {
-        if (!s || !s.attributeName || !s.value) continue;
-        if (invalidAttrs.test(s.attributeName)) continue;
-        const fromSpec = extractAh(s.value);
-        if (fromSpec) return fromSpec;
-      }
-    }
-
-    // 4. product.capacity field (e.g. "DIN-100 CAR", "35L CAR", "85AH L")
     if (product.capacity && typeof product.capacity === "string") {
       const raw = product.capacity.trim();
       const fromCapAh = extractAh(raw);
@@ -175,7 +179,6 @@ export function ProductCard({
         if (n >= 20 && n <= 300) return `${n} Ah`;
       }
 
-      // Sizing like 35L CAR, 80R CAR (ignoring pure tech codes like EFB, AGM, N55, RL, etc.)
       if (!/^(efb|agm|n\d+|r\/l|l\/r|rl|lr|r|l)$/i.test(raw)) {
         const numPrefix = raw.match(/^(\d+)[LR]?(?:\s|$|CAR|ACCENT)/i);
         if (numPrefix) {
@@ -185,9 +188,26 @@ export function ProductCard({
       }
     }
 
-    // Never return unverified strings like "EFB", "6-7 Hours", etc.
     return null;
   }, [product]);
+
+  const directCapacity = directSpecCapacity || directFieldCapacity;
+
+  // 3. Fallback: If no direct capacity and no specDetails, query product details to read full specifications
+  const needsDetail = !directCapacity && !(product as any).specDetails;
+  const { data: detailData } = useQuery({
+    ...productDetailQuery(product.seo?.slug || product.productId),
+    enabled: Boolean(needsDetail),
+    staleTime: 10 * 60_000,
+  });
+
+  const detailSpecCapacity = useMemo(() => {
+    if (!detailData?.specDetails) return null;
+    return extractFromSpecs(detailData.specDetails);
+  }, [detailData]);
+
+  // Final capacity: ONLY from specifications / capacity fields, NEVER from product title!
+  const displayCapacity = directCapacity || detailSpecCapacity;
 
   // Generate pseudo-random deterministic rating based on product name length
   const rating = useMemo(() => {
