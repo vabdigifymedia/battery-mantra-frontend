@@ -6,6 +6,7 @@ import {
   brandsQuery,
   categoriesQuery,
 } from "@/queries";
+import { useMemo } from "react";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/shop/c/$categorySlug/")({
   },
   head: ({ loaderData, params }) => {
     const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const category = loaderData?.categories?.find((c: any) => (c.categorySlug || toSlug(c.categoryName)) === params.categorySlug || toSlug(c.categoryName) === params.categorySlug);
     const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 
     const seo = resolveTemplateSeo(
@@ -52,13 +53,51 @@ function CategoryProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.id });
 
-  const { data: categories, isLoading } = useQuery(categoriesQuery());
+  const { data: categories, isLoading: isLoadingFlat } = useQuery(categoriesQuery());
+  const { data: rootCategories, isLoading: isLoadingRoot } = useQuery(rootCategoriesQuery());
+
+  const isLoading = isLoadingFlat || isLoadingRoot;
+
+  // Find category match from flat list first, then search tree recursively
+  const matchingCategory = useMemo(() => {
+    if (!categories && !rootCategories) return undefined;
+
+    // 1. Try flat list match by categorySlug property or name-derived slug
+    const flatMatch = categories?.find(c => {
+      const cSlug = c.categorySlug || toSlug(c.categoryName);
+      const cNameSlug = toSlug(c.categoryName);
+      return cSlug === categorySlug || cNameSlug === categorySlug;
+    });
+    if (flatMatch) return flatMatch;
+
+    // 2. Search recursively in root categories tree (for subcategories)
+    const normalizeSlug = (s: string) => s.toLowerCase().trim().replace(/-batteries$/, '-battery').replace(/\s+/g, '-');
+    const findInTree = (cats: any[]): any | undefined => {
+      for (const c of cats) {
+        const cSlug = c.categorySlug || toSlug(c.categoryName);
+        const cNameSlug = toSlug(c.categoryName);
+        if (
+          cSlug === categorySlug ||
+          cNameSlug === categorySlug ||
+          normalizeSlug(cSlug) === normalizeSlug(categorySlug) ||
+          normalizeSlug(cNameSlug) === normalizeSlug(categorySlug)
+        ) {
+          return c;
+        }
+        if (c.subCategories?.length) {
+          const found = findInTree(c.subCategories);
+          if (found) return found;
+        }
+      }
+      return undefined;
+    };
+    return rootCategories ? findInTree(rootCategories) : undefined;
+  }, [categories, rootCategories, categorySlug]);
 
   if (isLoading) {
     return <FullPageLoader />;
   }
 
-  const matchingCategory = categories?.find(c => toSlug(c.categoryName) === categorySlug);
   const activeCategoryId = matchingCategory?.categoryId;
 
   // We inject the category into the search context

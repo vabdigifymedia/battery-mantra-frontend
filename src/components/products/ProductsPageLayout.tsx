@@ -75,13 +75,22 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     const slugs = search.category.split(',');
     const ids: string[] = [];
 
+    const normalizeSlug = (s: string) => s.toLowerCase().trim().replace(/-batteries$/, '-battery').replace(/\s+/g, '-');
+
     const findId = (cats: any[]) => {
       for (const cat of cats) {
         const catSlug = cat.categorySlug || cat.categoryName.toLowerCase().replace(/\s+/g, '-');
-        const isMatch = slugs.includes(catSlug) || slugs.some(s => {
-          const normS = s.replace(/-batteries$/, '-battery');
-          const normC = catSlug.replace(/-batteries$/, '-battery');
-          if (normS === normC) return true;
+        const catNameSlug = cat.categoryName.toLowerCase().replace(/\s+/g, '-');
+        const isMatch = slugs.includes(catSlug) || slugs.includes(catNameSlug) || slugs.some(s => {
+          const normS = normalizeSlug(s);
+          const normC = normalizeSlug(catSlug);
+          const normN = normalizeSlug(catNameSlug);
+          if (normS === normC || normS === normN) return true;
+          // Also try matching without trailing '-battery'
+          const simpS = normS.replace(/-battery$/, '');
+          const simpC = normC.replace(/-battery$/, '');
+          const simpN = normN.replace(/-battery$/, '');
+          if (simpS.length > 3 && (simpS === simpC || simpS === simpN)) return true;
           if (/(^|-)car(-|$)/.test(s) && /(^|\s)car(\s|$)/i.test(cat.categoryName)) return true;
           if (/(^|-)bike(-|$)/.test(s) && /(^|\s)bike(\s|$)/i.test(cat.categoryName)) return true;
           return false;

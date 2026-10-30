@@ -160,7 +160,7 @@ export function LithiumSubCategoryPage({
             </h2>
             <p className="text-slate-500 font-medium text-xs md:text-base">Smart. Powerful. Future Ready.</p>
           </div>
-          <Link to="/shop/c/$categorySlug" params={{ categorySlug: type || toSlug(category.categoryName) }} className={`hidden md:flex items-center gap-1 text-sm font-bold ${IconText} hover:opacity-80`}>
+          <Link to="/shop/c/$categorySlug" params={{ categorySlug: category.categorySlug || type || toSlug(category.categoryName) }} className={`hidden md:flex items-center gap-1 text-sm font-bold ${IconText} hover:opacity-80`}>
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
