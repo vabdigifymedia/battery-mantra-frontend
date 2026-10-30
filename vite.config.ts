@@ -18,7 +18,7 @@ export default defineConfig({
     viteReact(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png'],
+      includeAssets: ['favicon.ico', 'favicon.png', 'favicon-48x48.png', 'favicon-96x96.png', 'favicon-192x192.png'],
       manifest: {
         name: 'Battery Mantra',
         short_name: 'BatteryMantra',
@@ -28,13 +28,13 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'favicon.png',
+            src: '/favicon-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'favicon.png',
-            sizes: '512x512',
+            src: '/favicon.png',
+            sizes: '192x192',
             type: 'image/png'
           }
         ]
