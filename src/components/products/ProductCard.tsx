@@ -100,26 +100,93 @@ export function ProductCard({
 
   // Determine capacity to display on card badge
   const displayCapacity = useMemo(() => {
+    const extractAh = (text: unknown): string | null => {
+      if (!text || typeof text !== "string") return null;
+      const m = text.match(/(?:\b|\()(\d+)\s*\)?\s*Ah\b/i);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (num >= 2 && num <= 500) return `${num} Ah`;
+      }
+      return null;
+    };
+
+    // 1. Direct capacityAh field (if valid Ah or pure number)
     if ('capacityAh' in product && (product as any).capacityAh) {
-      return (product as any).capacityAh;
+      const fromField = extractAh((product as any).capacityAh);
+      if (fromField) return fromField;
+      const rawNum = String((product as any).capacityAh).trim();
+      if (/^\d+$/.test(rawNum)) {
+        const n = parseInt(rawNum, 10);
+        if (n >= 2 && n <= 500) return `${n} Ah`;
+      }
     }
+
+    // 2. Product name (e.g. "Microtek ... 100Ah Lithium", "Amaron 35 Ah")
+    const fromName = extractAh(product.productName);
+    if (fromName) return fromName;
+
+    // 3. specDetails — strictly ignore load capacity, inverter capacity, reserve capacity etc.
     if ('specDetails' in product && Array.isArray((product as any).specDetails)) {
-      const capSpec = (product as any).specDetails.find(
-        (s: any) =>
-          (s.attributeName && /capacity/i.test(s.attributeName)) ||
-          (s.value && /\d+\s*Ah/i.test(s.value))
-      );
-      if (capSpec?.value) return capSpec.value;
+      const invalidAttrs = /load|inverter|reserve|tank|surge|gross/i;
+
+      // Check battery capacity attributes first
+      for (const s of (product as any).specDetails) {
+        if (!s || !s.attributeName || !s.value) continue;
+        const attr = s.attributeName.toLowerCase();
+        if (invalidAttrs.test(attr)) continue;
+
+        if (
+          attr === 'capacity' ||
+          attr.includes('battery capacity') ||
+          attr.includes('nominal capacity') ||
+          attr.includes('rated capacity') ||
+          attr.includes('capacity (in ah)') ||
+          attr.includes('capacity in ah') ||
+          attr.includes('capacity (ah)')
+        ) {
+          const fromSpec = extractAh(s.value);
+          if (fromSpec) return fromSpec;
+          const numOnly = String(s.value).match(/^\s*(\d+)\s*$/);
+          if (numOnly) {
+            const n = parseInt(numOnly[1], 10);
+            if (n >= 2 && n <= 500) return `${n} Ah`;
+          }
+        }
+      }
+
+      // Secondary: any other spec with explicit "XX Ah" (excluding invalid attributes)
+      for (const s of (product as any).specDetails) {
+        if (!s || !s.attributeName || !s.value) continue;
+        if (invalidAttrs.test(s.attributeName)) continue;
+        const fromSpec = extractAh(s.value);
+        if (fromSpec) return fromSpec;
+      }
     }
-    const matchName = product.productName?.match(/\b(\d+\s*Ah)\b/i);
-    if (matchName) return matchName[1];
-    if (!product.capacity) return null;
-    if (/Ah/i.test(product.capacity)) return product.capacity;
-    const dinMatch = product.capacity.match(/DIN[- ]?(\d+)/i);
-    if (dinMatch) return `${dinMatch[1]} Ah`;
-    const numMatch = product.capacity.match(/^(\d+)[LR]?\b/i);
-    if (numMatch) return `${numMatch[1]} Ah`;
-    return product.capacity;
+
+    // 4. product.capacity field (e.g. "DIN-100 CAR", "35L CAR", "85AH L")
+    if (product.capacity && typeof product.capacity === "string") {
+      const raw = product.capacity.trim();
+      const fromCapAh = extractAh(raw);
+      if (fromCapAh) return fromCapAh;
+
+      const dinMatch = raw.match(/DIN[- ]?(\d+)/i);
+      if (dinMatch) {
+        const n = parseInt(dinMatch[1], 10);
+        if (n >= 20 && n <= 300) return `${n} Ah`;
+      }
+
+      // Sizing like 35L CAR, 80R CAR (ignoring pure tech codes like EFB, AGM, N55, RL, etc.)
+      if (!/^(efb|agm|n\d+|r\/l|l\/r|rl|lr|r|l)$/i.test(raw)) {
+        const numPrefix = raw.match(/^(\d+)[LR]?(?:\s|$|CAR|ACCENT)/i);
+        if (numPrefix) {
+          const n = parseInt(numPrefix[1], 10);
+          if (n >= 20 && n <= 300) return `${n} Ah`;
+        }
+      }
+    }
+
+    // Never return unverified strings like "EFB", "6-7 Hours", etc.
+    return null;
   }, [product]);
 
   // Generate pseudo-random deterministic rating based on product name length
