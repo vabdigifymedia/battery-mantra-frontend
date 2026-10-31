@@ -9,9 +9,10 @@ import {
   brandsQuery,
   vehiclesListQuery,
   manufacturersListQuery,
+  productFilterQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { seoTemplatesQuery, resolveTemplateSeo, extractBatteryCapacity, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -158,10 +159,23 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
     const vehicle = findMatchingVehicle(vehicles, manufacturers, makeSlug, modelSlug, categorySlug);
     const manufacturer = manufacturers?.find((m: any) => toSlug(m.name) === makeSlug);
 
-    return { templates, vehicle, manufacturer };
+    // Fetch initial products for this vehicle to derive price statistics and capacity for SEO
+    let initialProducts: any[] = [];
+    if (vehicle?.vehicleId) {
+      try {
+        const prodData = await context.queryClient.ensureQueryData(
+          productFilterQuery({ vehicleId: vehicle.vehicleId, size: 24 })
+        );
+        initialProducts = prodData?.content || [];
+      } catch {
+        initialProducts = [];
+      }
+    }
+
+    return { templates, vehicle, manufacturer, initialProducts };
   },
   head: ({ params, loaderData }) => {
-    const { templates, vehicle, manufacturer } = (loaderData as any) || {};
+    const { templates, vehicle, manufacturer, initialProducts } = (loaderData as any) || {};
     const { categorySlug, makeSlug, modelSlug, _splat } = params as any;
 
     const fallbackMake = makeSlug ? makeSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
@@ -182,6 +196,9 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
     // Avoid duplicate brand like "Honda Honda Amaze" if model already starts with make
     const displayFullName = model.toLowerCase().startsWith(make.toLowerCase()) ? model : `${make} ${model}`;
 
+    const capacity = extractBatteryCapacity(vehicle, initialProducts);
+    const priceStats = extractProductPriceStats(initialProducts);
+
     const seo = resolveTemplateSeo(
       "SUB_MANUFACTURER",
       templates,
@@ -189,19 +206,35 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
         manufacturer_name: make,
         model_name: model,
         category_name: categoryName,
+        capacity,
+        battery_capacity: capacity,
+        price: priceStats.priceFormatted,
+        price_low: priceStats.priceLowestFormatted,
+        price_lowest: priceStats.priceLowestFormatted,
+        price_high: priceStats.priceHighestFormatted,
+        price_highest: priceStats.priceHighestFormatted,
+        price_range: priceStats.priceRangeFormatted,
+        fuel_type: vehicle?.fuelName || "",
+        fuel_name: vehicle?.fuelName || "",
+        warranty_range: priceStats.warrantyRangeFormatted,
+        vehicle_type: vehicle?.vehicleType || "Car",
         delivery_time: "1-2 Hours",
         ...(cityNameStr && { city_name: cityNameStr }),
       },
       (vehicle as any)?.seo || null,
       {
-        title: `${displayFullName} Battery Online | Buy 100% Genuine Car Battery`,
-        description: `Buy 100% Genuine ${displayFullName} Battery Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+        title: capacity
+          ? `${displayFullName} ${capacity} Battery Online | Buy 100% Genuine Car Battery`
+          : `${displayFullName} Battery Online | Buy 100% Genuine Car Battery`,
+        description: `Buy 100% Genuine ${displayFullName}${capacity ? ` ${capacity}` : ""} Battery Online at Best Price${priceStats.priceRangeFormatted ? ` (${priceStats.priceRangeFormatted})` : ""} in India. Get Free Express Delivery and Installation in 1-2 hours.`,
       }
     );
 
     return buildPageHead(seo, {
-      title: `${displayFullName} Battery Online | Buy 100% Genuine Car Battery`,
-      description: `Buy 100% Genuine ${displayFullName} Battery Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      title: capacity
+        ? `${displayFullName} ${capacity} Battery Online | Buy 100% Genuine Car Battery`
+        : `${displayFullName} Battery Online | Buy 100% Genuine Car Battery`,
+      description: `Buy 100% Genuine ${displayFullName}${capacity ? ` ${capacity}` : ""} Battery Online at Best Price${priceStats.priceRangeFormatted ? ` (${priceStats.priceRangeFormatted})` : ""} in India. Get Free Express Delivery and Installation in 1-2 hours.`,
     });
   },
   validateSearch: productSearchSchema,

@@ -44,6 +44,7 @@ import { SeoPriceTable } from "@/components/products/SeoPriceTable";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { useLocationStore } from "@/store/useLocationStore";
 import { applySeoTemplate, toSingularCategory, getBrandSlug } from "@/lib/utils";
+import { extractBatteryCapacity, extractProductPriceStats } from "@/lib/seo-templates";
 
 import { productSearchSchema, type ProductSearchState } from "@/lib/schemas/productSearchSchema";
 
@@ -193,81 +194,20 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const total = data?.pages[0]?.totalElements ?? 0;
   const totalPages = data?.pages[0]?.totalPages ?? 0;
 
-  // Calculate With-Exchange price statistics from products (respects city pricing returned by API)
-  const withExchangePrices = products
-    .map((p: any) => Math.max(0, (p.productPrice || 0) - (p.exchangeDiscount || 0)))
-    .filter((p: number) => p > 0);
-  const minWithExchange = withExchangePrices.length > 0 ? Math.min(...withExchangePrices) : 0;
-  const maxWithExchange = withExchangePrices.length > 0 ? Math.max(...withExchangePrices) : 0;
-  const priceRangeFormatted = minWithExchange > 0
-    ? (minWithExchange === maxWithExchange ? `₹${minWithExchange.toLocaleString('en-IN')}` : `₹${minWithExchange.toLocaleString('en-IN')} - ₹${maxWithExchange.toLocaleString('en-IN')}`)
-    : "";
-  const priceLowestFormatted = minWithExchange > 0 ? `₹${minWithExchange.toLocaleString('en-IN')}` : "";
-  const priceHighestFormatted = maxWithExchange > 0 ? `₹${maxWithExchange.toLocaleString('en-IN')}` : "";
+  // Calculate With-Exchange price statistics and warranty ranges from products
+  const priceStats = useMemo(() => {
+    return extractProductPriceStats(products);
+  }, [products]);
+
+  const minWithExchange = priceStats.minPrice;
+  const maxWithExchange = priceStats.maxPrice;
+  const priceRangeFormatted = priceStats.priceRangeFormatted;
+  const priceLowestFormatted = priceStats.priceLowestFormatted;
+  const priceHighestFormatted = priceStats.priceHighestFormatted;
 
   // Extract battery Ah capacity (e.g. "72 Ah", "45 Ah") — strictly ignoring layout codes (RL)
   const resolvedCapacity = useMemo(() => {
-    // 1. Check product capacityAh
-    for (const p of products) {
-      if (p.capacityAh && /\d+/.test(p.capacityAh)) {
-        const val = p.capacityAh.trim();
-        return /ah/i.test(val) ? val : `${val} Ah`;
-      }
-    }
-    // 2. Check product specs / specDetails
-    for (const p of products) {
-      const item = p as any;
-      if (Array.isArray(item.specDetails)) {
-        const capSpec = item.specDetails.find(
-          (s: any) =>
-            (s.attributeName && /capacity/i.test(s.attributeName)) ||
-            (s.value && /\d+\s*Ah/i.test(s.value))
-        );
-        if (capSpec?.value) {
-          const val = String(capSpec.value).trim();
-          if (/^\d+$/.test(val)) return `${val} Ah`;
-          if (/\d+\s*Ah/i.test(val)) return val;
-        }
-      }
-      if (item.specs && typeof item.specs === 'object') {
-        const capKey = Object.keys(item.specs).find(k => /capacity|ah/i.test(k));
-        if (capKey && item.specs[capKey]) {
-          const val = String(item.specs[capKey]).trim();
-          if (/^\d+$/.test(val)) return `${val} Ah`;
-          if (/\d+\s*Ah/i.test(val)) return val;
-        }
-      }
-    }
-    // 3. Check product name (e.g. "Amaron Flo 72 Ah", "Exide 45Ah")
-    for (const p of products) {
-      const matchName = p.productName?.match(/\b(\d+)\s*Ah\b/i);
-      if (matchName) return `${matchName[1]} Ah`;
-    }
-    // 4. Check product capacity field if it contains Ah or DIN number (not just R/L layout)
-    for (const p of products) {
-      const cap = p.capacity?.trim();
-      if (cap && !/^(r\/l|l\/r|rl|lr|r|l)$/i.test(cap)) {
-        const ahMatch = cap.match(/(\d+)\s*Ah/i);
-        if (ahMatch) return `${ahMatch[1]} Ah`;
-        const dinMatch = cap.match(/DIN[- ]?(\d+)/i);
-        if (dinMatch) return `${dinMatch[1]} Ah`;
-        const numMatch = cap.match(/^(\d+)[LR]?\b/i);
-        if (numMatch) return `${numMatch[1]} Ah`;
-      }
-    }
-    // 5. Check vehicle.capacity (often stores DIN-74, DIN-100, 35R CAR etc. - extract the number)
-    if (vehicle?.capacity) {
-      const vCap = String(vehicle.capacity).trim();
-      if (!/^(r\/l|l\/r|rl|lr|r|l)$/i.test(vCap)) {
-        const ahMatch = vCap.match(/(\d+)\s*Ah/i);
-        if (ahMatch) return `${ahMatch[1]} Ah`;
-        const dinMatch = vCap.match(/DIN[- ]?(\d+)/i);
-        if (dinMatch) return `${dinMatch[1]} Ah`;
-        const numMatch = vCap.match(/(\d+)\s*[LR]?\b/i);
-        if (numMatch) return `${numMatch[1]} Ah`;
-      }
-    }
-    return "";
+    return extractBatteryCapacity(vehicle, products);
   }, [products, vehicle]);
 
   let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "MANUFACTURER_MODEL" = "UNIVERSAL";
@@ -276,11 +216,15 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     delivery_time: getDeliveryTimeText(null, null, city?.cityName),
     price_range: priceRangeFormatted,
     price_lowest: priceLowestFormatted,
+    price_low: priceLowestFormatted,
     price_highest: priceHighestFormatted,
+    price_high: priceHighestFormatted,
     price_name: minWithExchange > 0 ? minWithExchange.toString() : "",
-    price: minWithExchange > 0 ? minWithExchange.toString() : "",
+    price: priceLowestFormatted || (minWithExchange > 0 ? minWithExchange.toString() : ""),
     with_exchange_price: minWithExchange > 0 ? minWithExchange.toString() : "",
     capacity: resolvedCapacity,
+    battery_capacity: resolvedCapacity,
+    warranty_range: priceStats.warrantyRangeFormatted,
   };
 
   if (vehicle) {
@@ -289,10 +233,20 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
       ...context,
       model_name: vehicle.model,
       brand_name: vehicle.make,
+      manufacturer_name: vehicle.make,
       category_name: toSingularCategory(category?.categoryName) || "Battery",
       capacity: resolvedCapacity,
+      battery_capacity: resolvedCapacity,
+      price: priceLowestFormatted,
       price_lowest: priceLowestFormatted,
+      price_low: priceLowestFormatted,
       price_highest: priceHighestFormatted,
+      price_high: priceHighestFormatted,
+      price_range: priceRangeFormatted,
+      fuel_type: vehicle.fuelName || "",
+      fuel_name: vehicle.fuelName || "",
+      warranty_range: priceStats.warrantyRangeFormatted,
+      vehicle_type: vehicle.vehicleType || "Car",
     };
   } else if (brand) {
     pageType = "BRAND";

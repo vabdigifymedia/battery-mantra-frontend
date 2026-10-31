@@ -104,12 +104,16 @@ function SeoQuickManufacturersPage() {
 function SeoTemplateForm({ title, templateType, data, onSave, isPending, placeholderEntity }: any) {
   const isSub = templateType.startsWith("SUB_MANUFACTURER");
   const varDesc = isSub
-    ? `Variables: manufacturer_name, model_name, category_name, delivery_time${templateType.includes("WITH_CITY") ? ", city_name" : ""}`
+    ? `Variables: manufacturer_name, model_name, category_name, capacity, price, price_range, price_low, price_high, fuel_type, warranty_range, delivery_time${templateType.includes("WITH_CITY") ? ", city_name" : ""}`
     : `Variables: manufacturer_name, category_name, delivery_time${templateType.includes("WITH_CITY") ? ", city_name" : ""}`;
   const entityExample = isSub ? "{manufacturer_name} {model_name}" : "{manufacturer_name}";
   const titlePlaceholder = templateType.includes("WITH_CITY")
-    ? `Buy ${entityExample} Battery in {city_name} | Batterymantra.com`
-    : `Buy ${entityExample} Battery at Best Price | Batterymantra.com`;
+    ? (isSub
+        ? `Buy ${entityExample} {capacity} Battery in {city_name} at {price_range} | Batterymantra.com`
+        : `Buy ${entityExample} Battery in {city_name} | Batterymantra.com`)
+    : (isSub
+        ? `Buy ${entityExample} {capacity} Battery Online at Best Price {price_range} | Batterymantra.com`
+        : `Buy ${entityExample} Battery at Best Price | Batterymantra.com`);
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
