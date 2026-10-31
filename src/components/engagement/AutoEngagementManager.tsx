@@ -22,6 +22,7 @@ const EXCLUDED_PREFIXES = [
   "/checkout",
   "/account",
   "/kalkaji",
+  "/staff-privacy-policy",
 ];
 
 const STORAGE_KEYS = {

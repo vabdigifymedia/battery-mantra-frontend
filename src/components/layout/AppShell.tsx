@@ -46,8 +46,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const isDashboardPage = pathname.startsWith("/kalkaji") || pathname.startsWith("/account");
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password");
+  const isStandalonePage = pathname.startsWith("/staff-privacy-policy");
 
-  if (isDashboardPage || isAuthPage) {
+  if (isDashboardPage || isAuthPage || isStandalonePage) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <main id="main" className="flex-1 flex flex-col">

@@ -20,6 +20,7 @@ import { Route as KalkajiRouteImport } from './routes/kalkaji'
 import { Route as ReelsRouteImport } from './routes/reels'
 import { Route as ShopByManufacturersRouteImport } from './routes/shop-by-manufacturers'
 import { Route as ShoppingCartRouteImport } from './routes/shopping-cart'
+import { Route as StaffPrivacyPolicyRouteImport } from './routes/staff-privacy-policy'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
@@ -151,6 +152,11 @@ const ShopByManufacturersRoute = ShopByManufacturersRouteImport.update({
 const ShoppingCartRoute = ShoppingCartRouteImport.update({
   id: '/shopping-cart',
   path: '/shopping-cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffPrivacyPolicyRoute = StaffPrivacyPolicyRouteImport.update({
+  id: '/staff-privacy-policy',
+  path: '/staff-privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
@@ -570,6 +576,7 @@ export interface FileRoutesByFullPath {
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/shopping-cart': typeof ShoppingCartRoute
+  '/staff-privacy-policy': typeof StaffPrivacyPolicyRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/wishlist': typeof WishlistRoute
   '/login': typeof AuthLoginRoute
@@ -659,6 +666,7 @@ export interface FileRoutesByTo {
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/shopping-cart': typeof ShoppingCartRoute
+  '/staff-privacy-policy': typeof StaffPrivacyPolicyRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/wishlist': typeof WishlistRoute
   '/login': typeof AuthLoginRoute
@@ -750,6 +758,7 @@ export interface FileRoutesById {
   '/reels': typeof ReelsRoute
   '/shop-by-manufacturers': typeof ShopByManufacturersRoute
   '/shopping-cart': typeof ShoppingCartRoute
+  '/staff-privacy-policy': typeof StaffPrivacyPolicyRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/wishlist': typeof WishlistRoute
   '/_auth/login': typeof AuthLoginRoute
@@ -842,6 +851,7 @@ export interface FileRouteTypes {
     | '/reels'
     | '/shop-by-manufacturers'
     | '/shopping-cart'
+    | '/staff-privacy-policy'
     | '/vehicle-finder'
     | '/wishlist'
     | '/login'
@@ -931,6 +941,7 @@ export interface FileRouteTypes {
     | '/reels'
     | '/shop-by-manufacturers'
     | '/shopping-cart'
+    | '/staff-privacy-policy'
     | '/vehicle-finder'
     | '/wishlist'
     | '/login'
@@ -1021,6 +1032,7 @@ export interface FileRouteTypes {
     | '/reels'
     | '/shop-by-manufacturers'
     | '/shopping-cart'
+    | '/staff-privacy-policy'
     | '/vehicle-finder'
     | '/wishlist'
     | '/_auth/login'
@@ -1113,6 +1125,7 @@ export interface RootRouteChildren {
   ReelsRoute: typeof ReelsRoute
   ShopByManufacturersRoute: typeof ShopByManufacturersRoute
   ShoppingCartRoute: typeof ShoppingCartRoute
+  StaffPrivacyPolicyRoute: typeof StaffPrivacyPolicyRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
   WishlistRoute: typeof WishlistRoute
   BrandDealerBrandSlugRoute: typeof BrandDealerBrandSlugRoute
@@ -1219,6 +1232,13 @@ declare module '@tanstack/react-router' {
       path: '/shopping-cart'
       fullPath: '/shopping-cart'
       preLoaderRoute: typeof ShoppingCartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-privacy-policy': {
+      id: '/staff-privacy-policy'
+      path: '/staff-privacy-policy'
+      fullPath: '/staff-privacy-policy'
+      preLoaderRoute: typeof StaffPrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vehicle-finder': {
@@ -1924,6 +1944,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReelsRoute: ReelsRoute,
   ShopByManufacturersRoute: ShopByManufacturersRoute,
   ShoppingCartRoute: ShoppingCartRoute,
+  StaffPrivacyPolicyRoute: StaffPrivacyPolicyRoute,
   VehicleFinderRoute: VehicleFinderRoute,
   WishlistRoute: WishlistRoute,
   BrandDealerBrandSlugRoute: BrandDealerBrandSlugRoute,
