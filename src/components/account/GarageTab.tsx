@@ -155,9 +155,9 @@ export function GarageTab() {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-base">{vehicle.nickname || `${vehicle.manufacturer} ${vehicle.modelName}`}</CardTitle>
+                    <CardTitle className="text-base">{vehicle.nickname || vehicle.modelName}</CardTitle>
                     {vehicle.nickname && (
-                      <p className="text-sm text-muted-foreground mt-0.5">{vehicle.manufacturer} {vehicle.modelName}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{vehicle.modelName}</p>
                     )}
                   </div>
                   <span className="bg-muted text-muted-foreground text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded">

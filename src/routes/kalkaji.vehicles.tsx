@@ -536,7 +536,7 @@ function AdminVehicles() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will permanently delete the vehicle "{vehicle.make} {vehicle.model}".
+                              This will permanently delete the vehicle "{vehicle.model}".
                               This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -606,7 +606,7 @@ function AdminVehicles() {
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div>
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold text-sm truncate">{vehicle.make} {vehicle.model}</h3>
+                      <h3 className="font-semibold text-sm truncate">{vehicle.model}</h3>
                       <span className="inline-flex shrink-0 items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset ring-muted-foreground/20">
                         {vehicle.vehicleType}
                       </span>

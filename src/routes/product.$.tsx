@@ -2,11 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, startTransition, useRef } from "react";
 import { z } from "zod";
-import { 
-  Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText, 
-  Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert, 
+import {
+  Clock, Check, RefreshCcw, Tag, Truck, CheckCircle2, FileText,
+  Share2, MapPin, Search, Plus, Minus, Battery, ShieldAlert,
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
-  ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
+  ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench,
   Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2,
   Award, Flame, TrendingUp, Box, Sparkles as SparklesIcon
 } from "lucide-react";
@@ -87,13 +87,13 @@ export const Route = createFileRoute("/product/$")({
   head: ({ loaderData }) => {
     const { product, templates, citySlug, slug } = loaderData || {};
     const seo = (product?.specs?.seo as any) || product?.seo;
-    
+
     const brandName = product?.brandName || "";
     const categoryName = product?.categoryName || "";
     const productName = product?.productName || "";
     const cityNameStr = citySlug ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1) : undefined;
     const deliveryTime = getDeliveryTimeText(null, null, cityNameStr || "Delhi");
-    
+
     // Temporarily override zustand state for this render if citySlug exists,
     // though resolveTemplateSeo internally reads zustand, we can pass it via vars
     const resolvedSeo = resolveTemplateSeo(
@@ -117,14 +117,14 @@ export const Route = createFileRoute("/product/$")({
     const rawImage = product?.productImage || (product?.additionalImages && product.additionalImages[0]) || "";
     const ogImage = rawImage
       ? (rawImage.startsWith("http://") || rawImage.startsWith("https://")
-          ? rawImage
-          : `https://batterymantra.com${rawImage.startsWith("/") ? "" : "/"}${rawImage}`)
+        ? rawImage
+        : `https://batterymantra.com${rawImage.startsWith("/") ? "" : "/"}${rawImage}`)
       : "https://batterymantra.com/logo.png";
     const imageType = ogImage.toLowerCase().endsWith(".jpg") || ogImage.toLowerCase().endsWith(".jpeg")
       ? "image/jpeg"
       : ogImage.toLowerCase().endsWith(".webp")
-      ? "image/webp"
-      : "image/png";
+        ? "image/webp"
+        : "image/png";
     const pageUrl = citySlug
       ? `https://batterymantra.com/product/${slug}/${citySlug}`
       : `https://batterymantra.com/product/${slug}`;
@@ -228,7 +228,7 @@ export function PdpPage() {
   const [showDeliveryPill, setShowDeliveryPill] = useState(true);
   const hasExchangeOffer = (data.exchangeDiscount ?? 0) > 0;
   const [exchange, setExchange] = useState<"no" | "yes">(hasExchangeOffer ? "yes" : "no");
-  
+
   const [activeImage, setActiveImage] = useState<string | null>(data?.productImage || null);
   const [isFullscreenGallery, setIsFullscreenGallery] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
@@ -241,7 +241,7 @@ export function PdpPage() {
   const wishlisted = isWishlisted(data.productId);
 
   const vehicles = useQuery(vehiclesListQuery());
-  const displayVehicles = data.capacity 
+  const displayVehicles = data.capacity
     ? (vehicles.data || []).filter(v => v.capacity?.split(",").map(c => c.trim()).includes(data.capacity!))
     : [];
 
@@ -330,7 +330,7 @@ export function PdpPage() {
 
   const search = Route.useSearch();
   const autoActionHandled = useRef(false);
-  
+
   useEffect(() => {
     if (autoActionHandled.current) return;
 
@@ -371,7 +371,7 @@ export function PdpPage() {
   };
 
   const allFlatSpecs = flattenSpecs(data.specs);
-  
+
   const getPriorityScore = (key: string) => {
     const k = key.toLowerCase();
     if (k.includes("warranty")) return 1;
@@ -389,12 +389,12 @@ export function PdpPage() {
 
   const topSpecs = (data.highlightedSpecAttributeIds && data.highlightedSpecAttributeIds.length > 0 && data.specDetails)
     ? data.highlightedSpecAttributeIds.map((id: string) => {
-        const detail = data.specDetails?.find((d: any) => d.attributeId === id);
-        if (detail) {
-          return { key: detail.attributeName, value: detail.value, id };
-        }
-        return null;
-      }).filter(Boolean)
+      const detail = data.specDetails?.find((d: any) => d.attributeId === id);
+      if (detail) {
+        return { key: detail.attributeName, value: detail.value, id };
+      }
+      return null;
+    }).filter(Boolean)
     : getFallbackSpecs();
 
   const iconMap: Record<string, any> = {
@@ -450,13 +450,13 @@ export function PdpPage() {
     return null;
   };
 
-  const currentPrice = exchange === "yes" && hasExchangeOffer 
-    ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0)) 
+  const currentPrice = exchange === "yes" && hasExchangeOffer
+    ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0))
     : data.productPrice;
 
   const exchangePriceValue = Math.max(0, data.productPrice - (data.exchangeDiscount || 0));
-  const basePriceForSavings = data.originalPrice && data.originalPrice > data.productPrice 
-    ? data.originalPrice 
+  const basePriceForSavings = data.originalPrice && data.originalPrice > data.productPrice
+    ? data.originalPrice
     : data.productPrice;
   const exchangeSavings = basePriceForSavings - exchangePriceValue;
 
@@ -495,7 +495,7 @@ export function PdpPage() {
   const rawWarranty = (data as any).warranty || (data as any).warrantyPeriod || (data as any).warranty_name;
   const warrantyText = rawWarranty ? String(rawWarranty) : (warrantySpec ? String(warrantySpec[1]) : null);
 
-  const withExchangePrice = (data.exchangeDiscount ?? 0) > 0 
+  const withExchangePrice = (data.exchangeDiscount ?? 0) > 0
     ? Math.max(0, (data.productPrice || 0) - (data.exchangeDiscount || 0))
     : (data.productPrice || 0);
 
@@ -625,11 +625,11 @@ export function PdpPage() {
 
       <Container size="xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* LEFT COLUMN: Gallery */}
           <div className="lg:col-span-5 lg:sticky lg:top-24">
             <div className="flex flex-col-reverse lg:flex-row gap-4 items-start">
-              
+
               {/* THUMBNAILS: horizontal on mobile (below image), vertical on desktop (left of image) */}
               {galleryImages.length > 1 && (
                 <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto pb-2 lg:pb-0 w-full lg:w-24 shrink-0 scrollbar-hide lg:max-h-[500px] scroll-smooth">
@@ -641,11 +641,10 @@ export function PdpPage() {
                           setActiveImage(img);
                         });
                       }}
-                      className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${
-                        activeImage === img 
-                          ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white" 
+                      className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${activeImage === img
+                          ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white"
                           : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
-                      }`}
+                        }`}
                     >
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-2 mix-blend-multiply" />
                     </button>
@@ -655,7 +654,7 @@ export function PdpPage() {
 
               {/* MAIN IMAGE (Clean borderless view, no box in box, no search icon) */}
               <div className="flex-1 w-full relative flex justify-center items-center aspect-[4/3] lg:aspect-square">
-                
+
                 {/* 100% Genuine Ribbon Overlay */}
                 <div className="absolute top-4 sm:top-6 -left-2 z-20 drop-shadow-md">
                   <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-3 sm:px-4 py-1.5 shadow-lg shadow-emerald-500/30 rounded-r-lg flex items-center gap-1.5 border border-l-0 border-emerald-400/50">
@@ -708,18 +707,18 @@ export function PdpPage() {
                 </div>
 
                 {activeImage ? (
-                  <button 
+                  <button
                     onClick={() => {
                       const idx = galleryImages.indexOf(activeImage);
                       setInitialSlide(Math.max(0, idx));
                       setIsFullscreenGallery(true);
-                    }} 
+                    }}
                     className="w-full h-full cursor-zoom-in outline-none relative group flex items-center justify-center"
                   >
-                    <img 
-                      src={activeImage} 
-                      alt={data.productName} 
-                      className="max-w-full max-h-full object-contain mix-blend-multiply" 
+                    <img
+                      src={activeImage}
+                      alt={data.productName}
+                      className="max-w-full max-h-full object-contain mix-blend-multiply"
                       fetchPriority="high"
                       loading="eager"
                     />
@@ -796,9 +795,9 @@ export function PdpPage() {
                   <div className="inline-flex items-center gap-1 sm:gap-1.5 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg text-amber-900 dark:text-amber-200 font-bold shadow-2xs">
                     <div className="flex items-center text-amber-500">
                       {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.floor(Number(mockRating)) ? "fill-amber-500 text-amber-500" : "fill-amber-500/30 text-amber-500/40"}`} 
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${i < Math.floor(Number(mockRating)) ? "fill-amber-500 text-amber-500" : "fill-amber-500/30 text-amber-500/40"}`}
                         />
                       ))}
                     </div>
@@ -818,12 +817,12 @@ export function PdpPage() {
                   <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border-l-4 border-amber-500 border-y border-r border-amber-500/20 p-2.5 sm:p-4 shadow-2xs sm:shadow-sm transition-all hover:shadow-md group">
                     {/* Subtle Background Decorative Glow */}
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
-                    
+
                     <div className="flex items-center sm:items-center gap-2.5 sm:gap-3.5 relative z-10">
                       <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-2 sm:p-2.5 rounded-lg sm:rounded-xl shadow-sm sm:shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center">
                         <ShieldCheck className="h-5 w-5 sm:h-7 sm:w-7 stroke-[2.2]" />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-1">
@@ -864,11 +863,10 @@ export function PdpPage() {
                             setExchange("no");
                           });
                         }}
-                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
-                          exchange === "no"
+                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "no"
                             ? "border-brand bg-brand/5 ring-1 ring-brand/30"
                             : "border-border bg-background hover:bg-muted/40"
-                        }`}
+                          }`}
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
@@ -891,11 +889,10 @@ export function PdpPage() {
                             setExchange("yes");
                           });
                         }}
-                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${
-                          exchange === "yes"
+                        className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "yes"
                             ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
                             : "border-border bg-background hover:bg-muted/40"
-                        }`}
+                          }`}
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
@@ -916,10 +913,10 @@ export function PdpPage() {
               </div>
 
               <div className="flex items-center gap-3 pt-1 sm:pt-2">
-                <Price 
-                  value={currentPrice} 
-                  size="xl" 
-                  className="text-4xl tracking-tight" 
+                <Price
+                  value={currentPrice}
+                  size="xl"
+                  className="text-4xl tracking-tight"
                 />
                 {hasDiscount && strikePrice && (
                   <>
@@ -932,7 +929,7 @@ export function PdpPage() {
                   </>
                 )}
               </div>
-              
+
               <div>
                 {inStock ? (
                   <Badge variant="outline" className="border-success/40 bg-success/10 text-success text-sm py-1">
@@ -958,9 +955,8 @@ export function PdpPage() {
                         setExchange("no");
                       });
                     }}
-                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
-                      exchange === "no" ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-muted hover:bg-muted/50"
-                    }`}
+                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${exchange === "no" ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-muted hover:bg-muted/50"
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -983,9 +979,8 @@ export function PdpPage() {
                         setExchange("yes");
                       });
                     }}
-                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${
-                      exchange === "yes" ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30" : "border-muted hover:bg-muted/50"
-                    }`}
+                    className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 text-left transition-colors ${exchange === "yes" ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30" : "border-muted hover:bg-muted/50"
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -1018,7 +1013,7 @@ export function PdpPage() {
                     disabled={!inStock || blockPurchase}
                   />
                 </div>
-                
+
                 <div className="flex-1 flex w-full gap-2 sm:gap-3 fixed bottom-0 left-0 right-0 z-[60] p-3 bg-background border-t border-border shadow-[0_-8px_16px_rgba(0,0,0,0.05)] sm:relative sm:z-auto sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none pb-safe sm:pb-0">
                   <Button
                     type="button"
@@ -1140,7 +1135,7 @@ export function PdpPage() {
                 {/* Decorative background elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl -z-0"></div>
-                
+
                 <div className="p-5 sm:p-6 relative z-10">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-5 gap-4">
                     <div className="flex gap-4 items-center sm:items-start">
@@ -1155,7 +1150,7 @@ export function PdpPage() {
                           <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>
                         </div>
                       </div>
-                      
+
                       <div>
                         <h3 className="font-extrabold text-lg sm:text-xl text-foreground tracking-tight">Need expert advice?</h3>
                         <p className="text-sm font-medium text-muted-foreground mt-0.5">Talk directly to Vikas</p>
@@ -1166,13 +1161,13 @@ export function PdpPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <a href="https://wa.me/919200920051?text=Hi,%20I%20need%20help%20buying%20a%20battery" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1DA851] text-white rounded-xl py-3.5 px-4 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md font-semibold text-sm w-full group">
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" /></svg>
                       Chat on WhatsApp
                     </a>
-                    
+
                     <a href="tel:+919200920051" className="flex items-center justify-center gap-2.5 bg-background hover:bg-muted border-2 border-border text-foreground rounded-xl py-3.5 px-4 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md font-semibold text-sm w-full group">
                       <PhoneCall className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
                       +91 9200920051
@@ -1233,7 +1228,7 @@ export function PdpPage() {
             <TabsTrigger value="vehicles" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm">Compatible Vehicles</TabsTrigger>
             <TabsTrigger value="policy" className="text-sm sm:text-base py-2 data-[state=active]:shadow-sm whitespace-normal text-center h-auto">Replacement Policy</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="specs" className="p-2 sm:p-4 outline-none">
             {data.specs && Object.keys(data.specs).length > 0 ? (
               <SpecificationsTable specs={data.specs} />
@@ -1241,10 +1236,10 @@ export function PdpPage() {
               <EmptyState title="No Specifications" description="Detailed specifications are not available for this product yet." />
             )}
           </TabsContent>
-          
+
           <TabsContent value="desc" className="p-2 sm:p-4 outline-none">
             {data.productDescription ? (
-              <div 
+              <div
                 className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: applySeoTemplate(data.productDescription, seoContext) }}
               />
@@ -1252,13 +1247,13 @@ export function PdpPage() {
               <EmptyState title="No Description" description="Description is not available for this product yet." />
             )}
           </TabsContent>
-          
+
           <TabsContent value="vehicles" className="p-2 sm:p-4 outline-none">
             {displayVehicles && displayVehicles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {displayVehicles.map((v) => (
-                  <Link 
-                    key={v.vehicleId} 
+                  <Link
+                    key={v.vehicleId}
                     to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
                     params={{
                       categorySlug: v.vehicleType === "BIKE" ? "bike-batteries" : "car-batteries",
@@ -1277,7 +1272,7 @@ export function PdpPage() {
                     )}
                     <div>
                       <div className="font-semibold text-foreground">
-                        {v.make} {v.model}
+                        {v.model}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 font-medium">
                         {[v.fuelName].filter(Boolean).join(" • ")}
@@ -1303,9 +1298,9 @@ export function PdpPage() {
               <p className="mb-4 text-sm text-foreground/80 bg-muted/50 p-4 rounded-lg border">
                 All our packages come with <strong>"Tamper Evident Void Seals."</strong> Please ensure that you do not accept packages where the seal has been tampered with. Approval of a tampered "Void Seal" or a harmed box will automatically disqualify you from any replacement declarations for physically damaged/faulty products, wrong Products, or missing accessories.
               </p>
-              
+
               <p className="mb-4"><strong>b)</strong> You shall keep the Products in their unused, original condition, along with the original invoice/ sale receipt, brand outer box, MRP tags attached, user manual, warranty cards, and original supplements in manufacturer packaging for a victorious replacement pick-up. We would accept the request for the replacement of such Product subject to the terms of this policy.</p>
-              
+
               <p className="mb-4"><strong>c)</strong> Your replacement will be processed only when the conditions as may be stipulated by us are fulfilled at the time of replacement of such Products, such as the Product to be replaced being provided to us in the original condition along with the price tag intact including original packaging of the Product, the serial number/ bar code of the Product matches our records, if Product(s) bought as a combo then Product(s) sent for a replacement to be as a complete combo, the brand outer packaging of the Product and all accessories therein shall be intact, no damage has occurred post-delivery of the Product while in your possession, etc.</p>
 
               <p className="mb-6"><strong>d)</strong> You agree that we will not replace any Product: (i) if you have placed the order for a wrong Product model, color, or incorrect Product, (ii) if the Product belongs to the non-replacement Product category (iii) if you fail to request replacement/register a complaint about a damaged, defective or inaccurate Product within the Replacement Period. Any damage to the Product caused by your improper use of the Product, any modification or change to the Product by you, the User, or a third party, or any depreciation in the value for other reasons will not be deemed such Product a damaged defective or inaccurate Product. It will not be considered a quality problem. Any judgment by us in this respect shall be final and binding.</p>
@@ -1318,10 +1313,10 @@ export function PdpPage() {
           </TabsContent>
         </Tabs>
       </Container>
-      
-      <GlobalFaqSection 
-        pageType="PRODUCT" 
-        context={seoContext} 
+
+      <GlobalFaqSection
+        pageType="PRODUCT"
+        context={seoContext}
       />
 
       <RelatedProducts currentProductId={data.productId} currentProduct={data} />
@@ -1333,26 +1328,26 @@ export function PdpPage() {
       {isFullscreenGallery && (
         <div className="fixed inset-0 z-[1000] bg-black/95 flex flex-col animate-in fade-in duration-200">
           <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-end z-[1001] pointer-events-none">
-            <button 
+            <button
               onClick={() => setIsFullscreenGallery(false)}
               className="text-white p-2 sm:p-3 rounded-full hover:bg-white/10 transition-colors pointer-events-auto bg-black/20"
             >
               <X className="h-6 w-6 sm:h-8 sm:w-8" />
             </button>
           </div>
-          
-          <Carousel 
-            opts={{ startIndex: initialSlide, loop: true }} 
+
+          <Carousel
+            opts={{ startIndex: initialSlide, loop: true }}
             className="w-full h-full flex items-center justify-center"
           >
             <CarouselContent className="ml-0 w-full">
               {galleryImages.map((img, idx) => (
                 <CarouselItem key={idx} className="pl-0 basis-full flex items-center justify-center h-[100dvh]">
                   <div className="w-full h-full p-4 sm:p-12 flex items-center justify-center relative">
-                    <img 
-                      src={img} 
-                      alt={`Gallery view ${idx + 1}`} 
-                      className="max-w-full max-h-full object-contain" 
+                    <img
+                      src={img}
+                      alt={`Gallery view ${idx + 1}`}
+                      className="max-w-full max-h-full object-contain"
                     />
                   </div>
                 </CarouselItem>
@@ -1410,27 +1405,27 @@ function RelatedProducts({ currentProductId, currentProduct }: { currentProductI
   useEffect(() => {
     if (allProducts && allProducts.length > 0) {
       const filtered = allProducts.filter((p: any) => p.productId !== currentProductId);
-      
+
       let matched = [...filtered];
-      
+
       if (currentProduct) {
-        const strictMatch = filtered.filter((p: any) => 
-          p.productCategory === currentProduct.categoryName && 
+        const strictMatch = filtered.filter((p: any) =>
+          p.productCategory === currentProduct.categoryName &&
           p.brandName === currentProduct.brandName
         );
-        
-        const categoryMatch = filtered.filter((p: any) => 
-          p.productCategory === currentProduct.categoryName && 
+
+        const categoryMatch = filtered.filter((p: any) =>
+          p.productCategory === currentProduct.categoryName &&
           p.brandName !== currentProduct.brandName
         );
-        
+
         const others = filtered.filter((p: any) => p.productCategory !== currentProduct.categoryName);
-        
+
         matched = [...strictMatch, ...categoryMatch, ...others];
       } else {
         matched.sort(() => 0.5 - Math.random());
       }
-      
+
       setRelated(matched.slice(0, 8));
     }
   }, [allProducts, currentProductId, currentProduct]);

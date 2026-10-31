@@ -96,16 +96,23 @@ export function VehicleStepper({ value, onChange, compact, showSearch = false }:
             <Empty />
           ) : (
             <Chips
-              items={modelsForMake.map((v) => ({
-                id: v.vehicleId,
-                label: v.model,
-                meta: [
-                  v.fuelName,
-                ]
-                  .filter(Boolean)
-                  .join(" · "),
-                imageUrl: v.imageUrl,
-              }))}
+              items={modelsForMake.map((v) => {
+                const cleanLabel = value.make && v.model.toLowerCase().startsWith(value.make.toLowerCase())
+                  ? v.model.slice(value.make.length).replace(/^[\s-]+/, '').trim() || v.model
+                  : v.model;
+
+                return {
+                  id: v.vehicleId,
+                  label: cleanLabel,
+                  meta: [
+                    v.fuelName,
+                  ]
+                    .filter(Boolean)
+                    .join(" · "),
+                  imageUrl: v.imageUrl,
+                  searchAlt: v.model,
+                };
+              })}
               activeId={value.vehicleId}
               onSelect={(id) => onChange({ ...value, vehicleId: String(id) })}
               showSearch={showSearch}
@@ -159,7 +166,7 @@ function StepRow({
   );
 }
 
-type ChipItem = { id: string; label: string; meta?: string; imageUrl?: string | null };
+type ChipItem = { id: string; label: string; meta?: string; imageUrl?: string | null; searchAlt?: string };
 
 function Chips({
   items,
@@ -179,7 +186,7 @@ function Chips({
   const filteredItems = useMemo(() => {
     if (!query || !showSearch) return items;
     const fuse = new Fuse(items, {
-      keys: ["label"],
+      keys: ["label", "searchAlt"],
       threshold: 0.3, // 0.3 handles slight typos well
       ignoreLocation: true,
     });

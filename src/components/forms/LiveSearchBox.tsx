@@ -36,7 +36,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
 
   const products = data?.content || [];
   const q = debouncedQuery.toLowerCase();
-  
+
   const matchedCategories = useMemo(() => {
     return q.length > 1 && categories ? categories.filter((c: any) => c.categoryName.toLowerCase().includes(q)).slice(0, 2) : [];
   }, [q, categories]);
@@ -58,7 +58,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
   }, [q, vehicles]);
 
   const hasResults = products.length > 0 || matchedCategories.length > 0 || matchedBrands.length > 0 || matchedManufacturers.length > 0 || matchedVehicles.length > 0;
-  
+
   const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
 
   const getVehicleCategorySlug = (categoryId?: string) => {
@@ -141,7 +141,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
             </div>
           ) : hasResults ? (
             <div className="flex flex-col max-h-[70vh] overflow-y-auto scrollbar-custom">
-              
+
               {matchedCategories.length > 0 && (
                 <div className="border-b">
                   <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/30 flex items-center">
@@ -220,9 +220,9 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                     <Link
                       key={v.vehicleId}
                       to="/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$"
-                      params={{ 
-                        categorySlug: getVehicleCategorySlug(v.categoryId), 
-                        makeSlug: toSlug(v.make), 
+                      params={{
+                        categorySlug: getVehicleCategorySlug(v.categoryId),
+                        makeSlug: toSlug(v.make),
                         modelSlug: getVehicleSlug(v),
                         _splat: ""
                       }}
@@ -233,7 +233,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                         {v.imageUrl ? <img src={v.imageUrl} alt={`${v.make} ${v.model}`} className="h-full w-full object-contain" /> : <Car className="h-4 w-4 text-muted-foreground/50" />}
                       </div>
                       <span className="text-sm font-medium text-foreground">
-                        {v.make} {v.model} {v.fuelName ? <span className="text-muted-foreground text-xs ml-1">({v.fuelName})</span> : null}
+                        {v.model} {v.fuelName ? <span className="text-muted-foreground text-xs ml-1">({v.fuelName})</span> : null}
                       </span>
                     </Link>
                   ))}
@@ -291,7 +291,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                 </div>
               )}
 
-              <div 
+              <div
                 className="p-3 bg-muted/30 border-t flex justify-center items-center hover:bg-muted/50 cursor-pointer transition-colors mt-auto"
                 onClick={() => {
                   setIsOpen(false);

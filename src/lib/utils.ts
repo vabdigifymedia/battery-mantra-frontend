@@ -80,6 +80,6 @@ export function getBrandSlug(b?: { slug?: string; seo?: { slug?: string }; brand
 export function getVehicleSlug(v?: { slug?: string; make?: string; model?: string } | null): string {
   if (!v) return "";
   if (v.slug && v.slug.trim()) return toSlug(v.slug);
-  return toSlug(`${v.make || ""} ${v.model || ""}`);
+  return toSlug(`${v.model || ""}`);
 }
 
