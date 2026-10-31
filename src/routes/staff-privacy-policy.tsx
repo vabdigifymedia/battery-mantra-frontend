@@ -3,23 +3,15 @@ import {
   ShieldCheck,
   Smartphone,
   Briefcase,
-  Share2,
-  Lock,
   UserX,
-  Users,
   Clock,
-  Mail,
-  Phone,
-  MapPin,
-  ExternalLink,
   CheckCircle2,
   AlertTriangle,
   ArrowLeft,
-  Building2,
-  FileText,
   KeyRound,
   BellRing,
   Wifi,
+  Lock,
 } from "lucide-react";
 
 export const Route = createFileRoute("/staff-privacy-policy")({
@@ -29,7 +21,7 @@ export const Route = createFileRoute("/staff-privacy-policy")({
       {
         name: "description",
         content:
-          "Official Privacy Policy for Battery Mantra Staff App. Discloses information collection, device permissions, third-party services, data security, and account deletion for Google Play compliance.",
+          "Official Privacy Policy for Battery Mantra Staff App. Discloses information collection, device permissions, operational data processing, and account lifecycle management for Google Play compliance.",
       },
       { property: "og:title", content: "Privacy Policy for Battery Mantra Staff App" },
       {
@@ -299,47 +291,44 @@ function StaffPrivacyPolicyPage() {
             </p>
           </section>
 
-          {/* Section 6: Data Retention and Account Deletion */}
-          <section className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+          {/* Section 6: Data Retention & Account Lifecycle */}
+          <section className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-5">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-[#DE2027]/10 flex items-center justify-center text-[#DE2027] shrink-0 font-bold text-base">
                 6
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-                Data Retention and Account Deletion
+                Data Retention & Account Lifecycle
               </h2>
             </div>
 
             <p className="text-slate-600 leading-relaxed">
-              We retain staff account information and service logs only as long as an individual remains an authorized partner or employee with Battery Mantra, or as required by commercial tax and auditing laws.
+              We retain staff account records and operational service logs only for the duration of an individual&apos;s active employment or partner association with Battery Mantra, and thereafter as mandated by commercial, tax, and statutory auditing requirements.
             </p>
 
-            {/* Account & Data Deletion Callout Box */}
-            <div className="p-5 sm:p-6 rounded-2xl border-2 border-[#DE2027]/30 bg-red-50/40 space-y-4">
-              <div className="flex items-center gap-2.5 text-[#DE2027] font-bold text-base sm:text-lg">
-                <UserX className="h-5 w-5" />
-                <h3>How to Request Account & Data Deletion</h3>
+            <div className="p-4 sm:p-5 rounded-xl border border-slate-100 bg-slate-50/70 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-lg bg-[#DE2027]/10 p-2 text-[#DE2027] shrink-0">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-slate-900">Enterprise Access & Lifecycle Management</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    As an internal operational tool, all accounts are centrally provisioned, monitored, and managed by Battery Mantra&apos;s administrative team. Access permissions are granted strictly based on active operational roles.
+                  </p>
+                </div>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-                Staff members, partners, or engineers can request the permanent deletion of their account credentials and personal profile data at any time by emailing{" "}
-                <a
-                  href="mailto:support@batterymantra.com?subject=Staff%20App%20Account%20Deletion%20Request"
-                  className="font-semibold text-[#DE2027] underline decoration-[#DE2027]/40 hover:decoration-[#DE2027] transition-colors"
-                >
-                  support@batterymantra.com
-                </a>{" "}
-                or contacting their supervising Administrator. Verified deletion requests will be completed within 30 days.
-              </p>
-
-              <div className="pt-2">
-                <a
-                  href="mailto:support@batterymantra.com?subject=Staff%20App%20Account%20Deletion%20Request"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DE2027] text-white text-sm font-semibold hover:bg-[#DE2027]/90 transition-all shadow-sm shadow-[#DE2027]/20"
-                >
-                  <Mail className="h-4 w-4" />
-                  Request Account Deletion via Email
-                </a>
+              <div className="flex items-start gap-3 pt-3 border-t border-slate-200/60">
+                <div className="mt-0.5 rounded-lg bg-[#DE2027]/10 p-2 text-[#DE2027] shrink-0">
+                  <UserX className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-slate-900">Account Deactivation & Data Deletion</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Upon conclusion, resignation, or termination of employment or partner affiliation, staff access credentials are automatically deactivated and revoked by the system administrator. Associated personal authentication data is purged or securely anonymized in accordance with company data retention protocols and applicable legal standards. Staff members seeking account deactivation may initiate this directly through their supervising administrator or operations desk.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -375,81 +364,6 @@ function StaffPrivacyPolicyPage() {
               We may periodically update this Privacy Policy. Any modifications will be published directly on this URL with an updated &ldquo;Last Updated&rdquo; date.
             </p>
           </section>
-
-          {/* Section 9: Contact Us */}
-          <section className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-[#DE2027]/10 flex items-center justify-center text-[#DE2027] shrink-0 font-bold text-base">
-                9
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-                Contact Us
-              </h2>
-            </div>
-
-            <p className="text-slate-600 leading-relaxed">
-              For any privacy-related questions or data deletion requests, contact us at:
-            </p>
-
-            <div className="grid gap-3 sm:grid-cols-2 pt-1">
-              <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1">
-                <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Organization</span>
-                <p className="font-semibold text-slate-900 flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-[#DE2027]" />
-                  Battery Mantra
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1">
-                <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Website</span>
-                <p>
-                  <a
-                    href="https://batterymantra.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-[#DE2027] hover:underline flex items-center gap-1.5"
-                  >
-                    https://batterymantra.com
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1">
-                <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Official Email</span>
-                <p>
-                  <a
-                    href="mailto:support@batterymantra.com"
-                    className="font-semibold text-[#DE2027] hover:underline flex items-center gap-1.5"
-                  >
-                    <Mail className="h-4 w-4" />
-                    support@batterymantra.com
-                  </a>
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1">
-                <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Support Hotline</span>
-                <p>
-                  <a
-                    href="tel:+919899797677"
-                    className="font-semibold text-[#DE2027] hover:underline flex items-center gap-1.5"
-                  >
-                    <Phone className="h-4 w-4" />
-                    +91-9899797677
-                  </a>
-                </p>
-              </div>
-
-              <div className="sm:col-span-2 p-4 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1">
-                <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Registered Office</span>
-                <p className="font-semibold text-slate-800 flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-[#DE2027] mt-1 shrink-0" />
-                  <span>Battery Mantra, Kalkaji, New Delhi, India</span>
-                </p>
-              </div>
-            </div>
-          </section>
         </div>
       </main>
 
@@ -463,12 +377,6 @@ function StaffPrivacyPolicyPage() {
               className="hover:text-[#DE2027] transition-colors"
             >
               batterymantra.com
-            </a>
-            <a
-              href="mailto:support@batterymantra.com"
-              className="hover:text-[#DE2027] transition-colors"
-            >
-              support@batterymantra.com
             </a>
           </div>
         </div>
