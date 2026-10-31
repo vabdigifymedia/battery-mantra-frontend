@@ -9,7 +9,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
 import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
-import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2 } from "lucide-react";
+import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -219,6 +219,14 @@ export function ProductCard({
   
   const reviews = useMemo(() => (product.productName.length * 7) % 300 + 40, [product.productName]);
 
+  const highlightBadges = useMemo(() => {
+    if (!product.highlights || typeof product.highlights !== "string") return [];
+    return product.highlights
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean);
+  }, [product.highlights]);
+
   return (
     <div
       className={cn(
@@ -229,16 +237,36 @@ export function ProductCard({
       <div className="flex flex-col flex-1">
         {/* Top Badges Bar */}
         <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between pointer-events-none">
-          <div className="flex flex-col gap-1 items-start">
+          <div className="flex flex-col gap-1 items-start max-w-[calc(100%-75px)]">
+            {/* Highlights Badges from Admin Quick Edit */}
+            {highlightBadges.slice(0, showSavings ? 1 : 2).map((badge, idx) => {
+              const isBestOrTop = /best|top|popular|hot|deal|trend|recommend/i.test(badge);
+              return (
+                <span
+                  key={idx}
+                  className={cn(
+                    "text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 max-w-full truncate tracking-tight",
+                    isBestOrTop
+                      ? "bg-amber-500 text-white"
+                      : "bg-slate-900/90 text-white backdrop-blur-xs"
+                  )}
+                  title={badge}
+                >
+                  <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                  <span className="truncate">{badge}</span>
+                </span>
+              );
+            })}
+
             {showSavings ? (
               <span className="bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                 Save ₹{totalSavings.toLocaleString()}
               </span>
-            ) : (
+            ) : highlightBadges.length === 0 ? (
               <span className="bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                 <ShieldCheck className="w-3 h-3" /> Warranty
               </span>
-            )}
+            ) : null}
           </div>
           <div className="flex items-center gap-1.5 pointer-events-auto">
             <button

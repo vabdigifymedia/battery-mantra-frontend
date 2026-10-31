@@ -8,7 +8,7 @@ import {
   ShoppingCart, ArrowLeft, Heart, Info, AlertCircle, Zap, PhoneCall,
   ShieldCheck, RefreshCw, Settings, PiggyBank, Star, Cpu, Wrench, 
   Maximize, Scale, Activity, Layers, Plug, X, Headset, Building2,
-  Award, Flame, TrendingUp, Box
+  Award, Flame, TrendingUp, Box, Sparkles as SparklesIcon
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -764,6 +764,33 @@ export function PdpPage() {
 
               {/* Reviews, Sold Stats & Creative Warranty Guarantee Banner */}
               <div className="space-y-2 sm:space-y-3 pt-0.5">
+                {/* Highlights tags from Admin (e.g. Best Seller, Top Rated) */}
+                {data.highlights && typeof data.highlights === "string" && (
+                  <div className="flex items-center flex-wrap gap-1.5 pb-0.5">
+                    {data.highlights
+                      .split(",")
+                      .map((h: string) => h.trim())
+                      .filter(Boolean)
+                      .map((badge: string, idx: number) => {
+                        const isBestOrTop = /best|top|popular|hot|deal|trend|recommend/i.test(badge);
+                        return (
+                          <span
+                            key={idx}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full shadow-2xs tracking-tight",
+                              isBestOrTop
+                                ? "bg-amber-500 text-white shadow-amber-500/20"
+                                : "bg-slate-900 text-white"
+                            )}
+                          >
+                            <SparklesIcon className="w-3.5 h-3.5 shrink-0" />
+                            {badge}
+                          </span>
+                        );
+                      })}
+                  </div>
+                )}
+
                 {/* 1. Rating & Popularity Stats (Mocked) - Compact & Inline on Mobile */}
                 <div className="flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-xs sm:text-sm">
                   <div className="inline-flex items-center gap-1 sm:gap-1.5 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg text-amber-900 dark:text-amber-200 font-bold shadow-2xs">
