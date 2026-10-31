@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Zap, ArrowUpRight, Wrench, BatteryCharging, Sun, Car, Truck } from "lucide-react";
+import { Zap, Wrench, BatteryCharging, Sun, Car, Truck } from "lucide-react";
 import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -33,9 +33,9 @@ export function CategoryGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-44 rounded-2xl" />
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <SkeletonBlock key={i} className="h-28 rounded-xl" />
         ))}
       </div>
     );
@@ -45,44 +45,33 @@ export function CategoryGrid() {
   const sorted = [...data].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
       {sorted.map((c) => {
         const rawSlug = c.categorySlug || toSlug(c.categoryName);
         const FallbackIcon = getCategoryFallbackIcon(c.categoryName);
 
         const cardContent = (
-          <div className="group relative flex flex-col items-center justify-between p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-brand/40 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[160px] sm:min-h-[175px]">
-            {/* Subtle Gradient Hover Backdrop */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-red-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-            {/* Corner Explore Arrow */}
-            <ArrowUpRight className="absolute top-2.5 right-2.5 w-4 h-4 text-slate-300 group-hover:text-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 opacity-0 sm:opacity-50 group-hover:opacity-100" />
-
-            {/* Harmonized Icon Pod (Constrains & standardizes all icon sizes) */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100/70 border border-slate-200/60 p-2.5 flex items-center justify-center group-hover:bg-red-50/60 group-hover:border-red-200/80 group-hover:scale-105 transition-all duration-300 shadow-2xs shrink-0">
+          <div className="group relative flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200/80 hover:border-brand/40 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-center cursor-pointer overflow-hidden h-full min-h-[96px] sm:min-h-[108px]">
+            {/* Harmonized Compact Icon Pod */}
+            <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-slate-50/90 border border-slate-100 flex items-center justify-center p-1.5 sm:p-2 group-hover:bg-red-50/60 group-hover:border-red-100 transition-colors shrink-0">
               {c.iconUrl ? (
                 <img
                   src={c.iconUrl}
                   alt={c.categoryName}
-                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-200"
                   loading="lazy"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-brand">
-                  <FallbackIcon className="w-8 h-8 stroke-[1.8] group-hover:scale-110 transition-transform duration-300" />
+                  <FallbackIcon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
                 </div>
               )}
             </div>
 
-            {/* Category Title with uniform alignment */}
-            <div className="relative z-10 mt-3 flex flex-col items-center justify-center w-full min-h-[2.5rem]">
-              <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-snug tracking-tight px-1">
-                {c.categoryName}
-              </span>
-            </div>
-
-            {/* Subtle Hover Accent Pill */}
-            <div className="w-0 group-hover:w-8 h-0.5 bg-brand rounded-full transition-all duration-300 mt-1" />
+            {/* Category Title */}
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-tight mt-1.5 px-0.5">
+              {c.categoryName}
+            </span>
           </div>
         );
 
