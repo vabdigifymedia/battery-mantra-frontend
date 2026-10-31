@@ -324,17 +324,17 @@ function StaffPrivacyPolicyPage() {
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
                 Staff members, partners, or engineers can request the permanent deletion of their account credentials and personal profile data at any time by emailing{" "}
                 <a
-                  href="mailto:support@batterymantra.com?subject=Staff%20App%20Account%20Deletion%20Request"
+                  href="mailto:batterymantra@gmail.com?subject=Staff%20App%20Account%20Deletion%20Request"
                   className="font-semibold text-[#DE2027] underline decoration-[#DE2027]/40 hover:decoration-[#DE2027] transition-colors"
                 >
-                  support@batterymantra.com
+                  batterymantra@gmail.com
                 </a>{" "}
                 or contacting their supervising Administrator. Verified deletion requests will be completed within 30 days.
               </p>
 
               <div className="pt-2">
                 <a
-                  href="mailto:support@batterymantra.com?subject=Staff%20App%20Account%20Deletion%20Request"
+                  href="mailto:batterymantra@gmail.com?subject=Staff%20App%20Account%20Deletion%20Request"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DE2027] text-white text-sm font-semibold hover:bg-[#DE2027]/90 transition-all shadow-sm shadow-[#DE2027]/20"
                 >
                   <Mail className="h-4 w-4" />
@@ -419,11 +419,11 @@ function StaffPrivacyPolicyPage() {
                 <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Official Email</span>
                 <p>
                   <a
-                    href="mailto:support@batterymantra.com"
+                    href="mailto:batterymantra@gmail.com"
                     className="font-semibold text-[#DE2027] hover:underline flex items-center gap-1.5"
                   >
                     <Mail className="h-4 w-4" />
-                    support@batterymantra.com
+                    batterymantra@gmail.com
                   </a>
                 </p>
               </div>
@@ -432,11 +432,11 @@ function StaffPrivacyPolicyPage() {
                 <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Support Hotline</span>
                 <p>
                   <a
-                    href="tel:+919899797677"
+                    href="tel:+919200920051"
                     className="font-semibold text-[#DE2027] hover:underline flex items-center gap-1.5"
                   >
                     <Phone className="h-4 w-4" />
-                    +91-9899797677
+                    +91-9200920051
                   </a>
                 </p>
               </div>
@@ -445,7 +445,7 @@ function StaffPrivacyPolicyPage() {
                 <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Registered Office</span>
                 <p className="font-semibold text-slate-800 flex items-start gap-2">
                   <MapPin className="h-4 w-4 text-[#DE2027] mt-1 shrink-0" />
-                  <span>Battery Mantra, Kalkaji, New Delhi, India</span>
+                  <span>Shop No-4, Block-4, Ganga Shopping, Sector 29, Noida, Uttar Pradesh</span>
                 </p>
               </div>
             </div>
@@ -465,10 +465,10 @@ function StaffPrivacyPolicyPage() {
               batterymantra.com
             </a>
             <a
-              href="mailto:support@batterymantra.com"
+              href="mailto:batterymantra@gmail.com"
               className="hover:text-[#DE2027] transition-colors"
             >
-              support@batterymantra.com
+              batterymantra@gmail.com
             </a>
           </div>
         </div>
