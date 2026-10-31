@@ -6,9 +6,10 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   categoriesQuery,
+  productFilterQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -28,7 +29,30 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
 
-    return { brands, categories, templates };
+    const firstSlug = params.categorySlug.toLowerCase();
+    const secondSlug = params.brandSlug.toLowerCase();
+    const brandMatchesFirst = brands?.find((b: any) => getBrandSlug(b) === firstSlug || toSlug(b.brandName) === firstSlug);
+    const brandMatchesSecond = brands?.find((b: any) => getBrandSlug(b) === secondSlug || toSlug(b.brandName) === secondSlug);
+    const matchedBrand = brandMatchesFirst || brandMatchesSecond;
+    const category = categories?.find((c: any) => toSlug(c.categoryName) === firstSlug);
+
+    let initialProducts: any[] = [];
+    if (matchedBrand?.brandId) {
+      try {
+        const prodData = await context.queryClient.ensureQueryData(
+          productFilterQuery({ 
+            brandId: [matchedBrand.brandId], 
+            categoryId: category?.categoryId ? [category.categoryId] : undefined,
+            size: 24 
+          })
+        );
+        initialProducts = prodData?.content || [];
+      } catch {
+        initialProducts = [];
+      }
+    }
+
+    return { brands, categories, templates, initialProducts };
   },
   head: ({ loaderData, params }) => {
     const firstSlug = params.categorySlug.toLowerCase();
@@ -60,21 +84,35 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       categoryName = toSingularCategory(firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     }
 
+    const priceStats = extractProductPriceStats(loaderData?.initialProducts);
+    const displayBrandName = brand?.brandName || brandName;
+    const displayCategoryName = categoryName || "Battery";
+
     const defaultTitle = cityName
-      ? `${brandName} Authorized Dealer in ${cityName}`
-      : `${brandName} ${categoryName} Authorized Dealer Online`;
+      ? `${displayBrandName} Authorized Dealer in ${cityName}`
+      : `${displayBrandName} ${displayCategoryName} Authorized Dealer Online`;
     const defaultDesc = cityName
-      ? `Buy 100% Genuine ${brandName} Battery from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
-      : `Buy 100% Genuine ${brandName} ${categoryName} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`;
+      ? `Buy 100% Genuine ${displayBrandName} Battery from Authorized Dealer in ${cityName} at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`
+      : `Buy 100% Genuine ${displayBrandName} ${displayCategoryName} from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`;
 
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
       {
-        brand_name: brand?.brandName || brandName,
-        category_name: categoryName,
+        brand_name: displayBrandName,
+        brand: displayBrandName,
+        category_name: displayCategoryName,
+        category: displayCategoryName,
         city_name: cityName,
+        city: cityName,
         delivery_time: "2-4 Hours",
+        price: priceStats.priceFormatted,
+        price_low: priceStats.priceLowestFormatted,
+        price_lowest: priceStats.priceLowestFormatted,
+        price_high: priceStats.priceHighestFormatted,
+        price_highest: priceStats.priceHighestFormatted,
+        price_range: priceStats.priceRangeFormatted,
+        warranty_range: priceStats.warrantyRangeFormatted,
       },
       (brand as any)?.seo,
       {

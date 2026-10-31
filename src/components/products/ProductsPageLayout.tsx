@@ -213,6 +213,7 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "MANUFACTURER_MODEL" = "UNIVERSAL";
   let context: Record<string, string> = {
     city_name: city?.cityName || "Delhi / NCR",
+    city: city?.cityName || "Delhi / NCR",
     delivery_time: getDeliveryTimeText(null, null, city?.cityName),
     price_range: priceRangeFormatted,
     price_lowest: priceLowestFormatted,
@@ -229,12 +230,17 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
 
   if (vehicle) {
     pageType = "MANUFACTURER_MODEL";
+    const categoryName = toSingularCategory(category?.categoryName) || "Battery";
     context = {
       ...context,
       model_name: vehicle.model,
+      model: vehicle.model,
       brand_name: vehicle.make,
+      brand: vehicle.make,
       manufacturer_name: vehicle.make,
-      category_name: toSingularCategory(category?.categoryName) || "Battery",
+      make: vehicle.make,
+      category_name: categoryName,
+      category: categoryName,
       capacity: resolvedCapacity,
       battery_capacity: resolvedCapacity,
       price: priceLowestFormatted,
@@ -250,20 +256,35 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     };
   } else if (brand) {
     pageType = "BRAND";
+    const categoryName = toSingularCategory(category?.categoryName) || "Battery";
     context = {
       ...context,
       brand_name: brand.brandName,
-      category_name: toSingularCategory(category?.categoryName) || "Battery",
+      brand: brand.brandName,
+      category_name: categoryName,
+      category: categoryName,
+      price: priceLowestFormatted,
       price_lowest: priceLowestFormatted,
+      price_low: priceLowestFormatted,
       price_highest: priceHighestFormatted,
+      price_high: priceHighestFormatted,
+      price_range: priceRangeFormatted,
+      warranty_range: priceStats.warrantyRangeFormatted,
     };
   } else if (category) {
     pageType = "CATEGORY";
+    const categoryName = toSingularCategory(category.categoryName);
     context = {
       ...context,
-      category_name: toSingularCategory(category.categoryName),
+      category_name: categoryName,
+      category: categoryName,
+      price: priceLowestFormatted,
       price_lowest: priceLowestFormatted,
+      price_low: priceLowestFormatted,
       price_highest: priceHighestFormatted,
+      price_high: priceHighestFormatted,
+      price_range: priceRangeFormatted,
+      warranty_range: priceStats.warrantyRangeFormatted,
     };
   }
 

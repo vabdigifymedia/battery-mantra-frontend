@@ -33,12 +33,16 @@ export const Route = createFileRoute("/brands/$categorySlug/")({
       .join(" ");
 
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
-    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName) || "Battery";
 
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: categoryName, delivery_time: "2-4 Hours" },
+      {
+        category_name: categoryName,
+        category: categoryName,
+        delivery_time: "2-4 Hours",
+      },
       (category as any)?.seo, // The category's own SEO
       {
         title: `Shop by ${categoryName} Brands | Battery Mantra`,

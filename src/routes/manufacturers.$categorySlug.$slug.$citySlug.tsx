@@ -25,22 +25,30 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$slug/$citySl
   head: ({ loaderData, params }) => {
     const makeName = params.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const cityName = params.citySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     
     const manufacturer = loaderData?.manufacturers?.find((m: any) => toSlug(m.name) === params.slug);
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+
+    const displayMfrName = manufacturer?.name || makeName;
+    const displayCategoryName = category?.categoryName || categoryName;
 
     const seo = resolveTemplateSeo(
       "MANUFACTURER",
       loaderData?.templates,
       { 
-        manufacturer_name: manufacturer?.name || makeName, 
-        category_name: category?.categoryName || categoryName,
+        manufacturer_name: displayMfrName,
+        make: displayMfrName,
+        category_name: displayCategoryName,
+        category: displayCategoryName,
+        city_name: cityName,
+        city: cityName,
         delivery_time: "2-4 Hours",
       },
       (manufacturer as any)?.seo,
       {
-        title: `Buy ${makeName} ${categoryName} Online at Best Price | Battery Mantra`,
-        description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
+        title: `Buy ${makeName} ${categoryName} in ${cityName} Online at Best Price | Battery Mantra`,
+        description: `Find 100% compatible batteries for all ${makeName} vehicle models in ${cityName} at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
       }
     );
 

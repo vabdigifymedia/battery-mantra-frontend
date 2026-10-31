@@ -92,7 +92,9 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>Variables: brand_name, category_name, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}</CardDescription>
+        <CardDescription>
+          Variables: brand_name, category_name, price, price_range, price_low, price_high, warranty_range, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">

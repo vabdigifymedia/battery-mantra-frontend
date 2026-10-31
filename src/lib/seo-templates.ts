@@ -169,19 +169,46 @@ function replaceVars(template: string | undefined | null, vars: Record<string, s
     }
     const regex = new RegExp(`\\{\\{?\\s*${key}\\s*\\}\\}?`, "gi");
     result = result.replace(regex, value || "");
+
+    // Also replace unbracketed variable name if key is snake_case and has a value (e.g. brand_name, category_name)
+    if (/^[a-z]+_[a-z]+(_[a-z]+)?$/i.test(key) && value) {
+      const wordRegex = new RegExp(`\\b${key}\\b`, "gi");
+      result = result.replace(wordRegex, value);
+    }
   }
-  // Safety: if template still has unreplaced delivery_time, resolve with fallback
+
+  // Safety fallbacks for common unsupplied variables
   if (/\{{1,2}\s*delivery_time\s*\}{1,2}/i.test(result)) {
     result = result.replace(/\{{1,2}\s*delivery_time\s*\}{1,2}/gi, vars.delivery_time || "1-2 Hours");
   }
-  // Deduplicate accidental repeated manufacturer name (e.g. "Honda Honda Amaze" -> "Honda Amaze")
-  if (vars.manufacturer_name) {
-    const m = vars.manufacturer_name.trim();
+  if (/\{{1,2}\s*category(_name)?\s*\}{1,2}/i.test(result)) {
+    result = result.replace(/\{{1,2}\s*category(_name)?\s*\}{1,2}/gi, vars.category_name || vars.category || "Battery");
+  }
+  if (/\{{1,2}\s*(sub_subcategory_name|model_name|model)\s*\}{1,2}/i.test(result)) {
+    result = result.replace(/\{{1,2}\s*(sub_subcategory_name|model_name|model)\s*\}{1,2}/gi, vars.model_name || vars.model || "");
+  }
+  result = result.replace(/\bsub_subcategory_name\b/gi, vars.model_name || vars.model || "");
+  result = result.replace(/\bmake_name\b/gi, vars.manufacturer_name || vars.make || "");
+
+  if (/\{{1,2}\s*city(_name)?\s*\}{1,2}/i.test(result)) {
+    result = result.replace(/\{{1,2}\s*city(_name)?\s*\}{1,2}/gi, vars.city_name || vars.city || "");
+  }
+
+  // Clean remaining unreplaced curly variables so they don't leak into UI/SEO
+  result = result.replace(/\{{1,2}\s*[a-zA-Z0-9_]+\s*\}{1,2}/g, "");
+
+  // Deduplicate accidental repeated brand/manufacturer name (e.g. "Honda Honda Amaze" -> "Honda Amaze")
+  const brandOrMfr = vars.manufacturer_name || vars.brand_name || vars.brand;
+  if (brandOrMfr) {
+    const m = brandOrMfr.trim();
     if (m) {
       const escaped = m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       result = result.replace(new RegExp(`\\b(${escaped})\\s+\\1\\b`, "gi"), "$1");
     }
   }
+
+  // Clean dangling prepositions like "in |", "in at", "in -"
+  result = result.replace(/\s+in\s*(?=[|,\-.]|\s+at\b|$)/gi, " ");
   // Clean multiple consecutive whitespace
   result = result.replace(/[ \t]{2,}/g, " ").trim();
   return result;
@@ -203,10 +230,15 @@ export function resolveTemplateSeo(
   defaults?: { title?: string; description?: string }
 ): PageSeoData {
   const city = useLocationStore.getState().city;
-  const cityName = vars.city_name || city?.cityName || "";
+  const cityName = vars.city_name !== undefined ? vars.city_name : (city?.cityName || "");
   const deliveryTime = vars.delivery_time || getDeliveryTimeText(null, null, cityName);
 
-  // Common aliases for capacity, price, and fuel variables
+  // Common aliases for brand, category, capacity, price, fuel, and models
+  const brandVal = vars.brand_name || vars.brand || "";
+  const categoryDefault = (entityType === "BRAND" || entityType === "DEALER") ? "Battery" : "";
+  const categoryVal = vars.category_name || vars.category || categoryDefault;
+  const manufacturerVal = vars.manufacturer_name || vars.manufacturer || vars.make || vars.make_name || "";
+  const modelVal = vars.model_name || vars.model || vars.sub_make || vars.sub_subcategory_name || "";
   const capacityVal = vars.capacity || vars.battery_capacity || "";
   const priceLowVal = vars.price_low || vars.price_lowest || vars.price || "";
   const priceHighVal = vars.price_high || vars.price_highest || "";
@@ -216,7 +248,22 @@ export function resolveTemplateSeo(
   const allVars: Record<string, string> = {
     delivery_time: deliveryTime,
     ...vars,
-    city_name: cityName || "India",
+    city_name: cityName,
+    city: cityName,
+    ...(brandVal && { brand_name: brandVal, brand: brandVal }),
+    ...(categoryVal && { category_name: categoryVal, category: categoryVal }),
+    ...(manufacturerVal && { 
+      manufacturer_name: manufacturerVal, 
+      manufacturer: manufacturerVal, 
+      make: manufacturerVal, 
+      make_name: manufacturerVal 
+    }),
+    ...(modelVal && { 
+      model_name: modelVal, 
+      model: modelVal, 
+      sub_make: modelVal, 
+      sub_subcategory_name: modelVal 
+    }),
     ...(capacityVal && { capacity: capacityVal, battery_capacity: capacityVal }),
     ...(priceLowVal && { price: priceLowVal, price_low: priceLowVal, price_lowest: priceLowVal }),
     ...(priceHighVal && { price_high: priceHighVal, price_highest: priceHighVal }),

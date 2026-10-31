@@ -6,9 +6,10 @@ import {
   brandsQuery,
   categoriesQuery,
   pageSeoQuery,
+  productFilterQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
@@ -35,7 +36,20 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
       // ignore
     }
 
-    return { brands, categories, templates, pageSeo };
+    const brand = brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    let initialProducts: any[] = [];
+    if (brand?.brandId) {
+      try {
+        const prodData = await context.queryClient.ensureQueryData(
+          productFilterQuery({ brandId: [brand.brandId], size: 24 })
+        );
+        initialProducts = prodData?.content || [];
+      } catch {
+        initialProducts = [];
+      }
+    }
+
+    return { brands, categories, templates, pageSeo, initialProducts };
   },
   head: ({ loaderData, params }) => {
     const categoryName = params.categorySlug
@@ -58,7 +72,8 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
     });
 
     const displayBrandName = brand?.brandName || brandName;
-    const displayCategoryName = toSingularCategory(category?.categoryName || categoryName);
+    const displayCategoryName = toSingularCategory(category?.categoryName || categoryName) || "Battery";
+    const priceStats = extractProductPriceStats(loaderData?.initialProducts);
 
     // Use specific CMS Page SEO first, then entity SEO, then templates
     const seo = resolveTemplateSeo(
@@ -66,8 +81,17 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/"
       loaderData?.templates ?? undefined,
       {
         brand_name: displayBrandName,
+        brand: displayBrandName,
         category_name: displayCategoryName,
+        category: displayCategoryName,
         delivery_time: "1-2 Hours",
+        price: priceStats.priceLowestFormatted,
+        price_lowest: priceStats.priceLowestFormatted,
+        price_low: priceStats.priceLowestFormatted,
+        price_highest: priceStats.priceHighestFormatted,
+        price_high: priceStats.priceHighestFormatted,
+        price_range: priceStats.priceRangeFormatted,
+        warranty_range: priceStats.warrantyRangeFormatted,
       },
       loaderData?.pageSeo?.seo || (brand as any)?.seo || (category as any)?.seo,
       {

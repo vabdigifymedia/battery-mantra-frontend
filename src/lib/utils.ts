@@ -23,7 +23,33 @@ export const toSlug = (text?: string) => text ? text.toLowerCase().trim().replac
 export function applySeoTemplate(template?: string | null, context: Record<string, string> = {}): string {
   if (!template) return "";
   let result = template;
-  for (const [key, value] of Object.entries(context)) {
+
+  // Build aliased context so both short and long forms work
+  const enriched: Record<string, string> = { ...context };
+  if (enriched.category_name && !enriched.category) enriched.category = enriched.category_name;
+  if (enriched.category && !enriched.category_name) enriched.category_name = enriched.category;
+  if (enriched.brand_name && !enriched.brand) enriched.brand = enriched.brand_name;
+  if (enriched.brand && !enriched.brand_name) enriched.brand_name = enriched.brand;
+  if (enriched.city_name && !enriched.city) enriched.city = enriched.city_name;
+  if (enriched.city && !enriched.city_name) enriched.city_name = enriched.city;
+  if (enriched.manufacturer_name && !enriched.make) enriched.make = enriched.manufacturer_name;
+  if (enriched.make && !enriched.manufacturer_name) enriched.manufacturer_name = enriched.make;
+  if (enriched.model_name && !enriched.model) enriched.model = enriched.model_name;
+  if (enriched.model && !enriched.model_name) enriched.model_name = enriched.model;
+  if (enriched.capacity && !enriched.battery_capacity) enriched.battery_capacity = enriched.capacity;
+  if (enriched.battery_capacity && !enriched.capacity) enriched.capacity = enriched.battery_capacity;
+  if (enriched.price_lowest && !enriched.price) enriched.price = enriched.price_lowest;
+  if (enriched.price_lowest && !enriched.price_low) enriched.price_low = enriched.price_lowest;
+  if (enriched.price_highest && !enriched.price_high) enriched.price_high = enriched.price_highest;
+
+  // Safety fallback for category if missing in brand/dealer context
+  if (!enriched.category_name && (enriched.brand_name || enriched.brand)) {
+    enriched.category_name = "Battery";
+    enriched.category = "Battery";
+  }
+
+  for (const [key, value] of Object.entries(enriched)) {
+    if (value === undefined || value === null) continue;
     // If value already starts with currency symbol (₹), avoid double symbols (e.g. ₹{price_lowest} -> ₹₹4,500)
     if (value && /^\s*₹/.test(value)) {
       const regexWithCurrency = new RegExp(`(?:₹|Rs\\.?|INR\\s*)\\s*\\{{1,2}\\s*${key}\\s*\\}{1,2}`, 'gi');
@@ -35,9 +61,15 @@ export function applySeoTemplate(template?: string | null, context: Record<strin
   }
   // Safety fallback: if delivery_time is still unreplaced, replace with context value or standard fallback
   if (/\{{1,2}\s*delivery_time\s*\}{1,2}/i.test(result)) {
-    const fallback = context.delivery_time || "1-2 Hours";
+    const fallback = enriched.delivery_time || "1-2 Hours";
     result = result.replace(/\{{1,2}\s*delivery_time\s*\}{1,2}/gi, fallback);
   }
+
+  // Clean unreplaced placeholder variables like {foo_bar}
+  result = result.replace(/\{{1,2}[a-zA-Z0-9_ -]+\}{1,2}/g, "");
+  // Clean multiple spaces that might result
+  result = result.replace(/[ \t]{2,}/g, " ");
+
   return result;
 }
 

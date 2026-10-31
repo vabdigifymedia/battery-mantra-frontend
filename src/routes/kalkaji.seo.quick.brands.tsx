@@ -92,29 +92,58 @@ function SeoTemplateForm({ title, templateType, data, onSave, isPending }: any) 
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>Variables: brand_name, category_name, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}</CardDescription>
+        <CardDescription>
+          Variables: brand_name, category_name, price, price_range, price_low, price_high, warranty_range, delivery_time{templateType.includes("WITH_CITY") && ", city_name"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div className="space-y-2">
             <Label>SEO Title</Label>
-            <AutoResizeTextarea placeholder={`Buy brand_name at Best Price | Batterymantra.com`} {...register("seoTitleTemplate")} />
+            <AutoResizeTextarea 
+              placeholder={templateType.includes("WITH_CITY")
+                ? "Buy {brand_name} {category_name} in {city_name} at Best Price | Batterymantra.com"
+                : "Buy {brand_name} {category_name} Online at Best Price | Batterymantra.com"
+              } 
+              {...register("seoTitleTemplate")} 
+            />
           </div>
           <div className="space-y-2">
             <Label>SEO Keywords</Label>
-            <AutoResizeTextarea placeholder={`brand_name price, buy brand_name...`} {...register("seoKeywordsTemplate")} />
+            <AutoResizeTextarea 
+              placeholder={templateType.includes("WITH_CITY")
+                ? "{brand_name} battery in {city_name}, buy {brand_name} {city_name}, {brand_name} price in {city_name}"
+                : "{brand_name} battery, buy {brand_name} online, {brand_name} battery price"
+              } 
+              {...register("seoKeywordsTemplate")} 
+            />
           </div>
           <div className="space-y-2">
             <Label>SEO Description</Label>
-            <AutoResizeTextarea placeholder={`Buy brand_name at Best Price. Cash on delivery available...`} {...register("seoDescriptionTemplate")} />
+            <AutoResizeTextarea 
+              placeholder={templateType.includes("WITH_CITY")
+                ? "Buy 100% Genuine {brand_name} {category_name} in {city_name} at lowest price starting {price}. Free installation in {delivery_time}."
+                : "Buy 100% Genuine {brand_name} {category_name} online at lowest price starting {price}. Free installation in {delivery_time}."
+              } 
+              {...register("seoDescriptionTemplate")} 
+            />
           </div>
           <div className="space-y-2 mt-4 pt-4 border-t">
             <Label>OG Title</Label>
-            <AutoResizeTextarea placeholder={`Buy brand_name at Best Price | Batterymantra.com`} {...register("ogTitleTemplate")} />
+            <AutoResizeTextarea 
+              placeholder={templateType.includes("WITH_CITY")
+                ? "Buy {brand_name} {category_name} in {city_name} | Batterymantra.com"
+                : "Buy {brand_name} {category_name} at Best Price | Batterymantra.com"
+              } 
+              {...register("ogTitleTemplate")} 
+            />
           </div>
           <div className="space-y-2">
             <Label>OG Description</Label>
-            <AutoResizeTextarea placeholder={`Buy brand_name at Best Price. Cash on delivery available...`} {...register("ogDescriptionTemplate")} />
+            <AutoResizeTextarea 
+              placeholder="Buy 100% genuine batteries from authorized dealers with express delivery." 
+              {...register("ogDescriptionTemplate")} 
+            />
           </div>
           <div className="pt-2 flex justify-end">
             <Button type="submit" disabled={isPending}>

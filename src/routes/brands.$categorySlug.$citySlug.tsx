@@ -33,18 +33,28 @@ export const Route = createFileRoute("/brands/$categorySlug/$citySlug")({
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
+    const cityName = params.citySlug
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
 
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
-    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName) || "Battery";
 
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: categoryName, delivery_time: "2-4 Hours" },
+      {
+        category_name: categoryName,
+        category: categoryName,
+        city_name: cityName,
+        city: cityName,
+        delivery_time: "2-4 Hours",
+      },
       (category as any)?.seo, // The category's own SEO
       {
-        title: `Shop by ${categoryName} Brands | Battery Mantra`,
-        description: `Select your ${categoryName} brand to find products at best prices with free installation.`,
+        title: `Shop by ${categoryName} Brands in ${cityName} | Battery Mantra`,
+        description: `Select your ${categoryName} brand in ${cityName} to find products at best prices with free installation.`,
       }
     );
 

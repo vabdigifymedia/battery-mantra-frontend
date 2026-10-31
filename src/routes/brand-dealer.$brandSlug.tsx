@@ -5,15 +5,16 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   categoriesQuery,
+  productFilterQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-dealer/$brandSlug")({
-  loader: async ({ context }) => {
+  loader: async ({ context, params }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
@@ -23,20 +24,49 @@ export const Route = createFileRoute("/brand-dealer/$brandSlug")({
       context.queryClient.ensureQueryData(brandsQuery()),
       context.queryClient.ensureQueryData(seoTemplatesQuery()),
     ]);
-    return { brands, templates };
+
+    const brand = brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    let initialProducts: any[] = [];
+    if (brand?.brandId) {
+      try {
+        const prodData = await context.queryClient.ensureQueryData(
+          productFilterQuery({ brandId: [brand.brandId], size: 24 })
+        );
+        initialProducts = prodData?.content || [];
+      } catch {
+        initialProducts = [];
+      }
+    }
+
+    return { brands, templates, initialProducts, brand };
   },
   head: ({ loaderData, params }) => {
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brand || loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    const priceStats = extractProductPriceStats(loaderData?.initialProducts);
+    const displayBrandName = brand?.brandName || brandName;
     
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
-      { brand_name: brand?.brandName || brandName, delivery_time: "2-4 Hours" },
+      { 
+        brand_name: displayBrandName,
+        brand: displayBrandName,
+        category_name: "Battery",
+        category: "Battery",
+        delivery_time: "2-4 Hours",
+        price: priceStats.priceFormatted,
+        price_low: priceStats.priceLowestFormatted,
+        price_lowest: priceStats.priceLowestFormatted,
+        price_high: priceStats.priceHighestFormatted,
+        price_highest: priceStats.priceHighestFormatted,
+        price_range: priceStats.priceRangeFormatted,
+        warranty_range: priceStats.warrantyRangeFormatted,
+      },
       (brand as any)?.seo,
       {
-        title: `${brandName} Authorized Dealer Online`,
-        description: `Buy 100% Genuine ${brandName} Batteries from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+        title: `${displayBrandName} Authorized Dealer Online`,
+        description: `Buy 100% Genuine ${displayBrandName} Batteries from Authorized Dealer Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
       }
     );
     

@@ -30,17 +30,24 @@ export const Route = createFileRoute("/shop/c/$categorySlug/$citySlug")({
   },
   head: ({ loaderData, params }) => {
     const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const cityName = params.citySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
-    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName) || "Battery";
 
     const seo = resolveTemplateSeo(
       "CATEGORY",
       loaderData?.templates,
-      { category_name: categoryName, delivery_time: "2-4 Hours" },
+      {
+        category_name: categoryName,
+        category: categoryName,
+        city_name: cityName,
+        city: cityName,
+        delivery_time: "2-4 Hours",
+      },
       (category as any)?.seo,
       {
-        title: `${categoryName} Online | Buy 100% Genuine Battery`,
-        description: `Buy 100% Genuine ${categoryName} Online at Best Price in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+        title: `${categoryName} in ${cityName} Online | Buy 100% Genuine Battery`,
+        description: `Buy 100% Genuine ${categoryName} in ${cityName} Online at Best Price. Get Free Express Delivery and Installation in 1-2 hours.`,
       }
     );
 

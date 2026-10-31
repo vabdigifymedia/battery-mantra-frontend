@@ -2875,54 +2875,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-glanza-diesel</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-glanza-petrol</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-gr-sport-fortuner</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-hilux-diesel</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-hycross-2-0-petrol</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-hycross-hybrid</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-old-petrol</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-land-cruiser-prado-3-0-diesel</loc>
-    <lastmod>2026-10-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-land-cruiser-prado-4-0-petrol</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -2942,6 +2894,12 @@
   </url>
   <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-prius-1-8-petrol</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-hilux-diesel</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3019,6 +2977,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-glanza-diesel</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-glanza-petrol</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-gr-sport-fortuner</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-crysta-diesel</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -3031,7 +3007,31 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-hycross-2-0-petrol</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-hycross-hybrid</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-old-diesel</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-innova-old-petrol</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/toyota/toyota-land-cruiser-prado-3-0-diesel</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

@@ -27,9 +27,14 @@ export type VariablePresetType =
 const PRESET_VARIABLES: Record<VariablePresetType, VariableDef[]> = {
   SEO_BRANDS: [
     { key: "{brand_name}", label: "Brand Name" },
-    { key: "{category_name}", label: "Category Name" },
+    { key: "{category_name}", label: "Category Name (e.g. Battery)" },
+    { key: "{price}", label: "Starting Price", highlight: true },
+    { key: "{price_range}", label: "Price Range", highlight: true },
+    { key: "{price_low}", label: "Lowest Price" },
+    { key: "{price_high}", label: "Highest Price" },
+    { key: "{warranty_range}", label: "Warranty Period" },
     { key: "{city_name}", label: "Selected City" },
-    { key: "{delivery_time}", label: "Delivery Time (e.g. 2-4 Hours)" },
+    { key: "{delivery_time}", label: "Delivery Time (e.g. 1-2 Hours)" },
   ],
   SEO_CATEGORIES: [
     { key: "{category_name}", label: "Category Name" },
@@ -39,9 +44,14 @@ const PRESET_VARIABLES: Record<VariablePresetType, VariableDef[]> = {
   ],
   SEO_DEALERS: [
     { key: "{brand_name}", label: "Brand Name" },
-    { key: "{category_name}", label: "Category Name (e.g. Batteries, Inverters)" },
+    { key: "{category_name}", label: "Category Name (e.g. Battery, Inverters)" },
+    { key: "{price}", label: "Starting Price", highlight: true },
+    { key: "{price_range}", label: "Price Range", highlight: true },
+    { key: "{price_low}", label: "Lowest Price" },
+    { key: "{price_high}", label: "Highest Price" },
+    { key: "{warranty_range}", label: "Warranty Period" },
     { key: "{city_name}", label: "Selected City" },
-    { key: "{delivery_time}", label: "Delivery Time (e.g. 2-4 Hours)" },
+    { key: "{delivery_time}", label: "Delivery Time (e.g. 1-2 Hours)" },
   ],
   SEO_MANUFACTURERS: [
     { key: "{manufacturer_name}", label: "Manufacturer (Make e.g. Maruti, BMW)" },

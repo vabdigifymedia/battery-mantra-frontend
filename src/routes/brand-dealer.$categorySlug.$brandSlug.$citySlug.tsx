@@ -8,15 +8,16 @@ import {
   rootCategoriesQuery,
   brandsQuery,
   categoriesQuery,
+  productFilterQuery,
 } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
-import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$citySlug")({
-  loader: async ({ context }) => {
+  loader: async ({ context, params }) => {
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
@@ -27,7 +28,21 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
       context.queryClient.ensureQueryData(categoriesQuery()),
       context.queryClient.ensureQueryData(seoTemplatesQuery()),
     ]);
-    return { brands, categories, templates };
+
+    const brand = brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    let initialProducts: any[] = [];
+    if (brand?.brandId) {
+      try {
+        const prodData = await context.queryClient.ensureQueryData(
+          productFilterQuery({ brandId: [brand.brandId], size: 24 })
+        );
+        initialProducts = prodData?.content || [];
+      } catch {
+        initialProducts = [];
+      }
+    }
+
+    return { brands, categories, templates, initialProducts };
   },
   head: ({ loaderData, params }) => {
     const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -35,13 +50,30 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
     const cityName = params.citySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const brand = loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
     const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
-    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
+    const categoryName = toSingularCategory(category?.categoryName || rawCategoryName) || "Battery";
+    const displayBrandName = brand?.brandName || brandName;
+    const priceStats = extractProductPriceStats(loaderData?.initialProducts);
 
     // Provide dealer specific SEO
     const seo = resolveTemplateSeo(
       "DEALER",
       loaderData?.templates,
-      { brand_name: brand?.brandName || brandName, category_name: categoryName, delivery_time: "2-4 Hours", city_name: cityName },
+      {
+        brand_name: displayBrandName,
+        brand: displayBrandName,
+        category_name: categoryName,
+        category: categoryName,
+        city_name: cityName,
+        city: cityName,
+        delivery_time: "2-4 Hours",
+        price: priceStats.priceLowestFormatted,
+        price_lowest: priceStats.priceLowestFormatted,
+        price_low: priceStats.priceLowestFormatted,
+        price_highest: priceStats.priceHighestFormatted,
+        price_high: priceStats.priceHighestFormatted,
+        price_range: priceStats.priceRangeFormatted,
+        warranty_range: priceStats.warrantyRangeFormatted,
+      },
       (brand as any)?.seo,
       {
         title: `${brandName} ${categoryName} Authorized Dealer in ${cityName}`,
