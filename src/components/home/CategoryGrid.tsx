@@ -35,7 +35,7 @@ export function CategoryGrid() {
     return (
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
         {Array.from({ length: 12 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-28 rounded-xl" />
+          <SkeletonBlock key={i} className="h-36 sm:h-44 rounded-2xl" />
         ))}
       </div>
     );
@@ -51,25 +51,25 @@ export function CategoryGrid() {
         const FallbackIcon = getCategoryFallbackIcon(c.categoryName);
 
         const cardContent = (
-          <div className="group relative flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200/80 hover:border-brand/40 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-center cursor-pointer overflow-hidden h-full min-h-[96px] sm:min-h-[108px]">
-            {/* Harmonized Compact Icon Pod */}
-            <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-slate-50/90 border border-slate-100 flex items-center justify-center p-1.5 sm:p-2 group-hover:bg-red-50/60 group-hover:border-red-100 transition-colors shrink-0">
+          <div className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand/40 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[130px] sm:min-h-[152px]">
+            {/* Prominent Category Icon Pod */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-slate-50/90 border border-slate-100 flex items-center justify-center p-2 sm:p-2.5 group-hover:bg-red-50/60 group-hover:border-red-100 transition-colors shrink-0">
               {c.iconUrl ? (
                 <img
                   src={c.iconUrl}
                   alt={c.categoryName}
-                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-200"
+                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
                   loading="lazy"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-brand">
-                  <FallbackIcon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
+                  <FallbackIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
                 </div>
               )}
             </div>
 
             {/* Category Title */}
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-tight mt-1.5 px-0.5">
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-snug mt-2.5 px-1">
               {c.categoryName}
             </span>
           </div>
@@ -147,11 +147,11 @@ export function CategoryGrid() {
 
       {/* All Categories Card */}
       <Link to="/categories" className="block h-full">
-        <div className="group relative flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl bg-gradient-to-b from-brand/5 via-white to-brand/5 border border-brand/25 hover:border-brand hover:bg-brand/5 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-center cursor-pointer overflow-hidden h-full min-h-[96px] sm:min-h-[108px]">
-          <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center p-1.5 sm:p-2 group-hover:bg-brand group-hover:text-white transition-colors shrink-0 text-brand">
-            <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2] group-hover:scale-110 transition-transform duration-200" />
+        <div className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-brand/5 via-white to-brand/5 border border-brand/25 hover:border-brand hover:bg-brand/5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[130px] sm:min-h-[152px]">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center p-2 sm:p-2.5 group-hover:bg-brand group-hover:text-white transition-colors shrink-0 text-brand">
+            <LayoutGrid className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 stroke-[2] group-hover:scale-110 transition-transform duration-200" />
           </div>
-          <span className="text-[11px] sm:text-xs font-bold text-brand group-hover:text-brand transition-colors line-clamp-2 leading-tight mt-1.5 px-0.5">
+          <span className="text-xs sm:text-[13px] font-bold text-brand group-hover:text-brand transition-colors line-clamp-2 leading-snug mt-2.5 px-1">
             All Categories
           </span>
         </div>

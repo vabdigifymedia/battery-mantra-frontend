@@ -37,11 +37,11 @@ function CategoriesPage() {
 
                 const cardContent = (
                   <>
-                    <span className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+                    <span className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center text-primary transition-transform group-hover:scale-110">
                       {c.iconUrl ? (
-                        <img src={c.iconUrl} alt={c.categoryName} className="h-full w-full object-contain mix-blend-multiply" />
+                        <img src={c.iconUrl} alt={c.categoryName} className="h-full w-full object-contain mix-blend-multiply drop-shadow-xs" />
                       ) : (
-                        <Layers className="h-6 w-6 sm:h-8 sm:w-8" />
+                        <Layers className="h-8 w-8 sm:h-10 sm:w-10" />
                       )}
                     </span>
                     <span className="text-[11px] sm:text-sm font-medium text-foreground line-clamp-2 leading-tight">

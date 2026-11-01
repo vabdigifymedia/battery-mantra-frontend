@@ -111,7 +111,7 @@ function CategoryIcon({ iconUrl, name }: { iconUrl?: string | null; name: string
 function CategoryCardItem({ category }: { category: CategoryListResponse }) {
   return (
     <>
-      <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-border/80 bg-gradient-to-b from-white via-white to-slate-50/80 dark:from-card dark:via-card dark:to-muted/20 p-2.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/40 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
+      <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-border/80 bg-gradient-to-b from-white via-white to-slate-50/80 dark:from-card dark:via-card dark:to-muted/20 p-1.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/40 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
         <CategoryIcon iconUrl={category.iconUrl} name={category.categoryName} />
       </div>
       <div className="h-[36px] w-full flex items-center justify-center">
@@ -239,9 +239,9 @@ export function HomeCategoryPills() {
 
         {/* All Categories Pill */}
         <Link to="/categories" className={linkClass}>
-          <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/5 via-white to-primary/10 dark:from-card dark:via-card dark:to-muted/20 p-2.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/60 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
+          <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/5 via-white to-primary/10 dark:from-card dark:via-card dark:to-muted/20 p-2 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/60 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
             <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
-              <LayoutGrid className="h-7 w-7 stroke-[2]" />
+              <LayoutGrid className="h-8 w-8 stroke-[2.2]" />
             </div>
           </div>
           <div className="h-[36px] w-full flex items-center justify-center">
