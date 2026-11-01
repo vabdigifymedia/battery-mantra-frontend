@@ -31,6 +31,7 @@ function CategoriesPage() {
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4">
             {(categories || [])
+              .filter((c) => !c.categoryName.toLowerCase().replace(/\s+/g, "").includes("allcat"))
               .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
               .map((c) => {
                 const rawSlug = c.categorySlug || toSlug(c.categoryName);

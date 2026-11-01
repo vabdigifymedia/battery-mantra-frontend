@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Zap, Wrench, BatteryCharging, Sun, Car, Truck, LayoutGrid } from "lucide-react";
+import { Zap, Wrench, BatteryCharging, Sun, Car, Truck } from "lucide-react";
 import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -28,6 +28,9 @@ function getCategoryFallbackIcon(name: string) {
   return Zap;
 }
 
+const ALL_CATEGORIES_LOGO =
+  "https://res.cloudinary.com/xtijkslp/image/upload/v1793505701/battery-mantra/categories/fqrfxxqvtqghgnddwzeq.png";
+
 export function CategoryGrid() {
   const { data, isLoading, isError } = useQuery(rootCategoriesQuery());
 
@@ -43,10 +46,30 @@ export function CategoryGrid() {
   if (isError || !data || !Array.isArray(data) || data.length === 0) return null;
 
   const sorted = [...data].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+  const categoriesList = sorted.filter(
+    (c) => !c.categoryName.toLowerCase().replace(/\s+/g, "").includes("allcat")
+  );
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
-      {sorted.map((c) => {
+      {/* All Categories Card - First Position */}
+      <Link to="/categories" className="block h-full">
+        <div className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand/40 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[130px] sm:min-h-[152px]">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-slate-50/90 border border-slate-100 flex items-center justify-center p-2 sm:p-2.5 group-hover:bg-red-50/60 group-hover:border-red-100 transition-colors shrink-0">
+            <img
+              src={ALL_CATEGORIES_LOGO}
+              alt="All Categories"
+              className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
+              loading="lazy"
+            />
+          </div>
+          <span className="text-xs sm:text-[13px] font-semibold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-snug mt-2.5 px-1">
+            All Categories
+          </span>
+        </div>
+      </Link>
+
+      {categoriesList.map((c) => {
         const rawSlug = c.categorySlug || toSlug(c.categoryName);
         const FallbackIcon = getCategoryFallbackIcon(c.categoryName);
 
@@ -144,18 +167,6 @@ export function CategoryGrid() {
           </Link>
         );
       })}
-
-      {/* All Categories Card */}
-      <Link to="/categories" className="block h-full">
-        <div className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-brand/5 via-white to-brand/5 border border-brand/25 hover:border-brand hover:bg-brand/5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[130px] sm:min-h-[152px]">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center p-2 sm:p-2.5 group-hover:bg-brand group-hover:text-white transition-colors shrink-0 text-brand">
-            <LayoutGrid className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 stroke-[2] group-hover:scale-110 transition-transform duration-200" />
-          </div>
-          <span className="text-xs sm:text-[13px] font-bold text-brand group-hover:text-brand transition-colors line-clamp-2 leading-snug mt-2.5 px-1">
-            All Categories
-          </span>
-        </div>
-      </Link>
     </div>
   );
 }

@@ -8,13 +8,15 @@ import {
   BatteryCharging,
   Car,
   Cpu,
-  LayoutGrid,
   Sun,
   Truck,
   Wrench,
   Zap,
 } from "lucide-react";
 import type { CategoryListResponse } from "@/types/dto";
+
+const ALL_CATEGORIES_LOGO =
+  "https://res.cloudinary.com/xtijkslp/image/upload/v1793505701/battery-mantra/categories/fqrfxxqvtqghgnddwzeq.png";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
@@ -147,6 +149,9 @@ export function HomeCategoryPills() {
   if (!categories || !Array.isArray(categories) || categories.length === 0) return null;
 
   const sorted = [...categories].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+  const categoriesList = sorted.filter(
+    (c) => !c.categoryName.toLowerCase().replace(/\s+/g, "").includes("allcat")
+  );
 
   const linkClass =
     "group flex flex-col items-center gap-1.5 w-[86px] min-w-[86px] shrink-0 snap-start active:scale-95 transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-2xl select-none";
@@ -158,7 +163,24 @@ export function HomeCategoryPills() {
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10" />
 
       <div className="flex w-full items-start gap-3 overflow-x-auto no-scrollbar scrollbar-hide px-4 scroll-px-4 snap-x snap-mandatory overscroll-x-contain py-1">
-        {sorted.map((category) => {
+        {/* All Categories Pill - First Position */}
+        <Link to="/categories" className={linkClass}>
+          <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-border/80 bg-gradient-to-b from-white via-white to-slate-50/80 dark:from-card dark:via-card dark:to-muted/20 p-1.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/40 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
+            <img
+              src={ALL_CATEGORIES_LOGO}
+              alt="All Categories"
+              className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+          <div className="h-[36px] w-full flex items-center justify-center">
+            <span className="text-xs font-semibold text-center leading-[1.25] tracking-tight text-foreground/90 group-hover:text-primary transition-colors line-clamp-2 px-0.5">
+              All Categories
+            </span>
+          </div>
+        </Link>
+
+        {categoriesList.map((category) => {
           const rawSlug = category.categorySlug || toSlug(category.categoryName);
           const cardContent = <CategoryCardItem category={category} />;
 
@@ -236,20 +258,6 @@ export function HomeCategoryPills() {
             </Link>
           );
         })}
-
-        {/* All Categories Pill */}
-        <Link to="/categories" className={linkClass}>
-          <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/5 via-white to-primary/10 dark:from-card dark:via-card dark:to-muted/20 p-2 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/60 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
-            <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
-              <LayoutGrid className="h-8 w-8 stroke-[2.2]" />
-            </div>
-          </div>
-          <div className="h-[36px] w-full flex items-center justify-center">
-            <span className="text-xs font-semibold text-center leading-[1.25] tracking-tight text-primary group-hover:text-primary transition-colors line-clamp-2 px-0.5">
-              All Categories
-            </span>
-          </div>
-        </Link>
 
         {/* Trailing spacer ensures last category pill isn't flush with edge on full scroll */}
         <div className="w-3 shrink-0 pointer-events-none" aria-hidden="true" />
