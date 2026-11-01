@@ -14,14 +14,14 @@ interface ManufacturerGridProps {
   limit?: number;
 }
 
-export function ManufacturerGrid({ categorySlug, categoryId, limit }: ManufacturerGridProps) {
+export function ManufacturerGrid({ categorySlug, categoryId, limit = 9 }: ManufacturerGridProps) {
   const { data, isLoading, isError } = useQuery(manufacturersListQuery(categoryId));
 
   if (isLoading) {
     return (
-      <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
-        {Array.from({ length: limit ?? 6 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-28 min-w-[120px] lg:min-w-0 snap-start" />
+      <div className="flex overflow-x-auto gap-2.5 sm:gap-3 pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-9 lg:overflow-visible lg:pb-0 lg:snap-none">
+        {Array.from({ length: limit }).map((_, i) => (
+          <SkeletonBlock key={i} className="h-28 min-w-[120px] lg:min-w-0 snap-start rounded-2xl" />
         ))}
       </div>
     );
@@ -34,7 +34,7 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
   const FallbackIcon = Car;
 
   return (
-    <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
+    <div className="flex overflow-x-auto gap-2.5 sm:gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-9 lg:overflow-visible lg:pb-0 lg:snap-none">
       {sorted.map((m) => (
         <Link
           key={m.id}
@@ -42,15 +42,15 @@ export function ManufacturerGrid({ categorySlug, categoryId, limit }: Manufactur
           params={{ categorySlug, slug: toSlug(m.name) }}
           className="snap-start"
         >
-          <GradientBlobCard className="flex flex-col items-center justify-center gap-2 p-4 text-center min-w-[120px] lg:min-w-0">
-            <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
+          <GradientBlobCard className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 p-3 lg:p-2.5 xl:p-3.5 text-center min-w-[120px] lg:min-w-0 h-full">
+            <span className="grid h-12 w-12 sm:h-14 sm:w-14 xl:h-16 xl:w-16 place-items-center text-primary transition-transform group-hover:scale-110">
               {m.logoUrl ? (
                 <img src={m.logoUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
               ) : (
-                <FallbackIcon className="h-8 w-8 text-muted-foreground" />
+                <FallbackIcon className="h-7 w-7 xl:h-8 xl:w-8 text-muted-foreground" />
               )}
             </span>
-            <span className="text-sm font-medium text-foreground line-clamp-2">
+            <span className="text-xs sm:text-sm font-medium text-foreground line-clamp-2 leading-tight">
               {m.name}
             </span>
           </GradientBlobCard>

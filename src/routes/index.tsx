@@ -155,7 +155,7 @@ function HomePage() {
                 }
               />
               <div className="mt-6">
-                <ManufacturerGrid categoryId={carCategory.categoryId} categorySlug={carCategory.categorySlug || "car-batteries"} limit={6} />
+                <ManufacturerGrid categoryId={carCategory.categoryId} categorySlug={carCategory.categorySlug || "car-batteries"} limit={9} />
               </div>
             </section>
           )}
