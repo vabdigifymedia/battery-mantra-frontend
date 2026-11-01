@@ -1,4 +1,5 @@
 export const GA_TRACKING_ID = "G-BBDZD3KEND";
+export const GOOGLE_ADS_ID = "AW-17528375123";
 
 declare global {
   interface Window {

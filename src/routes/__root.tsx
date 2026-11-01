@@ -126,8 +126,9 @@ function RootShell({ children }: { children: ReactNode }) {
         <meta name="google-site-verification" content="BLhIIt94LuNNvyaSro3EIhm19451TXjfTJme8smLRIA" />
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        {/* Google tag (gtag.js) */}
+        {/* Google tag (gtag.js) - Google Analytics & Google Ads */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-BBDZD3KEND" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17528375123" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -135,6 +136,7 @@ function RootShell({ children }: { children: ReactNode }) {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-BBDZD3KEND');
+              gtag('config', 'AW-17528375123');
             `,
           }}
         />
@@ -150,10 +152,14 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Track SPA route changes in Google Analytics (client-only)
+  // Track SPA route changes in Google Analytics & Google Ads (client-only)
   useEffect(() => {
     if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
       (window as any).gtag("config", "G-BBDZD3KEND", {
+        page_path: window.location.pathname + window.location.search,
+        page_title: document.title,
+      });
+      (window as any).gtag("config", "AW-17528375123", {
         page_path: window.location.pathname + window.location.search,
         page_title: document.title,
       });
