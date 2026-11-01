@@ -771,15 +771,15 @@ export function PdpPage() {
                       .map((h: string) => h.trim())
                       .filter(Boolean)
                       .map((badge: string, idx: number) => {
-                        const isBestOrTop = /best|top|popular|hot|deal|trend|recommend/i.test(badge);
+                        const isRoyalBlue = /top|rated|verified|assured|certified|blue/i.test(badge);
                         return (
                           <span
                             key={idx}
                             className={cn(
-                              "inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full shadow-2xs tracking-tight",
-                              isBestOrTop
-                                ? "bg-amber-500 text-white shadow-amber-500/20"
-                                : "bg-slate-900 text-white"
+                              "inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full shadow-xs tracking-tight transition-all",
+                              isRoyalBlue
+                                ? "bg-blue-600 text-white shadow-blue-600/25"
+                                : "bg-red-600 text-white shadow-red-600/25"
                             )}
                           >
                             <SparklesIcon className="w-3.5 h-3.5 shrink-0" />

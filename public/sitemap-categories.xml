@@ -49,18 +49,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/shop-by-category/all-catagory</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/brands/all-catagory</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://batterymantra.com/shop-by-category/car-batteries</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
@@ -205,13 +193,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/shop-by-category/online-ups</loc>
+    <loc>https://batterymantra.com/shop-by-category/computer-ups</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/shop-by-category/computer-ups</loc>
+    <loc>https://batterymantra.com/shop-by-category/online-ups</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

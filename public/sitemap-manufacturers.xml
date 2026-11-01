@@ -661,48 +661,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-endeavour-dec-2015-onw</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-classic-1-4</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-classic-1-6</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-torque</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-figo-1-2</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-figo-1-4</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-aspire-diesel</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
@@ -751,7 +709,67 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fusion</loc>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-endeavour-dec-2015-onwards</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-classic-1-4-diesel</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-classic-1-6-petrol</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-petrol</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fiesta-torque-diesel</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-figo-1-2-petrol</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-figo-1-4-diesel</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-figo-1-4-petrol</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fusion-diesel</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-fusion-petrol</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-new-ikon-1-3-petrol</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -770,12 +788,6 @@
   </url>
   <url>
     <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-mustang</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/manufacturer-products/car-batteries/ford/ford-new-ikon-1-3</loc>
     <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
