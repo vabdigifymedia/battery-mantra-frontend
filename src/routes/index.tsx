@@ -127,6 +127,13 @@ function HomePage() {
               eyebrow="Browse"
               title={<span id="categories">Shop by Category</span>}
               description="Pick from a curated catalogue of leading battery categories."
+              action={
+                <Button asChild variant="ghost-brand" size="sm">
+                  <Link to="/categories">
+                    All Categories <ArrowRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </Button>
+              }
             />
             <div className="mt-6">
               <CategoryGrid />

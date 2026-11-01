@@ -8,6 +8,7 @@ import {
   BatteryCharging,
   Car,
   Cpu,
+  LayoutGrid,
   Sun,
   Truck,
   Wrench,
@@ -235,6 +236,20 @@ export function HomeCategoryPills() {
             </Link>
           );
         })}
+
+        {/* All Categories Pill */}
+        <Link to="/categories" className={linkClass}>
+          <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/5 via-white to-primary/10 dark:from-card dark:via-card dark:to-muted/20 p-2.5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.06),0_1px_3px_-1px_rgba(0,0,0,0.04)] dark:shadow-none group-hover:border-primary/60 group-hover:shadow-md group-active:border-primary group-active:scale-95 transition-all duration-200 overflow-hidden">
+            <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+              <LayoutGrid className="h-7 w-7 stroke-[2]" />
+            </div>
+          </div>
+          <div className="h-[36px] w-full flex items-center justify-center">
+            <span className="text-xs font-semibold text-center leading-[1.25] tracking-tight text-primary group-hover:text-primary transition-colors line-clamp-2 px-0.5">
+              All Categories
+            </span>
+          </div>
+        </Link>
 
         {/* Trailing spacer ensures last category pill isn't flush with edge on full scroll */}
         <div className="w-3 shrink-0 pointer-events-none" aria-hidden="true" />

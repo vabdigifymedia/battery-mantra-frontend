@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Zap, Wrench, BatteryCharging, Sun, Car, Truck } from "lucide-react";
+import { Zap, Wrench, BatteryCharging, Sun, Car, Truck, LayoutGrid } from "lucide-react";
 import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 
@@ -144,6 +144,18 @@ export function CategoryGrid() {
           </Link>
         );
       })}
+
+      {/* All Categories Card */}
+      <Link to="/categories" className="block h-full">
+        <div className="group relative flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl bg-gradient-to-b from-brand/5 via-white to-brand/5 border border-brand/25 hover:border-brand hover:bg-brand/5 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-center cursor-pointer overflow-hidden h-full min-h-[96px] sm:min-h-[108px]">
+          <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center p-1.5 sm:p-2 group-hover:bg-brand group-hover:text-white transition-colors shrink-0 text-brand">
+            <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2] group-hover:scale-110 transition-transform duration-200" />
+          </div>
+          <span className="text-[11px] sm:text-xs font-bold text-brand group-hover:text-brand transition-colors line-clamp-2 leading-tight mt-1.5 px-0.5">
+            All Categories
+          </span>
+        </div>
+      </Link>
     </div>
   );
 }
