@@ -286,7 +286,7 @@ function CategoriesPage() {
       {/* ================= HERO HEADER ================= */}
       <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-white via-red-50/20 to-slate-50/50 dark:from-background dark:via-background dark:to-muted/30 pt-6 pb-10 sm:pt-10 sm:pb-14">
         {/* Subtle decorative mesh blur */}
-        <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[250px] bg-gradient-to-r from-red-500/10 via-amber-500/10 to-brand/10 blur-3xl opacity-70" />
+        <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[250px] bg-gradient-to-r from-red-500/10 via-rose-500/10 to-primary/10 blur-3xl opacity-70" />
 
         <Container size="xl" className="relative z-10 px-4">
           {/* Breadcrumb */}
@@ -302,13 +302,13 @@ function CategoriesPage() {
           {/* Title Area */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/70 dark:bg-red-950/50 border border-red-200/80 dark:border-red-800 text-brand text-xs font-bold tracking-wide uppercase mb-3">
-                <Sparkles className="h-3.5 w-3.5 text-brand animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/70 dark:bg-red-950/50 border border-red-200/80 dark:border-red-800 text-primary text-xs font-bold tracking-wide uppercase mb-3">
+                <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
                 Comprehensive Energy Catalogue
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-foreground tracking-tight leading-tight">
                 Browse All{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-red-600 to-orange-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-600 to-rose-600 dark:from-red-400 dark:via-rose-400 dark:to-red-400">
                   Categories
                 </span>
               </h1>
