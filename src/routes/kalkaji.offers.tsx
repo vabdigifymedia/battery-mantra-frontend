@@ -53,7 +53,32 @@ import { cn, toSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/kalkaji/offers")({
   component: AdminOffersPage,
+  errorComponent: ({ error, reset }: { error: any; reset: () => void }) => (
+    <div className="p-8 text-center space-y-4">
+      <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+        <AlertCircle className="w-6 h-6" />
+      </div>
+      <h2 className="text-xl font-bold">Failed to load Offers</h2>
+      <p className="text-sm text-muted-foreground max-w-md mx-auto">
+        {error?.message || "An unexpected error occurred while loading campaigns."}
+      </p>
+      <Button onClick={reset} variant="outline" size="sm">
+        <RefreshCw className="w-4 h-4 mr-2" /> Try Again
+      </Button>
+    </div>
+  ),
 });
+
+function safeFormatDate(dateStr?: string | null, fmt = "dd MMM yy"): string {
+  if (!dateStr) return "N/A";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "N/A";
+    return format(d, fmt);
+  } catch {
+    return "N/A";
+  }
+}
 
 const campaignSchema = z.object({
   name: z.string().trim().min(3, "Name must be at least 3 characters"),
@@ -93,11 +118,23 @@ function AdminOffersPage() {
   const [activeTab, setActiveTab] = useState("basic");
 
   // Auxiliary data for entity targeting selection
-  const { data: categories = [] } = useQuery(categoriesQuery());
-  const { data: brands = [] } = useQuery(brandsQuery());
-  const { data: products = [] } = useQuery(productListQuery());
+  const { data: rawCategories = [] } = useQuery(categoriesQuery());
+  const { data: rawBrands = [] } = useQuery(brandsQuery());
+  const { data: rawProducts = [] } = useQuery(productListQuery());
 
-  const { data: campaigns = [], isLoading } = useQuery(adminCampaignsQuery(statusFilter));
+  const { data: rawCampaigns = [], isLoading, isError } = useQuery(adminCampaignsQuery(statusFilter));
+
+  const categories = useMemo(() => Array.isArray(rawCategories) ? rawCategories : [], [rawCategories]);
+  const brands = useMemo(() => Array.isArray(rawBrands) ? rawBrands : [], [rawBrands]);
+  const products = useMemo(() => Array.isArray(rawProducts) ? rawProducts : [], [rawProducts]);
+
+  const campaignList: CampaignResponse[] = useMemo(() => {
+    if (Array.isArray(rawCampaigns)) return rawCampaigns;
+    if (rawCampaigns && typeof rawCampaigns === "object" && Array.isArray((rawCampaigns as any).content)) {
+      return (rawCampaigns as any).content;
+    }
+    return [];
+  }, [rawCampaigns]);
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(campaignSchema) as any,
@@ -229,6 +266,17 @@ function AdminOffersPage() {
     setIsModalOpen(true);
   };
 
+  const toLocalInputDate = (dStr?: string | null) => {
+    if (!dStr) return new Date().toISOString().slice(0, 16);
+    try {
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 16);
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    } catch {
+      return new Date().toISOString().slice(0, 16);
+    }
+  };
+
   const openEditModal = (c: CampaignResponse) => {
     setEditingCampaign(c);
     form.reset({
@@ -240,8 +288,8 @@ function AdminOffersPage() {
       badgeTheme: c.badgeTheme || "FESTIVE_GOLD",
       desktopBannerUrl: c.desktopBannerUrl || "",
       mobileBannerUrl: c.mobileBannerUrl || "",
-      startDate: c.startDate ? c.startDate.slice(0, 16) : new Date().toISOString().slice(0, 16),
-      endDate: c.endDate ? c.endDate.slice(0, 16) : new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 16),
+      startDate: toLocalInputDate(c.startDate),
+      endDate: toLocalInputDate(c.endDate),
       isActive: c.isActive,
       priority: c.priority || 0,
       showCountdown: c.showCountdown,
@@ -272,16 +320,17 @@ function AdminOffersPage() {
 
   // Filter campaigns by search query
   const filteredCampaigns = useMemo(() => {
-    return campaigns.filter((c) => {
+    return campaignList.filter((c) => {
+      if (!c) return false;
       const q = searchQuery.toLowerCase().trim();
       if (!q) return true;
       return (
-        c.name.toLowerCase().includes(q) ||
-        c.slug.toLowerCase().includes(q) ||
+        (c.name || "").toLowerCase().includes(q) ||
+        (c.slug || "").toLowerCase().includes(q) ||
         (c.couponCode && c.couponCode.toLowerCase().includes(q))
       );
     });
-  }, [campaigns, searchQuery]);
+  }, [campaignList, searchQuery]);
 
   return (
     <div className="space-y-6">
@@ -333,6 +382,17 @@ function AdminOffersPage() {
             <Spinner />
             <p className="text-xs text-muted-foreground mt-2">Loading campaigns...</p>
           </div>
+        ) : isError ? (
+          <div className="py-16 text-center space-y-3">
+            <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
+            <h3 className="text-base font-semibold">Unable to fetch campaigns</h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              The campaigns endpoint is currently initializing or backend is restarting.
+            </p>
+            <Button onClick={() => qc.invalidateQueries({ queryKey: queryKeys.campaigns.all })} size="sm" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-1" /> Retry
+            </Button>
+          </div>
         ) : filteredCampaigns.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <Flame className="w-10 h-10 text-muted-foreground mx-auto stroke-1" />
@@ -362,9 +422,12 @@ function AdminOffersPage() {
               {filteredCampaigns.map((c) => {
                 const styles = getCampaignThemeStyles(c.badgeTheme);
                 const discountLabel = formatCampaignDiscountLabel(c);
-                const isLive = c.isActive && new Date(c.startDate) <= new Date() && new Date(c.endDate) >= new Date();
-                const isUpcoming = c.isActive && new Date(c.startDate) > new Date();
-                const isExpired = new Date(c.endDate) < new Date();
+                const startMs = c.startDate ? new Date(c.startDate).getTime() : 0;
+                const endMs = c.endDate ? new Date(c.endDate).getTime() : 0;
+                const nowMs = Date.now();
+                const isLive = c.isActive && startMs > 0 && startMs <= nowMs && (endMs === 0 || endMs >= nowMs);
+                const isUpcoming = c.isActive && startMs > nowMs;
+                const isExpired = endMs > 0 && endMs < nowMs;
 
                 return (
                   <TableRow key={c.id} className="hover:bg-muted/30">
@@ -436,7 +499,7 @@ function AdminOffersPage() {
                       <div className="text-xs space-y-0.5">
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <Calendar className="w-3 h-3" />
-                          <span>{format(new Date(c.startDate), "dd MMM")} - {format(new Date(c.endDate), "dd MMM yy")}</span>
+                          <span>{safeFormatDate(c.startDate, "dd MMM")} - {safeFormatDate(c.endDate, "dd MMM yy")}</span>
                         </div>
                         <div>
                           {isLive && (

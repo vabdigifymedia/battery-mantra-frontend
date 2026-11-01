@@ -12,11 +12,19 @@ import type {
 export const campaignService = {
   // Public / Storefront Endpoints
   getActiveCampaigns: async (signal?: AbortSignal): Promise<CampaignResponse[]> => {
-    return apiFetch<CampaignResponse[]>(endpoints.campaigns.active, {
-      method: "GET",
-      auth: false,
-      signal,
-    });
+    try {
+      const res = await apiFetch<any>(endpoints.campaigns.active, {
+        method: "GET",
+        auth: false,
+        signal,
+      });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.content)) return res.content;
+      return [];
+    } catch (e) {
+      console.warn("Could not fetch active campaigns:", e);
+      return [];
+    }
   },
 
   getCampaignBySlug: async (
@@ -41,10 +49,18 @@ export const campaignService = {
 
   // Admin Endpoints
   getAllAdminCampaigns: async (status?: string): Promise<CampaignResponse[]> => {
-    return apiFetch<CampaignResponse[]>(endpoints.admin.campaigns.list(status), {
-      method: "GET",
-      auth: true,
-    });
+    try {
+      const res = await apiFetch<any>(endpoints.admin.campaigns.list(status), {
+        method: "GET",
+        auth: true,
+      });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.content)) return res.content;
+      return [];
+    } catch (e) {
+      console.warn("Could not fetch admin campaigns:", e);
+      return [];
+    }
   },
 
   getAdminCampaignById: async (id: string): Promise<CampaignResponse> => {
