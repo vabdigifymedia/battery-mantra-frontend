@@ -181,6 +181,12 @@ export const endpoints = {
       create: "/api/admin/coupons",
       byId: (id: string) => `/api/admin/coupons/${encodeURIComponent(id)}`,
     },
+    campaigns: {
+      list: (status?: string) => status ? `/api/admin/campaigns?status=${encodeURIComponent(status)}` : "/api/admin/campaigns",
+      create: "/api/admin/campaigns",
+      byId: (id: string) => `/api/admin/campaigns/${encodeURIComponent(id)}`,
+      toggleStatus: (id: string) => `/api/admin/campaigns/${encodeURIComponent(id)}/toggle-status`,
+    },
   },
   locations: {
     cities: "/api/locations/cities",
@@ -188,6 +194,20 @@ export const endpoints = {
   },
   coupons: {
     apply: "/api/coupons/apply",
+  },
+  campaigns: {
+    active: "/api/campaigns/active",
+    bySlug: (slug: string, params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string }) => {
+      const q = new URLSearchParams();
+      if (params?.page !== undefined) q.set("page", String(params.page));
+      if (params?.size !== undefined) q.set("size", String(params.size));
+      if (params?.category) q.set("category", params.category);
+      if (params?.brand) q.set("brand", params.brand);
+      if (params?.sort) q.set("sort", params.sort);
+      const queryStr = q.toString();
+      return `/api/campaigns/${encodeURIComponent(slug)}${queryStr ? `?${queryStr}` : ""}`;
+    },
+    validateCart: "/api/campaigns/validate-cart",
   },
   seo: {
     pages: "/api/seo/pages",

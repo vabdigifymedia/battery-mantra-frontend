@@ -6,6 +6,7 @@ import { FeatureStrip } from "./FeatureStrip";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { EmergencyFAB } from "./EmergencyFAB";
 import { AutoEngagementManager } from "@/components/engagement/AutoEngagementManager";
+import { CampaignAnnouncementBar } from "@/components/campaign/CampaignAnnouncementBar";
 
 const FOOTER_GROUPS: FooterGroup[] = [
   {
@@ -66,6 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
+      <CampaignAnnouncementBar />
       <Navbar />
       <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">
         {children}

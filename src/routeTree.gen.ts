@@ -43,6 +43,7 @@ import { Route as KalkajiFuelsRouteImport } from './routes/kalkaji.fuels'
 import { Route as KalkajiLeavesRouteImport } from './routes/kalkaji.leaves'
 import { Route as KalkajiLocationsRouteImport } from './routes/kalkaji.locations'
 import { Route as KalkajiManufacturersRouteImport } from './routes/kalkaji.manufacturers'
+import { Route as KalkajiOffersRouteImport } from './routes/kalkaji.offers'
 import { Route as KalkajiQuickEditRouteImport } from './routes/kalkaji.quick-edit'
 import { Route as KalkajiReelsRouteImport } from './routes/kalkaji.reels'
 import { Route as KalkajiSpecificationsRouteImport } from './routes/kalkaji.specifications'
@@ -50,6 +51,7 @@ import { Route as KalkajiUsersRouteImport } from './routes/kalkaji.users'
 import { Route as KalkajiVehiclesRouteImport } from './routes/kalkaji.vehicles'
 import { Route as KalkajiLoginRouteImport } from './routes/kalkaji_.login'
 import { Route as KalkajiPartnerRouteImport } from './routes/kalkaji_.partner'
+import { Route as OffersSlugRouteImport } from './routes/offers.$slug'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
@@ -269,6 +271,11 @@ const KalkajiManufacturersRoute = KalkajiManufacturersRouteImport.update({
   path: '/manufacturers',
   getParentRoute: () => KalkajiRoute,
 } as any)
+const KalkajiOffersRoute = KalkajiOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => KalkajiRoute,
+} as any)
 const KalkajiQuickEditRoute = KalkajiQuickEditRouteImport.update({
   id: '/quick-edit',
   path: '/quick-edit',
@@ -302,6 +309,11 @@ const KalkajiLoginRoute = KalkajiLoginRouteImport.update({
 const KalkajiPartnerRoute = KalkajiPartnerRouteImport.update({
   id: '/kalkaji_/partner',
   path: '/kalkaji/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffersSlugRoute = OffersSlugRouteImport.update({
+  id: '/offers/$slug',
+  path: '/offers/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersIndexRoute = OrdersIndexRouteImport.update({
@@ -597,6 +609,7 @@ export interface FileRoutesByFullPath {
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
+  '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
@@ -604,6 +617,7 @@ export interface FileRoutesByFullPath {
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
   '/kalkaji/login': typeof KalkajiLoginRoute
   '/kalkaji/partner': typeof KalkajiPartnerRouteWithChildren
+  '/offers/$slug': typeof OffersSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$': typeof ProductSplatRoute
   '/products/$citySlug': typeof ProductsCitySlugRoute
@@ -687,12 +701,14 @@ export interface FileRoutesByTo {
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
+  '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
   '/kalkaji/users': typeof KalkajiUsersRoute
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
   '/kalkaji/login': typeof KalkajiLoginRoute
+  '/offers/$slug': typeof OffersSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$': typeof ProductSplatRoute
   '/products/$citySlug': typeof ProductsCitySlugRoute
@@ -779,6 +795,7 @@ export interface FileRoutesById {
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
+  '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
@@ -786,6 +803,7 @@ export interface FileRoutesById {
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
   '/kalkaji_/login': typeof KalkajiLoginRoute
   '/kalkaji_/partner': typeof KalkajiPartnerRouteWithChildren
+  '/offers/$slug': typeof OffersSlugRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/product/$': typeof ProductSplatRoute
   '/products/$citySlug': typeof ProductsCitySlugRoute
@@ -872,6 +890,7 @@ export interface FileRouteTypes {
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
+    | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
     | '/kalkaji/specifications'
@@ -879,6 +898,7 @@ export interface FileRouteTypes {
     | '/kalkaji/vehicles'
     | '/kalkaji/login'
     | '/kalkaji/partner'
+    | '/offers/$slug'
     | '/orders/$orderId'
     | '/product/$'
     | '/products/$citySlug'
@@ -962,12 +982,14 @@ export interface FileRouteTypes {
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
+    | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
     | '/kalkaji/specifications'
     | '/kalkaji/users'
     | '/kalkaji/vehicles'
     | '/kalkaji/login'
+    | '/offers/$slug'
     | '/orders/$orderId'
     | '/product/$'
     | '/products/$citySlug'
@@ -1053,6 +1075,7 @@ export interface FileRouteTypes {
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
+    | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
     | '/kalkaji/specifications'
@@ -1060,6 +1083,7 @@ export interface FileRouteTypes {
     | '/kalkaji/vehicles'
     | '/kalkaji_/login'
     | '/kalkaji_/partner'
+    | '/offers/$slug'
     | '/orders/$orderId'
     | '/product/$'
     | '/products/$citySlug'
@@ -1132,6 +1156,7 @@ export interface RootRouteChildren {
   BrandBrandSlugRoute: typeof BrandBrandSlugRoute
   KalkajiLoginRoute: typeof KalkajiLoginRoute
   KalkajiPartnerRoute: typeof KalkajiPartnerRouteWithChildren
+  OffersSlugRoute: typeof OffersSlugRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductSplatRoute: typeof ProductSplatRoute
   ProductsCitySlugRoute: typeof ProductsCitySlugRoute
@@ -1395,6 +1420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KalkajiManufacturersRouteImport
       parentRoute: typeof KalkajiRoute
     }
+    '/kalkaji/offers': {
+      id: '/kalkaji/offers'
+      path: '/offers'
+      fullPath: '/kalkaji/offers'
+      preLoaderRoute: typeof KalkajiOffersRouteImport
+      parentRoute: typeof KalkajiRoute
+    }
     '/kalkaji/quick-edit': {
       id: '/kalkaji/quick-edit'
       path: '/quick-edit'
@@ -1442,6 +1474,13 @@ declare module '@tanstack/react-router' {
       path: '/kalkaji/partner'
       fullPath: '/kalkaji/partner'
       preLoaderRoute: typeof KalkajiPartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offers/$slug': {
+      id: '/offers/$slug'
+      path: '/offers/$slug'
+      fullPath: '/offers/$slug'
+      preLoaderRoute: typeof OffersSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders/': {
@@ -1817,6 +1856,7 @@ interface KalkajiRouteChildren {
   KalkajiLeavesRoute: typeof KalkajiLeavesRoute
   KalkajiLocationsRoute: typeof KalkajiLocationsRoute
   KalkajiManufacturersRoute: typeof KalkajiManufacturersRoute
+  KalkajiOffersRoute: typeof KalkajiOffersRoute
   KalkajiQuickEditRoute: typeof KalkajiQuickEditRoute
   KalkajiReelsRoute: typeof KalkajiReelsRoute
   KalkajiSpecificationsRoute: typeof KalkajiSpecificationsRoute
@@ -1864,6 +1904,7 @@ const KalkajiRouteChildren: KalkajiRouteChildren = {
   KalkajiLeavesRoute: KalkajiLeavesRoute,
   KalkajiLocationsRoute: KalkajiLocationsRoute,
   KalkajiManufacturersRoute: KalkajiManufacturersRoute,
+  KalkajiOffersRoute: KalkajiOffersRoute,
   KalkajiQuickEditRoute: KalkajiQuickEditRoute,
   KalkajiReelsRoute: KalkajiReelsRoute,
   KalkajiSpecificationsRoute: KalkajiSpecificationsRoute,
@@ -1951,6 +1992,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandBrandSlugRoute: BrandBrandSlugRoute,
   KalkajiLoginRoute: KalkajiLoginRoute,
   KalkajiPartnerRoute: KalkajiPartnerRouteWithChildren,
+  OffersSlugRoute: OffersSlugRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductSplatRoute: ProductSplatRoute,
   ProductsCitySlugRoute: ProductsCitySlugRoute,

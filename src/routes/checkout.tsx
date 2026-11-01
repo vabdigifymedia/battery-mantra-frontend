@@ -19,6 +19,7 @@ import { cartQuery, addressesQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
+import { campaignService } from "@/services/campaign.service";
 import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse, CityDto } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";

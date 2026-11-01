@@ -49,7 +49,7 @@ import {
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { ApiError } from "@/lib/api/errors";
-import { productDetailQuery, productListQuery, vehiclesListQuery } from "@/queries";
+import { productDetailQuery, productListQuery, vehiclesListQuery, activeCampaignsQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { useAuth } from "@/providers/AuthProvider";
 import { cartService } from "@/services/cart.service";
@@ -61,6 +61,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 import { formatDeliveryPillText, getDeliveryTimeText } from "@/lib/delivery";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
@@ -250,6 +251,14 @@ export function PdpPage() {
     queryFn: () => deliveryTimeService.getDeliveryTime(data.categoryId!, city!.cityId!),
     enabled: !!data.categoryId && !!city?.cityId,
   });
+
+  const { data: activeCampaigns } = useQuery(activeCampaignsQuery());
+  const matchedCampaign = useMemo(() => {
+    if (!activeCampaigns || activeCampaigns.length === 0) return null;
+    return activeCampaigns
+      .filter((c) => isProductEligibleForCampaign(data as any, c))
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0] || null;
+  }, [activeCampaigns, data]);
 
   const floatingPillDeliveryText = useMemo(() => {
     return formatDeliveryPillText(deliveryTime?.hours, deliveryTime?.days);
@@ -763,6 +772,23 @@ export function PdpPage() {
 
               {/* Reviews, Sold Stats & Creative Warranty Guarantee Banner */}
               <div className="space-y-2 sm:space-y-3 pt-0.5">
+                {/* Active Campaign Badge / Link */}
+                {matchedCampaign && (
+                  <div className="pb-0.5">
+                    <Link
+                      to="/offers/$slug"
+                      params={{ slug: matchedCampaign.slug }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 text-xs font-black px-3.5 py-1 rounded-full shadow-xs tracking-tight transition-all hover:scale-105 active:scale-95 uppercase",
+                        getCampaignThemeStyles(matchedCampaign.badgeTheme).badgeBg
+                      )}
+                    >
+                      <SparklesIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{matchedCampaign.badgeText || matchedCampaign.name} — {formatCampaignDiscountLabel(matchedCampaign)}</span>
+                    </Link>
+                  </div>
+                )}
+
                 {/* Highlights tags from Admin (e.g. Best Seller, Top Rated) */}
                 {data.highlights && typeof data.highlights === "string" && (
                   <div className="flex items-center flex-wrap gap-1.5 pb-0.5">

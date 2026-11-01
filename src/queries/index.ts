@@ -12,6 +12,7 @@ import { faqService } from "@/services/faq.service";
 import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
 import { deliveryTimeService } from "@/services/delivery-time.service";
+import { campaignService } from "@/services/campaign.service";
 import type { ProductFilterParams, BrandContentResponse } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
@@ -291,6 +292,30 @@ export const cityDeliveryTimesQuery = (cityId?: string | null) =>
     queryFn: () => (cityId ? deliveryTimeService.getDeliveryTimesByCity(cityId) : Promise.resolve([])),
     enabled: !!cityId,
     staleTime: 10 * 60_000,
+  });
+
+export const activeCampaignsQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.campaigns.active(),
+    queryFn: ({ signal }) => campaignService.getActiveCampaigns(signal),
+    staleTime: 60_000, // 1 minute
+  });
+
+export const campaignBySlugQuery = (
+  slug: string,
+  params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string }
+) =>
+  queryOptions({
+    queryKey: queryKeys.campaigns.bySlug(slug, params),
+    queryFn: ({ signal }) => campaignService.getCampaignBySlug(slug, params, signal),
+    staleTime: 60_000,
+  });
+
+export const adminCampaignsQuery = (status?: string) =>
+  queryOptions({
+    queryKey: queryKeys.campaigns.admin(status),
+    queryFn: () => campaignService.getAllAdminCampaigns(status),
+    staleTime: 15_000,
   });
 
 export * from "./reels";

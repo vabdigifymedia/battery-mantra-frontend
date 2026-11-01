@@ -20,6 +20,7 @@ import { SolarCategoriesWidget } from "@/components/home/SolarCategoriesWidget";
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import { HomeAboutSeoSection } from "@/components/home/HomeAboutSeoSection";
 import { PromoBanner } from "@/components/home/PromoBanner";
+import { HomeFestiveSpotlight } from "@/components/campaign/HomeFestiveSpotlight";
 import {
   productListQuery,
   rootCategoriesQuery,
@@ -27,6 +28,7 @@ import {
   vehiclesListQuery,
   bannersListQuery,
   pageSeoQuery,
+  activeCampaignsQuery,
 } from "@/queries";
 import { APP } from "@/constants/app";
 import { buildPageHead } from "@/lib/seo";
@@ -38,6 +40,7 @@ export const Route = createFileRoute("/")({
     void context.queryClient.prefetchQuery(featuredBrandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
     void context.queryClient.prefetchQuery(bannersListQuery());
+    void context.queryClient.prefetchQuery(activeCampaignsQuery());
     try {
       const pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/"));
       return { pageSeo };
@@ -118,6 +121,11 @@ function HomePage() {
 
       <div className="order-1 lg:order-2">
         <BannerCarousel />
+      </div>
+
+      {/* Dynamic Festive / Offers Showcase Spotlight */}
+      <div className="order-2 lg:order-2">
+        <HomeFestiveSpotlight />
       </div>
 
       <div className="order-2 lg:order-3 w-full bg-background pt-2 sm:pt-6 lg:pt-12">

@@ -891,3 +891,102 @@ export type CreateReelRequest = {
 };
 
 export type UpdateReelRequest = Partial<CreateReelRequest>;
+
+/* ---------- Campaigns & Offers (Dynamic Offers Engine) ---------- */
+export type CampaignBadgeTheme = "FESTIVE_GOLD" | "BRAND_RED" | "ROYAL_BLUE" | "EMERALD_GREEN";
+export type CampaignTargetType = "ALL_PRODUCTS" | "CATEGORIES" | "BRANDS" | "CUSTOM_PRODUCTS";
+export type CampaignDiscountType = "FLAT_AMOUNT" | "PERCENTAGE" | "EXTRA_EXCHANGE_BONUS" | "SHOWCASE_ONLY";
+
+export type CampaignResponse = {
+  id: UUID;
+  name: string;
+  slug: string;
+  tagline?: string | null;
+  description?: string | null;
+  badgeText?: string | null;
+  badgeTheme?: CampaignBadgeTheme;
+  desktopBannerUrl?: string | null;
+  mobileBannerUrl?: string | null;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  priority: number;
+  showCountdown: boolean;
+  showInAnnouncement: boolean;
+  showOnHome: boolean;
+  targetType: CampaignTargetType;
+  discountType: CampaignDiscountType;
+  discountValue?: number | null;
+  maxDiscountCap?: number | null;
+  minOrderValue?: number | null;
+  couponCode?: string | null;
+  categoryIds?: UUID[];
+  brandIds?: UUID[];
+  productIds?: UUID[];
+  excludedProductIds?: UUID[];
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type CreateCampaignRequest = {
+  name: string;
+  slug: string;
+  tagline?: string | null;
+  description?: string | null;
+  badgeText?: string | null;
+  badgeTheme?: CampaignBadgeTheme;
+  desktopBannerUrl?: string | null;
+  mobileBannerUrl?: string | null;
+  startDate: string;
+  endDate: string;
+  isActive?: boolean;
+  priority?: number;
+  showCountdown?: boolean;
+  showInAnnouncement?: boolean;
+  showOnHome?: boolean;
+  targetType: CampaignTargetType;
+  discountType: CampaignDiscountType;
+  discountValue?: number;
+  maxDiscountCap?: number | null;
+  minOrderValue?: number | null;
+  couponCode?: string | null;
+  categoryIds?: UUID[];
+  brandIds?: UUID[];
+  productIds?: UUID[];
+  excludedProductIds?: UUID[];
+};
+
+export type UpdateCampaignRequest = Partial<CreateCampaignRequest>;
+
+export type CampaignDetailWithProductsResponse = {
+  campaign: CampaignResponse;
+  products: {
+    content: ProductListResponse[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    first?: boolean;
+    last?: boolean;
+  };
+};
+
+export type CartItemCampaignValidation = {
+  productId: UUID;
+  quantity: number;
+  hasExchange?: boolean;
+};
+
+export type CartValidationRequest = {
+  items: CartItemCampaignValidation[];
+  couponCode?: string;
+};
+
+export type CartValidationResponse = {
+  applicable: boolean;
+  campaignId?: UUID;
+  campaignName?: string;
+  discountAmount: number;
+  finalPayable: number;
+  message?: string;
+};

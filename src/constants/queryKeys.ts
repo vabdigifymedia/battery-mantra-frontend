@@ -65,4 +65,11 @@ export const queryKeys = {
     all: ["seo"] as const,
     page: (route: string) => [...queryKeys.seo.all, "page", route] as const,
   },
+  campaigns: {
+    all: ["campaigns"] as const,
+    active: () => [...queryKeys.campaigns.all, "active"] as const,
+    bySlug: (slug: string, params?: Record<string, any>) =>
+      [...queryKeys.campaigns.all, "slug", slug, params] as const,
+    admin: (status?: string) => ["admin", "campaigns", status ?? "ALL"] as const,
+  },
 } as const;

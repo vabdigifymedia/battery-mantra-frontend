@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 import type { ProductListResponse } from "@/types/dto";
 import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
-import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery } from "@/queries";
+import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery, activeCampaignsQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
-import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2, Sparkles } from "lucide-react";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2, Sparkles, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,6 +29,14 @@ export function ProductCard({
   const city = useLocationStore((state) => state.city);
   const { data: cityDeliveryTimes } = useQuery(cityDeliveryTimesQuery(city?.cityId));
   const { data: categories } = useQuery(categoriesQuery());
+  const { data: activeCampaigns } = useQuery(activeCampaignsQuery());
+
+  const matchedCampaign = useMemo(() => {
+    if (!activeCampaigns || activeCampaigns.length === 0) return null;
+    return activeCampaigns
+      .filter((c) => isProductEligibleForCampaign(product, c))
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0] || null;
+  }, [activeCampaigns, product]);
 
   const matchedDeliveryTime = useMemo(() => {
     if (!cityDeliveryTimes || cityDeliveryTimes.length === 0) return null;
@@ -238,6 +247,22 @@ export function ProductCard({
         {/* Top Badges Bar */}
         <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between pointer-events-none">
           <div className="flex flex-col gap-1 items-start max-w-[calc(100%-75px)]">
+            {/* Dynamic Active Campaign Badge */}
+            {matchedCampaign && (
+              <span
+                className={cn(
+                  "text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 max-w-full truncate tracking-tight uppercase",
+                  getCampaignThemeStyles(matchedCampaign.badgeTheme).badgeBg
+                )}
+                title={matchedCampaign.name}
+              >
+                <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                <span className="truncate">
+                  {matchedCampaign.badgeText || formatCampaignDiscountLabel(matchedCampaign)}
+                </span>
+              </span>
+            )}
+
             {/* Highlights Badges from Admin Quick Edit */}
             {highlightBadges.slice(0, showSavings ? 1 : 2).map((badge, idx) => {
               const isBestOrTop = /best|top|popular|hot|deal|trend|recommend/i.test(badge);
