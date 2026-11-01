@@ -55,90 +55,167 @@ export function HomeFestiveSpotlight() {
           <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-yellow-500/10 blur-3xl pointer-events-none" />
 
-          {/* Optional Desktop Banner as subtle background overlay if uploaded */}
-          {homeCampaign.desktopBannerUrl && (
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-overlay pointer-events-none"
-              style={{ backgroundImage: `url(${homeCampaign.desktopBannerUrl})` }}
-            />
-          )}
-
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            {/* Left Content Column */}
-            <div className="max-w-xl space-y-4">
-              {/* Badge */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md",
-                    styles.badgeBg
+          {/* If campaign has uploaded banner: Display clean responsive <picture> banner + docked action bar */}
+          {homeCampaign.desktopBannerUrl || homeCampaign.mobileBannerUrl ? (
+            <div className="space-y-4">
+              {/* Responsive High-Resolution Banner Graphic (100% Crisp, No Filters) */}
+              <Link
+                to="/offers/$slug"
+                params={{ slug: homeCampaign.slug }}
+                className="block group overflow-hidden rounded-2xl sm:rounded-3xl border border-border/50 bg-neutral-950 shadow-md hover:shadow-xl transition-all"
+              >
+                <picture className="w-full block">
+                  {homeCampaign.mobileBannerUrl && (
+                    <source media="(max-width: 640px)" srcSet={homeCampaign.mobileBannerUrl} />
                   )}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  {homeCampaign.badgeText || "Festive Offer"}
-                </span>
+                  <img
+                    src={homeCampaign.desktopBannerUrl || homeCampaign.mobileBannerUrl!}
+                    alt={homeCampaign.name}
+                    className="w-full h-auto max-h-[480px] object-contain mx-auto block group-hover:scale-[1.006] transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </picture>
+              </Link>
 
-                <span className={cn("px-3 py-0.5 rounded-full text-xs font-bold border", styles.pillBg)}>
-                  <Flame className="w-3 h-3 inline mr-1 text-amber-400" />
-                  {discountLabel}
-                </span>
-              </div>
-
-              {/* Title & Tagline */}
-              <div>
-                <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                  {homeCampaign.name}
-                </h2>
-                {homeCampaign.tagline && (
-                  <p className="mt-2 text-sm sm:text-base text-white/80 font-medium">
-                    {homeCampaign.tagline}
-                  </p>
-                )}
-                {homeCampaign.description && (
-                  <p className="mt-1 text-xs sm:text-sm text-white/60 line-clamp-2">
-                    {homeCampaign.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Action Buttons & Optional Coupon */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button asChild size="lg" className={cn("rounded-full font-bold shadow-lg", styles.buttonVariant)}>
-                  <Link to="/offers/$slug" params={{ slug: homeCampaign.slug }}>
-                    Shop Deals Now <ArrowRight className="w-4 h-4 ml-1.5" />
-                  </Link>
-                </Button>
-
-                {homeCampaign.couponCode && (
-                  <button
-                    type="button"
-                    onClick={handleCopyCoupon}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-mono text-sm font-bold backdrop-blur-md transition-all active:scale-95"
-                    title="Click to copy coupon"
-                  >
-                    <Tag className="w-4 h-4 text-amber-300" />
-                    <span>CODE: {homeCampaign.couponCode}</span>
-                    {copied ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5 opacity-70" />
+              {/* Docked Action Bar: Details, Coupon & Countdown */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
+                {/* Left: Badges, Title, Discount & Coupon */}
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md",
+                      styles.badgeBg
                     )}
-                  </button>
-                )}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {homeCampaign.badgeText || "Special Offer"}
+                  </span>
+
+                  <span className="text-white font-bold text-base sm:text-lg">
+                    {homeCampaign.name}
+                  </span>
+
+                  <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-bold border", styles.pillBg)}>
+                    <Flame className="w-3 h-3 inline mr-1 text-amber-400" />
+                    {discountLabel}
+                  </span>
+
+                  {homeCampaign.couponCode && (
+                    <button
+                      type="button"
+                      onClick={handleCopyCoupon}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs font-bold backdrop-blur-md transition-all active:scale-95"
+                      title="Click to copy coupon"
+                    >
+                      <Tag className="w-3.5 h-3.5 text-amber-300" />
+                      <span>CODE: {homeCampaign.couponCode}</span>
+                      {copied ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3 h-3 opacity-70" />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* Right: Countdown & CTA Button */}
+                <div className="flex items-center gap-3 shrink-0">
+                  {homeCampaign.showCountdown && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 backdrop-blur-md border border-white/15">
+                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider hidden sm:inline">
+                        Ends in:
+                      </span>
+                      <CampaignCountdown endDate={homeCampaign.endDate} variant="compact" />
+                    </div>
+                  )}
+
+                  <Button asChild size="default" className={cn("rounded-full font-bold shadow-lg", styles.buttonVariant)}>
+                    <Link to="/offers/$slug" params={{ slug: homeCampaign.slug }}>
+                      Shop Deals <ArrowRight className="w-4 h-4 ml-1.5" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
+          ) : (
+            /* Fallback Text-Based Festive Card (When no graphic banner is uploaded) */
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              {/* Left Content Column */}
+              <div className="max-w-xl space-y-4">
+                {/* Badge */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md",
+                      styles.badgeBg
+                    )}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {homeCampaign.badgeText || "Festive Offer"}
+                  </span>
 
-            {/* Right Column: Countdown Clock (Hero Size) */}
-            {homeCampaign.showCountdown && (
-              <div className="flex flex-col items-start lg:items-end justify-center gap-2 p-5 rounded-2xl bg-black/30 backdrop-blur-md border border-white/15">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-widest">
-                  <Sparkles className="w-3.5 h-3.5 animate-spin-slow" />
-                  <span>Offer Ends In</span>
+                  <span className={cn("px-3 py-0.5 rounded-full text-xs font-bold border", styles.pillBg)}>
+                    <Flame className="w-3 h-3 inline mr-1 text-amber-400" />
+                    {discountLabel}
+                  </span>
                 </div>
-                <CampaignCountdown endDate={homeCampaign.endDate} variant="hero" />
+
+                {/* Title & Tagline */}
+                <div>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                    {homeCampaign.name}
+                  </h2>
+                  {homeCampaign.tagline && (
+                    <p className="mt-2 text-sm sm:text-base text-white/80 font-medium">
+                      {homeCampaign.tagline}
+                    </p>
+                  )}
+                  {homeCampaign.description && (
+                    <p className="mt-1 text-xs sm:text-sm text-white/60 line-clamp-2">
+                      {homeCampaign.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Buttons & Optional Coupon */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Button asChild size="lg" className={cn("rounded-full font-bold shadow-lg", styles.buttonVariant)}>
+                    <Link to="/offers/$slug" params={{ slug: homeCampaign.slug }}>
+                      Shop Deals Now <ArrowRight className="w-4 h-4 ml-1.5" />
+                    </Link>
+                  </Button>
+
+                  {homeCampaign.couponCode && (
+                    <button
+                      type="button"
+                      onClick={handleCopyCoupon}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-mono text-sm font-bold backdrop-blur-md transition-all active:scale-95"
+                      title="Click to copy coupon"
+                    >
+                      <Tag className="w-4 h-4 text-amber-300" />
+                      <span>CODE: {homeCampaign.couponCode}</span>
+                      {copied ? (
+                        <Check className="w-4 h-4 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5 opacity-70" />
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
+
+              {/* Right Column: Countdown Clock (Hero Size) */}
+              {homeCampaign.showCountdown && (
+                <div className="flex flex-col items-start lg:items-end justify-center gap-2 p-5 rounded-2xl bg-black/30 backdrop-blur-md border border-white/15">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-widest">
+                    <Sparkles className="w-3.5 h-3.5 animate-spin-slow" />
+                    <span>Offer Ends In</span>
+                  </div>
+                  <CampaignCountdown endDate={homeCampaign.endDate} variant="hero" />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Participating Products Spotlight (if loaded) */}
           {products.length > 0 && (

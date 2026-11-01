@@ -30,7 +30,7 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
 
     if (!slotBanners.length) return [];
 
-    // Filter by device
+    // Filter by device (prioritize deviceSpecific e.g. mobile over universal)
     const deviceSpecific = slotBanners.filter(
       (b) => parseBannerTitle(b.title).deviceType === target
     );
@@ -38,7 +38,8 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
       (b) => parseBannerTitle(b.title).deviceType === "ALL"
     );
 
-    const result = [...deviceSpecific, ...universal].sort(
+    const candidateList = deviceSpecific.length > 0 ? deviceSpecific : universal;
+    const result = candidateList.sort(
       (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
     );
 
@@ -77,7 +78,7 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
         src={banner.imageUrl}
         alt={cleanTitle || "Promotional Banner"}
         className={cn(
-          "w-full h-auto max-h-[160px] sm:max-h-[240px] md:max-h-[320px] object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]",
+          "w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-[1.015]",
           imageClassName
         )}
         loading="lazy"

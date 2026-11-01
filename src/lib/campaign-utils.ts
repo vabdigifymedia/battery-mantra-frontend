@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import type { CampaignResponse, CampaignBadgeTheme, ProductListResponse } from "@/types/dto";
 
 export function getCampaignThemeStyles(theme?: CampaignBadgeTheme | null) {
@@ -151,4 +152,15 @@ export function calculateProductCampaignDiscount(
 
   const finalPrice = Math.max(0, basePrice - discountAmount);
   return { discountAmount: Math.round(discountAmount), finalPrice: Math.round(finalPrice) };
+}
+
+export function safeFormatDate(dateStr?: string | null, fmt = "dd MMM yy"): string {
+  if (!dateStr) return "N/A";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "N/A";
+    return format(d, fmt);
+  } catch {
+    return "N/A";
+  }
 }

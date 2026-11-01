@@ -4,7 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Sparkles, Tag, ArrowLeft, ArrowRight, Copy, Check, Clock, ShieldCheck, Flame, ShoppingBag } from "lucide-react";
 import { campaignBySlugQuery } from "@/queries";
-import { getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { getCampaignThemeStyles, formatCampaignDiscountLabel, safeFormatDate } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "@/components/campaign/CampaignCountdown";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Container } from "@/components/layout/Container";
@@ -116,20 +116,28 @@ function CampaignOfferPage() {
         </Container>
       </div>
 
-      {/* Hero Banner Section */}
-      <section className={cn("relative overflow-hidden border-b", styles.barBg)}>
-        {campaign.desktopBannerUrl && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay pointer-events-none"
-            style={{ backgroundImage: `url(${campaign.desktopBannerUrl})` }}
-          />
-        )}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Banner / Hero Section */}
+      {campaign.desktopBannerUrl || campaign.mobileBannerUrl ? (
+        <div>
+          {/* Responsive High-Resolution Banner Graphic (100% Crisp, No Filters) */}
+          <div className="w-full bg-neutral-950 flex items-center justify-center overflow-hidden border-b">
+            <picture className="w-full max-w-[1920px] mx-auto block">
+              {campaign.mobileBannerUrl && (
+                <source media="(max-width: 640px)" srcSet={campaign.mobileBannerUrl} />
+              )}
+              <img
+                src={campaign.desktopBannerUrl || campaign.mobileBannerUrl!}
+                alt={campaign.name}
+                className="w-full h-auto max-h-[500px] object-contain mx-auto block"
+              />
+            </picture>
+          </div>
 
-        <Container size="xl" className="relative z-10 py-10 sm:py-16">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="max-w-2xl space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
+          {/* Docked Offer Details & Live Countdown Strip */}
+          <div className={cn("border-b py-3.5 sm:py-4 shadow-xs", styles.barBg)}>
+            <Container size="xl" className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+              {/* Left: Badges, Hooks, Coupon */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <span
                   className={cn(
                     "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm",
@@ -137,76 +145,121 @@ function CampaignOfferPage() {
                   )}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  {campaign.badgeText || "Special Offer"}
+                  {campaign.badgeText || "SPECIAL OFFER"}
                 </span>
 
                 <span className={cn("px-3 py-0.5 rounded-full text-xs font-bold border", styles.pillBg)}>
                   <Flame className="w-3.5 h-3.5 inline mr-1 text-amber-400" />
                   {discountLabel}
                 </span>
+
+                {campaign.tagline && (
+                  <span className="text-xs sm:text-sm font-semibold text-white/90">
+                    {campaign.tagline}
+                  </span>
+                )}
+
+                {campaign.couponCode && (
+                  <button
+                    type="button"
+                    onClick={handleCopyCoupon}
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-black/40 hover:bg-black/60 border border-white/20 text-white font-mono text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs"
+                    title="Click to copy coupon code"
+                  >
+                    <Tag className="w-3.5 h-3.5 text-amber-300" />
+                    <span>CODE: {campaign.couponCode}</span>
+                    {copied ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5 opacity-70" />
+                    )}
+                  </button>
+                )}
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-                {campaign.name}
-              </h1>
-
-              {campaign.tagline && (
-                <p className="text-base sm:text-lg text-white/90 font-medium">
-                  {campaign.tagline}
-                </p>
-              )}
-
-              {campaign.description && (
-                <p className="text-sm text-white/70 max-w-xl">
-                  {campaign.description}
-                </p>
-              )}
-
-              {/* Coupon Code Pill */}
-              {campaign.couponCode && (
-                <div className="pt-2">
-                  <div className="inline-flex items-center gap-3 p-2.5 px-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/20 text-white shadow-lg">
-                    <Tag className="w-5 h-5 text-amber-300 shrink-0" />
-                    <div className="text-left">
-                      <div className="text-[10px] text-white/70 uppercase font-bold tracking-wider">Coupon Code</div>
-                      <div className="font-mono text-base font-extrabold tracking-wider">{campaign.couponCode}</div>
+              {/* Right: Countdown Clock */}
+              {campaign.showCountdown && (
+                <div className="flex items-center gap-2.5 bg-black/35 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/15 shrink-0 self-start md:self-auto">
+                  <div className="text-left md:text-right">
+                    <div className="text-[10px] font-bold text-amber-300 uppercase tracking-widest flex items-center gap-1">
+                      <Clock className="w-3 h-3 animate-pulse" /> Ends In
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={handleCopyCoupon}
-                      className={cn("ml-2 rounded-lg text-xs font-bold", styles.buttonVariant)}
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 mr-1" /> Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 mr-1" /> Copy Code
-                        </>
-                      )}
-                    </Button>
+                    <div className="text-[10px] text-white/60">
+                      Till {safeFormatDate(campaign.endDate, "dd MMM yyyy")}
+                    </div>
                   </div>
+                  <CampaignCountdown endDate={campaign.endDate} variant="compact" className="text-xs sm:text-sm font-mono text-white" />
+                </div>
+              )}
+            </Container>
+          </div>
+        </div>
+      ) : (
+        /* Fallback when NO banner image is uploaded */
+        <section className={cn("relative overflow-hidden border-b py-10 sm:py-16", styles.barBg)}>
+          <Container size="xl" className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="max-w-2xl space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm",
+                      styles.badgeBg
+                    )}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {campaign.badgeText || "Special Offer"}
+                  </span>
+
+                  <span className={cn("px-3 py-0.5 rounded-full text-xs font-bold border", styles.pillBg)}>
+                    <Flame className="w-3.5 h-3.5 inline mr-1 text-amber-400" />
+                    {discountLabel}
+                  </span>
+                </div>
+
+                <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                  {campaign.name}
+                </h1>
+
+                {campaign.tagline && (
+                  <p className="text-base sm:text-lg text-white/90 font-medium">
+                    {campaign.tagline}
+                  </p>
+                )}
+
+                {campaign.couponCode && (
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleCopyCoupon}
+                      className="inline-flex items-center gap-3 p-2.5 px-4 rounded-xl bg-black/40 border border-white/20 text-white shadow-lg cursor-pointer"
+                    >
+                      <Tag className="w-5 h-5 text-amber-300 shrink-0" />
+                      <div className="text-left">
+                        <div className="text-[10px] text-white/70 uppercase font-bold tracking-wider">Coupon Code</div>
+                        <div className="font-mono text-base font-extrabold tracking-wider">{campaign.couponCode}</div>
+                      </div>
+                      <span className={cn("ml-2 px-2.5 py-1 rounded text-xs font-bold", styles.buttonVariant)}>
+                        {copied ? "Copied!" : "Copy"}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {campaign.showCountdown && (
+                <div className="flex flex-col items-start lg:items-end gap-2 p-6 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 shadow-xl">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-widest">
+                    <Clock className="w-4 h-4 animate-pulse" />
+                    <span>Offer Ends In</span>
+                  </div>
+                  <CampaignCountdown endDate={campaign.endDate} variant="hero" />
                 </div>
               )}
             </div>
-
-            {/* Countdown Clock Box */}
-            {campaign.showCountdown && (
-              <div className="flex flex-col items-start lg:items-end gap-2 p-6 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 shadow-xl">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-widest">
-                  <Clock className="w-4 h-4 animate-pulse" />
-                  <span>Offer Ends In</span>
-                </div>
-                <CampaignCountdown endDate={campaign.endDate} variant="hero" />
-                <span className="text-[11px] text-white/60">
-                  Valid till {new Date(campaign.endDate).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
-                </span>
-              </div>
-            )}
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+      )}
 
       {/* Offer Terms Bar */}
       <div className="border-b bg-card/60 py-3">

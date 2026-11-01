@@ -28,7 +28,9 @@ export function BannerCarousel() {
     // Banners targeting ALL devices
     const universal = heroBanners.filter((b) => parseBannerTitle(b.title).deviceType === "ALL");
 
-    const matched = [...deviceSpecific, ...universal].sort(
+    // Prioritize device-specific banners (e.g. mobile banners on phone) over generic fallback
+    const candidateList = deviceSpecific.length > 0 ? deviceSpecific : universal;
+    const matched = candidateList.sort(
       (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
     );
 
@@ -50,6 +52,13 @@ export function BannerCarousel() {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
+
+  // Re-init carousel whenever banners or API instance changes
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+    onSelect();
+  }, [emblaApi, banners, onSelect]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -85,7 +94,10 @@ export function BannerCarousel() {
             return (
               <div key={banner.bannerId} className="flex-[0_0_100%] min-w-0 relative">
                 {banner.linkUrl ? (
-                  <Link to={banner.linkUrl as any} className="block w-full h-[290px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
+                  <Link
+                    to={banner.linkUrl as any}
+                    className="block w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[1.82/1] max-h-[580px] overflow-hidden bg-neutral-900/5"
+                  >
                     <img
                       src={banner.imageUrl}
                       alt={cleanTitle || "Promotional Banner"}
@@ -95,7 +107,7 @@ export function BannerCarousel() {
                     />
                   </Link>
                 ) : (
-                  <div className="w-full h-[290px] sm:h-[350px] md:h-[550px] lg:h-[650px]">
+                  <div className="w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[1.82/1] max-h-[580px] overflow-hidden bg-neutral-900/5">
                     <img
                       src={banner.imageUrl}
                       alt={cleanTitle || "Promotional Banner"}
