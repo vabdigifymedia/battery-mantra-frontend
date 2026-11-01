@@ -327,7 +327,7 @@ function CategoriesPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search category (e.g. car, solar, ups)..."
-                  className="w-full pl-10 pr-9 py-2.5 sm:py-3 rounded-xl bg-white dark:bg-card border border-slate-200 dark:border-border text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand shadow-xs transition-all"
+                  className="w-full pl-10 pr-9 py-2.5 sm:py-3 rounded-xl bg-white dark:bg-card border border-slate-200 dark:border-border text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary shadow-xs transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -357,10 +357,10 @@ function CategoriesPage() {
                     "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer shadow-2xs select-none",
                     isActive
                       ? "bg-slate-900 text-white dark:bg-primary dark:text-primary-foreground shadow-md -translate-y-0.5"
-                      : "bg-white dark:bg-card text-slate-700 dark:text-muted-foreground border border-slate-200/80 dark:border-border/60 hover:border-brand/40 hover:text-brand"
+                      : "bg-white dark:bg-card text-slate-700 dark:text-muted-foreground border border-slate-200/80 dark:border-border/60 hover:border-primary/40 hover:text-primary"
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", isActive ? "text-brand-light" : "text-slate-400")} />
+                  <Icon className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-slate-400")} />
                   <span>{tab.label}</span>
                   <span
                     className={cn(
@@ -386,7 +386,7 @@ function CategoriesPage() {
             {searchQuery && (
               <span>
                 {" "}
-                matching &ldquo;<span className="text-brand font-semibold">{searchQuery}</span>&rdquo;
+                matching &ldquo;<span className="text-primary font-semibold">{searchQuery}</span>&rdquo;
               </span>
             )}
           </p>
@@ -397,7 +397,7 @@ function CategoriesPage() {
                 setSearchQuery("");
                 setActiveTab("ALL");
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline cursor-pointer"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Reset Filters
@@ -428,7 +428,7 @@ function CategoriesPage() {
         ) : filteredCategories.length === 0 ? (
           /* Empty Search State */
           <div className="py-16 text-center max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-red-50 text-brand flex items-center justify-center mx-auto mb-4 border border-red-100">
+            <div className="w-16 h-16 rounded-2xl bg-red-50 text-primary flex items-center justify-center mx-auto mb-4 border border-red-100">
               <SearchX className="h-8 w-8 stroke-[1.8]" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-foreground">No Categories Found</h3>
@@ -440,7 +440,7 @@ function CategoriesPage() {
                 setSearchQuery("");
                 setActiveTab("ALL");
               }}
-              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand/90 transition-colors shadow-sm"
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-hover transition-colors shadow-sm"
             >
               <RefreshCw className="h-4 w-4" />
               View All Categories
