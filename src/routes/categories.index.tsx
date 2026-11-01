@@ -459,10 +459,10 @@ function CategoriesPage() {
                   key={c.categoryId}
                   to={target.to}
                   params={target.params as any}
-                  className="group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-card border border-slate-200/90 dark:border-border/60 p-4 sm:p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:border-brand/50 hover:shadow-[0_16px_32px_-12px_rgba(220,38,38,0.18)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden cursor-pointer h-[235px] sm:h-[265px]"
+                  className="group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-card border border-slate-200/90 dark:border-border/60 p-4 sm:p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:border-primary/50 hover:shadow-[0_16px_32px_-12px_rgba(220,38,38,0.18)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden cursor-pointer h-[235px] sm:h-[265px]"
                 >
                   {/* Subtle red corner glow on hover */}
-                  <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br from-brand/10 to-transparent blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br from-primary/10 to-transparent blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                   {/* Top Bar: Badge & Arrow */}
                   <div className="flex items-center justify-between gap-2 z-10">
@@ -474,7 +474,7 @@ function CategoriesPage() {
                     >
                       {meta.tag}
                     </span>
-                    <span className="w-7 h-7 shrink-0 rounded-full bg-slate-100/90 dark:bg-muted flex items-center justify-center text-slate-400 group-hover:bg-brand group-hover:text-white transition-all duration-300 shadow-xs">
+                    <span className="w-7 h-7 shrink-0 rounded-full bg-slate-100/90 dark:bg-muted flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-xs">
                       <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </span>
                   </div>
@@ -490,21 +490,21 @@ function CategoriesPage() {
                           loading="lazy"
                         />
                       ) : (
-                        <FallbackIcon className="h-8 w-8 sm:h-10 sm:w-10 text-brand stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
+                        <FallbackIcon className="h-8 w-8 sm:h-10 sm:w-10 text-primary stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
                       )}
                     </div>
                   </div>
 
                   {/* Bottom Info: Title & Action */}
                   <div className="z-10 mt-auto pt-2.5 border-t border-slate-100 dark:border-border/40">
-                    <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-foreground group-hover:text-brand transition-colors line-clamp-1">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-foreground group-hover:text-primary transition-colors line-clamp-1">
                       {c.categoryName}
                     </h2>
                     <p className="text-[11px] sm:text-xs text-slate-500 dark:text-muted-foreground line-clamp-1 mt-0.5">
                       {meta.description}
                     </p>
                     <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-50 dark:border-border/20">
-                      <span className="text-[11px] font-semibold text-brand flex items-center gap-1 group-hover:underline">
+                      <span className="text-[11px] font-semibold text-primary flex items-center gap-1 group-hover:underline">
                         Explore <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                       </span>
                       {c.subCategories && c.subCategories.length > 0 ? (
@@ -528,7 +528,7 @@ function CategoriesPage() {
         <section className="mt-14 sm:mt-20 pt-8 sm:pt-10 border-t border-slate-200/80 dark:border-border/60">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div className="flex items-start gap-3.5 p-4 rounded-xl bg-white dark:bg-card border border-slate-200/70 dark:border-border/60 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-red-50 text-brand flex items-center justify-center shrink-0 border border-red-100">
+              <div className="w-10 h-10 rounded-xl bg-red-50 text-primary flex items-center justify-center shrink-0 border border-red-100">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
@@ -580,7 +580,7 @@ function CategoriesPage() {
         {/* ================= BOTTOM CTA BANNER ================= */}
         <section className="mt-10 sm:mt-12 relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-6 sm:p-10 shadow-xl">
           {/* Background Ambient Glow */}
-          <div className="pointer-events-none absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-brand/20 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-primary/20 blur-3xl" />
           <div className="pointer-events-none absolute left-10 -top-20 w-60 h-60 rounded-full bg-blue-500/10 blur-3xl" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -600,7 +600,7 @@ function CategoriesPage() {
             <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Link
                 to="/vehicle-finder"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-brand hover:bg-brand/90 text-white text-sm font-bold shadow-lg hover:shadow-brand/25 hover:-translate-y-0.5 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-primary-foreground text-sm font-bold shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all duration-200"
               >
                 <Car className="h-4 w-4" />
                 Find by Vehicle
