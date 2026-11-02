@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import {
   Flame, Plus, Edit, Trash2, Check, Clock, Sparkles, AlertCircle,
   ExternalLink, Search, RefreshCw, Calendar, Tag, Layers, CheckCircle2,
-  Sliders, Eye, EyeOff
+  Sliders, Eye, EyeOff, Package, X
 } from "lucide-react";
 import { campaignService } from "@/services/campaign.service";
 import { adminCampaignsQuery, categoriesQuery, brandsQuery, productListQuery } from "@/queries";
@@ -116,6 +116,9 @@ function AdminOffersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<CampaignResponse | null>(null);
   const [activeTab, setActiveTab] = useState("basic");
+  const [productSearch, setProductSearch] = useState("");
+  const [categorySearch, setCategorySearch] = useState("");
+  const [brandSearch, setBrandSearch] = useState("");
 
   // Auxiliary data for entity targeting selection
   const { data: rawCategories = [] } = useQuery(categoriesQuery());
@@ -127,6 +130,30 @@ function AdminOffersPage() {
   const categories = useMemo(() => Array.isArray(rawCategories) ? rawCategories : [], [rawCategories]);
   const brands = useMemo(() => Array.isArray(rawBrands) ? rawBrands : [], [rawBrands]);
   const products = useMemo(() => Array.isArray(rawProducts) ? rawProducts : [], [rawProducts]);
+
+  const filteredProducts = useMemo(() => {
+    if (!productSearch.trim()) return products;
+    const q = productSearch.toLowerCase().trim();
+    return products.filter((p) => {
+      const name = (p.productName || "").toLowerCase();
+      const brand = (p.brandName || "").toLowerCase();
+      const cap = (p.capacity || p.capacityAh || "").toLowerCase();
+      const cat = (p.productCategory || "").toLowerCase();
+      return name.includes(q) || brand.includes(q) || cap.includes(q) || cat.includes(q);
+    });
+  }, [products, productSearch]);
+
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch.trim()) return categories;
+    const q = categorySearch.toLowerCase().trim();
+    return categories.filter((c) => (c.categoryName || "").toLowerCase().includes(q));
+  }, [categories, categorySearch]);
+
+  const filteredBrands = useMemo(() => {
+    if (!brandSearch.trim()) return brands;
+    const q = brandSearch.toLowerCase().trim();
+    return brands.filter((b) => (b.brandName || "").toLowerCase().includes(q));
+  }, [brands, brandSearch]);
 
   const campaignList: CampaignResponse[] = useMemo(() => {
     if (Array.isArray(rawCampaigns)) return rawCampaigns;
@@ -263,6 +290,9 @@ function AdminOffersPage() {
       productIds: [],
     });
     setActiveTab("basic");
+    setProductSearch("");
+    setCategorySearch("");
+    setBrandSearch("");
     setIsModalOpen(true);
   };
 
@@ -306,6 +336,9 @@ function AdminOffersPage() {
       productIds: c.productIds || [],
     });
     setActiveTab("basic");
+    setProductSearch("");
+    setCategorySearch("");
+    setBrandSearch("");
     setIsModalOpen(true);
   };
 
@@ -586,7 +619,7 @@ function AdminOffersPage() {
 
       {/* Create / Edit Campaign Modal Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl w-[96vw] sm:w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl font-bold">
               <Flame className="w-5 h-5 text-red-600" />
@@ -596,11 +629,11 @@ function AdminOffersPage() {
 
           <form onSubmit={form.handleSubmit((v: any) => saveMutation.mutate(v))} className="space-y-6 pt-2">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-4 w-full">
-                <TabsTrigger value="basic">1. Basic Info</TabsTrigger>
-                <TabsTrigger value="media">2. Banners & Badges</TabsTrigger>
-                <TabsTrigger value="discount">3. Discounts</TabsTrigger>
-                <TabsTrigger value="targeting">4. Targeting</TabsTrigger>
+              <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto p-1 gap-1">
+                <TabsTrigger value="basic" className="text-xs sm:text-sm py-1.5 px-2 truncate">1. Basic Info</TabsTrigger>
+                <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5 px-2 truncate">2. Banners & Badges</TabsTrigger>
+                <TabsTrigger value="discount" className="text-xs sm:text-sm py-1.5 px-2 truncate">3. Discounts</TabsTrigger>
+                <TabsTrigger value="targeting" className="text-xs sm:text-sm py-1.5 px-2 truncate">4. Targeting</TabsTrigger>
               </TabsList>
 
               {/* TAB 1: BASIC INFO & TIMING */}
@@ -909,36 +942,73 @@ function AdminOffersPage() {
                 {/* TARGET = CATEGORIES */}
                 {watchedTargetType === "CATEGORIES" && (
                   <div className="space-y-2 pt-2 border-t">
-                    <Label className="text-xs font-bold text-muted-foreground uppercase">
-                      Select Target Categories ({watchedCategoryIds.length} selected)
-                    </Label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-2 border rounded-lg bg-muted/20">
-                      {categories.map((cat) => {
-                        const isSelected = watchedCategoryIds.includes(cat.categoryId);
-                        return (
-                          <button
-                            key={cat.categoryId}
-                            type="button"
-                            onClick={() => {
-                              const updated = isSelected
-                                ? watchedCategoryIds.filter((id) => id !== cat.categoryId)
-                                : [...watchedCategoryIds, cat.categoryId];
-                              form.setValue("categoryIds", updated);
-                            }}
-                            className={cn(
-                              "flex items-center gap-2 p-2 rounded text-left text-xs transition-all border",
-                              isSelected
-                                ? "bg-red-50 border-red-300 text-red-900 font-bold dark:bg-red-950/40 dark:text-red-300"
-                                : "bg-card border-border/60 hover:bg-muted text-foreground"
-                            )}
-                          >
-                            <div className={cn("w-3.5 h-3.5 rounded flex items-center justify-center border", isSelected ? "bg-red-600 border-red-600 text-white" : "border-muted-foreground/40")}>
-                              {isSelected && <Check className="w-2.5 h-2.5" />}
-                            </div>
-                            <span className="truncate">{cat.categoryName}</span>
-                          </button>
-                        );
-                      })}
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-bold text-muted-foreground uppercase">
+                        Select Target Categories ({watchedCategoryIds.length} selected)
+                      </Label>
+                      {watchedCategoryIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => form.setValue("categoryIds", [])}
+                          className="text-[11px] text-red-600 hover:underline font-semibold"
+                        >
+                          Clear Selection
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={categorySearch}
+                        onChange={(e) => setCategorySearch(e.target.value)}
+                        placeholder="Search categories..."
+                        className="pl-8 h-8 text-xs"
+                      />
+                      {categorySearch && (
+                        <button
+                          type="button"
+                          onClick={() => setCategorySearch("")}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-2 border rounded-lg bg-muted/20">
+                      {filteredCategories.length === 0 ? (
+                        <div className="col-span-full py-6 text-center text-xs text-muted-foreground">
+                          No categories match "{categorySearch}"
+                        </div>
+                      ) : (
+                        filteredCategories.map((cat) => {
+                          const isSelected = watchedCategoryIds.includes(cat.categoryId);
+                          return (
+                            <button
+                              key={cat.categoryId}
+                              type="button"
+                              onClick={() => {
+                                const updated = isSelected
+                                  ? watchedCategoryIds.filter((id) => id !== cat.categoryId)
+                                  : [...watchedCategoryIds, cat.categoryId];
+                                form.setValue("categoryIds", updated);
+                              }}
+                              className={cn(
+                                "flex items-center gap-2 p-2 rounded-md text-left text-xs transition-all border min-w-0 select-none",
+                                isSelected
+                                  ? "bg-red-50 border-red-300 text-red-900 font-bold dark:bg-red-950/40 dark:text-red-300"
+                                  : "bg-card border-border/60 hover:bg-muted text-foreground"
+                              )}
+                            >
+                              <div className={cn("w-3.5 h-3.5 rounded flex items-center justify-center border shrink-0", isSelected ? "bg-red-600 border-red-600 text-white" : "border-muted-foreground/40")}>
+                                {isSelected && <Check className="w-2.5 h-2.5" />}
+                              </div>
+                              <span className="truncate flex-1">{cat.categoryName}</span>
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 )}
@@ -946,78 +1016,261 @@ function AdminOffersPage() {
                 {/* TARGET = BRANDS */}
                 {watchedTargetType === "BRANDS" && (
                   <div className="space-y-2 pt-2 border-t">
-                    <Label className="text-xs font-bold text-muted-foreground uppercase">
-                      Select Target Brands ({watchedBrandIds.length} selected)
-                    </Label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-2 border rounded-lg bg-muted/20">
-                      {brands.map((b) => {
-                        const isSelected = watchedBrandIds.includes(b.brandId);
-                        return (
-                          <button
-                            key={b.brandId}
-                            type="button"
-                            onClick={() => {
-                              const updated = isSelected
-                                ? watchedBrandIds.filter((id) => id !== b.brandId)
-                                : [...watchedBrandIds, b.brandId];
-                              form.setValue("brandIds", updated);
-                            }}
-                            className={cn(
-                              "flex items-center gap-2 p-2 rounded text-left text-xs transition-all border",
-                              isSelected
-                                ? "bg-red-50 border-red-300 text-red-900 font-bold dark:bg-red-950/40 dark:text-red-300"
-                                : "bg-card border-border/60 hover:bg-muted text-foreground"
-                            )}
-                          >
-                            <div className={cn("w-3.5 h-3.5 rounded flex items-center justify-center border", isSelected ? "bg-red-600 border-red-600 text-white" : "border-muted-foreground/40")}>
-                              {isSelected && <Check className="w-2.5 h-2.5" />}
-                            </div>
-                            <span className="truncate">{b.brandName}</span>
-                          </button>
-                        );
-                      })}
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-bold text-muted-foreground uppercase">
+                        Select Target Brands ({watchedBrandIds.length} selected)
+                      </Label>
+                      {watchedBrandIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => form.setValue("brandIds", [])}
+                          className="text-[11px] text-red-600 hover:underline font-semibold"
+                        >
+                          Clear Selection
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={brandSearch}
+                        onChange={(e) => setBrandSearch(e.target.value)}
+                        placeholder="Search brands..."
+                        className="pl-8 h-8 text-xs"
+                      />
+                      {brandSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setBrandSearch("")}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-2 border rounded-lg bg-muted/20">
+                      {filteredBrands.length === 0 ? (
+                        <div className="col-span-full py-6 text-center text-xs text-muted-foreground">
+                          No brands match "{brandSearch}"
+                        </div>
+                      ) : (
+                        filteredBrands.map((b) => {
+                          const isSelected = watchedBrandIds.includes(b.brandId);
+                          return (
+                            <button
+                              key={b.brandId}
+                              type="button"
+                              onClick={() => {
+                                const updated = isSelected
+                                  ? watchedBrandIds.filter((id) => id !== b.brandId)
+                                  : [...watchedBrandIds, b.brandId];
+                                form.setValue("brandIds", updated);
+                              }}
+                              className={cn(
+                                "flex items-center gap-2 p-2 rounded-md text-left text-xs transition-all border min-w-0 select-none",
+                                isSelected
+                                  ? "bg-red-50 border-red-300 text-red-900 font-bold dark:bg-red-950/40 dark:text-red-300"
+                                  : "bg-card border-border/60 hover:bg-muted text-foreground"
+                              )}
+                            >
+                              <div className={cn("w-3.5 h-3.5 rounded flex items-center justify-center border shrink-0", isSelected ? "bg-red-600 border-red-600 text-white" : "border-muted-foreground/40")}>
+                                {isSelected && <Check className="w-2.5 h-2.5" />}
+                              </div>
+                              <span className="truncate flex-1">{b.brandName}</span>
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 )}
 
                 {/* TARGET = CUSTOM PRODUCTS */}
                 {watchedTargetType === "CUSTOM_PRODUCTS" && (
-                  <div className="space-y-2 pt-2 border-t">
-                    <Label className="text-xs font-bold text-muted-foreground uppercase">
-                      Select Handpicked Products ({watchedProductIds.length} selected)
-                    </Label>
-                    <div className="space-y-1.5 max-h-64 overflow-y-auto p-2 border rounded-lg bg-muted/20">
-                      {products.map((p) => {
-                        const isSelected = watchedProductIds.includes(p.productId);
-                        return (
+                  <div className="space-y-2.5 pt-2 border-t">
+                    {/* Header + Selection Counter & Quick Toggle */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                      <Label className="text-xs font-bold text-muted-foreground uppercase">
+                        Select Handpicked Products ({watchedProductIds.length} of {products.length} selected)
+                      </Label>
+                      {watchedProductIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => form.setValue("productIds", [])}
+                          className="text-[11px] text-red-600 hover:underline font-semibold self-start sm:self-auto"
+                        >
+                          Clear Selection ({watchedProductIds.length})
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Instant Search Bar + Select/Deselect All Filtered */}
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          value={productSearch}
+                          onChange={(e) => setProductSearch(e.target.value)}
+                          placeholder="Search products by name, brand, capacity, category..."
+                          className="pl-9 pr-8 h-9 text-xs"
+                        />
+                        {productSearch && (
                           <button
-                            key={p.productId}
                             type="button"
-                            onClick={() => {
-                              const updated = isSelected
-                                ? watchedProductIds.filter((id) => id !== p.productId)
-                                : [...watchedProductIds, p.productId];
-                              form.setValue("productIds", updated);
-                            }}
-                            className={cn(
-                              "w-full flex items-center justify-between p-2 rounded text-left text-xs transition-all border",
-                              isSelected
-                                ? "bg-red-50 border-red-300 text-red-900 font-bold dark:bg-red-950/40 dark:text-red-300"
-                                : "bg-card border-border/60 hover:bg-muted text-foreground"
-                            )}
+                            onClick={() => setProductSearch("")}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
                           >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className={cn("w-3.5 h-3.5 rounded flex items-center justify-center border shrink-0", isSelected ? "bg-red-600 border-red-600 text-white" : "border-muted-foreground/40")}>
-                                {isSelected && <Check className="w-2.5 h-2.5" />}
-                              </div>
-                              <span className="truncate">{p.productName}</span>
-                            </div>
-                            <span className="text-[11px] font-mono text-muted-foreground shrink-0 ml-2">
-                              ₹{p.productPrice.toLocaleString()}
-                            </span>
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        );
-                      })}
+                        )}
+                      </div>
+
+                      {filteredProducts.length > 0 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-9 text-xs shrink-0 whitespace-nowrap"
+                          onClick={() => {
+                            const filteredIds = filteredProducts.map((p) => p.productId);
+                            const allSelected = filteredIds.every((id) => watchedProductIds.includes(id));
+                            if (allSelected) {
+                              form.setValue(
+                                "productIds",
+                                watchedProductIds.filter((id) => !filteredIds.includes(id))
+                              );
+                            } else {
+                              const union = Array.from(new Set([...watchedProductIds, ...filteredIds]));
+                              form.setValue("productIds", union);
+                            }
+                          }}
+                        >
+                          {filteredProducts.every((p) => watchedProductIds.includes(p.productId))
+                            ? "Deselect All"
+                            : "Select All"}
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Product List with Image Thumbnail & Guaranteed Price Column */}
+                    <div className="space-y-1.5 max-h-72 sm:max-h-80 overflow-y-auto overflow-x-hidden p-2 border rounded-lg bg-muted/20">
+                      {filteredProducts.length === 0 ? (
+                        <div className="py-10 text-center text-xs text-muted-foreground space-y-2">
+                          <Package className="w-8 h-8 mx-auto opacity-40 text-muted-foreground" />
+                          <div>No products match "{productSearch}"</div>
+                          {productSearch && (
+                            <button
+                              type="button"
+                              onClick={() => setProductSearch("")}
+                              className="text-red-600 hover:underline font-semibold"
+                            >
+                              Clear search query
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        filteredProducts.map((p) => {
+                          const isSelected = watchedProductIds.includes(p.productId);
+                          return (
+                            <div
+                              key={p.productId}
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              tabIndex={0}
+                              onClick={() => {
+                                const updated = isSelected
+                                  ? watchedProductIds.filter((id) => id !== p.productId)
+                                  : [...watchedProductIds, p.productId];
+                                form.setValue("productIds", updated);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === " " || e.key === "Enter") {
+                                  e.preventDefault();
+                                  const updated = isSelected
+                                    ? watchedProductIds.filter((id) => id !== p.productId)
+                                    : [...watchedProductIds, p.productId];
+                                  form.setValue("productIds", updated);
+                                }
+                              }}
+                              className={cn(
+                                "w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all border cursor-pointer select-none gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500",
+                                isSelected
+                                  ? "bg-red-50/90 border-red-300 text-red-950 font-medium dark:bg-red-950/40 dark:text-red-200 dark:border-red-800 shadow-2xs"
+                                  : "bg-card border-border/60 hover:bg-muted/80 text-foreground"
+                              )}
+                            >
+                              {/* Left: Checkbox + Photo + Product Info */}
+                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                {/* Checkbox */}
+                                <div
+                                  className={cn(
+                                    "w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors",
+                                    isSelected
+                                      ? "bg-red-600 border-red-600 text-white"
+                                      : "border-input bg-background"
+                                  )}
+                                >
+                                  {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
+
+                                {/* Product Photo Thumbnail */}
+                                <div className="w-10 h-10 rounded-md border border-border/60 bg-white flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-2xs">
+                                  {p.productImage ? (
+                                    <img
+                                      src={p.productImage}
+                                      alt={p.productName}
+                                      className="w-full h-full object-contain"
+                                      loading="lazy"
+                                    />
+                                  ) : (
+                                    <Package className="w-4 h-4 text-muted-foreground/40" />
+                                  )}
+                                </div>
+
+                                {/* Product Titles & Brand/Capacity Subtitles */}
+                                <div className="min-w-0 flex-1">
+                                  <div
+                                    className="font-semibold text-foreground text-xs leading-snug truncate"
+                                    title={p.productName}
+                                  >
+                                    {p.productName}
+                                  </div>
+                                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+                                    {p.brandName && (
+                                      <span className="font-semibold text-foreground/80 px-1 py-0.2 rounded bg-muted">
+                                        {p.brandName}
+                                      </span>
+                                    )}
+                                    {(p.capacity || p.capacityAh) && (
+                                      <span>{p.capacity || p.capacityAh}</span>
+                                    )}
+                                    {p.productCategory && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="truncate">{p.productCategory}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Right: Guaranteed, un-truncated Price Column */}
+                              <div className="shrink-0 text-right pl-2">
+                                <div className="text-xs font-bold font-mono text-foreground whitespace-nowrap">
+                                  ₹{p.productPrice?.toLocaleString("en-IN") || "0"}
+                                </div>
+                                {p.originalPrice && p.originalPrice > p.productPrice && (
+                                  <div className="text-[10px] font-mono text-muted-foreground line-through whitespace-nowrap">
+                                    ₹{p.originalPrice.toLocaleString("en-IN")}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 )}
@@ -1025,7 +1278,7 @@ function AdminOffersPage() {
             </Tabs>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center justify-between pt-4 border-t gap-3 mt-6">
               <Button
                 type="button"
                 variant="outline"
@@ -1038,7 +1291,7 @@ function AdminOffersPage() {
                 <Button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold whitespace-nowrap shadow-sm"
                 >
                   {saveMutation.isPending && <Spinner className="w-4 h-4 mr-2" />}
                   {editingCampaign ? "Save Changes" : "Create Campaign"}
