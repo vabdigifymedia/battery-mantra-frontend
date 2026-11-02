@@ -105,6 +105,7 @@ const campaignSchema = z.object({
   categoryIds: z.array(z.string()).default([]),
   brandIds: z.array(z.string()).default([]),
   productIds: z.array(z.string()).default([]),
+  productDiscounts: z.record(z.string(), z.coerce.number()).optional().default({}),
 });
 
 type CampaignFormValues = z.infer<typeof campaignSchema>;
@@ -190,6 +191,7 @@ function AdminOffersPage() {
       categoryIds: [],
       brandIds: [],
       productIds: [],
+      productDiscounts: {},
     },
   });
 
@@ -220,6 +222,7 @@ function AdminOffersPage() {
         categoryIds: values.targetType === "CATEGORIES" ? values.categoryIds : [],
         brandIds: values.targetType === "BRANDS" ? values.brandIds : [],
         productIds: values.targetType === "CUSTOM_PRODUCTS" ? values.productIds : [],
+        productDiscounts: values.targetType === "CUSTOM_PRODUCTS" ? values.productDiscounts : {},
       };
 
       if (editingCampaign) {
@@ -288,6 +291,7 @@ function AdminOffersPage() {
       categoryIds: [],
       brandIds: [],
       productIds: [],
+      productDiscounts: {},
     });
     setActiveTab("basic");
     setProductSearch("");
@@ -334,6 +338,7 @@ function AdminOffersPage() {
       categoryIds: c.categoryIds || [],
       brandIds: c.brandIds || [],
       productIds: c.productIds || [],
+      productDiscounts: (c as any).productDiscounts || {},
     });
     setActiveTab("basic");
     setProductSearch("");
@@ -350,6 +355,8 @@ function AdminOffersPage() {
   const watchedCategoryIds = form.watch("categoryIds") || [];
   const watchedBrandIds = form.watch("brandIds") || [];
   const watchedProductIds = form.watch("productIds") || [];
+  const watchedProductDiscounts: Record<string, number> = form.watch("productDiscounts") || {};
+  const watchedDiscountValue = form.watch("discountValue") || 0;
 
   // Filter campaigns by search query
   const filteredCampaigns = useMemo(() => {
@@ -524,7 +531,16 @@ function AdminOffersPage() {
                         {c.targetType === "ALL_PRODUCTS" && "All Products (Storewide)"}
                         {c.targetType === "CATEGORIES" && `${c.categoryIds?.length || 0} Categories`}
                         {c.targetType === "BRANDS" && `${c.brandIds?.length || 0} Brands`}
-                        {c.targetType === "CUSTOM_PRODUCTS" && `${c.productIds?.length || 0} Products`}
+                        {c.targetType === "CUSTOM_PRODUCTS" && (
+                          <div>
+                            <span>{c.productIds?.length || 0} Products</span>
+                            {c.productDiscounts && Object.keys(c.productDiscounts).length > 0 && (
+                              <div className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                                ({Object.keys(c.productDiscounts).length} custom discounts)
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </TableCell>
 
@@ -1098,8 +1114,11 @@ function AdminOffersPage() {
                       {watchedProductIds.length > 0 && (
                         <button
                           type="button"
-                          onClick={() => form.setValue("productIds", [])}
-                          className="text-[11px] text-red-600 hover:underline font-semibold self-start sm:self-auto"
+                          onClick={() => {
+                            form.setValue("productIds", [], { shouldDirty: true });
+                            form.setValue("productDiscounts", {}, { shouldDirty: true });
+                          }}
+                          className="text-[11px] text-red-600 hover:underline font-semibold self-start sm:self-auto cursor-pointer"
                         >
                           Clear Selection ({watchedProductIds.length})
                         </button>
@@ -1139,11 +1158,15 @@ function AdminOffersPage() {
                             if (allSelected) {
                               form.setValue(
                                 "productIds",
-                                watchedProductIds.filter((id) => !filteredIds.includes(id))
+                                watchedProductIds.filter((id) => !filteredIds.includes(id)),
+                                { shouldDirty: true }
                               );
+                              const copy = { ...watchedProductDiscounts };
+                              filteredIds.forEach((id) => delete copy[id]);
+                              form.setValue("productDiscounts", copy, { shouldDirty: true });
                             } else {
                               const union = Array.from(new Set([...watchedProductIds, ...filteredIds]));
-                              form.setValue("productIds", union);
+                              form.setValue("productIds", union, { shouldDirty: true });
                             }
                           }}
                         >
@@ -1173,100 +1196,203 @@ function AdminOffersPage() {
                       ) : (
                         filteredProducts.map((p) => {
                           const isSelected = watchedProductIds.includes(p.productId);
+                          const customDiscountValue = watchedProductDiscounts[p.productId];
+                          const hasCustomDiscount = customDiscountValue !== undefined && customDiscountValue !== null;
+
+                          let effectiveDiscount = 0;
+                          if (hasCustomDiscount) {
+                            effectiveDiscount = Number(customDiscountValue);
+                          } else if (watchedDiscountType === "FLAT_AMOUNT") {
+                            effectiveDiscount = Number(watchedDiscountValue || 0);
+                          } else if (watchedDiscountType === "PERCENTAGE") {
+                            effectiveDiscount = Math.round((p.productPrice * Number(watchedDiscountValue || 0)) / 100);
+                            if (form.watch("maxDiscountCap")) {
+                              effectiveDiscount = Math.min(effectiveDiscount, Number(form.watch("maxDiscountCap")));
+                            }
+                          } else if (watchedDiscountType === "EXTRA_EXCHANGE_BONUS") {
+                            effectiveDiscount = Number(watchedDiscountValue || 0);
+                          }
+
+                          const dealPrice = Math.max(0, p.productPrice - effectiveDiscount);
+
                           return (
                             <div
                               key={p.productId}
-                              role="checkbox"
-                              aria-checked={isSelected}
-                              tabIndex={0}
-                              onClick={() => {
-                                const updated = isSelected
-                                  ? watchedProductIds.filter((id) => id !== p.productId)
-                                  : [...watchedProductIds, p.productId];
-                                form.setValue("productIds", updated);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === " " || e.key === "Enter") {
-                                  e.preventDefault();
-                                  const updated = isSelected
-                                    ? watchedProductIds.filter((id) => id !== p.productId)
-                                    : [...watchedProductIds, p.productId];
-                                  form.setValue("productIds", updated);
-                                }
-                              }}
                               className={cn(
-                                "w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all border cursor-pointer select-none gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500",
+                                "w-full rounded-lg transition-all border select-none focus-within:ring-2 focus-within:ring-red-500",
                                 isSelected
-                                  ? "bg-red-50/90 border-red-300 text-red-950 font-medium dark:bg-red-950/40 dark:text-red-200 dark:border-red-800 shadow-2xs"
+                                  ? "bg-red-50/90 border-red-300 text-red-950 dark:bg-red-950/40 dark:text-red-200 dark:border-red-800 shadow-2xs"
                                   : "bg-card border-border/60 hover:bg-muted/80 text-foreground"
                               )}
                             >
-                              {/* Left: Checkbox + Photo + Product Info */}
-                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                {/* Checkbox */}
-                                <div
-                                  className={cn(
-                                    "w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors",
-                                    isSelected
-                                      ? "bg-red-600 border-red-600 text-white"
-                                      : "border-input bg-background"
-                                  )}
-                                >
-                                  {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                                </div>
-
-                                {/* Product Photo Thumbnail */}
-                                <div className="w-10 h-10 rounded-md border border-border/60 bg-white flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-2xs">
-                                  {p.productImage ? (
-                                    <img
-                                      src={p.productImage}
-                                      alt={p.productName}
-                                      className="w-full h-full object-contain"
-                                      loading="lazy"
-                                    />
-                                  ) : (
-                                    <Package className="w-4 h-4 text-muted-foreground/40" />
-                                  )}
-                                </div>
-
-                                {/* Product Titles & Brand/Capacity Subtitles */}
-                                <div className="min-w-0 flex-1">
+                              {/* Main Clickable Row: Checkbox, Thumbnail, Title, Price */}
+                              <div
+                                role="checkbox"
+                                aria-checked={isSelected}
+                                tabIndex={0}
+                                onClick={() => {
+                                  const updated = isSelected
+                                    ? watchedProductIds.filter((id) => id !== p.productId)
+                                    : [...watchedProductIds, p.productId];
+                                  form.setValue("productIds", updated, { shouldDirty: true });
+                                  if (isSelected) {
+                                    const copy = { ...watchedProductDiscounts };
+                                    delete copy[p.productId];
+                                    form.setValue("productDiscounts", copy, { shouldDirty: true });
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === " " || e.key === "Enter") {
+                                    e.preventDefault();
+                                    const updated = isSelected
+                                      ? watchedProductIds.filter((id) => id !== p.productId)
+                                      : [...watchedProductIds, p.productId];
+                                    form.setValue("productIds", updated, { shouldDirty: true });
+                                    if (isSelected) {
+                                      const copy = { ...watchedProductDiscounts };
+                                      delete copy[p.productId];
+                                      form.setValue("productDiscounts", copy, { shouldDirty: true });
+                                    }
+                                  }
+                                }}
+                                className="flex items-center justify-between p-2 cursor-pointer gap-2.5"
+                              >
+                                {/* Left: Checkbox + Photo + Product Info */}
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                  {/* Checkbox */}
                                   <div
-                                    className="font-semibold text-foreground text-xs leading-snug truncate"
-                                    title={p.productName}
+                                    className={cn(
+                                      "w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors",
+                                      isSelected
+                                        ? "bg-red-600 border-red-600 text-white"
+                                        : "border-input bg-background"
+                                    )}
                                   >
-                                    {p.productName}
+                                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                                   </div>
-                                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
-                                    {p.brandName && (
-                                      <span className="font-semibold text-foreground/80 px-1 py-0.2 rounded bg-muted">
-                                        {p.brandName}
+
+                                  {/* Product Photo Thumbnail */}
+                                  <div className="w-10 h-10 rounded-md border border-border/60 bg-white flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-2xs">
+                                    {p.productImage ? (
+                                      <img
+                                        src={p.productImage}
+                                        alt={p.productName}
+                                        className="w-full h-full object-contain"
+                                        loading="lazy"
+                                      />
+                                    ) : (
+                                      <Package className="w-4 h-4 text-muted-foreground/40" />
+                                    )}
+                                  </div>
+
+                                  {/* Product Titles & Brand/Capacity Subtitles */}
+                                  <div className="min-w-0 flex-1">
+                                    <div
+                                      className="font-semibold text-foreground text-xs leading-snug truncate"
+                                      title={p.productName}
+                                    >
+                                      {p.productName}
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+                                      {p.brandName && (
+                                        <span className="font-semibold text-foreground/80 px-1 py-0.2 rounded bg-muted">
+                                          {p.brandName}
+                                        </span>
+                                      )}
+                                      {(p.capacity || p.capacityAh) && (
+                                        <span>{p.capacity || p.capacityAh}</span>
+                                      )}
+                                      {p.productCategory && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="truncate">{p.productCategory}</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Right: Price + Deal Price */}
+                                <div className="shrink-0 text-right pl-2">
+                                  <div className="text-xs font-bold font-mono text-foreground whitespace-nowrap">
+                                    ₹{p.productPrice?.toLocaleString("en-IN") || "0"}
+                                  </div>
+                                  {isSelected && (
+                                    <div className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                      Deal: ₹{dealPrice.toLocaleString("en-IN")}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Custom Discount Config Strip (Visible when checked) */}
+                              {isSelected && (
+                                <div
+                                  className="flex flex-wrap items-center justify-between gap-2 px-2.5 py-1.5 border-t border-red-200/60 dark:border-red-900/40 bg-white/70 dark:bg-black/20 rounded-b-lg text-[11px]"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <Tag className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                                    <span className="font-semibold text-foreground/90 text-xs">Custom Discount:</span>
+                                    <div className="relative w-28">
+                                      <span className="absolute left-2 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-xs">₹</span>
+                                      <Input
+                                        type="number"
+                                        min={0}
+                                        max={p.productPrice}
+                                        value={hasCustomDiscount ? customDiscountValue : ""}
+                                        placeholder={
+                                          watchedDiscountType === "PERCENTAGE"
+                                            ? `${watchedDiscountValue}%`
+                                            : `${watchedDiscountValue}`
+                                        }
+                                        onChange={(e) => {
+                                          const val = e.target.value.trim();
+                                          const num = val === "" ? undefined : Math.max(0, Number(val));
+                                          const updated = { ...watchedProductDiscounts };
+                                          if (num === undefined || isNaN(num)) {
+                                            delete updated[p.productId];
+                                          } else {
+                                            updated[p.productId] = num;
+                                          }
+                                          form.setValue("productDiscounts", updated, { shouldDirty: true });
+                                        }}
+                                        className="h-6.5 text-xs pl-5 pr-1 py-0 font-mono bg-background border-input shadow-2xs"
+                                      />
+                                    </div>
+                                    {hasCustomDiscount && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const updated = { ...watchedProductDiscounts };
+                                          delete updated[p.productId];
+                                          form.setValue("productDiscounts", updated, { shouldDirty: true });
+                                        }}
+                                        className="text-[10px] text-muted-foreground hover:text-red-600 underline cursor-pointer"
+                                        title="Revert to campaign default discount"
+                                      >
+                                        Use Default
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 text-xs font-medium ml-auto">
+                                    <span className="text-muted-foreground text-[10px]">You save:</span>
+                                    <strong className="text-red-600 font-bold font-mono">
+                                      ₹{effectiveDiscount.toLocaleString("en-IN")}
+                                    </strong>
+                                    {hasCustomDiscount ? (
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200 font-bold tracking-tight">
+                                        CUSTOM
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                                        DEFAULT
                                       </span>
                                     )}
-                                    {(p.capacity || p.capacityAh) && (
-                                      <span>{p.capacity || p.capacityAh}</span>
-                                    )}
-                                    {p.productCategory && (
-                                      <>
-                                        <span>•</span>
-                                        <span className="truncate">{p.productCategory}</span>
-                                      </>
-                                    )}
                                   </div>
                                 </div>
-                              </div>
-
-                              {/* Right: Guaranteed, un-truncated Price Column */}
-                              <div className="shrink-0 text-right pl-2">
-                                <div className="text-xs font-bold font-mono text-foreground whitespace-nowrap">
-                                  ₹{p.productPrice?.toLocaleString("en-IN") || "0"}
-                                </div>
-                                {p.originalPrice && p.originalPrice > p.productPrice && (
-                                  <div className="text-[10px] font-mono text-muted-foreground line-through whitespace-nowrap">
-                                    ₹{p.originalPrice.toLocaleString("en-IN")}
-                                  </div>
-                                )}
-                              </div>
+                              )}
                             </div>
                           );
                         })

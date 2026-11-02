@@ -43,7 +43,16 @@ export function getCampaignThemeStyles(theme?: CampaignBadgeTheme | null) {
   }
 }
 
-export function formatCampaignDiscountLabel(campaign: CampaignResponse): string {
+export function formatCampaignDiscountLabel(
+  campaign: CampaignResponse,
+  product?: ProductListResponse
+): string {
+  if (product && campaign.productDiscounts?.[product.productId] !== undefined) {
+    const custom = campaign.productDiscounts[product.productId];
+    if (custom !== null && Number(custom) > 0) {
+      return `Save ₹${Number(custom).toLocaleString()}`;
+    }
+  }
   if (campaign.discountType === "FLAT_AMOUNT") {
     return `Flat ₹${Number(campaign.discountValue || 0).toLocaleString()} OFF`;
   }
@@ -116,6 +125,14 @@ export function calculateProductCampaignDiscount(
   const basePrice = hasExchange && product.exchangeDiscount
     ? Math.max(0, product.productPrice - product.exchangeDiscount)
     : product.productPrice;
+
+  // 1. Check if campaign has a per-product custom discount override
+  const customVal = campaign.productDiscounts?.[product.productId];
+  if (customVal !== undefined && customVal !== null && Number(customVal) >= 0) {
+    const discountAmount = Math.min(basePrice, Number(customVal));
+    const finalPrice = Math.max(0, basePrice - discountAmount);
+    return { discountAmount: Math.round(discountAmount), finalPrice: Math.round(finalPrice) };
+  }
 
   let discountAmount = 0;
 

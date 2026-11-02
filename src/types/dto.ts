@@ -923,6 +923,7 @@ export type CampaignResponse = {
   categoryIds?: UUID[];
   brandIds?: UUID[];
   productIds?: UUID[];
+  productDiscounts?: Record<UUID, number> | null;
   excludedProductIds?: UUID[];
   createdAt?: string;
   updatedAt?: string;
@@ -953,6 +954,7 @@ export type CreateCampaignRequest = {
   categoryIds?: UUID[];
   brandIds?: UUID[];
   productIds?: UUID[];
+  productDiscounts?: Record<UUID, number> | null;
   excludedProductIds?: UUID[];
 };
 
