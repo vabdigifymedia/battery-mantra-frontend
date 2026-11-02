@@ -64,7 +64,7 @@ function AdminDashboard() {
 
   // Sort orders descending by date
   const recentOrders = useMemo(() => 
-    [...orders].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()).slice(0, 5),
+    [...orders].sort((a, b) => new Date(b.placedAt || 0).getTime() - new Date(a.placedAt || 0).getTime()).slice(0, 5),
     [orders]
   );
 
@@ -79,7 +79,8 @@ function AdminDashboard() {
     }
   };
 
-  const formatTime = (dateString: string) => {
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 

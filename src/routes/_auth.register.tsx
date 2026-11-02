@@ -69,7 +69,7 @@ function RegisterPage() {
         const [path, query] = redirect.split("?");
         if (query) {
           const params = Object.fromEntries(new URLSearchParams(query));
-          router.navigate({ to: path as any, search: params });
+          router.navigate({ to: path as any, search: params as any });
         } else {
           router.navigate({ to: path as any });
         }
