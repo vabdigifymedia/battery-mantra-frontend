@@ -2,7 +2,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { z } from "zod";
-import { Sparkles, Tag, ArrowLeft, ArrowRight, Copy, Check, Clock, ShieldCheck, Flame, ShoppingBag } from "lucide-react";
+import { Sparkles, Tag, ArrowLeft, ArrowRight, Copy, Check, Clock, ShieldCheck, Flame, ShoppingBag, Info } from "lucide-react";
 import { campaignBySlugQuery } from "@/queries";
 import { getCampaignThemeStyles, formatCampaignDiscountLabel, safeFormatDate } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "@/components/campaign/CampaignCountdown";
@@ -227,6 +227,12 @@ function CampaignOfferPage() {
                   </p>
                 )}
 
+                {campaign.description && (
+                  <p className="text-xs sm:text-sm text-white/80 font-normal leading-relaxed whitespace-pre-line max-w-xl">
+                    {campaign.description}
+                  </p>
+                )}
+
                 {campaign.couponCode && (
                   <div className="pt-2">
                     <button
@@ -278,6 +284,30 @@ function CampaignOfferPage() {
 
       {/* Products Section */}
       <Container size="xl" className="py-8 sm:py-12">
+        {/* Offer Description / Terms Details */}
+        {campaign.description && (
+          <div className="mb-8 rounded-2xl border bg-card/60 p-5 sm:p-6 shadow-xs backdrop-blur-xs">
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className="w-7 h-7 rounded-lg bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400 flex items-center justify-center shrink-0">
+                <Info className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-foreground">
+                Offer Details & Terms
+              </h3>
+            </div>
+            {/<[a-z][\s\S]*>/i.test(campaign.description) ? (
+              <div
+                className="prose prose-sm max-w-none text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: campaign.description }}
+              />
+            ) : (
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                {campaign.description}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">

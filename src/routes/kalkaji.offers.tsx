@@ -497,7 +497,9 @@ function AdminOffersPage() {
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Link>
                           </div>
-                          <div className="text-xs text-muted-foreground truncate">{c.tagline || c.slug}</div>
+                          <div className="text-xs text-muted-foreground truncate" title={c.description || c.tagline || c.slug}>
+                            {c.tagline || c.description || c.slug}
+                          </div>
                           {c.couponCode && (
                             <div className="inline-block mt-0.5 font-mono text-[10px] font-bold px-1.5 py-0.2 rounded bg-muted border">
                               CODE: {c.couponCode}

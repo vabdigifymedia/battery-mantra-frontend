@@ -100,6 +100,12 @@ export function HomeFestiveSpotlight() {
                     {discountLabel}
                   </span>
 
+                  {(homeCampaign.tagline || homeCampaign.description) && (
+                    <span className="hidden xl:inline text-xs text-white/80 font-medium truncate max-w-sm" title={homeCampaign.description || homeCampaign.tagline || ""}>
+                      {homeCampaign.tagline || homeCampaign.description}
+                    </span>
+                  )}
+
                   {homeCampaign.couponCode && (
                     <button
                       type="button"
