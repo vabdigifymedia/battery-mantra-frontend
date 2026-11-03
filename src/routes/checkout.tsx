@@ -2,7 +2,8 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles, Clock, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,57 @@ function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState<string>("STANDARD_DELIVERY");
   const [installationDate, setInstallationDate] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
+
+  // Same-Day Delivery / Home Installation Cutoff: 7:00 PM (19:00 IST)
+  // After 7:00 PM, same-day delivery/installation is closed; earliest slot is tomorrow.
+  const deliveryCutoffInfo = useMemo(() => {
+    const now = new Date();
+    const istFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const parts = istFormatter.formatToParts(now);
+    const getPart = (type: string) => parts.find((p) => p.type === type)?.value || "";
+    const year = getPart("year");
+    const month = getPart("month");
+    const day = getPart("day");
+    const hour = parseInt(getPart("hour"), 10);
+    const today = `${year}-${month}-${day}`;
+
+    const getOffsetDate = (offsetDays: number) => {
+      const d = new Date(now.getTime() + offsetDays * 24 * 60 * 60 * 1000);
+      const p = istFormatter.formatToParts(d);
+      const gp = (type: string) => p.find((x) => x.type === type)?.value || "";
+      return `${gp("year")}-${gp("month")}-${gp("day")}`;
+    };
+
+    const tomorrow = getOffsetDate(1);
+    const dayAfter = getOffsetDate(2);
+    const isAfterCutoff = hour >= 19; // 7:00 PM cutoff
+
+    return {
+      hour,
+      today,
+      tomorrow,
+      dayAfter,
+      isAfterCutoff,
+      minInstallationDate: isAfterCutoff ? tomorrow : today,
+    };
+  }, []);
+
+  // Pre-fill / adjust installation date when Home Installation is chosen
+  useEffect(() => {
+    if (deliveryMethod === "HOME_INSTALLATION") {
+      if (!installationDate || installationDate < deliveryCutoffInfo.minInstallationDate) {
+        setInstallationDate(deliveryCutoffInfo.minInstallationDate);
+      }
+    }
+  }, [deliveryMethod, deliveryCutoffInfo.minInstallationDate, installationDate]);
 
   const { data: addresses } = useQuery(addressesQuery(status === "authenticated"));
   const selectedAddress = addresses?.find((a) => a.addressId === addressId);
@@ -436,7 +488,9 @@ function CheckoutPage() {
     );
   }
 
-  const hasValidDelivery = deliveryMethod !== "HOME_INSTALLATION" || installationDate !== "";
+  const hasValidDelivery =
+    deliveryMethod !== "HOME_INSTALLATION" ||
+    (Boolean(installationDate) && installationDate >= deliveryCutoffInfo.minInstallationDate);
 
   const isProcessing = checkout.isPending || createRazorpayOrder.isPending || verifyRazorpayPayment.isPending;
   const canPlace = hasValidAddress && !isUnserviceable && !isCheckingServiceability && items.length > 0 && !isProcessing && hasValidDelivery;
@@ -544,14 +598,18 @@ function CheckoutPage() {
             active={activeStep === 3}
             completed={activeStep > 3}
             onEdit={() => setActiveStep(3)}
-            summary={deliveryMethod.replace('_', ' ')}
+            summary={deliveryMethod === "HOME_INSTALLATION" && installationDate ? `Home Installation • ${installationDate}` : deliveryMethod.replace('_', ' ')}
           >
             <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod} className="space-y-3 sm:space-y-4">
               <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "STANDARD_DELIVERY" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                 <RadioGroupItem value="STANDARD_DELIVERY" id="delivery-standard" className="mt-1" />
                 <Label htmlFor="delivery-standard" className="cursor-pointer font-medium flex-1">
                   <div className="text-sm sm:text-base font-semibold">Standard Delivery</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-0.5">Same-Day Delivery on Orders Before 7 PM</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-0.5">
+                    {deliveryCutoffInfo.isAfterCutoff
+                      ? "Next-Day Delivery (Orders placed after 7 PM are dispatched next morning)"
+                      : "Same-Day Delivery on Orders Before 7 PM"}
+                  </div>
                 </Label>
               </div>
               <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "STORE_PICKUP" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
@@ -563,25 +621,116 @@ function CheckoutPage() {
               </div>
               <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "HOME_INSTALLATION" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                 <RadioGroupItem value="HOME_INSTALLATION" id="delivery-install" className="mt-1" />
-                <Label htmlFor="delivery-install" className="cursor-pointer font-medium flex-1">
-                  <div className="text-sm sm:text-base font-semibold">Home Installation</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-0.5">A technician will arrive at your location to install the battery.</div>
+                <div className="font-medium flex-1">
+                  <Label htmlFor="delivery-install" className="cursor-pointer block">
+                    <div className="text-sm sm:text-base font-semibold">Home Installation</div>
+                    <div className="text-muted-foreground text-xs font-normal mt-0.5">A technician will arrive at your location to install the battery.</div>
+                  </Label>
 
                   {deliveryMethod === "HOME_INSTALLATION" && (
-                    <div className="mt-3.5 animate-in fade-in slide-in-from-top-2">
-                      <Label htmlFor="install-date" className="mb-1.5 block text-xs">Select Installation Date</Label>
-                      <Input
-                        id="install-date"
-                        type="date"
-                        className="bg-background max-w-[200px]"
-                        min={new Date().toISOString().split('T')[0]}
-                        value={installationDate}
-                        onChange={(e) => setInstallationDate(e.target.value)}
-                        required
-                      />
+                    <div className="mt-3.5 animate-in fade-in slide-in-from-top-2 space-y-3">
+                      <div>
+                        <Label htmlFor="install-date" className="mb-2 block text-xs font-semibold text-foreground">
+                          Select Installation Date
+                        </Label>
+
+                        {/* Quick date selector pills */}
+                        <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                          {/* Today */}
+                          <button
+                            type="button"
+                            disabled={deliveryCutoffInfo.isAfterCutoff}
+                            onClick={() => setInstallationDate(deliveryCutoffInfo.today)}
+                            className={cn(
+                              "text-xs px-3 py-1.5 rounded-lg border transition-all text-left flex items-center gap-1.5",
+                              deliveryCutoffInfo.isAfterCutoff
+                                ? "opacity-50 cursor-not-allowed bg-muted/60 text-muted-foreground line-through border-border"
+                                : installationDate === deliveryCutoffInfo.today
+                                ? "border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
+                                : "border-border bg-background hover:bg-muted/50 text-foreground"
+                            )}
+                          >
+                            <Calendar className="w-3.5 h-3.5 shrink-0" />
+                            <span>Today</span>
+                            {deliveryCutoffInfo.isAfterCutoff && (
+                              <span className="text-[10px] no-underline font-normal text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1 rounded ml-0.5">
+                                Closed (Past 7 PM)
+                              </span>
+                            )}
+                          </button>
+
+                          {/* Tomorrow */}
+                          <button
+                            type="button"
+                            onClick={() => setInstallationDate(deliveryCutoffInfo.tomorrow)}
+                            className={cn(
+                              "text-xs px-3 py-1.5 rounded-lg border transition-all text-left flex items-center gap-1.5",
+                              installationDate === deliveryCutoffInfo.tomorrow
+                                ? "border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
+                                : "border-border bg-background hover:bg-muted/50 text-foreground"
+                            )}
+                          >
+                            <Calendar className="w-3.5 h-3.5 shrink-0" />
+                            <span>Tomorrow</span>
+                          </button>
+
+                          {/* Day After */}
+                          <button
+                            type="button"
+                            onClick={() => setInstallationDate(deliveryCutoffInfo.dayAfter)}
+                            className={cn(
+                              "text-xs px-3 py-1.5 rounded-lg border transition-all text-left flex items-center gap-1.5",
+                              installationDate === deliveryCutoffInfo.dayAfter
+                                ? "border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
+                                : "border-border bg-background hover:bg-muted/50 text-foreground"
+                            )}
+                          >
+                            <Calendar className="w-3.5 h-3.5 shrink-0" />
+                            <span>Day After</span>
+                          </button>
+                        </div>
+
+                        {/* Direct Native Date Input */}
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="install-date"
+                            type="date"
+                            className="bg-background max-w-[220px] text-xs sm:text-sm h-9"
+                            min={deliveryCutoffInfo.minInstallationDate}
+                            value={installationDate}
+                            onChange={(e) => setInstallationDate(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      {/* Informational notice & cutoff warning */}
+                      {deliveryCutoffInfo.isAfterCutoff ? (
+                        <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs leading-relaxed">
+                          <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-semibold">Same-Day Slot Closed (7:00 PM Cutoff):</span>{" "}
+                            Orders placed after 7:00 PM cannot be delivered/installed today. Earliest available slot starts from tomorrow ({deliveryCutoffInfo.tomorrow}).
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>Same-day installation is available for orders placed before <strong>7:00 PM</strong> today.</span>
+                        </div>
+                      )}
+
+                      {/* Error message if invalid past/today date is entered */}
+                      {installationDate && installationDate < deliveryCutoffInfo.minInstallationDate && (
+                        <p className="text-xs text-destructive font-medium">
+                          {deliveryCutoffInfo.isAfterCutoff
+                            ? "Same-day installation is closed after 7:00 PM. Please select tomorrow or a later date."
+                            : "Selected installation date cannot be in the past. Please choose a valid date."}
+                        </p>
+                      )}
                     </div>
                   )}
-                </Label>
+                </div>
               </div>
             </RadioGroup>
             <div className="mt-5 sm:mt-6">
