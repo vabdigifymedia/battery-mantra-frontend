@@ -43,11 +43,11 @@ export function HomeFestiveSpotlight() {
   };
 
   return (
-    <section className="relative w-full py-8 sm:py-12 overflow-hidden">
+    <section className="relative w-full py-6 sm:py-12 overflow-hidden">
       <Container size="xl">
         <div
           className={cn(
-            "relative rounded-3xl overflow-hidden border shadow-xl p-6 sm:p-10 transition-all",
+            "relative rounded-2xl sm:rounded-3xl overflow-hidden border shadow-xl p-3.5 sm:p-6 lg:p-10 transition-all",
             styles.barBg
           )}
         >
@@ -219,9 +219,9 @@ export function HomeFestiveSpotlight() {
 
           {/* Participating Products Spotlight (if loaded) */}
           {products.length > 0 && (
-            <div className="relative z-10 mt-8 pt-8 border-t border-white/15">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+            <div className="relative z-10 mt-6 sm:mt-8 pt-5 sm:pt-8 border-t border-white/15">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-1.5 sm:gap-2">
                   <Flame className="w-4 h-4 text-amber-400" />
                   Handpicked Offers for You
                 </h3>
@@ -234,7 +234,7 @@ export function HomeFestiveSpotlight() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
                 {products.slice(0, 4).map((p) => (
                   <div key={p.productId} className="h-full">
                     <ProductCard product={p} className="h-full bg-white/95" />

@@ -245,13 +245,13 @@ export function ProductCard({
     >
       <div className="flex flex-col flex-1">
         {/* Top Badges Bar */}
-        <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between pointer-events-none">
-          <div className="flex flex-col gap-1 items-start max-w-[calc(100%-75px)]">
+        <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 right-2.5 sm:right-3 z-10 flex items-start justify-between pointer-events-none gap-1">
+          <div className="flex flex-col gap-1 items-start max-w-[calc(100%-36px)] sm:max-w-[calc(100%-75px)]">
             {/* Dynamic Active Campaign Badge */}
             {matchedCampaign && (
               <span
                 className={cn(
-                  "text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 max-w-full truncate tracking-tight uppercase",
+                  "text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 max-w-full truncate tracking-tight uppercase",
                   getCampaignThemeStyles(matchedCampaign.badgeTheme).badgeBg
                 )}
                 title={matchedCampaign.name}
@@ -264,13 +264,13 @@ export function ProductCard({
             )}
 
             {/* Highlights Badges from Admin Quick Edit */}
-            {highlightBadges.slice(0, showSavings ? 1 : 2).map((badge, idx) => {
+            {highlightBadges.slice(0, matchedCampaign ? 0 : showSavings ? 1 : 2).map((badge, idx) => {
               const isBestOrTop = /best|top|popular|hot|deal|trend|recommend/i.test(badge);
               return (
                 <span
                   key={idx}
                   className={cn(
-                    "text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 max-w-full truncate tracking-tight",
+                    "text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 max-w-full truncate tracking-tight",
                     isBestOrTop
                       ? "bg-amber-500 text-white"
                       : "bg-slate-900/90 text-white backdrop-blur-xs"
@@ -284,20 +284,26 @@ export function ProductCard({
             })}
 
             {showSavings ? (
-              <span className="bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+              <span
+                className={cn(
+                  "bg-red-600 text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs truncate",
+                  matchedCampaign && "hidden sm:inline-block"
+                )}
+              >
                 Save ₹{totalSavings.toLocaleString()}
               </span>
-            ) : highlightBadges.length === 0 ? (
-              <span className="bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" /> Warranty
+            ) : highlightBadges.length === 0 && !matchedCampaign ? (
+              <span className="bg-amber-500 text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Warranty
               </span>
             ) : null}
           </div>
-          <div className="flex items-center gap-1.5 pointer-events-auto">
+
+          <div className="flex items-center gap-1 sm:gap-1.5 pointer-events-auto shrink-0">
             <button
               type="button"
               onClick={handleShareCard}
-              className="p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-brand hover:bg-white transition-all shadow-sm active:scale-95"
+              className="hidden sm:inline-flex p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-brand hover:bg-white transition-all shadow-sm active:scale-95"
               aria-label="Share product"
               title="Share product"
             >
@@ -310,7 +316,7 @@ export function ProductCard({
                 e.stopPropagation();
                 toggleWishlist(product);
               }}
-              className="p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500 hover:bg-white transition-all shadow-sm active:scale-95"
+              className="p-1 sm:p-1.5 rounded-full bg-white/80 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500 hover:bg-white transition-all shadow-xs active:scale-95"
               aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
               title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             >
@@ -328,7 +334,7 @@ export function ProductCard({
         <RouterLink 
           to="/product/$" 
           params={{ _splat: product.seo?.slug || product.productId }}
-          className="relative pt-10 pb-4 px-4 flex items-center justify-center bg-slate-50/50 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 transition-colors"
+          className="relative pt-8 sm:pt-10 pb-2 sm:pb-4 px-2 sm:px-4 flex items-center justify-center bg-slate-50/50 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 transition-colors"
         >
           <Image
             src={product.productImage}
@@ -338,51 +344,54 @@ export function ProductCard({
             className="rounded-none object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
           />
           {displayCapacity && (
-            <div className="absolute bottom-3 right-3 bg-red-50 text-red-600 border border-red-100 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm">
-              <Zap className="w-3 h-3" /> {displayCapacity}
+            <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 bg-red-50/95 text-red-600 border border-red-100 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-xs backdrop-blur-xs">
+              <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> {displayCapacity}
             </div>
           )}
         </RouterLink>
 
         {/* Details Area */}
-        <div className="px-4 pt-3 pb-0 flex flex-col gap-1.5">
+        <div className="px-2.5 sm:px-4 pt-2 sm:pt-3 pb-0 flex flex-col gap-1 sm:gap-1.5">
           {/* Brand */}
-          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-muted-foreground truncate">
             {product.brandName || "BATTERY"}
           </div>
 
           {/* Title */}
           <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
-            <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug">
+            <h3 className="line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] text-xs sm:text-sm font-bold text-slate-800 group-hover:text-primary transition-colors leading-tight sm:leading-snug">
               {product.productName}
             </h3>
           </RouterLink>
 
           {/* Reviews */}
-          <div className="flex items-center gap-1 mt-0.5">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span className="text-xs font-bold text-slate-700">{rating}</span>
-            <span className="text-xs text-muted-foreground">({reviews} Reviews)</span>
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+            <span className="text-[11px] sm:text-xs font-bold text-slate-700">{rating}</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
+              ({reviews}<span className="hidden sm:inline"> Reviews</span>)
+            </span>
           </div>
 
           {/* Price Block */}
-          <div className="mt-2 space-y-1">
-            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-              <Price value={exchangePrice} className="font-black text-red-600 text-base sm:text-lg lg:text-xl" />
+          <div className="mt-1 sm:mt-2 space-y-0.5 sm:space-y-1">
+            <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+              <Price value={exchangePrice} className="font-black text-red-600 text-sm sm:text-lg lg:text-xl leading-none" />
               {hasExchange && (
-                <span className="text-[9px] sm:text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">
-                  With Exchange
+                <span className="text-[8px] sm:text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1 sm:px-1.5 py-0.5 rounded border border-emerald-200/60 leading-none whitespace-nowrap">
+                  <span className="sm:hidden">With Exch.</span>
+                  <span className="hidden sm:inline">With Exchange</span>
                 </span>
               )}
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-[10px] sm:text-xs font-medium">
-              <span className="text-muted-foreground">
+            <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-xs font-medium text-muted-foreground flex-wrap leading-tight">
+              <span>
                 MRP: <span className="line-through">₹{basePriceForSavings.toLocaleString()}</span>
               </span>
               {showSavings && (
-                <span className="text-red-600 font-bold">
-                  You Save ₹{totalSavings.toLocaleString()}
+                <span className="text-emerald-700 sm:text-red-600 font-bold whitespace-nowrap">
+                  Save ₹{totalSavings.toLocaleString()}
                 </span>
               )}
             </div>
@@ -430,16 +439,20 @@ export function ProductCard({
         </div>
       </div>
 
-      {/* Action Buttons - Stack on mobile, side-by-side on sm+ */}
-      <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-0 flex flex-col sm:flex-row items-center gap-2 mt-auto">
-        <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg">
+      {/* Action Buttons */}
+      <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 pt-2 sm:pt-0 flex items-center gap-2 mt-auto">
+        <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-xs w-full sm:flex-1 h-7.5 sm:h-9 rounded-md sm:rounded-lg">
           <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
-            <span className="text-[10px] sm:text-xs font-bold flex items-center"><ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now</span>
+            <span className="text-[11px] sm:text-xs font-bold flex items-center justify-center">
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now
+            </span>
           </RouterLink>
         </Button>
-        <Button asChild size="sm" variant="outline" className="border-border shadow-sm w-full sm:flex-1 h-8 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-50">
+        <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-border shadow-xs sm:flex-1 h-9 rounded-lg hover:bg-slate-50">
           <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
-            <span className="text-[10px] sm:text-xs font-bold text-slate-700 flex items-center justify-center">View Details <ArrowRight className="ml-1 w-3 h-3" /></span>
+            <span className="text-xs font-bold text-slate-700 flex items-center justify-center">
+              View Details <ArrowRight className="ml-1 w-3 h-3" />
+            </span>
           </RouterLink>
         </Button>
       </div>
