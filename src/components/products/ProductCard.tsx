@@ -4,7 +4,7 @@ import { Link as RouterLink } from "@tanstack/react-router";
 import { Image } from "@/components/common/Image";
 import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
-import type { ProductListResponse } from "@/types/dto";
+import type { ProductListResponse, CampaignResponse } from "@/types/dto";
 import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
 import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery, activeCampaignsQuery } from "@/queries";
@@ -19,9 +19,11 @@ import { Label } from "@/components/ui/label";
 export function ProductCard({
   product,
   className,
+  campaign,
 }: {
   product: ProductListResponse;
   className?: string;
+  campaign?: CampaignResponse | null;
 }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const wishlisted = isWishlisted(product.productId);
@@ -32,11 +34,12 @@ export function ProductCard({
   const { data: activeCampaigns } = useQuery(activeCampaignsQuery());
 
   const matchedCampaign = useMemo(() => {
+    if (campaign) return campaign;
     if (!activeCampaigns || activeCampaigns.length === 0) return null;
     return activeCampaigns
       .filter((c) => isProductEligibleForCampaign(product, c))
       .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0] || null;
-  }, [activeCampaigns, product]);
+  }, [campaign, activeCampaigns, product]);
 
   const matchedDeliveryTime = useMemo(() => {
     if (!cityDeliveryTimes || cityDeliveryTimes.length === 0) return null;

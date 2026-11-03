@@ -311,7 +311,7 @@ function CampaignOfferPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {products.map((p) => (
                 <div key={p.productId} className="h-full">
-                  <ProductCard product={p} className="h-full shadow-sm hover:shadow-md" />
+                  <ProductCard product={p} campaign={campaign} className="h-full shadow-sm hover:shadow-md" />
                 </div>
               ))}
             </div>

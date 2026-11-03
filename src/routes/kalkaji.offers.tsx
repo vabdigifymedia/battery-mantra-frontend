@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useState, useMemo, useEffect } from "react";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -105,10 +105,211 @@ const campaignSchema = z.object({
   categoryIds: z.array(z.string()).default([]),
   brandIds: z.array(z.string()).default([]),
   productIds: z.array(z.string()).default([]),
-  productDiscounts: z.record(z.string(), z.coerce.number()).optional().default({}),
+  productDiscounts: z.record(z.string(), z.any()).optional().default({}),
 });
 
 type CampaignFormValues = z.infer<typeof campaignSchema>;
+
+interface ProductTargetRowProps {
+  product: any;
+  isSelected: boolean;
+  customDiscount?: number;
+  discountType: string;
+  defaultDiscountValue: number;
+  maxDiscountCap?: number | null;
+  onToggle: (productId: string) => void;
+  onUpdateDiscount: (productId: string, discount?: number) => void;
+}
+
+function ProductTargetRow({
+  product,
+  isSelected,
+  customDiscount,
+  discountType,
+  defaultDiscountValue,
+  maxDiscountCap,
+  onToggle,
+  onUpdateDiscount,
+}: ProductTargetRowProps) {
+  const [val, setVal] = useState<string>(
+    customDiscount !== undefined && customDiscount !== null ? String(customDiscount) : ""
+  );
+
+  useEffect(() => {
+    setVal(customDiscount !== undefined && customDiscount !== null ? String(customDiscount) : "");
+  }, [customDiscount]);
+
+  const hasCustom = customDiscount !== undefined && customDiscount !== null && customDiscount > 0;
+
+  let effectiveDiscount = 0;
+  if (hasCustom) {
+    effectiveDiscount = Number(customDiscount);
+  } else if (discountType === "FLAT_AMOUNT" || discountType === "EXTRA_EXCHANGE_BONUS") {
+    effectiveDiscount = Number(defaultDiscountValue || 0);
+  } else if (discountType === "PERCENTAGE") {
+    effectiveDiscount = Math.round((product.productPrice * Number(defaultDiscountValue || 0)) / 100);
+    if (maxDiscountCap) {
+      effectiveDiscount = Math.min(effectiveDiscount, Number(maxDiscountCap));
+    }
+  }
+
+  const dealPrice = Math.max(0, product.productPrice - effectiveDiscount);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    setVal(raw);
+    const trimmed = raw.trim();
+    if (trimmed === "") {
+      onUpdateDiscount(product.productId, undefined);
+    } else {
+      const num = Number(trimmed);
+      if (!isNaN(num) && num >= 0) {
+        onUpdateDiscount(product.productId, Math.min(num, product.productPrice));
+      }
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "w-full rounded-lg transition-all border select-none overflow-hidden",
+        isSelected
+          ? "bg-red-50/90 border-red-300 text-red-950 dark:bg-red-950/40 dark:text-red-200 dark:border-red-800 shadow-2xs"
+          : "bg-card border-border/60 hover:bg-muted/80 text-foreground"
+      )}
+    >
+      <div
+        role="checkbox"
+        aria-checked={isSelected}
+        tabIndex={0}
+        onClick={() => onToggle(product.productId)}
+        onKeyDown={(e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            onToggle(product.productId);
+          }
+        }}
+        className="flex items-center justify-between p-2 sm:p-2.5 cursor-pointer gap-2 sm:gap-3"
+      >
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+          <div
+            className={cn(
+              "w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors",
+              isSelected ? "bg-red-600 border-red-600 text-white" : "border-input bg-background"
+            )}
+          >
+            {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+          </div>
+
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-md border border-border/60 bg-white flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-2xs">
+            {product.productImage ? (
+              <img
+                src={product.productImage}
+                alt={product.productName}
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <Package className="w-4 h-4 text-muted-foreground/40" />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-foreground text-xs leading-snug truncate" title={product.productName}>
+              {product.productName}
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+              {product.brandName && (
+                <span className="font-semibold text-foreground/80 px-1 py-0.2 rounded bg-muted">
+                  {product.brandName}
+                </span>
+              )}
+              {(product.capacity || product.capacityAh) && <span>{product.capacity || product.capacityAh}</span>}
+              {product.productCategory && (
+                <>
+                  <span>•</span>
+                  <span className="truncate">{product.productCategory}</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="shrink-0 text-right pl-2">
+          <div className="text-xs font-bold font-mono text-foreground whitespace-nowrap">
+            ₹{product.productPrice?.toLocaleString("en-IN") || "0"}
+          </div>
+          {isSelected && (
+            <div className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+              Deal: ₹{dealPrice.toLocaleString("en-IN")}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {isSelected && (
+        <div
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-2.5 py-2 border-t border-red-200/60 dark:border-red-900/40 bg-white/70 dark:bg-black/20 text-[11px]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Tag className="w-3.5 h-3.5 text-red-600 shrink-0" />
+            <span className="font-semibold text-foreground/90 text-xs">Custom Discount:</span>
+            <div className="relative w-28">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-xs">₹</span>
+              <Input
+                type="number"
+                min={0}
+                max={product.productPrice}
+                value={val}
+                placeholder={
+                  discountType === "PERCENTAGE"
+                    ? `${defaultDiscountValue}%`
+                    : `${defaultDiscountValue}`
+                }
+                onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Enter") e.preventDefault();
+                }}
+                className="h-7 text-xs pl-5 pr-1 py-0 font-mono bg-background border-input shadow-2xs"
+              />
+            </div>
+            {hasCustom && (
+              <button
+                type="button"
+                onClick={() => {
+                  setVal("");
+                  onUpdateDiscount(product.productId, undefined);
+                }}
+                className="text-[10px] text-muted-foreground hover:text-red-600 underline cursor-pointer"
+                title="Revert to campaign default discount"
+              >
+                Use Default
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between sm:justify-end gap-2 text-xs font-medium border-t sm:border-t-0 pt-1 sm:pt-0">
+            <span className="text-muted-foreground text-[10px]">Savings:</span>
+            <strong className="text-red-600 font-bold font-mono">
+              ₹{effectiveDiscount.toLocaleString("en-IN")}
+            </strong>
+            {hasCustom ? (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200 font-bold tracking-tight">
+                CUSTOM ₹{Number(customDiscount).toLocaleString("en-IN")}
+              </span>
+            ) : (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                DEFAULT ({discountType === "PERCENTAGE" ? `${defaultDiscountValue}%` : `₹${defaultDiscountValue}`})
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function AdminOffersPage() {
   const qc = useQueryClient();
@@ -197,6 +398,18 @@ function AdminOffersPage() {
 
   const saveMutation = useMutation({
     mutationFn: (values: CampaignFormValues) => {
+      const cleanDiscounts: Record<string, number> = {};
+      if (values.targetType === "CUSTOM_PRODUCTS" && values.productDiscounts) {
+        for (const [pId, val] of Object.entries(values.productDiscounts)) {
+          if (values.productIds?.includes(pId)) {
+            const num = Number(val);
+            if (!isNaN(num) && num > 0) {
+              cleanDiscounts[pId] = num;
+            }
+          }
+        }
+      }
+
       const payload: CreateCampaignRequest = {
         name: values.name,
         slug: values.slug,
@@ -222,7 +435,7 @@ function AdminOffersPage() {
         categoryIds: values.targetType === "CATEGORIES" ? values.categoryIds : [],
         brandIds: values.targetType === "BRANDS" ? values.brandIds : [],
         productIds: values.targetType === "CUSTOM_PRODUCTS" ? values.productIds : [],
-        productDiscounts: values.targetType === "CUSTOM_PRODUCTS" ? values.productDiscounts : {},
+        productDiscounts: values.targetType === "CUSTOM_PRODUCTS" ? cleanDiscounts : {},
       };
 
       if (editingCampaign) {
@@ -312,6 +525,19 @@ function AdminOffersPage() {
   };
 
   const openEditModal = (c: CampaignResponse) => {
+    let initialDiscounts: Record<string, number> = {};
+    if (c.productDiscounts) {
+      if (typeof c.productDiscounts === "string") {
+        try {
+          initialDiscounts = JSON.parse(c.productDiscounts);
+        } catch {
+          initialDiscounts = {};
+        }
+      } else if (typeof c.productDiscounts === "object") {
+        initialDiscounts = { ...c.productDiscounts };
+      }
+    }
+
     setEditingCampaign(c);
     form.reset({
       name: c.name,
@@ -338,7 +564,7 @@ function AdminOffersPage() {
       categoryIds: c.categoryIds || [],
       brandIds: c.brandIds || [],
       productIds: c.productIds || [],
-      productDiscounts: (c as any).productDiscounts || {},
+      productDiscounts: initialDiscounts,
     });
     setActiveTab("basic");
     setProductSearch("");
@@ -349,14 +575,56 @@ function AdminOffersPage() {
 
   // Watchers for reactive UI
   const watchedName = form.watch("name");
-  const watchedTargetType = form.watch("targetType");
-  const watchedDiscountType = form.watch("discountType");
-  const watchedBadgeTheme = form.watch("badgeTheme");
-  const watchedCategoryIds = form.watch("categoryIds") || [];
-  const watchedBrandIds = form.watch("brandIds") || [];
-  const watchedProductIds = form.watch("productIds") || [];
-  const watchedProductDiscounts: Record<string, number> = form.watch("productDiscounts") || {};
+  const watchedTargetType = useWatch({ control: form.control, name: "targetType", defaultValue: "ALL_PRODUCTS" });
+  const watchedDiscountType = useWatch({ control: form.control, name: "discountType", defaultValue: "FLAT_AMOUNT" });
+  const watchedBadgeTheme = useWatch({ control: form.control, name: "badgeTheme", defaultValue: "FESTIVE_GOLD" });
+  const watchedCategoryIds = (useWatch({ control: form.control, name: "categoryIds", defaultValue: [] }) || []) as string[];
+  const watchedBrandIds = (useWatch({ control: form.control, name: "brandIds", defaultValue: [] }) || []) as string[];
+  const watchedProductIds = (useWatch({ control: form.control, name: "productIds", defaultValue: [] }) || []) as string[];
+  const watchedProductDiscounts = (useWatch({ control: form.control, name: "productDiscounts", defaultValue: {} }) || {}) as Record<string, number>;
   const watchedDiscountValue = form.watch("discountValue") || 0;
+
+  const handleToggleProduct = (productId: string) => {
+    const isSelected = watchedProductIds.includes(productId);
+    const updatedIds = isSelected
+      ? watchedProductIds.filter((id) => id !== productId)
+      : [...watchedProductIds, productId];
+    form.setValue("productIds", updatedIds, { shouldDirty: true, shouldValidate: true });
+
+    if (isSelected && watchedProductDiscounts[productId] !== undefined) {
+      const copy = { ...watchedProductDiscounts };
+      delete copy[productId];
+      form.setValue("productDiscounts", copy, { shouldDirty: true, shouldValidate: true });
+    }
+  };
+
+  const handleUpdateProductDiscount = (productId: string, discount?: number) => {
+    const updated = { ...watchedProductDiscounts };
+    if (discount === undefined || isNaN(discount) || discount <= 0) {
+      delete updated[productId];
+    } else {
+      updated[productId] = discount;
+    }
+    form.setValue("productDiscounts", updated, { shouldDirty: true, shouldValidate: true });
+  };
+
+  const onFormSubmitError = (errors: any) => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const firstKey = errorKeys[0];
+      const msg = errors[firstKey]?.message || `Error in ${firstKey}`;
+      toast.error(`Please check form: ${msg}`);
+      if (["name", "slug", "tagline", "description", "startDate", "endDate", "priority"].includes(firstKey)) {
+        setActiveTab("basic");
+      } else if (["badgeText", "badgeTheme", "desktopBannerUrl", "mobileBannerUrl"].includes(firstKey)) {
+        setActiveTab("media");
+      } else if (["discountType", "discountValue", "maxDiscountCap", "minOrderValue", "couponCode"].includes(firstKey)) {
+        setActiveTab("discount");
+      } else if (["targetType", "categoryIds", "brandIds", "productIds", "productDiscounts"].includes(firstKey)) {
+        setActiveTab("targeting");
+      }
+    }
+  };
 
   // Filter campaigns by search query
   const filteredCampaigns = useMemo(() => {
@@ -637,22 +905,43 @@ function AdminOffersPage() {
 
       {/* Create / Edit Campaign Modal Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl w-[96vw] sm:w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-              <Flame className="w-5 h-5 text-red-600" />
-              {editingCampaign ? "Edit Campaign / Offer" : "Create New Campaign / Offer"}
+        <DialogContent className="max-w-4xl w-[96vw] sm:w-[92vw] md:w-full h-[94vh] sm:h-[88vh] max-h-[94vh] flex flex-col p-0 overflow-hidden rounded-xl sm:rounded-2xl gap-0">
+          <DialogHeader className="px-4 py-3 sm:px-6 sm:py-4 border-b shrink-0 flex flex-row items-center justify-between text-left pr-12">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg font-bold">
+              <Flame className="w-5 h-5 text-red-600 shrink-0" />
+              <span className="truncate">{editingCampaign ? "Edit Campaign / Offer" : "Create New Campaign / Offer"}</span>
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={form.handleSubmit((v: any) => saveMutation.mutate(v))} className="space-y-6 pt-2">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto p-1 gap-1">
-                <TabsTrigger value="basic" className="text-xs sm:text-sm py-1.5 px-2 truncate">1. Basic Info</TabsTrigger>
-                <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5 px-2 truncate">2. Banners & Badges</TabsTrigger>
-                <TabsTrigger value="discount" className="text-xs sm:text-sm py-1.5 px-2 truncate">3. Discounts</TabsTrigger>
-                <TabsTrigger value="targeting" className="text-xs sm:text-sm py-1.5 px-2 truncate">4. Targeting</TabsTrigger>
-              </TabsList>
+          <form
+            onSubmit={form.handleSubmit((v: any) => saveMutation.mutate(v), onFormSubmitError)}
+            className="flex-1 flex flex-col min-h-0 overflow-hidden"
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="px-3 sm:px-6 pt-3 shrink-0">
+                <TabsList className="w-full flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-4 h-auto p-1 gap-1 bg-muted/80 rounded-lg">
+                  <TabsTrigger value="basic" className="text-xs sm:text-sm py-1.5 px-3 shrink-0 sm:shrink whitespace-nowrap">
+                    1. Basic Info
+                  </TabsTrigger>
+                  <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5 px-3 shrink-0 sm:shrink whitespace-nowrap">
+                    2. Banners & Badges
+                  </TabsTrigger>
+                  <TabsTrigger value="discount" className="text-xs sm:text-sm py-1.5 px-3 shrink-0 sm:shrink whitespace-nowrap">
+                    3. Discounts
+                  </TabsTrigger>
+                  <TabsTrigger value="targeting" className="text-xs sm:text-sm py-1.5 px-3 shrink-0 sm:shrink whitespace-nowrap">
+                    4. Targeting
+                    {watchedProductIds.length > 0 && watchedTargetType === "CUSTOM_PRODUCTS" && (
+                      <span className="ml-1.5 px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-bold">
+                        {watchedProductIds.length}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* Scrollable Form Body */}
+              <div className="flex-1 overflow-y-auto px-4 py-3 sm:px-6 sm:py-4 min-h-0">
 
               {/* TAB 1: BASIC INFO & TIMING */}
               <TabsContent value="basic" className="space-y-4 pt-4">
@@ -1180,7 +1469,7 @@ function AdminOffersPage() {
                     </div>
 
                     {/* Product List with Image Thumbnail & Guaranteed Price Column */}
-                    <div className="space-y-1.5 max-h-72 sm:max-h-80 overflow-y-auto overflow-x-hidden p-2 border rounded-lg bg-muted/20">
+                    <div className="space-y-2 max-h-[48vh] sm:max-h-[52vh] overflow-y-auto p-2 border rounded-lg bg-muted/20">
                       {filteredProducts.length === 0 ? (
                         <div className="py-10 text-center text-xs text-muted-foreground space-y-2">
                           <Package className="w-8 h-8 mx-auto opacity-40 text-muted-foreground" />
@@ -1196,239 +1485,53 @@ function AdminOffersPage() {
                           )}
                         </div>
                       ) : (
-                        filteredProducts.map((p) => {
-                          const isSelected = watchedProductIds.includes(p.productId);
-                          const customDiscountValue = watchedProductDiscounts[p.productId];
-                          const hasCustomDiscount = customDiscountValue !== undefined && customDiscountValue !== null;
-
-                          let effectiveDiscount = 0;
-                          if (hasCustomDiscount) {
-                            effectiveDiscount = Number(customDiscountValue);
-                          } else if (watchedDiscountType === "FLAT_AMOUNT") {
-                            effectiveDiscount = Number(watchedDiscountValue || 0);
-                          } else if (watchedDiscountType === "PERCENTAGE") {
-                            effectiveDiscount = Math.round((p.productPrice * Number(watchedDiscountValue || 0)) / 100);
-                            if (form.watch("maxDiscountCap")) {
-                              effectiveDiscount = Math.min(effectiveDiscount, Number(form.watch("maxDiscountCap")));
-                            }
-                          } else if (watchedDiscountType === "EXTRA_EXCHANGE_BONUS") {
-                            effectiveDiscount = Number(watchedDiscountValue || 0);
-                          }
-
-                          const dealPrice = Math.max(0, p.productPrice - effectiveDiscount);
-
-                          return (
-                            <div
-                              key={p.productId}
-                              className={cn(
-                                "w-full rounded-lg transition-all border select-none focus-within:ring-2 focus-within:ring-red-500",
-                                isSelected
-                                  ? "bg-red-50/90 border-red-300 text-red-950 dark:bg-red-950/40 dark:text-red-200 dark:border-red-800 shadow-2xs"
-                                  : "bg-card border-border/60 hover:bg-muted/80 text-foreground"
-                              )}
-                            >
-                              {/* Main Clickable Row: Checkbox, Thumbnail, Title, Price */}
-                              <div
-                                role="checkbox"
-                                aria-checked={isSelected}
-                                tabIndex={0}
-                                onClick={() => {
-                                  const updated = isSelected
-                                    ? watchedProductIds.filter((id) => id !== p.productId)
-                                    : [...watchedProductIds, p.productId];
-                                  form.setValue("productIds", updated, { shouldDirty: true });
-                                  if (isSelected) {
-                                    const copy = { ...watchedProductDiscounts };
-                                    delete copy[p.productId];
-                                    form.setValue("productDiscounts", copy, { shouldDirty: true });
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === " " || e.key === "Enter") {
-                                    e.preventDefault();
-                                    const updated = isSelected
-                                      ? watchedProductIds.filter((id) => id !== p.productId)
-                                      : [...watchedProductIds, p.productId];
-                                    form.setValue("productIds", updated, { shouldDirty: true });
-                                    if (isSelected) {
-                                      const copy = { ...watchedProductDiscounts };
-                                      delete copy[p.productId];
-                                      form.setValue("productDiscounts", copy, { shouldDirty: true });
-                                    }
-                                  }
-                                }}
-                                className="flex items-center justify-between p-2 cursor-pointer gap-2.5"
-                              >
-                                {/* Left: Checkbox + Photo + Product Info */}
-                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                  {/* Checkbox */}
-                                  <div
-                                    className={cn(
-                                      "w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors",
-                                      isSelected
-                                        ? "bg-red-600 border-red-600 text-white"
-                                        : "border-input bg-background"
-                                    )}
-                                  >
-                                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                                  </div>
-
-                                  {/* Product Photo Thumbnail */}
-                                  <div className="w-10 h-10 rounded-md border border-border/60 bg-white flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-2xs">
-                                    {p.productImage ? (
-                                      <img
-                                        src={p.productImage}
-                                        alt={p.productName}
-                                        className="w-full h-full object-contain"
-                                        loading="lazy"
-                                      />
-                                    ) : (
-                                      <Package className="w-4 h-4 text-muted-foreground/40" />
-                                    )}
-                                  </div>
-
-                                  {/* Product Titles & Brand/Capacity Subtitles */}
-                                  <div className="min-w-0 flex-1">
-                                    <div
-                                      className="font-semibold text-foreground text-xs leading-snug truncate"
-                                      title={p.productName}
-                                    >
-                                      {p.productName}
-                                    </div>
-                                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
-                                      {p.brandName && (
-                                        <span className="font-semibold text-foreground/80 px-1 py-0.2 rounded bg-muted">
-                                          {p.brandName}
-                                        </span>
-                                      )}
-                                      {(p.capacity || p.capacityAh) && (
-                                        <span>{p.capacity || p.capacityAh}</span>
-                                      )}
-                                      {p.productCategory && (
-                                        <>
-                                          <span>•</span>
-                                          <span className="truncate">{p.productCategory}</span>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Right: Price + Deal Price */}
-                                <div className="shrink-0 text-right pl-2">
-                                  <div className="text-xs font-bold font-mono text-foreground whitespace-nowrap">
-                                    ₹{p.productPrice?.toLocaleString("en-IN") || "0"}
-                                  </div>
-                                  {isSelected && (
-                                    <div className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                                      Deal: ₹{dealPrice.toLocaleString("en-IN")}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Custom Discount Config Strip (Visible when checked) */}
-                              {isSelected && (
-                                <div
-                                  className="flex flex-wrap items-center justify-between gap-2 px-2.5 py-1.5 border-t border-red-200/60 dark:border-red-900/40 bg-white/70 dark:bg-black/20 rounded-b-lg text-[11px]"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <Tag className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                                    <span className="font-semibold text-foreground/90 text-xs">Custom Discount:</span>
-                                    <div className="relative w-28">
-                                      <span className="absolute left-2 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-xs">₹</span>
-                                      <Input
-                                        type="number"
-                                        min={0}
-                                        max={p.productPrice}
-                                        value={hasCustomDiscount ? customDiscountValue : ""}
-                                        placeholder={
-                                          watchedDiscountType === "PERCENTAGE"
-                                            ? `${watchedDiscountValue}%`
-                                            : `${watchedDiscountValue}`
-                                        }
-                                        onChange={(e) => {
-                                          const val = e.target.value.trim();
-                                          const num = val === "" ? undefined : Math.max(0, Number(val));
-                                          const updated = { ...watchedProductDiscounts };
-                                          if (num === undefined || isNaN(num)) {
-                                            delete updated[p.productId];
-                                          } else {
-                                            updated[p.productId] = num;
-                                          }
-                                          form.setValue("productDiscounts", updated, { shouldDirty: true });
-                                        }}
-                                        className="h-6.5 text-xs pl-5 pr-1 py-0 font-mono bg-background border-input shadow-2xs"
-                                      />
-                                    </div>
-                                    {hasCustomDiscount && (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const updated = { ...watchedProductDiscounts };
-                                          delete updated[p.productId];
-                                          form.setValue("productDiscounts", updated, { shouldDirty: true });
-                                        }}
-                                        className="text-[10px] text-muted-foreground hover:text-red-600 underline cursor-pointer"
-                                        title="Revert to campaign default discount"
-                                      >
-                                        Use Default
-                                      </button>
-                                    )}
-                                  </div>
-
-                                  <div className="flex items-center gap-1.5 text-xs font-medium ml-auto">
-                                    <span className="text-muted-foreground text-[10px]">You save:</span>
-                                    <strong className="text-red-600 font-bold font-mono">
-                                      ₹{effectiveDiscount.toLocaleString("en-IN")}
-                                    </strong>
-                                    {hasCustomDiscount ? (
-                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200 font-bold tracking-tight">
-                                        CUSTOM
-                                      </span>
-                                    ) : (
-                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-                                        DEFAULT
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
+                        filteredProducts.map((p) => (
+                          <ProductTargetRow
+                            key={p.productId}
+                            product={p}
+                            isSelected={watchedProductIds.includes(p.productId)}
+                            customDiscount={watchedProductDiscounts[p.productId]}
+                            discountType={watchedDiscountType}
+                            defaultDiscountValue={Number(watchedDiscountValue || 0)}
+                            maxDiscountCap={form.watch("maxDiscountCap")}
+                            onToggle={handleToggleProduct}
+                            onUpdateDiscount={handleUpdateProductDiscount}
+                          />
+                        ))
                       )}
                     </div>
                   </div>
                 )}
               </TabsContent>
-            </Tabs>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-4 border-t gap-3 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancel
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  type="submit"
-                  disabled={saveMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700 text-white font-semibold whitespace-nowrap shadow-sm"
-                >
-                  {saveMutation.isPending && <Spinner className="w-4 h-4 mr-2" />}
-                  {editingCampaign ? "Save Changes" : "Create Campaign"}
-                </Button>
-              </div>
             </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </Tabs>
+
+          {/* Pinned Modal Footer */}
+          <div className="px-4 py-3 sm:px-6 border-t bg-muted/30 shrink-0 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsModalOpen(false)}
+              className="h-9 text-xs sm:text-sm"
+            >
+              Cancel
+            </Button>
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="submit"
+                disabled={saveMutation.isPending}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold text-xs sm:text-sm h-9 px-4 sm:px-5 whitespace-nowrap shadow-sm cursor-pointer"
+              >
+                {saveMutation.isPending && <Spinner className="w-4 h-4 mr-2" />}
+                {editingCampaign ? "Save Changes" : "Create Campaign"}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
     </div>
   );
 }
