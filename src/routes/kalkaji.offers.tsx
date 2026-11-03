@@ -525,16 +525,23 @@ function AdminOffersPage() {
   };
 
   const openEditModal = (c: CampaignResponse) => {
-    let initialDiscounts: Record<string, number> = {};
+    const initialDiscounts: Record<string, number> = {};
     if (c.productDiscounts) {
+      let rawObj: any = c.productDiscounts;
       if (typeof c.productDiscounts === "string") {
         try {
-          initialDiscounts = JSON.parse(c.productDiscounts);
+          rawObj = JSON.parse(c.productDiscounts);
         } catch {
-          initialDiscounts = {};
+          rawObj = {};
         }
-      } else if (typeof c.productDiscounts === "object") {
-        initialDiscounts = { ...c.productDiscounts };
+      }
+      if (rawObj && typeof rawObj === "object") {
+        for (const [pId, val] of Object.entries(rawObj)) {
+          const num = Number(val);
+          if (!isNaN(num) && num > 0) {
+            initialDiscounts[pId] = Math.round(num);
+          }
+        }
       }
     }
 
@@ -585,21 +592,26 @@ function AdminOffersPage() {
   const watchedDiscountValue = form.watch("discountValue") || 0;
 
   const handleToggleProduct = (productId: string) => {
-    const isSelected = watchedProductIds.includes(productId);
+    const currentProductIds = (form.getValues("productIds") || []) as string[];
+    const isSelected = currentProductIds.includes(productId);
     const updatedIds = isSelected
-      ? watchedProductIds.filter((id) => id !== productId)
-      : [...watchedProductIds, productId];
+      ? currentProductIds.filter((id) => id !== productId)
+      : [...currentProductIds, productId];
     form.setValue("productIds", updatedIds, { shouldDirty: true, shouldValidate: true });
 
-    if (isSelected && watchedProductDiscounts[productId] !== undefined) {
-      const copy = { ...watchedProductDiscounts };
-      delete copy[productId];
-      form.setValue("productDiscounts", copy, { shouldDirty: true, shouldValidate: true });
+    if (isSelected) {
+      const currentDiscounts = (form.getValues("productDiscounts") || {}) as Record<string, number>;
+      if (currentDiscounts[productId] !== undefined) {
+        const copy = { ...currentDiscounts };
+        delete copy[productId];
+        form.setValue("productDiscounts", copy, { shouldDirty: true, shouldValidate: true });
+      }
     }
   };
 
   const handleUpdateProductDiscount = (productId: string, discount?: number) => {
-    const updated = { ...watchedProductDiscounts };
+    const currentDiscounts = (form.getValues("productDiscounts") || {}) as Record<string, number>;
+    const updated = { ...currentDiscounts };
     if (discount === undefined || isNaN(discount) || discount <= 0) {
       delete updated[productId];
     } else {
@@ -1452,7 +1464,8 @@ function AdminOffersPage() {
                                 watchedProductIds.filter((id) => !filteredIds.includes(id)),
                                 { shouldDirty: true }
                               );
-                              const copy = { ...watchedProductDiscounts };
+                              const currentDiscounts = (form.getValues("productDiscounts") || {}) as Record<string, number>;
+                              const copy = { ...currentDiscounts };
                               filteredIds.forEach((id) => delete copy[id]);
                               form.setValue("productDiscounts", copy, { shouldDirty: true });
                             } else {
