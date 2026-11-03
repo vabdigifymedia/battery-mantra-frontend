@@ -112,11 +112,15 @@ export function ProductCard({
     ? campaignCalc.finalPrice
     : exchangePrice;
 
-  const basePriceForSavings = product.originalPrice && product.originalPrice > product.productPrice 
-    ? product.originalPrice 
-    : product.productPrice;
+  const productMrp = (product as any).originalPrice || (product as any).mrp || (product as any).specs?.originalPrice || (product as any).specs?.mrp;
+  const basePriceForSavings = productMrp && Number(productMrp) > product.productPrice 
+    ? Number(productMrp) 
+    : (product.originalPrice && product.originalPrice > product.productPrice ? product.originalPrice : product.productPrice);
   const totalSavings = basePriceForSavings - effectivePrice;
   const showSavings = totalSavings > 0;
+  const percentSavings = showSavings && basePriceForSavings > 0
+    ? Math.round(((basePriceForSavings - effectivePrice) / basePriceForSavings) * 100)
+    : 0;
 
   // Helper to extract clean "XX Ah" strictly
   const extractAh = (text: unknown): string | null => {
@@ -416,6 +420,7 @@ export function ProductCard({
               {showSavings && (
                 <span className="text-emerald-700 sm:text-red-600 font-bold whitespace-nowrap">
                   Save ₹{totalSavings.toLocaleString("en-IN")}
+                  {percentSavings > 0 && ` (${percentSavings}% OFF)`}
                 </span>
               )}
             </div>

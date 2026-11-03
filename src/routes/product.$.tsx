@@ -499,10 +499,17 @@ export function PdpPage() {
         ? productMrp
         : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
 
-  const hasDiscount = Boolean(strikePrice && strikePrice > currentPrice);
+  const hasDiscount = Boolean((strikePrice && strikePrice > currentPrice) || (productMrp && productMrp > currentPrice));
 
-  const discountPercent = hasDiscount && strikePrice
-    ? Math.round(((strikePrice - currentPrice) / strikePrice) * 100)
+  // Option A: Reference original MRP for overall % OFF so user sees total savings from MRP
+  const referencePriceForDiscount = (productMrp && productMrp > currentPrice)
+    ? productMrp
+    : (basePriceForSavings && basePriceForSavings > currentPrice
+        ? basePriceForSavings
+        : (strikePrice && strikePrice > currentPrice ? strikePrice : null));
+
+  const discountPercent = referencePriceForDiscount && referencePriceForDiscount > currentPrice
+    ? Math.round(((referencePriceForDiscount - currentPrice) / referencePriceForDiscount) * 100)
     : 0;
 
   const campaignThemeStyles = getCampaignThemeStyles(matchedCampaign?.badgeTheme);
@@ -997,9 +1004,11 @@ export function PdpPage() {
                           MRP ₹{productMrp.toLocaleString()}
                         </span>
                       )}
-                      <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
-                        {discountPercent}% OFF
-                      </Badge>
+                      {discountPercent > 0 && (
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
+                          {discountPercent}% OFF
+                        </Badge>
+                      )}
                     </>
                   )}
                 </div>
