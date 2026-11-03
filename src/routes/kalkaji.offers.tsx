@@ -396,6 +396,12 @@ function AdminOffersPage() {
     },
   });
 
+  const refreshCampaigns = () => {
+    qc.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+    qc.invalidateQueries({ queryKey: ["admin", "campaigns"] });
+    qc.refetchQueries({ queryKey: queryKeys.campaigns.admin() });
+  };
+
   const saveMutation = useMutation({
     mutationFn: (values: CampaignFormValues) => {
       const cleanDiscounts: Record<string, number> = {};
@@ -444,7 +450,7 @@ function AdminOffersPage() {
       return campaignService.createCampaign(payload);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      refreshCampaigns();
       toast.success(editingCampaign ? "Campaign updated successfully!" : "Campaign created successfully!");
       setIsModalOpen(false);
       setEditingCampaign(null);
@@ -458,7 +464,7 @@ function AdminOffersPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => campaignService.deleteCampaign(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      refreshCampaigns();
       toast.success("Campaign deleted successfully");
     },
     onError: (err: any) => {
@@ -469,7 +475,7 @@ function AdminOffersPage() {
   const toggleStatusMutation = useMutation({
     mutationFn: (id: string) => campaignService.toggleCampaignStatus(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      refreshCampaigns();
       toast.success("Campaign status updated");
     },
     onError: (err: any) => {
@@ -709,7 +715,7 @@ function AdminOffersPage() {
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
               The campaigns endpoint is currently initializing or backend is restarting.
             </p>
-            <Button onClick={() => qc.invalidateQueries({ queryKey: queryKeys.campaigns.all })} size="sm" variant="outline">
+            <Button onClick={refreshCampaigns} size="sm" variant="outline">
               <RefreshCw className="w-4 h-4 mr-1" /> Retry
             </Button>
           </div>
