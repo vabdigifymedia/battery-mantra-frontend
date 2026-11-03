@@ -63,7 +63,10 @@ export function formatCampaignDiscountLabel(
   if (campaign.discountType === "EXTRA_EXCHANGE_BONUS") {
     return `+₹${Number(campaign.discountValue || 0).toLocaleString()} Extra Exchange Bonus`;
   }
-  return campaign.badgeText || "Special Offer";
+  if (campaign.discountType === "SHOWCASE_ONLY") {
+    return "";
+  }
+  return "";
 }
 
 export function isProductEligibleForCampaign(
@@ -164,7 +167,7 @@ export function calculateProductCampaignDiscount(
       isCustomDiscount: true,
       isCouponEligible: false, // Non-stackable: Product already on exclusive deal
       campaign,
-      badgeLabel: campaign.badgeText || `Save ₹${Math.round(discountAmount).toLocaleString("en-IN")}`,
+      badgeLabel: discountAmount > 0 ? `Save ₹${Math.round(discountAmount).toLocaleString("en-IN")}` : (campaign.badgeText || "Special Offer"),
     };
   }
 
@@ -221,7 +224,7 @@ export function calculateProductCampaignDiscount(
     isCustomDiscount: false,
     isCouponEligible: roundedDiscount === 0, // only eligible for coupons if no discount was deducted
     campaign,
-    badgeLabel: campaign.badgeText || formatCampaignDiscountLabel(campaign, product),
+    badgeLabel: formatCampaignDiscountLabel(campaign, product) || campaign.badgeText || "Special Offer",
   };
 }
 

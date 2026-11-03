@@ -513,6 +513,16 @@ export function PdpPage() {
     : 0;
 
   const campaignThemeStyles = getCampaignThemeStyles(matchedCampaign?.badgeTheme);
+  const campaignHeading = (matchedCampaign?.badgeText || matchedCampaign?.name || "Offer").trim();
+  const rawCampaignRule = (
+    activeCampaignCalc.hasCampaignDiscount
+      ? `Save ₹${activeCampaignCalc.discountAmount.toLocaleString("en-IN")}`
+      : (activeCampaignCalc.badgeLabel || (matchedCampaign ? formatCampaignDiscountLabel(matchedCampaign, data as any) : ""))
+  ).trim();
+  const isRuleRedundant = !rawCampaignRule || rawCampaignRule.toLowerCase() === campaignHeading.toLowerCase();
+  const campaignBadgeText = isRuleRedundant
+    ? campaignHeading
+    : `${campaignHeading} • ${rawCampaignRule}`;
 
   // Generate consistent mock rating & sales data based on product name/id
   const charCodeSum = (data.productName || data.productId || "").split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
@@ -816,7 +826,7 @@ export function PdpPage() {
                       )}
                     >
                       <SparklesIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span>{matchedCampaign.badgeText || matchedCampaign.name} — {activeCampaignCalc.badgeLabel || formatCampaignDiscountLabel(matchedCampaign, data as any)}</span>
+                      <span>{campaignBadgeText}</span>
                     </Link>
                   </div>
                 )}
