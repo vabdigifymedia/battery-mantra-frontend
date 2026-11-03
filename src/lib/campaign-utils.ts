@@ -67,10 +67,10 @@ export function formatCampaignDiscountLabel(
 }
 
 export function isProductEligibleForCampaign(
-  product: ProductListResponse,
+  product: ProductListResponse | any,
   campaign: CampaignResponse
 ): boolean {
-  if (!campaign.isActive) return false;
+  if (!product || !campaign || !campaign.isActive) return false;
 
   const now = new Date();
   if (campaign.startDate && new Date(campaign.startDate) > now) return false;
@@ -90,7 +90,7 @@ export function isProductEligibleForCampaign(
       if (product.categoryId && campaign.categoryIds.includes(product.categoryId)) {
         return true;
       }
-      if (product.categories && product.categories.some((c) => campaign.categoryIds?.includes(c.categoryId))) {
+      if (product.categories && product.categories.some((c: any) => campaign.categoryIds?.includes(c.categoryId))) {
         return true;
       }
       return false;

@@ -48,6 +48,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isDashboardPage = pathname.startsWith("/kalkaji") || pathname.startsWith("/account");
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password");
   const isStandalonePage = pathname.startsWith("/staff-privacy-policy");
+  const isPdpPage = pathname.startsWith("/product/");
+  const isCheckoutPage = pathname.startsWith("/checkout");
 
   if (isDashboardPage || isAuthPage || isStandalonePage) {
     return (
@@ -67,14 +69,16 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <CampaignAnnouncementBar />
-      <Navbar />
+      <div className={isPdpPage ? "hidden sm:block" : ""}>
+        <CampaignAnnouncementBar />
+        <Navbar />
+      </div>
       <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">
         {children}
       </main>
       <FeatureStrip />
       <Footer groups={FOOTER_GROUPS} />
-      <MobileBottomNav />
+      {!isPdpPage && !isCheckoutPage && <MobileBottomNav />}
       <EmergencyFAB />
       <AutoEngagementManager />
     </div>

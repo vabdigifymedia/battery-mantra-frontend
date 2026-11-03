@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { z } from "zod";
 import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles } from "lucide-react";
 import { Container } from "@/components/layout/Container";
@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddressSelector } from "@/components/checkout/AddressSelector";
 import { Price } from "@/components/common/Price";
 import { EmptyState } from "@/components/feedback/EmptyState";
+import { ErrorState } from "@/components/feedback/ErrorState";
 import { Spinner } from "@/components/feedback/Spinner";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { useAuth } from "@/providers/AuthProvider";
@@ -36,9 +37,11 @@ import { matchCity } from "@/lib/cityMatcher";
 import { pageSeoQuery } from "@/queries";
 import { buildPageHead } from "@/lib/seo";
 
-const searchSchema = z.object({
-  addressId: z.string().uuid().optional(),
-});
+const searchSchema = z
+  .object({
+    addressId: z.string().optional().catch(undefined),
+  })
+  .catch({});
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: searchSchema,
@@ -55,6 +58,15 @@ export const Route = createFileRoute("/checkout")({
       title: "Checkout — BatteryMantra",
       description: "Review your order and place it securely.",
     }),
+  errorComponent: ({ error, reset }) => (
+    <Container size="lg" className="py-16">
+      <ErrorState
+        title="Unable to load checkout"
+        description="There was an issue loading your checkout session. Please refresh or try again."
+        onRetry={reset}
+      />
+    </Container>
+  ),
   component: CheckoutPage,
 });
 
@@ -76,6 +88,16 @@ function CheckoutPage() {
   const selectedAddress = addresses?.find((a) => a.addressId === addressId);
   const hasValidAddress = /^[0-9a-fA-F-]{36}$/.test(addressId);
   const postalCode = selectedAddress?.postalCode?.trim() ?? "";
+
+  // Auto-select default or first address if none selected
+  useEffect(() => {
+    if (!addressId && addresses && addresses.length > 0) {
+      const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0];
+      if (defaultAddr) {
+        setAddressId(defaultAddr.addressId);
+      }
+    }
+  }, [addressId, addresses]);
 
   // Public serviceable cities query
   const { data: publicCities } = useQuery({
@@ -270,10 +292,10 @@ function CheckoutPage() {
               orderId: verifyRes.orderId || orderRes.orderId,
               totalAmount: orderRes.amount ? orderRes.amount / 100 : 0,
               items: items.map((it: any) => ({
-                id: it.product.productId,
-                name: it.product.productName,
-                price: it.product.productPrice,
-                quantity: it.quantity,
+                id: it?.product?.productId || it?.cartItemId,
+                name: it?.product?.productName || "Product",
+                price: it?.product?.productPrice || 0,
+                quantity: it?.quantity || 1,
               })),
             });
             toast.success("Payment successful! Order confirmed.");
@@ -296,12 +318,24 @@ function CheckoutPage() {
     }
   };
 
-  if (status === "loading") return <FullPageLoader />;
+  if (status === "loading" || cart.isLoading) return <FullPageLoader />;
   if (status !== "authenticated")
     return <Navigate to="/login" search={{ redirect: "/checkout" }} />;
 
+  if (cart.isError) {
+    return (
+      <Container size="lg" className="py-12">
+        <ErrorState
+          title="Unable to load your cart"
+          description="We couldn't retrieve your cart details. Please try refreshing or check back."
+          onRetry={() => void cart.refetch()}
+        />
+      </Container>
+    );
+  }
+
   const items = cart.data?.cartItems ?? [];
-  const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
+  const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + (it?.product?.productPrice ?? 0) * (it?.quantity ?? 1), 0);
   const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
   const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
 
@@ -317,6 +351,7 @@ function CheckoutPage() {
     const campaignNamesSet = new Set<string>();
 
     for (const item of items) {
+      if (!item?.product) continue;
       const matched = activeCampaigns
         .filter((c) => isProductEligibleForCampaign(item.product, c))
         .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
@@ -324,8 +359,8 @@ function CheckoutPage() {
       if (matched) {
         const calc = calculateProductCampaignDiscount(item.product, matched, Boolean(item.exchangeOldBattery));
         if (calc.hasCampaignDiscount) {
-          totalCampaignDiscount += calc.discountAmount * item.quantity;
-          const itemBase = (item.product.productPrice - (item.exchangeOldBattery ? (item.product.exchangeDiscount || 0) : 0)) * item.quantity;
+          totalCampaignDiscount += calc.discountAmount * (item.quantity || 1);
+          const itemBase = ((item.product.productPrice || 0) - (item.exchangeOldBattery ? (item.product.exchangeDiscount || 0) : 0)) * (item.quantity || 1);
           dealItemsSubtotal += itemBase;
           campaignNamesSet.add(matched.name);
         }
@@ -383,7 +418,7 @@ function CheckoutPage() {
     toast.success("Coupon removed");
   };
 
-  if (!cart.isLoading && items.length === 0) {
+  if (items.length === 0) {
     return (
       <Container size="lg" className="py-12">
         <EmptyState
@@ -405,13 +440,17 @@ function CheckoutPage() {
   const canPlace = hasValidAddress && !isUnserviceable && !isCheckingServiceability && items.length > 0 && !isProcessing && hasValidDelivery;
 
   return (
-    <div className="bg-muted/20 min-h-screen pb-16">
-      <PageHeader title="Secure Checkout" description="Complete your order securely." className="bg-background border-b mb-8 shadow-sm" />
+    <div className="bg-muted/20 min-h-screen pb-20 sm:pb-16">
+      <PageHeader
+        title="Secure Checkout"
+        description="Complete your order securely."
+        className="bg-background border-b mb-4 sm:mb-8 shadow-xs py-3.5 sm:py-6"
+      />
       
-      <Container size="xl" className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] items-start">
+      <Container size="xl" className="grid gap-4 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_380px] items-start px-3 sm:px-6">
         
         {/* LEFT COLUMN: ACCORDION STEPS */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           
           {/* STEP 1: LOGIN */}
           <CheckoutStep 
@@ -445,9 +484,9 @@ function CheckoutPage() {
 
             {/* Serviceability / Price Adjustment Notices */}
             {hasValidAddress && (
-              <div className="mt-5 space-y-4">
+              <div className="mt-4 sm:mt-5 space-y-3 sm:space-y-4">
                 {isCheckingServiceability && (
-                  <div className="flex items-center gap-2.5 rounded-xl border border-muted bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2.5 rounded-xl border border-muted bg-muted/40 px-3.5 py-2.5 text-xs text-muted-foreground">
                     <Spinner size="sm" />
                     <span>Verifying delivery network serviceability for {postalCode}...</span>
                   </div>
@@ -474,10 +513,11 @@ function CheckoutPage() {
               </div>
             )}
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <Button 
                 variant="brand" 
                 size="lg" 
+                className="w-full sm:w-auto min-w-[160px]"
                 disabled={!hasValidAddress || isUnserviceable || isCheckingServiceability} 
                 onClick={() => setActiveStep(3)}
               >
@@ -504,29 +544,29 @@ function CheckoutPage() {
             onEdit={() => setActiveStep(3)}
             summary={deliveryMethod.replace('_', ' ')}
           >
-            <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod} className="space-y-4">
-              <div className={`flex items-start space-x-3 rounded-xl border p-4 transition-colors ${deliveryMethod === "STANDARD_DELIVERY" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
+            <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod} className="space-y-3 sm:space-y-4">
+              <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "STANDARD_DELIVERY" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                 <RadioGroupItem value="STANDARD_DELIVERY" id="delivery-standard" className="mt-1" />
                 <Label htmlFor="delivery-standard" className="cursor-pointer font-medium flex-1">
-                  <div>Standard Delivery</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-1">Free delivery within 3-5 business days.</div>
+                  <div className="text-sm sm:text-base font-semibold">Standard Delivery</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-0.5">Free delivery within 3-5 business days.</div>
                 </Label>
               </div>
-              <div className={`flex items-start space-x-3 rounded-xl border p-4 transition-colors ${deliveryMethod === "STORE_PICKUP" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
+              <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "STORE_PICKUP" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                 <RadioGroupItem value="STORE_PICKUP" id="delivery-pickup" className="mt-1" />
                 <Label htmlFor="delivery-pickup" className="cursor-pointer font-medium flex-1">
-                  <div>Store Pickup</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-1">Pick up your battery from our nearest partner garage.</div>
+                  <div className="text-sm sm:text-base font-semibold">Store Pickup</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-0.5">Pick up your battery from our nearest partner garage.</div>
                 </Label>
               </div>
-              <div className={`flex items-start space-x-3 rounded-xl border p-4 transition-colors ${deliveryMethod === "HOME_INSTALLATION" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
+              <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "HOME_INSTALLATION" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                 <RadioGroupItem value="HOME_INSTALLATION" id="delivery-install" className="mt-1" />
                 <Label htmlFor="delivery-install" className="cursor-pointer font-medium flex-1">
-                  <div>Home Installation</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-1">A technician will arrive at your location to install the battery.</div>
+                  <div className="text-sm sm:text-base font-semibold">Home Installation</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-0.5">A technician will arrive at your location to install the battery.</div>
                   
                   {deliveryMethod === "HOME_INSTALLATION" && (
-                    <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="mt-3.5 animate-in fade-in slide-in-from-top-2">
                       <Label htmlFor="install-date" className="mb-1.5 block text-xs">Select Installation Date</Label>
                       <Input 
                         id="install-date" 
@@ -542,10 +582,11 @@ function CheckoutPage() {
                 </Label>
               </div>
             </RadioGroup>
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <Button 
                 variant="brand" 
                 size="lg" 
+                className="w-full sm:w-auto min-w-[160px]"
                 disabled={!hasValidDelivery} 
                 onClick={() => setActiveStep(4)}
               >
@@ -564,25 +605,28 @@ function CheckoutPage() {
             summary={`${items.length} item(s)`}
           >
             <div className="border rounded-xl overflow-hidden divide-y">
-              {items.map((it) => (
-                <div key={it.cartItemId} className="flex items-center gap-4 p-4 bg-background">
-                  <div className="h-16 w-16 bg-muted rounded-md border flex items-center justify-center shrink-0">
-                    {it.product.productImage ? (
-                      <img src={it.product.productImage} alt={it.product.productName} className="h-full w-full object-contain p-1" />
-                    ) : (
-                      <span className="text-xs text-muted-foreground">No img</span>
-                    )}
+              {items.map((it) => {
+                if (!it?.product) return null;
+                return (
+                  <div key={it.cartItemId} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-background">
+                    <div className="h-14 w-14 sm:h-16 sm:w-16 bg-muted rounded-md border flex items-center justify-center shrink-0">
+                      {it.product.productImage ? (
+                        <img src={it.product.productImage} alt={it.product.productName || "Product"} className="h-full w-full object-contain p-1" />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No img</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-xs sm:text-sm text-foreground truncate">{it.product.productName || "Product"}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Qty: {it.quantity}</p>
+                    </div>
+                    <Price value={(it.product.productPrice || 0) * it.quantity} size="sm" className="font-bold sm:text-base shrink-0" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-foreground truncate">{it.product.productName}</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">Qty: {it.quantity}</p>
-                  </div>
-                  <Price value={it.product.productPrice * it.quantity} size="md" className="font-bold" />
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <div className="mt-6">
-              <Button variant="brand" size="lg" onClick={() => setActiveStep(5)}>
+            <div className="mt-5 sm:mt-6">
+              <Button variant="brand" size="lg" className="w-full sm:w-auto min-w-[160px]" onClick={() => setActiveStep(5)}>
                 Continue
               </Button>
             </div>
@@ -595,7 +639,7 @@ function CheckoutPage() {
             active={activeStep === 5} 
             completed={false}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
               <PaymentOption
                 active={paymentMethod === "COD"}
                 onClick={() => setPaymentMethod("COD")}
@@ -612,14 +656,14 @@ function CheckoutPage() {
               />
             </div>
             {paymentMethod === "ONLINE" && (
-              <p className="mt-4 rounded-md bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary flex items-center gap-2">
+              <p className="mt-3.5 sm:mt-4 rounded-md bg-primary/10 border border-primary/20 px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-primary flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 shrink-0" />
                 Online payment will be initiated securely after order placement.
               </p>
             )}
 
             {isUnserviceable && (
-              <div className="mt-6">
+              <div className="mt-5 sm:mt-6">
                 <ServiceabilityWarningCTA
                   postalCode={selectedAddress?.postalCode}
                   cityName={selectedAddress?.city}
@@ -629,11 +673,15 @@ function CheckoutPage() {
               </div>
             )}
 
-            <div className="mt-8 flex justify-end pt-4 border-t">
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t">
+              <div className="flex items-center justify-between sm:block">
+                <span className="text-xs text-muted-foreground uppercase tracking-wider block">Total Payable</span>
+                <Price value={totalAmount} size="lg" className="font-extrabold text-foreground" />
+              </div>
               <Button
                 variant="brand"
                 size="lg"
-                className="w-full sm:w-auto min-w-[200px] text-lg h-12 shadow-md shadow-brand/20"
+                className="w-full sm:w-auto min-w-[200px] text-base sm:text-lg h-12 shadow-md shadow-brand/20"
                 disabled={!canPlace}
                 onClick={handlePlaceOrder}
               >
@@ -643,7 +691,7 @@ function CheckoutPage() {
                   : isCheckingServiceability
                   ? "Checking Serviceability..."
                   : paymentMethod === "ONLINE"
-                  ? "Pay Now"
+                  ? `Pay Now`
                   : "Place Order"}
               </Button>
             </div>
@@ -651,10 +699,10 @@ function CheckoutPage() {
 
         </div>
 
-        {/* RIGHT COLUMN: STICKY ORDER SUMMARY */}
-        <aside className="sticky top-24 rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-          <div className="bg-muted/30 border-b p-5 flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wide">Price Details</h2>
+        {/* RIGHT COLUMN: ORDER SUMMARY */}
+        <aside className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden lg:sticky lg:top-24">
+          <div className="bg-muted/30 border-b p-4 sm:p-5 flex items-center justify-between">
+            <h2 className="font-display text-base sm:text-lg font-semibold text-foreground uppercase tracking-wide">Price Details</h2>
             {effectiveCity && (
               <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
@@ -662,7 +710,7 @@ function CheckoutPage() {
               </span>
             )}
           </div>
-          <div className="p-5">
+          <div className="p-4 sm:p-5">
             {/* Context Notices in Summary */}
             {isUnserviceable && (
               <div className="mb-4 rounded-xl border border-rose-300 bg-rose-50/80 p-3 text-xs text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200">
@@ -974,14 +1022,19 @@ function CheckoutStep({
   return (
     <div id={`checkout-step-${index}`} className={`rounded-xl overflow-hidden transition-all duration-300 border bg-card ${active ? 'shadow-md ring-1 ring-primary/20 border-primary' : 'border-border'}`}>
       <div 
-        className={`flex items-center justify-between p-4 sm:p-5 transition-colors ${active ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground'} ${completed && !active ? 'cursor-pointer hover:bg-muted/30' : ''}`}
+        className={`flex items-center justify-between p-3.5 sm:p-5 transition-colors ${active ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground'} ${completed && !active ? 'cursor-pointer hover:bg-muted/30' : ''}`}
         onClick={() => { if (completed && !active && onEdit) onEdit(); }}
       >
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className={`grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded text-xs sm:text-sm font-bold shrink-0 transition-colors ${active ? 'bg-background text-primary' : 'bg-muted-foreground/10 text-muted-foreground'} ${completed && !active ? 'bg-background text-primary border border-border shadow-sm' : ''}`}>
-            {completed && !active ? <Check className="h-4 w-4 text-primary" /> : index}
+        <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
+          <div className={`grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded text-xs sm:text-sm font-bold shrink-0 transition-colors ${active ? 'bg-background text-primary' : 'bg-muted-foreground/10 text-muted-foreground'} ${completed && !active ? 'bg-background text-primary border border-border shadow-xs' : ''}`}>
+            {completed && !active ? <Check className="h-3.5 w-3.5 text-primary" /> : index}
           </div>
-          <h2 className="text-base sm:text-lg font-semibold uppercase tracking-wide truncate">{title}</h2>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm sm:text-base font-semibold uppercase tracking-wide truncate">{title}</h2>
+            {completed && !active && summary && (
+              <p className="text-xs text-muted-foreground truncate mt-0.5 sm:hidden">{summary}</p>
+            )}
+          </div>
           {completed && !active && summary && (
             <span className="hidden sm:inline-block ml-4 text-sm font-medium text-foreground truncate opacity-80 border-l pl-4 border-border">
               {summary}
@@ -989,12 +1042,12 @@ function CheckoutStep({
           )}
         </div>
         {completed && !active && onEdit && (
-          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onEdit(); }} className="h-8 ml-2">Change</Button>
+          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onEdit(); }} className="h-7 sm:h-8 text-xs ml-2 shrink-0">Change</Button>
         )}
       </div>
 
       {active && (
-        <div className="p-5 sm:p-6 bg-card animate-in slide-in-from-top-2 fade-in duration-300">
+        <div className="p-3.5 sm:p-6 bg-card animate-in slide-in-from-top-2 fade-in duration-300">
           {children}
         </div>
       )}

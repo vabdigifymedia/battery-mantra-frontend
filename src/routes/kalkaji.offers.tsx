@@ -680,15 +680,17 @@ function AdminOffersPage() {
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full sm:w-auto">
-          <TabsList>
-            <TabsTrigger value="ALL">All Offers</TabsTrigger>
-            <TabsTrigger value="ACTIVE">Live / Active</TabsTrigger>
-            <TabsTrigger value="SCHEDULED">Scheduled</TabsTrigger>
-            <TabsTrigger value="EXPIRED">Expired</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="overflow-x-auto pb-1 max-w-full">
+          <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full sm:w-auto">
+            <TabsList className="inline-flex min-w-max h-auto p-1 bg-muted/60 rounded-xl">
+              <TabsTrigger value="ALL" className="py-2 px-3.5 text-xs sm:text-sm font-medium">All Offers</TabsTrigger>
+              <TabsTrigger value="ACTIVE" className="py-2 px-3.5 text-xs sm:text-sm font-medium">Live / Active</TabsTrigger>
+              <TabsTrigger value="SCHEDULED" className="py-2 px-3.5 text-xs sm:text-sm font-medium">Scheduled</TabsTrigger>
+              <TabsTrigger value="EXPIRED" className="py-2 px-3.5 text-xs sm:text-sm font-medium">Expired</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -731,17 +733,17 @@ function AdminOffersPage() {
             </Button>
           </div>
         ) : (
-          <Table>
+          <Table className="min-w-[1050px]">
             <TableHeader>
               <TableRow className="bg-muted/40">
-                <TableHead className="w-[280px]">Campaign / Offer</TableHead>
-                <TableHead>Badge & Theme</TableHead>
-                <TableHead>Discount Rule</TableHead>
-                <TableHead>Targeting</TableHead>
-                <TableHead>Schedule</TableHead>
-                <TableHead className="text-center">Priority</TableHead>
-                <TableHead className="text-center">Active</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="min-w-[260px] max-w-[320px]">Campaign / Offer</TableHead>
+                <TableHead className="min-w-[130px]">Badge & Theme</TableHead>
+                <TableHead className="min-w-[150px]">Discount Rule</TableHead>
+                <TableHead className="min-w-[140px]">Targeting</TableHead>
+                <TableHead className="min-w-[150px]">Schedule</TableHead>
+                <TableHead className="w-[80px] text-center">Priority</TableHead>
+                <TableHead className="w-[80px] text-center">Active</TableHead>
+                <TableHead className="w-[100px] text-right sticky right-0 bg-muted/90 backdrop-blur-xs shadow-[-6px_0_10px_-4px_rgba(0,0,0,0.06)] z-10">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -870,7 +872,7 @@ function AdminOffersPage() {
                       />
                     </TableCell>
 
-                    <TableCell className="text-right">
+                    <TableCell className="text-right sticky right-0 bg-card/95 backdrop-blur-xs shadow-[-6px_0_10px_-4px_rgba(0,0,0,0.06)] z-10">
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
