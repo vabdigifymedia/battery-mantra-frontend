@@ -77,7 +77,7 @@ function CheckoutPage() {
   const qc = useQueryClient();
   const { city: locationCity, setLocation } = useLocationStore();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  
+
   const [activeStep, setActiveStep] = useState<number>(2);
   const [addressId, setAddressId] = useState<string>(search.addressId ?? "");
   const [deliveryMethod, setDeliveryMethod] = useState<string>("STANDARD_DELIVERY");
@@ -164,8 +164,8 @@ function CheckoutPage() {
   const isCityMismatch = Boolean(
     hasValidAddress &&
     !isUnserviceable &&
-    resolvedDeliveryCity &&
-    locationCity &&
+    resolvedDeliveryCity?.cityName &&
+    locationCity?.cityName &&
     (resolvedDeliveryCity.cityId !== locationCity.cityId ||
       resolvedDeliveryCity.cityName.trim().toLowerCase() !== locationCity.cityName.trim().toLowerCase())
   );
@@ -177,10 +177,60 @@ function CheckoutPage() {
 
   // Real-time cart query fetched using effective delivery city ID
   const cart = useQuery(cartQuery(status === "authenticated", effectiveCity?.cityId));
+  const { data: activeCampaigns = [] } = useQuery(activeCampaignsQuery());
+
+  const items = useMemo(() => cart.data?.cartItems ?? [], [cart.data?.cartItems]);
+  const subtotal = useMemo(
+    () => cart.data?.subTotal ?? items.reduce((s, it) => s + (it?.product?.productPrice ?? 0) * (it?.quantity ?? 1), 0),
+    [cart.data?.subTotal, items]
+  );
+  const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
+  const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
 
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const campaignDiscountSummary = useMemo(() => {
+    if (!activeCampaigns || activeCampaigns.length === 0 || items.length === 0) {
+      return { totalCampaignDiscount: 0, hasDealItems: false, eligibleCouponAmount: baseTotalAmount, campaignNames: [] };
+    }
+
+    let totalCampaignDiscount = 0;
+    let dealItemsSubtotal = 0;
+    const campaignNamesSet = new Set<string>();
+
+    for (const item of items) {
+      if (!item?.product) continue;
+      const matched = activeCampaigns
+        .filter((c) => isProductEligibleForCampaign(item.product, c))
+        .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
+
+      if (matched) {
+        const calc = calculateProductCampaignDiscount(item.product, matched, Boolean(item.exchangeOldBattery));
+        if (calc.hasCampaignDiscount) {
+          totalCampaignDiscount += calc.discountAmount * (item.quantity || 1);
+          const itemBase = ((item.product.productPrice || 0) - (item.exchangeOldBattery ? (item.product.exchangeDiscount || 0) : 0)) * (item.quantity || 1);
+          dealItemsSubtotal += itemBase;
+          campaignNamesSet.add(matched.name);
+        }
+      }
+    }
+
+    const hasDealItems = totalCampaignDiscount > 0;
+    const eligibleCouponAmount = Math.max(0, baseTotalAmount - dealItemsSubtotal);
+
+    return {
+      totalCampaignDiscount,
+      hasDealItems,
+      eligibleCouponAmount,
+      campaignNames: Array.from(campaignNamesSet),
+    };
+  }, [activeCampaigns, items, baseTotalAmount]);
+
+  const campaignDiscountAmount = campaignDiscountSummary.totalCampaignDiscount;
+  const couponDiscountAmount = appliedCoupon?.discountAmount ?? 0;
+  const totalAmount = Math.max(0, baseTotalAmount - campaignDiscountAmount - couponDiscountAmount);
 
   const handleSyncBrowsingCity = () => {
     if (resolvedDeliveryCity && selectedAddress) {
@@ -195,10 +245,46 @@ function CheckoutPage() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+
+    // Strict Anti-Stacking Check: If all cart items are already on special campaign deal
+    if (campaignDiscountSummary.hasDealItems && campaignDiscountSummary.eligibleCouponAmount <= 0) {
+      toast.error("Coupons cannot be applied to products already enjoying an exclusive deal.");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    try {
+      const evalTotal = campaignDiscountSummary.hasDealItems
+        ? campaignDiscountSummary.eligibleCouponAmount
+        : baseTotalAmount;
+      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: evalTotal });
+      if (res.isValid) {
+        setAppliedCoupon({ ...res, code: couponInput.trim().toUpperCase() });
+        toast.success(res.message || "Coupon applied successfully");
+      } else {
+        toast.error(res.message || "Invalid coupon code");
+        setAppliedCoupon(null);
+      }
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Failed to apply coupon");
+      setAppliedCoupon(null);
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    toast.success("Coupon removed");
+  };
+
   const checkout = useMutation({
-    mutationFn: () => ordersService.checkout({ 
-      addressId: addressId as any, 
-      deliveryMethod, 
+    mutationFn: () => ordersService.checkout({
+      addressId: addressId as any,
+      deliveryMethod,
       paymentMethod,
       installationDate: deliveryMethod === "HOME_INSTALLATION" ? installationDate : undefined,
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
@@ -334,90 +420,6 @@ function CheckoutPage() {
     );
   }
 
-  const items = cart.data?.cartItems ?? [];
-  const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + (it?.product?.productPrice ?? 0) * (it?.quantity ?? 1), 0);
-  const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
-  const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
-
-  const { data: activeCampaigns = [] } = useQuery(activeCampaignsQuery());
-
-  const campaignDiscountSummary = useMemo(() => {
-    if (!activeCampaigns || activeCampaigns.length === 0 || items.length === 0) {
-      return { totalCampaignDiscount: 0, hasDealItems: false, eligibleCouponAmount: baseTotalAmount, campaignNames: [] };
-    }
-
-    let totalCampaignDiscount = 0;
-    let dealItemsSubtotal = 0;
-    const campaignNamesSet = new Set<string>();
-
-    for (const item of items) {
-      if (!item?.product) continue;
-      const matched = activeCampaigns
-        .filter((c) => isProductEligibleForCampaign(item.product, c))
-        .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
-
-      if (matched) {
-        const calc = calculateProductCampaignDiscount(item.product, matched, Boolean(item.exchangeOldBattery));
-        if (calc.hasCampaignDiscount) {
-          totalCampaignDiscount += calc.discountAmount * (item.quantity || 1);
-          const itemBase = ((item.product.productPrice || 0) - (item.exchangeOldBattery ? (item.product.exchangeDiscount || 0) : 0)) * (item.quantity || 1);
-          dealItemsSubtotal += itemBase;
-          campaignNamesSet.add(matched.name);
-        }
-      }
-    }
-
-    const hasDealItems = totalCampaignDiscount > 0;
-    const eligibleCouponAmount = Math.max(0, baseTotalAmount - dealItemsSubtotal);
-
-    return {
-      totalCampaignDiscount,
-      hasDealItems,
-      eligibleCouponAmount,
-      campaignNames: Array.from(campaignNamesSet),
-    };
-  }, [activeCampaigns, items, baseTotalAmount]);
-
-  const campaignDiscountAmount = campaignDiscountSummary.totalCampaignDiscount;
-  const couponDiscountAmount = appliedCoupon?.discountAmount ?? 0;
-  const totalAmount = Math.max(0, baseTotalAmount - campaignDiscountAmount - couponDiscountAmount);
-
-  const handleApplyCoupon = async () => {
-    if (!couponInput.trim()) return;
-
-    // Strict Anti-Stacking Check: If all cart items are already on special campaign deal
-    if (campaignDiscountSummary.hasDealItems && campaignDiscountSummary.eligibleCouponAmount <= 0) {
-      toast.error("Coupons cannot be applied to products already enjoying an exclusive deal.");
-      return;
-    }
-
-    setIsApplyingCoupon(true);
-    try {
-      const evalTotal = campaignDiscountSummary.hasDealItems
-        ? campaignDiscountSummary.eligibleCouponAmount
-        : baseTotalAmount;
-      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: evalTotal });
-      if (res.isValid) {
-        setAppliedCoupon({ ...res, code: couponInput.trim().toUpperCase() });
-        toast.success(res.message || "Coupon applied successfully");
-      } else {
-        toast.error(res.message || "Invalid coupon code");
-        setAppliedCoupon(null);
-      }
-    } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Failed to apply coupon");
-      setAppliedCoupon(null);
-    } finally {
-      setIsApplyingCoupon(false);
-    }
-  };
-
-  const removeCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponInput("");
-    toast.success("Coupon removed");
-  };
-
   if (items.length === 0) {
     return (
       <Container size="lg" className="py-12">
@@ -435,7 +437,7 @@ function CheckoutPage() {
   }
 
   const hasValidDelivery = deliveryMethod !== "HOME_INSTALLATION" || installationDate !== "";
-  
+
   const isProcessing = checkout.isPending || createRazorpayOrder.isPending || verifyRazorpayPayment.isPending;
   const canPlace = hasValidAddress && !isUnserviceable && !isCheckingServiceability && items.length > 0 && !isProcessing && hasValidDelivery;
 
@@ -446,17 +448,17 @@ function CheckoutPage() {
         description="Complete your order securely."
         className="bg-background border-b mb-4 sm:mb-8 shadow-xs py-3.5 sm:py-6"
       />
-      
+
       <Container size="xl" className="grid gap-4 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_380px] items-start px-3 sm:px-6">
-        
+
         {/* LEFT COLUMN: ACCORDION STEPS */}
         <div className="space-y-3 sm:space-y-4">
-          
+
           {/* STEP 1: LOGIN */}
-          <CheckoutStep 
-            index={1} 
-            title="Login" 
-            active={false} 
+          <CheckoutStep
+            index={1}
+            title="Login"
+            active={false}
             completed={true}
             summary={user?.email || user?.username || "Authenticated"}
           >
@@ -464,10 +466,10 @@ function CheckoutPage() {
           </CheckoutStep>
 
           {/* STEP 2: ADDRESS */}
-          <CheckoutStep 
-            index={2} 
-            title="Delivery Address" 
-            active={activeStep === 2} 
+          <CheckoutStep
+            index={2}
+            title="Delivery Address"
+            active={activeStep === 2}
             completed={activeStep > 2}
             onEdit={() => setActiveStep(2)}
             summary={
@@ -475,8 +477,8 @@ function CheckoutPage() {
                 ? isUnserviceable
                   ? "Delivery Unavailable"
                   : resolvedDeliveryCity?.cityName
-                  ? `${resolvedDeliveryCity.cityName} (${selectedAddress?.postalCode})`
-                  : "Address selected"
+                    ? `${resolvedDeliveryCity.cityName} (${selectedAddress?.postalCode})`
+                    : "Address selected"
                 : ""
             }
           >
@@ -514,11 +516,11 @@ function CheckoutPage() {
             )}
 
             <div className="mt-5 sm:mt-6">
-              <Button 
-                variant="brand" 
-                size="lg" 
+              <Button
+                variant="brand"
+                size="lg"
                 className="w-full sm:w-auto min-w-[160px]"
-                disabled={!hasValidAddress || isUnserviceable || isCheckingServiceability} 
+                disabled={!hasValidAddress || isUnserviceable || isCheckingServiceability}
                 onClick={() => setActiveStep(3)}
               >
                 {isCheckingServiceability ? (
@@ -536,10 +538,10 @@ function CheckoutPage() {
           </CheckoutStep>
 
           {/* STEP 3: DELIVERY METHOD */}
-          <CheckoutStep 
-            index={3} 
-            title="Delivery Method" 
-            active={activeStep === 3} 
+          <CheckoutStep
+            index={3}
+            title="Delivery Method"
+            active={activeStep === 3}
             completed={activeStep > 3}
             onEdit={() => setActiveStep(3)}
             summary={deliveryMethod.replace('_', ' ')}
@@ -549,7 +551,7 @@ function CheckoutPage() {
                 <RadioGroupItem value="STANDARD_DELIVERY" id="delivery-standard" className="mt-1" />
                 <Label htmlFor="delivery-standard" className="cursor-pointer font-medium flex-1">
                   <div className="text-sm sm:text-base font-semibold">Standard Delivery</div>
-                  <div className="text-muted-foreground text-xs font-normal mt-0.5">Free delivery within 3-5 business days.</div>
+                  <div className="text-muted-foreground text-xs font-normal mt-0.5">Same-Day Delivery on Orders Before 7 PM</div>
                 </Label>
               </div>
               <div className={`flex items-start space-x-3 rounded-xl border p-3.5 sm:p-4 transition-colors ${deliveryMethod === "STORE_PICKUP" ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
@@ -564,13 +566,13 @@ function CheckoutPage() {
                 <Label htmlFor="delivery-install" className="cursor-pointer font-medium flex-1">
                   <div className="text-sm sm:text-base font-semibold">Home Installation</div>
                   <div className="text-muted-foreground text-xs font-normal mt-0.5">A technician will arrive at your location to install the battery.</div>
-                  
+
                   {deliveryMethod === "HOME_INSTALLATION" && (
                     <div className="mt-3.5 animate-in fade-in slide-in-from-top-2">
                       <Label htmlFor="install-date" className="mb-1.5 block text-xs">Select Installation Date</Label>
-                      <Input 
-                        id="install-date" 
-                        type="date" 
+                      <Input
+                        id="install-date"
+                        type="date"
                         className="bg-background max-w-[200px]"
                         min={new Date().toISOString().split('T')[0]}
                         value={installationDate}
@@ -583,11 +585,11 @@ function CheckoutPage() {
               </div>
             </RadioGroup>
             <div className="mt-5 sm:mt-6">
-              <Button 
-                variant="brand" 
-                size="lg" 
+              <Button
+                variant="brand"
+                size="lg"
                 className="w-full sm:w-auto min-w-[160px]"
-                disabled={!hasValidDelivery} 
+                disabled={!hasValidDelivery}
                 onClick={() => setActiveStep(4)}
               >
                 Continue
@@ -596,10 +598,10 @@ function CheckoutPage() {
           </CheckoutStep>
 
           {/* STEP 4: ORDER SUMMARY */}
-          <CheckoutStep 
-            index={4} 
-            title="Order Summary" 
-            active={activeStep === 4} 
+          <CheckoutStep
+            index={4}
+            title="Order Summary"
+            active={activeStep === 4}
             completed={activeStep > 4}
             onEdit={() => setActiveStep(4)}
             summary={`${items.length} item(s)`}
@@ -633,10 +635,10 @@ function CheckoutPage() {
           </CheckoutStep>
 
           {/* STEP 5: PAYMENT OPTIONS */}
-          <CheckoutStep 
-            index={5} 
-            title="Payment Options" 
-            active={activeStep === 5} 
+          <CheckoutStep
+            index={5}
+            title="Payment Options"
+            active={activeStep === 5}
             completed={false}
           >
             <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
@@ -689,10 +691,10 @@ function CheckoutPage() {
                 {isUnserviceable
                   ? "Delivery Unavailable"
                   : isCheckingServiceability
-                  ? "Checking Serviceability..."
-                  : paymentMethod === "ONLINE"
-                  ? `Pay Now`
-                  : "Place Order"}
+                    ? "Checking Serviceability..."
+                    : paymentMethod === "ONLINE"
+                      ? `Pay Now`
+                      : "Place Order"}
               </Button>
             </div>
           </CheckoutStep>
@@ -751,7 +753,7 @@ function CheckoutPage() {
                   <Price value={subtotal} size="sm" />
                 </dd>
               </div>
-              
+
               <div className="flex justify-between text-foreground">
                 <dt>Delivery Charges</dt>
                 <dd className="text-success font-medium">Free</dd>
@@ -777,14 +779,14 @@ function CheckoutPage() {
                   </dd>
                 </div>
               )}
-              
+
               <div className="my-2 border-t border-dashed" />
 
               {!appliedCoupon ? (
                 <div>
                   <div className="flex gap-2 mb-1.5">
-                    <Input 
-                      placeholder="Enter Coupon Code" 
+                    <Input
+                      placeholder="Enter Coupon Code"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value)}
                       className="uppercase h-9"
@@ -818,7 +820,7 @@ function CheckoutPage() {
               )}
 
               <div className="my-2 border-t border-dashed" />
-              
+
               <div className="flex justify-between items-center text-lg font-bold">
                 <dt>Total Amount</dt>
                 <dd>
@@ -832,7 +834,7 @@ function CheckoutPage() {
                 You will save ₹{exchangeDiscount} on this order
               </p>
             )}
-            
+
             <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg border border-border/50">
               <ShieldCheck className="h-5 w-5 shrink-0" />
               <span>Safe and Secure Payments. Easy returns. 100% Authentic products.</span>
@@ -1002,26 +1004,26 @@ function DestinationPricingNoticeCTA({
   );
 }
 
-function CheckoutStep({ 
-  index, 
-  title, 
-  active, 
-  completed, 
-  onEdit, 
+function CheckoutStep({
+  index,
+  title,
+  active,
+  completed,
+  onEdit,
   children,
   summary
-}: { 
-  index: number; 
-  title: string; 
-  active: boolean; 
-  completed: boolean; 
-  onEdit?: () => void; 
+}: {
+  index: number;
+  title: string;
+  active: boolean;
+  completed: boolean;
+  onEdit?: () => void;
   children: React.ReactNode;
   summary?: React.ReactNode;
 }) {
   return (
     <div id={`checkout-step-${index}`} className={`rounded-xl overflow-hidden transition-all duration-300 border bg-card ${active ? 'shadow-md ring-1 ring-primary/20 border-primary' : 'border-border'}`}>
-      <div 
+      <div
         className={`flex items-center justify-between p-3.5 sm:p-5 transition-colors ${active ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground'} ${completed && !active ? 'cursor-pointer hover:bg-muted/30' : ''}`}
         onClick={() => { if (completed && !active && onEdit) onEdit(); }}
       >
@@ -1072,11 +1074,10 @@ function PaymentOption({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border-2 p-4 text-left transition-colors flex items-start gap-4 ${
-        active
+      className={`rounded-xl border-2 p-4 text-left transition-colors flex items-start gap-4 ${active
           ? "border-primary bg-primary/5"
           : "border-border bg-background hover:border-primary/40 hover:bg-muted/20"
-      }`}
+        }`}
       aria-pressed={active}
     >
       <div className={`mt-0.5 shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
