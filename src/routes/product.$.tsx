@@ -61,7 +61,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 import { formatDeliveryPillText, getDeliveryTimeText } from "@/lib/delivery";
-import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
@@ -459,28 +459,53 @@ export function PdpPage() {
     return null;
   };
 
-  const currentPrice = exchange === "yes" && hasExchangeOffer
+  // 1. Without Exchange Campaign Calculation
+  const buyNewCampaignCalc = useMemo(() => {
+    return calculateProductCampaignDiscount(data, matchedCampaign, false);
+  }, [data, matchedCampaign]);
+
+  // 2. With Exchange Campaign Calculation
+  const withExchangeCampaignCalc = useMemo(() => {
+    return calculateProductCampaignDiscount(data, matchedCampaign, true);
+  }, [data, matchedCampaign]);
+
+  // Current selected exchange mode calculation
+  const isExchangeSelected = exchange === "yes" && hasExchangeOffer;
+  const activeCampaignCalc = isExchangeSelected
+    ? withExchangeCampaignCalc
+    : buyNewCampaignCalc;
+
+  // Regular City Base Price for current mode (before campaign discount)
+  const regularCityModePrice = isExchangeSelected
     ? Math.max(0, data.productPrice - (data.exchangeDiscount || 0))
     : data.productPrice;
 
+  // Final Effective Price to Pay
+  const currentPrice = activeCampaignCalc.hasCampaignDiscount
+    ? activeCampaignCalc.finalPrice
+    : regularCityModePrice;
+
   const exchangePriceValue = Math.max(0, data.productPrice - (data.exchangeDiscount || 0));
+  const productMrp = getMrpFromProduct(data);
   const basePriceForSavings = data.originalPrice && data.originalPrice > data.productPrice
     ? data.originalPrice
-    : data.productPrice;
+    : (productMrp && productMrp > data.productPrice ? productMrp : data.productPrice);
   const exchangeSavings = basePriceForSavings - exchangePriceValue;
 
-  const productMrp = getMrpFromProduct(data);
-
   // Calculate dynamic strike price & discount based on selected exchange mode
-  const strikePrice = (productMrp && productMrp > currentPrice)
-    ? productMrp
-    : (exchange === "yes" && hasExchangeOffer && data.productPrice > currentPrice ? data.productPrice : null);
+  const strikePrice = activeCampaignCalc.hasCampaignDiscount
+    ? regularCityModePrice
+    : (productMrp && productMrp > currentPrice
+        ? productMrp
+        : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
 
   const hasDiscount = Boolean(strikePrice && strikePrice > currentPrice);
 
   const discountPercent = hasDiscount && strikePrice
     ? Math.round(((strikePrice - currentPrice) / strikePrice) * 100)
     : 0;
+
+  const campaignThemeStyles = getCampaignThemeStyles(matchedCampaign?.badgeTheme);
 
   // Generate consistent mock rating & sales data based on product name/id
   const charCodeSum = (data.productName || data.productId || "").split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
@@ -784,7 +809,7 @@ export function PdpPage() {
                       )}
                     >
                       <SparklesIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span>{matchedCampaign.badgeText || matchedCampaign.name} — {formatCampaignDiscountLabel(matchedCampaign)}</span>
+                      <span>{matchedCampaign.badgeText || matchedCampaign.name} — {activeCampaignCalc.badgeLabel || formatCampaignDiscountLabel(matchedCampaign, data as any)}</span>
                     </Link>
                   </div>
                 )}
@@ -903,9 +928,16 @@ export function PdpPage() {
                           </div>
                           <span className="text-[10px] text-muted-foreground block mt-0.5 pl-4.5">Keep old</span>
                         </div>
-                        <span className="text-xs font-extrabold text-foreground ml-1 shrink-0">
-                          ₹{data.productPrice.toLocaleString()}
-                        </span>
+                        <div className="text-right shrink-0 ml-1">
+                          <div className="text-xs font-extrabold text-foreground">
+                            ₹{(buyNewCampaignCalc.hasCampaignDiscount ? buyNewCampaignCalc.finalPrice : data.productPrice).toLocaleString()}
+                          </div>
+                          {buyNewCampaignCalc.hasCampaignDiscount && (
+                            <div className="text-[10px] text-muted-foreground line-through">
+                              ₹{data.productPrice.toLocaleString()}
+                            </div>
+                          )}
+                        </div>
                       </button>
 
                       <button
@@ -929,30 +961,64 @@ export function PdpPage() {
                           </div>
                           <span className="text-[10px] text-muted-foreground block mt-0.5 pl-4.5">Return old</span>
                         </div>
-                        <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 ml-1 shrink-0">
-                          ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
-                        </span>
+                        <div className="text-right shrink-0 ml-1">
+                          <div className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">
+                            ₹{(withExchangeCampaignCalc.hasCampaignDiscount ? withExchangeCampaignCalc.finalPrice : Math.max(0, data.productPrice - (data.exchangeDiscount || 0))).toLocaleString()}
+                          </div>
+                          {withExchangeCampaignCalc.hasCampaignDiscount && (
+                            <div className="text-[10px] text-muted-foreground line-through">
+                              ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
+                            </div>
+                          )}
+                        </div>
                       </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-3 pt-1 sm:pt-2">
-                <Price
-                  value={currentPrice}
-                  size="xl"
-                  className="text-4xl tracking-tight"
-                />
-                {hasDiscount && strikePrice && (
-                  <>
-                    <span className="text-2xl text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
-                      ₹{strikePrice.toLocaleString()}
+              <div className="space-y-1.5 pt-1 sm:pt-2">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Price
+                    value={currentPrice}
+                    size="xl"
+                    className={cn(
+                      "text-4xl tracking-tight font-black",
+                      activeCampaignCalc.hasCampaignDiscount ? (campaignThemeStyles.accentText || "text-amber-600") : "text-foreground"
+                    )}
+                  />
+                  {hasDiscount && strikePrice && (
+                    <>
+                      <span className="text-2xl text-muted-foreground line-through decoration-muted-foreground/50 font-medium">
+                        ₹{strikePrice.toLocaleString()}
+                      </span>
+                      {productMrp && productMrp > strikePrice && (
+                        <span className="text-base text-muted-foreground/70 line-through decoration-muted-foreground/40 font-normal">
+                          MRP ₹{productMrp.toLocaleString()}
+                        </span>
+                      )}
+                      <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
+                        {discountPercent}% OFF
+                      </Badge>
+                    </>
+                  )}
+                </div>
+
+                {activeCampaignCalc.hasCampaignDiscount && (
+                  <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1 text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-tight shadow-2xs",
+                        campaignThemeStyles.badgeBg
+                      )}
+                    >
+                      <SparklesIcon className="w-3.5 h-3.5" />
+                      <span>{matchedCampaign?.name || "Offer"}: Save ₹{activeCampaignCalc.discountAmount.toLocaleString()}</span>
                     </span>
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white text-sm px-2.5 py-0.5 rounded-md font-semibold">
-                      {discountPercent}% OFF
-                    </Badge>
-                  </>
+                    <span className="text-[11px] text-muted-foreground font-medium">
+                      *Exclusive deal price. Additional coupons cannot be stacked.
+                    </span>
+                  </div>
                 )}
               </div>
 
@@ -992,10 +1058,24 @@ export function PdpPage() {
                         <span className="font-medium text-base">Buy New</span>
                       </div>
                     </div>
-                    <span className="text-2xl font-bold ml-6">
-                      ₹{data.productPrice.toLocaleString()}
-                    </span>
-                    <span className="text-sm text-muted-foreground ml-6 mt-1">Keep your old battery</span>
+                    <div className="flex items-baseline gap-2 ml-6">
+                      <span className="text-2xl font-bold">
+                        ₹{(buyNewCampaignCalc.hasCampaignDiscount ? buyNewCampaignCalc.finalPrice : data.productPrice).toLocaleString()}
+                      </span>
+                      {buyNewCampaignCalc.hasCampaignDiscount && (
+                        <span className="text-base text-muted-foreground line-through font-medium">
+                          ₹{data.productPrice.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    {buyNewCampaignCalc.hasCampaignDiscount ? (
+                      <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded ml-6 mt-1.5 self-start inline-flex items-center gap-1 shadow-2xs", campaignThemeStyles.badgeBg)}>
+                        <SparklesIcon className="w-3 h-3" />
+                        {buyNewCampaignCalc.badgeLabel}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted-foreground ml-6 mt-1">Keep your old battery</span>
+                    )}
                   </button>
 
                   <button
@@ -1017,10 +1097,24 @@ export function PdpPage() {
                       </div>
                       <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">Save ₹{exchangeSavings.toLocaleString()}</Badge>
                     </div>
-                    <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 ml-6">
-                      ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
-                    </span>
-                    <span className="text-sm text-muted-foreground ml-6 mt-1">Return old battery</span>
+                    <div className="flex items-baseline gap-2 ml-6">
+                      <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+                        ₹{(withExchangeCampaignCalc.hasCampaignDiscount ? withExchangeCampaignCalc.finalPrice : Math.max(0, data.productPrice - (data.exchangeDiscount || 0))).toLocaleString()}
+                      </span>
+                      {withExchangeCampaignCalc.hasCampaignDiscount && (
+                        <span className="text-base text-muted-foreground line-through font-medium">
+                          ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    {withExchangeCampaignCalc.hasCampaignDiscount ? (
+                      <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded ml-6 mt-1.5 self-start inline-flex items-center gap-1 shadow-2xs", campaignThemeStyles.badgeBg)}>
+                        <SparklesIcon className="w-3 h-3" />
+                        {withExchangeCampaignCalc.badgeLabel}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted-foreground ml-6 mt-1">Return old battery</span>
+                    )}
                   </button>
                 </div>
               </div>

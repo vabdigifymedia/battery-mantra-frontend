@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,12 @@ import { EmptyState } from "@/components/feedback/EmptyState";
 import { Spinner } from "@/components/feedback/Spinner";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 import { useAuth } from "@/providers/AuthProvider";
-import { cartQuery, addressesQuery } from "@/queries";
+import { cartQuery, addressesQuery, activeCampaignsQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
 import { campaignService } from "@/services/campaign.service";
+import { isProductEligibleForCampaign, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse, CityDto } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
@@ -303,16 +304,64 @@ function CheckoutPage() {
   const subtotal = cart.data?.subTotal ?? items.reduce((s, it) => s + it.product.productPrice * it.quantity, 0);
   const exchangeDiscount = cart.data?.exchangeDiscount ?? 0;
   const baseTotalAmount = cart.data?.totalAmount ?? subtotal;
-  
-  const totalAmount = appliedCoupon
-    ? Math.max(0, baseTotalAmount - (appliedCoupon.discountAmount ?? 0))
-    : baseTotalAmount;
+
+  const { data: activeCampaigns = [] } = useQuery(activeCampaignsQuery());
+
+  const campaignDiscountSummary = useMemo(() => {
+    if (!activeCampaigns || activeCampaigns.length === 0 || items.length === 0) {
+      return { totalCampaignDiscount: 0, hasDealItems: false, eligibleCouponAmount: baseTotalAmount, campaignNames: [] };
+    }
+
+    let totalCampaignDiscount = 0;
+    let dealItemsSubtotal = 0;
+    const campaignNamesSet = new Set<string>();
+
+    for (const item of items) {
+      const matched = activeCampaigns
+        .filter((c) => isProductEligibleForCampaign(item.product, c))
+        .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
+
+      if (matched) {
+        const calc = calculateProductCampaignDiscount(item.product, matched, Boolean(item.exchangeOldBattery));
+        if (calc.hasCampaignDiscount) {
+          totalCampaignDiscount += calc.discountAmount * item.quantity;
+          const itemBase = (item.product.productPrice - (item.exchangeOldBattery ? (item.product.exchangeDiscount || 0) : 0)) * item.quantity;
+          dealItemsSubtotal += itemBase;
+          campaignNamesSet.add(matched.name);
+        }
+      }
+    }
+
+    const hasDealItems = totalCampaignDiscount > 0;
+    const eligibleCouponAmount = Math.max(0, baseTotalAmount - dealItemsSubtotal);
+
+    return {
+      totalCampaignDiscount,
+      hasDealItems,
+      eligibleCouponAmount,
+      campaignNames: Array.from(campaignNamesSet),
+    };
+  }, [activeCampaigns, items, baseTotalAmount]);
+
+  const campaignDiscountAmount = campaignDiscountSummary.totalCampaignDiscount;
+  const couponDiscountAmount = appliedCoupon?.discountAmount ?? 0;
+  const totalAmount = Math.max(0, baseTotalAmount - campaignDiscountAmount - couponDiscountAmount);
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return;
+
+    // Strict Anti-Stacking Check: If all cart items are already on special campaign deal
+    if (campaignDiscountSummary.hasDealItems && campaignDiscountSummary.eligibleCouponAmount <= 0) {
+      toast.error("Coupons cannot be applied to products already enjoying an exclusive deal.");
+      return;
+    }
+
     setIsApplyingCoupon(true);
     try {
-      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: baseTotalAmount });
+      const evalTotal = campaignDiscountSummary.hasDealItems
+        ? campaignDiscountSummary.eligibleCouponAmount
+        : baseTotalAmount;
+      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: evalTotal });
       if (res.isValid) {
         setAppliedCoupon({ ...res, code: couponInput.trim().toUpperCase() });
         toast.success(res.message || "Coupon applied successfully");
@@ -668,20 +717,39 @@ function CheckoutPage() {
                   </dd>
                 </div>
               )}
+
+              {campaignDiscountAmount > 0 && (
+                <div className="flex justify-between text-amber-600 dark:text-amber-400 font-bold">
+                  <dt className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                    <span>Offer Discount ({campaignDiscountSummary.campaignNames.join(", ")})</span>
+                  </dt>
+                  <dd>
+                    -<Price value={campaignDiscountAmount} size="sm" />
+                  </dd>
+                </div>
+              )}
               
               <div className="my-2 border-t border-dashed" />
 
               {!appliedCoupon ? (
-                <div className="flex gap-2 mb-2">
-                  <Input 
-                    placeholder="Enter Coupon Code" 
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value)}
-                    className="uppercase h-9"
-                  />
-                  <Button variant="secondary" size="sm" className="h-9 shrink-0" onClick={handleApplyCoupon} disabled={!couponInput.trim() || isApplyingCoupon}>
-                    {isApplyingCoupon ? <Spinner size="sm" /> : "Apply"}
-                  </Button>
+                <div>
+                  <div className="flex gap-2 mb-1.5">
+                    <Input 
+                      placeholder="Enter Coupon Code" 
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      className="uppercase h-9"
+                    />
+                    <Button variant="secondary" size="sm" className="h-9 shrink-0" onClick={handleApplyCoupon} disabled={!couponInput.trim() || isApplyingCoupon}>
+                      {isApplyingCoupon ? <Spinner size="sm" /> : "Apply"}
+                    </Button>
+                  </div>
+                  {campaignDiscountSummary.hasDealItems && (
+                    <p className="text-[10px] text-muted-foreground/80 mb-2">
+                      *Note: Products with special campaign deals are excluded from additional coupon discounts.
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-lg">

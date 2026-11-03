@@ -9,7 +9,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
 import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery, activeCampaignsQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
-import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
 import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2, Sparkles, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -104,10 +104,18 @@ export function ProductCard({
     ? Math.max(0, product.productPrice - (product.exchangeDiscount || 0))
     : product.productPrice;
 
+  const campaignCalc = useMemo(() => {
+    return calculateProductCampaignDiscount(product, matchedCampaign, hasExchange);
+  }, [product, matchedCampaign, hasExchange]);
+
+  const effectivePrice = campaignCalc.hasCampaignDiscount
+    ? campaignCalc.finalPrice
+    : exchangePrice;
+
   const basePriceForSavings = product.originalPrice && product.originalPrice > product.productPrice 
     ? product.originalPrice 
     : product.productPrice;
-  const totalSavings = basePriceForSavings - exchangePrice;
+  const totalSavings = basePriceForSavings - effectivePrice;
   const showSavings = totalSavings > 0;
 
   // Helper to extract clean "XX Ah" strictly
@@ -378,8 +386,21 @@ export function ProductCard({
 
           {/* Price Block */}
           <div className="mt-1 sm:mt-2 space-y-0.5 sm:space-y-1">
-            <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
-              <Price value={exchangePrice} className="font-black text-red-600 text-sm sm:text-lg lg:text-xl leading-none" />
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <Price
+                value={effectivePrice}
+                className={cn(
+                  "font-black text-sm sm:text-lg lg:text-xl leading-none",
+                  campaignCalc.hasCampaignDiscount
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-red-600"
+                )}
+              />
+              {campaignCalc.hasCampaignDiscount && (
+                <span className="text-xs sm:text-sm font-bold text-muted-foreground line-through decoration-muted-foreground/60 leading-none">
+                  ₹{exchangePrice.toLocaleString("en-IN")}
+                </span>
+              )}
               {hasExchange && (
                 <span className="text-[8px] sm:text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1 sm:px-1.5 py-0.5 rounded border border-emerald-200/60 leading-none whitespace-nowrap">
                   <span className="sm:hidden">With Exch.</span>
@@ -390,14 +411,30 @@ export function ProductCard({
             
             <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-xs font-medium text-muted-foreground flex-wrap leading-tight">
               <span>
-                MRP: <span className="line-through">₹{basePriceForSavings.toLocaleString()}</span>
+                MRP: <span className="line-through">₹{basePriceForSavings.toLocaleString("en-IN")}</span>
               </span>
               {showSavings && (
                 <span className="text-emerald-700 sm:text-red-600 font-bold whitespace-nowrap">
-                  Save ₹{totalSavings.toLocaleString()}
+                  Save ₹{totalSavings.toLocaleString("en-IN")}
                 </span>
               )}
             </div>
+
+            {campaignCalc.hasCampaignDiscount && (
+              <div className="pt-0.5">
+                <span
+                  className={cn(
+                    "text-[9px] font-black px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 uppercase tracking-tight shadow-2xs",
+                    getCampaignThemeStyles(matchedCampaign?.badgeTheme).badgeBg
+                  )}
+                >
+                  <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                  <span className="truncate">
+                    {campaignCalc.badgeLabel || `${matchedCampaign?.name} Deal`}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

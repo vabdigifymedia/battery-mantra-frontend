@@ -117,27 +117,70 @@ export function isProductEligibleForCampaign(
   }
 }
 
+export interface ProductCampaignDiscountResult {
+  hasCampaignDiscount: boolean;
+  basePrice: number;
+  discountAmount: number;
+  finalPrice: number;
+  isCustomDiscount: boolean;
+  isCouponEligible: boolean;
+  campaign: CampaignResponse | null;
+  badgeLabel: string;
+}
+
 export function calculateProductCampaignDiscount(
-  product: ProductListResponse,
-  campaign: CampaignResponse,
+  product: any,
+  campaign?: CampaignResponse | null,
   hasExchange = false
-): { discountAmount: number; finalPrice: number } {
-  const basePrice = hasExchange && product.exchangeDiscount
-    ? Math.max(0, product.productPrice - product.exchangeDiscount)
-    : product.productPrice;
+): ProductCampaignDiscountResult {
+  const regularCityPrice = Number(product?.productPrice || 0);
+  const exchangeDiscount = hasExchange ? Number(product?.exchangeDiscount || 0) : 0;
+  const basePrice = Math.max(0, regularCityPrice - exchangeDiscount);
+
+  if (!campaign || !isProductEligibleForCampaign(product, campaign)) {
+    return {
+      hasCampaignDiscount: false,
+      basePrice,
+      discountAmount: 0,
+      finalPrice: basePrice,
+      isCustomDiscount: false,
+      isCouponEligible: true,
+      campaign: null,
+      badgeLabel: "",
+    };
+  }
 
   // 1. Check if campaign has a per-product custom discount override
   const customVal = campaign.productDiscounts?.[product.productId];
-  if (customVal !== undefined && customVal !== null && Number(customVal) >= 0) {
-    const discountAmount = Math.min(basePrice, Number(customVal));
+  if (customVal !== undefined && customVal !== null && Number(customVal) > 0) {
+    const customNum = Number(customVal);
+    const discountAmount = Math.min(basePrice, customNum);
     const finalPrice = Math.max(0, basePrice - discountAmount);
-    return { discountAmount: Math.round(discountAmount), finalPrice: Math.round(finalPrice) };
+    return {
+      hasCampaignDiscount: discountAmount > 0,
+      basePrice,
+      discountAmount: Math.round(discountAmount),
+      finalPrice: Math.round(finalPrice),
+      isCustomDiscount: true,
+      isCouponEligible: false, // Non-stackable: Product already on exclusive deal
+      campaign,
+      badgeLabel: campaign.badgeText || `Save ₹${Math.round(discountAmount).toLocaleString("en-IN")}`,
+    };
   }
 
   let discountAmount = 0;
 
   if (campaign.minOrderValue && basePrice < campaign.minOrderValue) {
-    return { discountAmount: 0, finalPrice: basePrice };
+    return {
+      hasCampaignDiscount: false,
+      basePrice,
+      discountAmount: 0,
+      finalPrice: basePrice,
+      isCustomDiscount: false,
+      isCouponEligible: true,
+      campaign,
+      badgeLabel: campaign.badgeText || "Special Offer",
+    };
   }
 
   switch (campaign.discountType) {
@@ -167,8 +210,19 @@ export function calculateProductCampaignDiscount(
       break;
   }
 
-  const finalPrice = Math.max(0, basePrice - discountAmount);
-  return { discountAmount: Math.round(discountAmount), finalPrice: Math.round(finalPrice) };
+  const roundedDiscount = Math.round(discountAmount);
+  const finalPrice = Math.max(0, basePrice - roundedDiscount);
+
+  return {
+    hasCampaignDiscount: roundedDiscount > 0,
+    basePrice,
+    discountAmount: roundedDiscount,
+    finalPrice: Math.round(finalPrice),
+    isCustomDiscount: false,
+    isCouponEligible: roundedDiscount === 0, // only eligible for coupons if no discount was deducted
+    campaign,
+    badgeLabel: campaign.badgeText || formatCampaignDiscountLabel(campaign, product),
+  };
 }
 
 export function safeFormatDate(dateStr?: string | null, fmt = "dd MMM yy"): string {
