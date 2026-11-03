@@ -273,7 +273,7 @@ export function ProductCard({
               >
                 <Sparkles className="w-2.5 h-2.5 shrink-0" />
                 <span className="truncate">
-                  {matchedCampaign.badgeText || formatCampaignDiscountLabel(matchedCampaign, product)}
+                  {matchedCampaign.badgeText || matchedCampaign.name}
                 </span>
               </span>
             )}
