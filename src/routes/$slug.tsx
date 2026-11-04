@@ -42,7 +42,7 @@ export const Route = createFileRoute("/$slug")({
     }
     return { page, pageSeo };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
     const page = loaderData?.page;
     const pageSeo = loaderData?.pageSeo?.seo;
 

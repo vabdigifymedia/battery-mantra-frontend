@@ -279,6 +279,15 @@
   to { transform: translateX(-50%); }
 }
 
+@utility animate-tab-progress {
+  animation: tab-progress 6s linear forwards;
+}
+
+@keyframes tab-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
 /* Hide scrollbar utility for custom scrollable areas */
 @utility scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
