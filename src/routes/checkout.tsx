@@ -58,6 +58,7 @@ export const Route = createFileRoute("/checkout")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Checkout — BatteryMantra",
       description: "Review your order and place it securely.",
+      noIndex: true,
     }),
   errorComponent: ({ error, reset }) => (
     <Container size="lg" className="py-16">

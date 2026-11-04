@@ -9,6 +9,7 @@ export const Route = createFileRoute("/wishlist")({
     buildPageHead(undefined, {
       title: "My Wishlist — BatteryMantra",
       description: "View and manage your saved and favorited batteries.",
+      noIndex: true,
     }),
   component: WishlistPage,
 });

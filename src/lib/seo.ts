@@ -9,6 +9,7 @@ export interface PageSeoData {
   ogImage?: string;
   ogType?: string;
   canonicalUrl?: string;
+  noIndex?: boolean;
 }
 
 const BASE_ORIGIN = "https://batterymantra.com";
@@ -40,6 +41,7 @@ export function buildPageHead(
     image?: string;
     canonicalUrl?: string;
     path?: string;
+    noIndex?: boolean;
   }
 ) {
   const title = seoData?.metaTitle || defaults?.title || `${APP.name} — ${APP.tagline}`;
@@ -49,6 +51,7 @@ export function buildPageHead(
   const ogDescription = seoData?.ogDescription || description;
   const ogImage = seoData?.ogImage || defaults?.image || "https://batterymantra.com/logo.png";
   const ogType = seoData?.ogType || "website";
+  const isNoIndex = seoData?.noIndex ?? defaults?.noIndex ?? false;
 
   const rawCanonical =
     seoData?.canonicalUrl ||
@@ -72,6 +75,10 @@ export function buildPageHead(
     { name: "twitter:description", content: ogDescription },
     { name: "twitter:image", content: ogImage },
   ];
+
+  if (isNoIndex) {
+    metaList.push({ name: "robots", content: "noindex,nofollow" });
+  }
 
   if (keywords) {
     metaList.push({ name: "keywords", content: keywords });

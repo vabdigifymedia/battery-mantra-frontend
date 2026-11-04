@@ -5,6 +5,11 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { PartnerSidebar } from "@/components/layout/PartnerSidebar";
 
 export const Route = createFileRoute("/kalkaji_/partner")({
+  head: () => ({
+    meta: [
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
   component: PartnerLayout,
 });
 

@@ -25,8 +25,14 @@ import { OrdersTab } from "@/components/account/OrdersTab";
 import { WishlistTab } from "@/components/account/WishlistTab";
 import { GarageTab } from "@/components/account/GarageTab";
 import { AddressModal } from "@/components/account/AddressModal";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/account")({
+  head: () =>
+    buildPageHead(null, {
+      title: "My Account — BatteryMantra",
+      noIndex: true,
+    }),
   component: AccountPage,
 });
 

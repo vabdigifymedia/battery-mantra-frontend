@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_auth/login")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Sign in — BatteryMantra",
       description: "Sign in to your BatteryMantra account with OTP.",
+      noIndex: true,
     }),
   component: LoginPage,
 });

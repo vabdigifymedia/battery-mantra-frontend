@@ -43,6 +43,7 @@ export const Route = createFileRoute("/kalkaji_/login")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Admin Sign in — BatteryMantra",
       description: "Sign in to your Admin account.",
+      noIndex: true,
     }),
   component: LoginPage,
 });

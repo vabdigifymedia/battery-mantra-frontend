@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_auth/register")({
     meta: [
       { title: "Create account — BatteryMantra" },
       { name: "description", content: "Create your BatteryMantra account." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   validateSearch: searchSchema,

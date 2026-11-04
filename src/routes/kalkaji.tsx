@@ -4,6 +4,11 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AdminRoute } from "@/guards/AdminRoute";
 
 export const Route = createFileRoute("/kalkaji")({
+  head: () => ({
+    meta: [
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
   component: AdminLayout,
 });
 

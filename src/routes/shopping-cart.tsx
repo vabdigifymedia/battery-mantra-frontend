@@ -39,6 +39,7 @@ export const Route = createFileRoute("/shopping-cart")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Your cart — BatteryMantra",
       description: "Review the batteries in your cart before checkout.",
+      noIndex: true,
     }),
   component: CartPage,
 });
