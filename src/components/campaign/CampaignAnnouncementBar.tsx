@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, ArrowRight, X, Copy, Check } from "lucide-react";
 import { activeCampaignsQuery } from "@/queries";
-import { getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { getCampaignThemeStyles, formatCampaignDiscountLabel, compareCampaignPriority } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "./CampaignCountdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -25,10 +25,10 @@ export function CampaignAnnouncementBar() {
     }
   }, []);
 
-  // Get top active campaign that wants to be shown in announcement
+  // Get top active campaign that wants to be shown in announcement (Priority 1 first)
   const activeCampaign = campaigns
     ?.filter((c) => c.showInAnnouncement && c.isActive)
-    ?.sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
+    ?.sort(compareCampaignPriority)[0];
 
   if (!activeCampaign) return null;
   if (dismissedId === activeCampaign.id) return null;

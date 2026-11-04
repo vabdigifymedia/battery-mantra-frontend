@@ -9,7 +9,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { useLocationStore } from "@/store/useLocationStore";
 import { cityDeliveryTimesQuery, categoriesQuery, productDetailQuery, activeCampaignsQuery } from "@/queries";
 import { formatDeliveryCardSla, formatCityDeliveryLabel } from "@/lib/delivery";
-import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
 import { Heart, Zap, ArrowRight, ShieldCheck, Star, RefreshCcw, Settings2, BatteryCharging, Truck, Check, ShoppingCart, Share2, Sparkles, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export function ProductCard({
     if (!activeCampaigns || activeCampaigns.length === 0) return null;
     return activeCampaigns
       .filter((c) => isProductEligibleForCampaign(product, c))
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0] || null;
+      .sort(compareCampaignPriority)[0] || null;
   }, [campaign, activeCampaigns, product]);
 
   const matchedDeliveryTime = useMemo(() => {

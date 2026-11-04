@@ -22,7 +22,7 @@ import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
 import { campaignService } from "@/services/campaign.service";
-import { isProductEligibleForCampaign, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
+import { isProductEligibleForCampaign, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse, CityDto } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
@@ -257,7 +257,7 @@ function CheckoutPage() {
       if (!item?.product) continue;
       const matched = activeCampaigns
         .filter((c) => isProductEligibleForCampaign(item.product, c))
-        .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0];
+        .sort(compareCampaignPriority)[0];
 
       if (matched) {
         const calc = calculateProductCampaignDiscount(item.product, matched, Boolean(item.exchangeOldBattery));

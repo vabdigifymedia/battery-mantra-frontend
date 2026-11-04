@@ -61,7 +61,7 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { locationService } from "@/services/location.service";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 import { formatDeliveryPillText, getDeliveryTimeText } from "@/lib/delivery";
-import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount } from "@/lib/campaign-utils";
+import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
 
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
@@ -257,7 +257,7 @@ export function PdpPage() {
     if (!activeCampaigns || activeCampaigns.length === 0) return null;
     return activeCampaigns
       .filter((c) => isProductEligibleForCampaign(data as any, c))
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0] || null;
+      .sort(compareCampaignPriority)[0] || null;
   }, [activeCampaigns, data]);
 
   const floatingPillDeliveryText = useMemo(() => {

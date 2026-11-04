@@ -238,3 +238,17 @@ export function safeFormatDate(dateStr?: string | null, fmt = "dd MMM yy"): stri
     return "N/A";
   }
 }
+
+/**
+ * Sorts campaigns by ascending priority:
+ * Priority 1 (Rank 1) comes first, Priority 2 comes next.
+ * Unspecified, 0 or negative priorities rank lowest.
+ */
+export function compareCampaignPriority(
+  a: { priority?: number | null },
+  b: { priority?: number | null }
+): number {
+  const pA = a.priority !== undefined && a.priority !== null && a.priority > 0 ? a.priority : 999999;
+  const pB = b.priority !== undefined && b.priority !== null && b.priority > 0 ? b.priority : 999999;
+  return pA - pB;
+}

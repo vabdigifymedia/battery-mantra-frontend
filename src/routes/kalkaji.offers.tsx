@@ -1036,13 +1036,15 @@ function AdminOffersPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
                   <div className="space-y-1.5">
-                    <Label htmlFor="priority">Showcase Priority (Higher = Top)</Label>
+                    <Label htmlFor="priority">Showcase Priority (1 = Top, 2 = Next)</Label>
                     <Input
                       id="priority"
                       type="number"
+                      min={1}
+                      placeholder="e.g. 1"
                       {...form.register("priority")}
                     />
-                    <p className="text-[11px] text-muted-foreground">Used to decide which banner / ticker takes precedence.</p>
+                    <p className="text-[11px] text-muted-foreground">Order of priority: 1 comes first, followed by 2, 3, etc.</p>
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/20 mt-3">

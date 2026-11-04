@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Sparkles, ArrowRight, Flame, Copy, Check, Tag, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sparkles, ArrowRight, Flame, Copy, Check, Tag, ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import { activeCampaignsQuery, campaignBySlugQuery } from "@/queries";
-import { getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
+import { getCampaignThemeStyles, formatCampaignDiscountLabel, compareCampaignPriority } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "./CampaignCountdown";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
@@ -15,29 +15,30 @@ export function HomeFestiveSpotlight() {
   const { data: campaigns } = useQuery(activeCampaignsQuery());
   const [copied, setCopied] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isManualMode, setIsManualMode] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // All active campaigns designated for home showcase
+  // All active campaigns designated for home showcase sorted by Priority (Priority 1 first, Priority 2 next...)
   const homeCampaigns = useMemo(() => {
     return (campaigns || [])
       .filter((c) => c.showOnHome && c.isActive)
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      .sort(compareCampaignPriority);
   }, [campaigns]);
 
   // Keep active index in bounds if campaigns change
   const validIndex = activeIndex < homeCampaigns.length ? activeIndex : 0;
   const homeCampaign = homeCampaigns[validIndex];
 
-  // Auto-switch tabs every 6 seconds if not paused
+  // Auto-switch tabs every 6 seconds ONLY when not in manual mode and not hovered
   useEffect(() => {
-    if (homeCampaigns.length <= 1 || isPaused) return;
+    if (homeCampaigns.length <= 1 || isManualMode || isHovered) return;
 
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % homeCampaigns.length);
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [homeCampaigns.length, isPaused, validIndex]);
+  }, [homeCampaigns.length, isManualMode, isHovered, validIndex]);
 
   // Query participating products for active campaign
   const { data: campaignDetail } = useQuery({
@@ -61,24 +62,36 @@ export function HomeFestiveSpotlight() {
     setTimeout(() => setCopied(false), 2500);
   };
 
+  // When user clicks a tab manually, lock to that offer and stop auto-switching
+  const handleTabClick = (idx: number) => {
+    setActiveIndex(idx);
+    setIsManualMode(true);
+  };
+
   const handlePrev = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setActiveIndex((prev) => (prev - 1 + homeCampaigns.length) % homeCampaigns.length);
-    setIsPaused(true);
+    setIsManualMode(true);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setActiveIndex((prev) => (prev + 1) % homeCampaigns.length);
-    setIsPaused(true);
+    setIsManualMode(true);
+  };
+
+  const toggleAutoPlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsManualMode((prev) => !prev);
   };
 
   return (
     <section className="relative w-full py-6 sm:py-12 overflow-hidden">
       <Container size="xl">
-        {/* If multiple active campaigns: Interactive Auto-Switching Tabs */}
+        {/* If multiple active campaigns: Interactive Tabs with Priority Order & Manual Control */}
         {homeCampaigns.length > 1 && (
           <div className="mb-3.5 sm:mb-4 flex items-center justify-between gap-3 flex-wrap">
             {/* Scrollable Tabs */}
@@ -89,10 +102,7 @@ export function HomeFestiveSpotlight() {
                   <button
                     key={camp.id || camp.slug || idx}
                     type="button"
-                    onClick={() => {
-                      setActiveIndex(idx);
-                      setIsPaused(true);
-                    }}
+                    onClick={() => handleTabClick(idx)}
                     className={cn(
                       "relative shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all border shadow-xs cursor-pointer overflow-hidden",
                       isActive
@@ -112,18 +122,15 @@ export function HomeFestiveSpotlight() {
                     </span>
                     {isActive && (
                       <span className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500 text-black ml-0.5">
-                        Active
+                        {isManualMode ? "Viewing" : "Active"}
                       </span>
                     )}
 
-                    {/* Progress indicator bar on active tab */}
-                    {isActive && (
+                    {/* Progress indicator bar: only animate when auto-switching is active */}
+                    {isActive && !isManualMode && !isHovered && (
                       <span
                         key={`tab-progress-${idx}-${validIndex}`}
-                        className={cn(
-                          "absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-amber-400 via-primary to-amber-300",
-                          !isPaused ? "animate-tab-progress" : "w-full"
-                        )}
+                        className="absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-amber-400 via-primary to-amber-300 animate-tab-progress"
                       />
                     )}
                   </button>
@@ -131,12 +138,34 @@ export function HomeFestiveSpotlight() {
               })}
             </div>
 
-            {/* Carousel navigation controls (Prev / Next & auto status) */}
-            <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="text-[11px] font-medium bg-muted px-2.5 py-1 rounded-full border flex items-center gap-1.5">
-                <span className={cn("w-1.5 h-1.5 rounded-full", isPaused ? "bg-amber-500" : "bg-emerald-500 animate-ping")} />
-                {isPaused ? "Paused" : "Auto-Switching"} ({validIndex + 1}/{homeCampaigns.length})
-              </span>
+            {/* Navigation & Auto-Rotation Toggle */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+              <button
+                type="button"
+                onClick={toggleAutoPlay}
+                className={cn(
+                  "text-[11px] font-semibold px-2.5 py-1 rounded-full border flex items-center gap-1.5 transition-colors cursor-pointer",
+                  isManualMode
+                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/25"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                )}
+                title={isManualMode ? "Click to resume auto-rotation" : "Click to pause auto-rotation"}
+              >
+                {isManualMode ? (
+                  <>
+                    <Play className="w-3 h-3 text-amber-600 dark:text-amber-400 fill-amber-600 dark:fill-amber-400" />
+                    <span>Paused • Resume</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                    <Pause className="w-3 h-3 opacity-60" />
+                    <span>Auto-Rotating</span>
+                  </>
+                )}
+                <span className="opacity-75 font-normal">({validIndex + 1}/{homeCampaigns.length})</span>
+              </button>
+
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -160,8 +189,8 @@ export function HomeFestiveSpotlight() {
         )}
 
         <div
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className={cn(
             "relative rounded-2xl sm:rounded-3xl overflow-hidden border shadow-xl p-3.5 sm:p-6 lg:p-10 transition-all duration-500",
             styles.barBg
