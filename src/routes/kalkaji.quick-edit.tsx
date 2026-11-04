@@ -84,7 +84,8 @@ function BulkPricingPage() {
       update.productPrice !== undefined || 
       update.originalPrice !== undefined || 
       update.exchangeDiscount !== undefined ||
-      update.highlights !== undefined
+      update.highlights !== undefined ||
+      update.productStock !== undefined
     );
     if (updates.length > 0) {
       saveMutation.mutate(updates);
@@ -148,6 +149,7 @@ function BulkPricingPage() {
           <thead className="text-xs uppercase bg-muted/50 border-b">
             <tr>
               <th className="px-4 py-3 font-semibold min-w-[250px]">Product Info</th>
+              <th className="px-4 py-3 font-semibold w-[120px]">Stock Qty<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Central)</span></th>
               <th className="px-4 py-3 font-semibold w-[130px]">MRP (₹)</th>
               <th className="px-4 py-3 font-semibold w-[130px]">Base Price (₹)<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Without Exch.)</span></th>
               <th className="px-4 py-3 font-semibold w-[130px]">Old Battery (₹)<br/><span className="text-[10px] normal-case font-normal text-muted-foreground">(Exchange Value)</span></th>
@@ -157,13 +159,13 @@ function BulkPricingPage() {
           <tbody className="divide-y">
             {isLoading || isFetching ? (
               <tr>
-                <td colSpan={6} className="h-32 text-center">
+                <td colSpan={7} className="h-32 text-center">
                   <Spinner className="mx-auto" />
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan={6} className="h-32 text-center text-muted-foreground">
+                <td colSpan={7} className="h-32 text-center text-muted-foreground">
                   No products found for the selected filters.
                 </td>
               </tr>
@@ -185,6 +187,26 @@ function BulkPricingPage() {
                           <p className="text-[10px] text-muted-foreground mt-0.5">{p.brandName} • {p.productCategory}</p>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const stockVal = Number(getFieldValue(p, "productStock") || 0);
+                        return (
+                          <Input 
+                            type="number" 
+                            min="0"
+                            className={`h-9 font-semibold ${
+                              stockVal === 0
+                                ? "bg-red-50 text-red-700 border-red-300 dark:bg-red-950/30"
+                                : stockVal <= 10
+                                ? "bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/30"
+                                : "bg-emerald-50/50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/30"
+                            } ${editedProducts[p.productId]?.productStock !== undefined ? "ring-2 ring-amber-400" : ""}`}
+                            value={getFieldValue(p, "productStock")}
+                            onChange={(e) => handleEdit(p.productId, "productStock", e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0))}
+                          />
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3">
                       <Input 

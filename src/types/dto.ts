@@ -238,6 +238,7 @@ export type ProductListResponse = {
   productPrice: number;
   originalPrice?: number;
   exchangeDiscount?: number;
+  productStock?: number;
   productImage?: string;
   additionalImages?: string[];
   productCategory?: string;
@@ -579,6 +580,22 @@ export type BulkProductUpdateRequest = {
   originalPrice?: number;
   exchangeDiscount?: number;
   highlights?: string;
+  productStock?: number;
+};
+
+export type InventoryStockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
+
+export type UpdateStockRequest = {
+  stockQuantity: number;
+  notes?: string;
+};
+
+export type InventorySummaryResponse = {
+  totalSkus: number;
+  inStockCount: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  lowStockThreshold: number;
 };
 
 export type OrderStatusUpdateRequest = {

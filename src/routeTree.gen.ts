@@ -40,6 +40,7 @@ import { Route as KalkajiCouponsRouteImport } from './routes/kalkaji.coupons'
 import { Route as KalkajiDeliveryTimeRouteImport } from './routes/kalkaji.delivery-time'
 import { Route as KalkajiEnquiriesRouteImport } from './routes/kalkaji.enquiries'
 import { Route as KalkajiFuelsRouteImport } from './routes/kalkaji.fuels'
+import { Route as KalkajiInventoryRouteImport } from './routes/kalkaji.inventory'
 import { Route as KalkajiLeavesRouteImport } from './routes/kalkaji.leaves'
 import { Route as KalkajiLocationsRouteImport } from './routes/kalkaji.locations'
 import { Route as KalkajiManufacturersRouteImport } from './routes/kalkaji.manufacturers'
@@ -254,6 +255,11 @@ const KalkajiEnquiriesRoute = KalkajiEnquiriesRouteImport.update({
 const KalkajiFuelsRoute = KalkajiFuelsRouteImport.update({
   id: '/fuels',
   path: '/fuels',
+  getParentRoute: () => KalkajiRoute,
+} as any)
+const KalkajiInventoryRoute = KalkajiInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => KalkajiRoute,
 } as any)
 const KalkajiLeavesRoute = KalkajiLeavesRouteImport.update({
@@ -606,6 +612,7 @@ export interface FileRoutesByFullPath {
   '/kalkaji/delivery-time': typeof KalkajiDeliveryTimeRoute
   '/kalkaji/enquiries': typeof KalkajiEnquiriesRoute
   '/kalkaji/fuels': typeof KalkajiFuelsRoute
+  '/kalkaji/inventory': typeof KalkajiInventoryRoute
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
@@ -698,6 +705,7 @@ export interface FileRoutesByTo {
   '/kalkaji/delivery-time': typeof KalkajiDeliveryTimeRoute
   '/kalkaji/enquiries': typeof KalkajiEnquiriesRoute
   '/kalkaji/fuels': typeof KalkajiFuelsRoute
+  '/kalkaji/inventory': typeof KalkajiInventoryRoute
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
@@ -792,6 +800,7 @@ export interface FileRoutesById {
   '/kalkaji/delivery-time': typeof KalkajiDeliveryTimeRoute
   '/kalkaji/enquiries': typeof KalkajiEnquiriesRoute
   '/kalkaji/fuels': typeof KalkajiFuelsRoute
+  '/kalkaji/inventory': typeof KalkajiInventoryRoute
   '/kalkaji/leaves': typeof KalkajiLeavesRoute
   '/kalkaji/locations': typeof KalkajiLocationsRoute
   '/kalkaji/manufacturers': typeof KalkajiManufacturersRoute
@@ -887,6 +896,7 @@ export interface FileRouteTypes {
     | '/kalkaji/delivery-time'
     | '/kalkaji/enquiries'
     | '/kalkaji/fuels'
+    | '/kalkaji/inventory'
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
@@ -979,6 +989,7 @@ export interface FileRouteTypes {
     | '/kalkaji/delivery-time'
     | '/kalkaji/enquiries'
     | '/kalkaji/fuels'
+    | '/kalkaji/inventory'
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
@@ -1072,6 +1083,7 @@ export interface FileRouteTypes {
     | '/kalkaji/delivery-time'
     | '/kalkaji/enquiries'
     | '/kalkaji/fuels'
+    | '/kalkaji/inventory'
     | '/kalkaji/leaves'
     | '/kalkaji/locations'
     | '/kalkaji/manufacturers'
@@ -1397,6 +1409,13 @@ declare module '@tanstack/react-router' {
       path: '/fuels'
       fullPath: '/kalkaji/fuels'
       preLoaderRoute: typeof KalkajiFuelsRouteImport
+      parentRoute: typeof KalkajiRoute
+    }
+    '/kalkaji/inventory': {
+      id: '/kalkaji/inventory'
+      path: '/inventory'
+      fullPath: '/kalkaji/inventory'
+      preLoaderRoute: typeof KalkajiInventoryRouteImport
       parentRoute: typeof KalkajiRoute
     }
     '/kalkaji/leaves': {
@@ -1853,6 +1872,7 @@ interface KalkajiRouteChildren {
   KalkajiDeliveryTimeRoute: typeof KalkajiDeliveryTimeRoute
   KalkajiEnquiriesRoute: typeof KalkajiEnquiriesRoute
   KalkajiFuelsRoute: typeof KalkajiFuelsRoute
+  KalkajiInventoryRoute: typeof KalkajiInventoryRoute
   KalkajiLeavesRoute: typeof KalkajiLeavesRoute
   KalkajiLocationsRoute: typeof KalkajiLocationsRoute
   KalkajiManufacturersRoute: typeof KalkajiManufacturersRoute
@@ -1901,6 +1921,7 @@ const KalkajiRouteChildren: KalkajiRouteChildren = {
   KalkajiDeliveryTimeRoute: KalkajiDeliveryTimeRoute,
   KalkajiEnquiriesRoute: KalkajiEnquiriesRoute,
   KalkajiFuelsRoute: KalkajiFuelsRoute,
+  KalkajiInventoryRoute: KalkajiInventoryRoute,
   KalkajiLeavesRoute: KalkajiLeavesRoute,
   KalkajiLocationsRoute: KalkajiLocationsRoute,
   KalkajiManufacturersRoute: KalkajiManufacturersRoute,

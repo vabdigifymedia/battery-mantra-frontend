@@ -1054,13 +1054,17 @@ export function PdpPage() {
               </div>
 
               <div>
-                {inStock ? (
-                  <Badge variant="outline" className="border-success/40 bg-success/10 text-success text-sm py-1">
-                    <CheckCircle2 className="mr-1.5 h-4 w-4" /> In Stock
+                {!inStock ? (
+                  <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive text-sm py-1 font-semibold">
+                    Out of stock
+                  </Badge>
+                ) : (data.productStock ?? 0) <= 10 ? (
+                  <Badge variant="outline" className="border-amber-500/50 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 text-sm py-1 font-bold animate-pulse">
+                    <AlertCircle className="mr-1.5 h-4 w-4 text-amber-600" /> Only {data.productStock} left in stock - order soon!
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive text-sm py-1">
-                    Out of stock
+                  <Badge variant="outline" className="border-success/40 bg-success/10 text-success text-sm py-1 font-semibold">
+                    <CheckCircle2 className="mr-1.5 h-4 w-4" /> In Stock
                   </Badge>
                 )}
               </div>

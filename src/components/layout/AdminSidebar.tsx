@@ -3,7 +3,7 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit, KeyRound, Flame, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit, KeyRound, Flame, Sparkles, Boxes } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/auth/ChangePasswordDialog";
 import {
   Sidebar,
@@ -52,6 +52,7 @@ const navigation = [
 
 const productNavigation = [
   { name: "Products", href: "/kalkaji/products", icon: Package },
+  { name: "Inventory", href: "/kalkaji/inventory", icon: Boxes },
   { name: "Product Priority", href: "/kalkaji/products/priority", icon: ArrowUpDown },
   { name: "Pricing %", href: "/kalkaji/bulk-pricing", icon: Percent },
   { name: "Price Value", href: "/kalkaji/quick-edit", icon: IndianRupee },

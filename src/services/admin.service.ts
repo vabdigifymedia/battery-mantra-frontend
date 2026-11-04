@@ -171,6 +171,46 @@ export const adminService = {
     apiFetch<void>("/api/admin/products/reorder", { method: "PUT", body }),
   bulkUpdateProducts: (body: BulkProductUpdateRequest[]) =>
     apiFetch<void>("/api/admin/products/bulk-update", { method: "PUT", body }),
+  updateStock: async (id: UUID, stockQuantity: number, notes?: string) => {
+    try {
+      return await apiFetch<{ productId: UUID; productStock: number; message: string }>(
+        `/api/admin/inventory/${id}/stock`,
+        {
+          method: "PATCH",
+          body: { stockQuantity, notes },
+        }
+      );
+    } catch {
+      // Graceful fallback to updating product directly if dedicated inventory endpoint is not yet mounted
+      return await apiFetch<ProductDetailResponse>(
+        endpoints.admin.products.update(id),
+        {
+          method: "PATCH",
+          body: { productStock: stockQuantity },
+        }
+      );
+    }
+  },
+  bulkUpdateStock: async (updates: Array<{ productId: UUID; stockQuantity: number }>) => {
+    try {
+      return await apiFetch<{ updatedCount: number; message: string }>(
+        "/api/admin/inventory/bulk-update",
+        {
+          method: "PUT",
+          body: updates,
+        }
+      );
+    } catch {
+      // Graceful fallback to bulk update products endpoint
+      return await apiFetch<void>("/api/admin/products/bulk-update", {
+        method: "PUT",
+        body: updates.map((u) => ({
+          productId: u.productId,
+          productStock: u.stockQuantity,
+        })),
+      });
+    }
+  },
 
   // Categories
   createCategory: (body: CreateCategoryRequest) => 

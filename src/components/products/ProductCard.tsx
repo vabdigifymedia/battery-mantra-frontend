@@ -251,6 +251,10 @@ export function ProductCard({
       .filter(Boolean);
   }, [product.highlights]);
 
+  const stockQty = product.productStock;
+  const isOutOfStock = stockQty !== undefined && stockQty === 0;
+  const isLowStock = stockQty !== undefined && stockQty > 0 && stockQty <= 10;
+
   return (
     <div
       className={cn(
@@ -277,6 +281,17 @@ export function ProductCard({
                 </span>
               </span>
             )}
+
+            {/* Out of Stock & Low Stock Badges */}
+            {isOutOfStock ? (
+              <span className="text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs bg-red-600 text-white tracking-tight uppercase">
+                Out of Stock
+              </span>
+            ) : isLowStock ? (
+              <span className="text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs bg-amber-500 text-amber-950 tracking-tight uppercase animate-pulse">
+                Only {stockQty} Left!
+              </span>
+            ) : null}
 
             {/* Highlights Badges from Admin Quick Edit */}
             {highlightBadges.slice(0, matchedCampaign ? 0 : showSavings ? 1 : 2).map((badge, idx) => {
@@ -464,35 +479,85 @@ export function ProductCard({
         </div>
 
         {/* Delivery & Stock Strip - Hidden on Mobile */}
-        <div className="hidden sm:flex mx-4 mb-3 bg-emerald-50/80 rounded-lg p-2.5 items-center justify-between border border-emerald-100/50">
-          <div className="flex items-start gap-1.5 w-1/2 border-r border-emerald-200/50 pr-2">
-            <Truck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] font-bold text-emerald-800 leading-tight truncate">{deliverySla}</span>
-              <span className="text-[9px] text-emerald-600/80 leading-tight truncate">{deliveryCityLabel}</span>
+        {isOutOfStock ? (
+          <div className="hidden sm:flex mx-4 mb-3 bg-red-50/80 rounded-lg p-2.5 items-center justify-between border border-red-200/60">
+            <div className="flex items-start gap-1.5 w-1/2 border-r border-red-200/50 pr-2">
+              <Truck className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-bold text-red-800 leading-tight truncate">Currently Unavailable</span>
+                <span className="text-[9px] text-red-600/80 leading-tight truncate">{deliveryCityLabel}</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-1.5 pl-2">
+              <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-red-800 leading-tight">Out of Stock</span>
+                <span className="text-[9px] text-red-600/80 leading-tight truncate">Restocking Soon</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-start gap-1.5 pl-2">
-            <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+        ) : isLowStock ? (
+          <div className="hidden sm:flex mx-4 mb-3 bg-amber-50/90 rounded-lg p-2.5 items-center justify-between border border-amber-200/60">
+            <div className="flex items-start gap-1.5 w-1/2 border-r border-amber-200/50 pr-2">
+              <Truck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-bold text-amber-800 leading-tight truncate">{deliverySla}</span>
+                <span className="text-[9px] text-amber-700/80 leading-tight truncate">{deliveryCityLabel}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-emerald-800 leading-tight">In Stock</span>
-              <span className="text-[9px] text-emerald-600/80 leading-tight truncate">Ready to Dispatch</span>
+            <div className="flex items-start gap-1.5 pl-2">
+              <div className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-amber-800 leading-tight">Only {stockQty} Left!</span>
+                <span className="text-[9px] text-amber-700/80 leading-tight truncate">Hurry, Selling Fast</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="hidden sm:flex mx-4 mb-3 bg-emerald-50/80 rounded-lg p-2.5 items-center justify-between border border-emerald-100/50">
+            <div className="flex items-start gap-1.5 w-1/2 border-r border-emerald-200/50 pr-2">
+              <Truck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-bold text-emerald-800 leading-tight truncate">{deliverySla}</span>
+                <span className="text-[9px] text-emerald-600/80 leading-tight truncate">{deliveryCityLabel}</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-1.5 pl-2">
+              <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-emerald-800 leading-tight">In Stock</span>
+                <span className="text-[9px] text-emerald-600/80 leading-tight truncate">Ready to Dispatch</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
       <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 pt-2 sm:pt-0 flex items-center gap-2 mt-auto">
-        <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-xs w-full sm:flex-1 h-7.5 sm:h-9 rounded-md sm:rounded-lg">
-          <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
-            <span className="text-[11px] sm:text-xs font-bold flex items-center justify-center">
-              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now
-            </span>
-          </RouterLink>
-        </Button>
+        {isOutOfStock ? (
+          <Button asChild size="sm" variant="outline" className="border-red-200 bg-red-50/60 text-red-700 hover:bg-red-100 hover:text-red-800 shadow-xs w-full sm:flex-1 h-7.5 sm:h-9 rounded-md sm:rounded-lg">
+            <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
+              <span className="text-[11px] sm:text-xs font-bold flex items-center justify-center">
+                Out of Stock
+              </span>
+            </RouterLink>
+          </Button>
+        ) : (
+          <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-xs w-full sm:flex-1 h-7.5 sm:h-9 rounded-md sm:rounded-lg">
+            <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
+              <span className="text-[11px] sm:text-xs font-bold flex items-center justify-center">
+                <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> Buy Now
+              </span>
+            </RouterLink>
+          </Button>
+        )}
         <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-border shadow-xs sm:flex-1 h-9 rounded-lg hover:bg-slate-50">
           <RouterLink to="/product/$" params={{ _splat: product.seo?.slug || product.productId }}>
             <span className="text-xs font-bold text-slate-700 flex items-center justify-center">
