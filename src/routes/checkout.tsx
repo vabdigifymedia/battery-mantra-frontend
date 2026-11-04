@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles, Clock, Calendar } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Check, Ticket, X, AlertTriangle, MapPin, RefreshCw, Sparkles, Clock, Calendar, Trash2, Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -22,6 +22,7 @@ import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
 import { campaignService } from "@/services/campaign.service";
+import { cartService } from "@/services/cart.service";
 import { isProductEligibleForCampaign, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse, CityDto } from "@/types/dto";
@@ -231,6 +232,28 @@ function CheckoutPage() {
   // Real-time cart query fetched using effective delivery city ID
   const cart = useQuery(cartQuery(status === "authenticated", effectiveCity?.cityId));
   const { data: activeCampaigns = [] } = useQuery(activeCampaignsQuery());
+
+  const removeCartItem = useMutation({
+    mutationFn: (cartItemId: string) => cartService.remove(cartItemId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+      toast.success("Item removed from order");
+    },
+    onError: (e) => {
+      toast.error(e instanceof ApiError ? e.message : "Could not remove item.");
+    },
+  });
+
+  const updateCartItemQty = useMutation({
+    mutationFn: ({ cartItemId, qty }: { cartItemId: string; qty: number }) =>
+      cartService.update(cartItemId, { quantity: qty }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+    },
+    onError: (e) => {
+      toast.error(e instanceof ApiError ? e.message : "Could not update quantity.");
+    },
+  });
 
   const items = useMemo(() => cart.data?.cartItems ?? [], [cart.data?.cartItems]);
   const subtotal = useMemo(
@@ -756,23 +779,99 @@ function CheckoutPage() {
             onEdit={() => setActiveStep(4)}
             summary={`${items.length} item(s)`}
           >
-            <div className="border rounded-xl overflow-hidden divide-y">
+            <div className="border rounded-xl overflow-hidden divide-y bg-background">
               {items.map((it) => {
                 if (!it?.product) return null;
+                const isItemRemoving = removeCartItem.isPending && removeCartItem.variables === it.cartItemId;
+                const isItemUpdating = updateCartItemQty.isPending && updateCartItemQty.variables?.cartItemId === it.cartItemId;
+
                 return (
-                  <div key={it.cartItemId} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-background">
-                    <div className="h-14 w-14 sm:h-16 sm:w-16 bg-muted rounded-md border flex items-center justify-center shrink-0">
-                      {it.product.productImage ? (
-                        <img src={it.product.productImage} alt={it.product.productName || "Product"} className="h-full w-full object-contain p-1" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No img</span>
-                      )}
+                  <div
+                    key={it.cartItemId}
+                    className={cn(
+                      "flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 transition-all",
+                      (isItemRemoving || isItemUpdating) && "opacity-50 pointer-events-none"
+                    )}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      {/* Product Image */}
+                      <div className="h-14 w-14 sm:h-16 sm:w-16 bg-muted rounded-lg border flex items-center justify-center shrink-0 overflow-hidden">
+                        {it.product.productImage ? (
+                          <img
+                            src={it.product.productImage}
+                            alt={it.product.productName || "Product"}
+                            className="h-full w-full object-contain p-1"
+                          />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">No img</span>
+                        )}
+                      </div>
+
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-xs sm:text-sm text-foreground leading-snug line-clamp-2">
+                          {it.product.productName || "Product"}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          {it.exchangeOldBattery && (
+                            <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                              With Exchange
+                            </span>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            ₹{(it.product.productPrice || 0).toLocaleString("en-IN")} each
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-xs sm:text-sm text-foreground truncate">{it.product.productName || "Product"}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">Qty: {it.quantity}</p>
+
+                    {/* Controls & Price Row */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-border/50">
+                      {/* Quantity Stepper */}
+                      <div className="flex items-center border rounded-lg bg-muted/30">
+                        <button
+                          type="button"
+                          disabled={it.quantity <= 1 || isItemUpdating}
+                          onClick={() => updateCartItemQty.mutate({ cartItemId: it.cartItemId, qty: it.quantity - 1 })}
+                          className="h-7 w-7 flex items-center justify-center hover:bg-muted text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                          title="Decrease quantity"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-8 text-center text-xs font-bold text-foreground">
+                          {it.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={isItemUpdating}
+                          onClick={() => updateCartItemQty.mutate({ cartItemId: it.cartItemId, qty: it.quantity + 1 })}
+                          className="h-7 w-7 flex items-center justify-center hover:bg-muted text-foreground transition-colors cursor-pointer"
+                          title="Increase quantity"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Item Total Price */}
+                      <div className="text-right min-w-[70px]">
+                        <Price
+                          value={(it.product.productPrice || 0) * it.quantity}
+                          size="sm"
+                          className="font-bold sm:text-base"
+                        />
+                      </div>
+
+                      {/* Remove / Trash Button */}
+                      <button
+                        type="button"
+                        onClick={() => removeCartItem.mutate(it.cartItemId)}
+                        disabled={isItemRemoving}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors cursor-pointer"
+                        title="Remove item from order"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <Price value={(it.product.productPrice || 0) * it.quantity} size="sm" className="font-bold sm:text-base shrink-0" />
                   </div>
                 );
               })}

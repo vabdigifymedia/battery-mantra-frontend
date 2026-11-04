@@ -337,6 +337,31 @@ export function PdpPage() {
     },
   });
 
+  const buyNow = useMutation({
+    mutationFn: async () => {
+      // Clear any previously added cart items so "Buy Now" checks out ONLY this product
+      try {
+        await cartService.clear();
+      } catch {
+        // ignore if cart was already empty
+      }
+      return cartService.add({ productId: data.productId, quantity: qty, exchangeOldBattery: isExchange });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+      trackAddToCart({
+        productId: data.productId,
+        productName: data.productName,
+        brandName: data.brandName,
+        productPrice: isExchange ? withExchangePrice : data.productPrice,
+      });
+      navigate({ to: "/checkout" });
+    },
+    onError: (e) => {
+      toast.error(e instanceof ApiError ? e.message : "Could not proceed to checkout.");
+    },
+  });
+
   const search = Route.useSearch();
   const autoActionHandled = useRef(false);
 
@@ -347,12 +372,10 @@ export function PdpPage() {
       autoActionHandled.current = true;
       navigate({ search: (prev: any) => ({ ...prev, autoAdd: undefined }), replace: true } as any);
       addToCart.mutate();
-    } else if (status === "authenticated" && search.autoBuy === "true" && inStock && !addToCart.isPending && !addToCart.isSuccess) {
+    } else if (status === "authenticated" && search.autoBuy === "true" && inStock && !buyNow.isPending && !buyNow.isSuccess) {
       autoActionHandled.current = true;
       navigate({ search: (prev: any) => ({ ...prev, autoBuy: undefined }), replace: true } as any);
-      addToCart.mutate(undefined, {
-        onSuccess: () => navigate({ to: "/checkout" }),
-      });
+      buyNow.mutate();
     }
   }, [status, search.autoAdd, search.autoBuy, inStock]);
 
@@ -374,9 +397,7 @@ export function PdpPage() {
       navigate({ to: "/login", search: { redirect: `${currentPath}?autoBuy=true` } });
       return;
     }
-    addToCart.mutate(undefined, {
-      onSuccess: () => navigate({ to: "/checkout" }),
-    });
+    buyNow.mutate();
   };
 
   const allFlatSpecs = flattenSpecs(data.specs);
@@ -1199,10 +1220,10 @@ export function PdpPage() {
                     size="lg"
                     className="flex-1 h-12 sm:h-14 text-sm sm:text-base font-semibold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all px-2"
                     onClick={onBuyNow}
-                    disabled={!inStock || addToCart.isPending || blockPurchase}
+                    disabled={!inStock || addToCart.isPending || buyNow.isPending || blockPurchase}
                   >
                     <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
-                    Buy Now
+                    {buyNow.isPending ? "Proceeding..." : "Buy Now"}
                   </Button>
                 </div>
 
