@@ -235,6 +235,8 @@ export type ProductListResponse = {
   productId: UUID;
   productName: string;
   brandName?: string;
+  brandId?: UUID;
+  warranty?: string;
   productPrice: number;
   originalPrice?: number;
   exchangeDiscount?: number;

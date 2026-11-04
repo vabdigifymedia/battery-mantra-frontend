@@ -68,8 +68,10 @@ const SORTS: { value: ProductSort; label: string }[] = [
 
 export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, hideCategoryFilter, baseUrl, isDealerPage, hidePageHeader }: ProductsPageLayoutProps) {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const categoriesList = useQuery(rootCategoriesQuery()).data || [];
-  const brandsList = useQuery(brandsQuery(undefined)).data || [];
+  const categoriesQueryState = useQuery(rootCategoriesQuery());
+  const brandsQueryState = useQuery(brandsQuery(undefined));
+  const categoriesList = categoriesQueryState.data || [];
+  const brandsList = brandsQueryState.data || [];
 
   let effectiveCategoryIds = useMemo(() => {
     if (!search.category) return undefined;
@@ -122,14 +124,17 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
 
   const effectiveBrandIds = useMemo(() => {
     if (!search.brand) return undefined;
-    const slugs = search.brand.split(',');
-    return brandsList
+    const slugs = search.brand.split(',').map(s => s.trim().toLowerCase());
+    const ids = brandsList
       .filter(b => {
-        const bSlug = getBrandSlug(b);
+        const bSlug = getBrandSlug(b)?.toLowerCase();
         const bNameSlug = b.brandName ? b.brandName.toLowerCase().replace(/\s+/g, '-') : '';
-        return slugs.includes(bSlug) || slugs.includes(bNameSlug);
+        const bRawName = b.brandName?.toLowerCase();
+        return slugs.includes(bSlug) || slugs.includes(bNameSlug) || (bRawName && slugs.includes(bRawName));
       })
-      .map(b => b.brandId);
+      .map(b => b.brandId)
+      .filter(Boolean);
+    return ids.length > 0 ? ids : undefined;
   }, [search.brand, brandsList]);
 
   const filters: ProductFilterState = {
@@ -141,17 +146,31 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     maxPrice: search.maxPrice,
   };
 
-
   const params: ProductFilterParams = {
-    ...filters,
     categoryId: effectiveCategoryIds,
     brandId: effectiveBrandIds,
     keyword: search.q,
     vehicleId: vehicleIdOverride ?? search.vehicleId,
+    minPrice: search.minPrice ? Number(search.minPrice) : undefined,
+    maxPrice: search.maxPrice ? Number(search.maxPrice) : undefined,
+    capacity: Array.isArray(search.capacity)
+      ? search.capacity
+      : typeof search.capacity === "string"
+        ? (search.capacity as string).split(",").map((s) => s.trim()).filter(Boolean)
+        : undefined,
+    warranty: Array.isArray(search.warranty)
+      ? search.warranty
+      : typeof search.warranty === "string"
+        ? (search.warranty as string).split(",").map((s) => s.trim()).filter(Boolean)
+        : undefined,
     page: search.page,
     size: search.size,
     ...sortToApi((search.sort as ProductSort) || "relevance"),
   };
+
+  const isWaitingForFilters =
+    (Boolean(search.brand) && brandsQueryState.isLoading) ||
+    (Boolean(search.category) && categoriesQueryState.isLoading);
 
   const {
     data,
@@ -162,7 +181,10 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useInfiniteQuery(productFilterInfiniteQuery(params));
+  } = useInfiniteQuery({
+    ...productFilterInfiniteQuery(params),
+    enabled: !isWaitingForFilters,
+  });
 
   const { data: aggregations } = useQuery(productFilterAggregationsQuery(params));
 

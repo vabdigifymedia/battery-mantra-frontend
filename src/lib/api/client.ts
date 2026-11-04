@@ -25,7 +25,18 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
   const usp = new URLSearchParams();
   for (const [k, v] of Object.entries(query)) {
     if (v === undefined || v === null) continue;
-    usp.append(k, String(v));
+    if (Array.isArray(v)) {
+      if (v.length === 0) continue;
+      for (const item of v) {
+        if (item !== undefined && item !== null && String(item).trim() !== "") {
+          usp.append(k, String(item).trim());
+        }
+      }
+      continue;
+    }
+    const str = String(v).trim();
+    if (str === "") continue;
+    usp.append(k, str);
   }
   const qs = usp.toString();
   return qs ? `${url}?${qs}` : url;

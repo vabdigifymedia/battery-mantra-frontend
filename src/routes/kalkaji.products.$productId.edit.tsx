@@ -373,8 +373,8 @@ function EditProductForm({
       draft.clearDraft();
       toast.success("Product updated successfully!");
       // Clear ALL product detail caches — both admin and public (with any cityId)
-      queryClient.removeQueries({ queryKey: ["admin", "products", "detail", productId] });
-      queryClient.removeQueries({ queryKey: ["products", "detail", productId] });
+      queryClient.removeQueries({ queryKey: ["admin", "products", "detail"] });
+      queryClient.removeQueries({ queryKey: ["products", "detail"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate({ to: "/kalkaji/products" as any });

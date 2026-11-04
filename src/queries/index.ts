@@ -63,23 +63,22 @@ export const productDetailQuery = (id: string) => {
     queryKey: queryKeys.products.detail(id, cityId),
     queryFn: async ({ signal }) => {
       const product = await productsService.byId(id, cityId, signal);
-      // Fallback: If city pricing has exchangeDiscount = 0, but master product has exchangeDiscount > 0
-      if (cityId && (product.exchangeDiscount ?? 0) <= 0) {
+      // If cityId is selected, ensure central stock & exchange discount are synced with the master product
+      if (cityId) {
         try {
           const masterProduct = await productsService.byId(id, undefined, signal);
-          if ((masterProduct.exchangeDiscount ?? 0) > 0) {
-            return {
-              ...product,
-              exchangeDiscount: masterProduct.exchangeDiscount,
-            };
-          }
+          return {
+            ...product,
+            productStock: masterProduct.productStock ?? product.productStock,
+            exchangeDiscount: (product.exchangeDiscount ?? 0) > 0 ? product.exchangeDiscount : masterProduct.exchangeDiscount,
+          };
         } catch {
           // ignore fallback error
         }
       }
       return product;
     },
-    staleTime: 60_000,
+    staleTime: 0,
   });
 };
 

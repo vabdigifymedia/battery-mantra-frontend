@@ -159,6 +159,7 @@ export function AdminInventoryPage() {
         delete next[variables.productId];
         return next;
       });
+      queryClient.removeQueries({ queryKey: ["products", "detail"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -178,6 +179,7 @@ export function AdminInventoryPage() {
     onSuccess: (_, variables) => {
       toast.success(`${variables.length} products stock updated successfully!`);
       setStagedStock({});
+      queryClient.removeQueries({ queryKey: ["products", "detail"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },

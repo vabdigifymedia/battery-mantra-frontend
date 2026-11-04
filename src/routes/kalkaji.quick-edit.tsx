@@ -70,9 +70,11 @@ function BulkPricingPage() {
   const saveMutation = useMutation({
     mutationFn: (updates: BulkProductUpdateRequest[]) => adminService.bulkUpdateProducts(updates),
     onSuccess: () => {
-      toast.success("Prices and Highlights updated successfully!");
+      toast.success("Prices, Stock and Highlights updated successfully!");
       setEditedProducts({});
+      queryClient.removeQueries({ queryKey: ["products", "detail"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: () => {
       toast.error("Failed to update products.");
