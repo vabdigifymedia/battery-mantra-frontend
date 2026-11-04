@@ -45,6 +45,7 @@ export const Route = createFileRoute("/products/")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Shop batteries — BatteryMantra",
       description: "Browse premium automotive, inverter and industrial batteries from trusted brands.",
+      path: "/products",
     }),
   validateSearch: productSearchSchema,
   component: ProductsPage,

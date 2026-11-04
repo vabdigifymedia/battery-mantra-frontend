@@ -65,6 +65,7 @@ export const Route = createFileRoute("/$slug")({
     const head = buildPageHead(mergedSeo, {
       title: page ? `${page.title} — ${APP.name}` : undefined,
       description: page ? page.title : undefined,
+      path: `/${params.slug}`,
     });
 
     // Inject og:image if available

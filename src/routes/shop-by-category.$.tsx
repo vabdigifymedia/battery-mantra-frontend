@@ -120,7 +120,7 @@ export const Route = createFileRoute("/shop-by-category/$")({
       links: [
         {
           rel: "canonical",
-          href: `https://www.batterymantra.com/shop-by-category/${categorySlug}${citySlug ? `/${citySlug}` : ""}`,
+          href: `https://batterymantra.com/shop-by-category/${categorySlug}${citySlug ? `/${citySlug}` : ""}`,
         },
       ],
     };

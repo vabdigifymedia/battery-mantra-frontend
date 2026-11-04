@@ -50,7 +50,7 @@ export const Route = createFileRoute("/brands/$categorySlug/")({
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brands/${params.categorySlug}` });
   },
   component: CategoryBrandsPage,
 });

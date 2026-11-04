@@ -75,7 +75,7 @@ export const Route = createFileRoute("/brand/$brandSlug")({
       }
     );
     
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brand/${params.brandSlug}` });
   },
   validateSearch: productSearchSchema,
   component: BrandProductsPage,

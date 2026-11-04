@@ -53,6 +53,7 @@ export const Route = createFileRoute("/")({
       title: `${APP.name} — ${APP.tagline}`,
       description:
         "Shop premium automotive, inverter and industrial batteries with free installation, exchange offers and India-wide delivery.",
+      canonicalUrl: "https://batterymantra.com/",
     }),
   component: HomePage,
 });

@@ -58,7 +58,7 @@ export const Route = createFileRoute("/brands/$categorySlug/$citySlug")({
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brands/${params.categorySlug}/${params.citySlug}` });
   },
   component: CategoryBrandsPage,
 });

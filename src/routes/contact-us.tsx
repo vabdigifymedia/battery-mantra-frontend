@@ -28,6 +28,7 @@ export const Route = createFileRoute("/contact-us")({
     buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Contact Us - BatteryMantra",
       description: "Get in touch with BatteryMantra. Quick contact, email, and phone support for your battery and inverter needs.",
+      path: "/contact-us",
     }),
   component: ContactUsPage,
 });

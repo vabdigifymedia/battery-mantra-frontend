@@ -114,7 +114,7 @@ export const Route = createFileRoute("/brand-products/$categorySlug/$brandSlug/$
       links: [
         {
           rel: "canonical",
-          href: `https://www.batterymantra.com/brand-products/${params.categorySlug}/${params.brandSlug}/${params.citySlug}`,
+          href: `https://batterymantra.com/brand-products/${params.categorySlug}/${params.brandSlug}/${params.citySlug}`,
         },
       ],
     };
