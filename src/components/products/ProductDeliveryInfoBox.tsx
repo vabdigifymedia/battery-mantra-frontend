@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Truck, CheckCircle2, RotateCcw, Banknote, FileText, ChevronRight } from "lucide-react";
+import { Truck, CheckCircle2, RotateCcw, Banknote, FileText, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LocationModal } from "@/components/location/LocationModal";
 import type { CityDto } from "@/types/dto";
-import { formatDeliveryDetailSla } from "@/lib/delivery";
+import { formatDeliveryDetailSla, getDeliverySubText, getDeliveryCutoffState } from "@/lib/delivery";
+import { cn } from "@/lib/utils";
 
 interface ProductDeliveryInfoBoxProps {
   city: CityDto | null;
@@ -24,6 +25,9 @@ export function ProductDeliveryInfoBox({
   const isCodAvailable = city?.isCodAvailable !== false;
   const deliveryCharge = city?.deliveryCharge ?? 0;
   const originalDeliveryCharge = city?.originalDeliveryCharge ?? 40;
+
+  const subText = getDeliverySubText();
+  const cutoffInfo = getDeliveryCutoffState();
 
   // Delivery SLA Text
   const formatSla = () => {
@@ -74,8 +78,16 @@ export function ProductDeliveryInfoBox({
                   {formatSla()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1 text-left">
-                if ordered between 9:00 A.M. to 6:00 P.M.
+              <p
+                className={cn(
+                  "text-xs mt-1 text-left flex items-center gap-1.5 transition-colors",
+                  subText.isCutoff
+                    ? "text-amber-600 dark:text-amber-400 font-medium"
+                    : "text-muted-foreground"
+                )}
+              >
+                {subText.isCutoff && <Clock className="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400" />}
+                <span>{subText.text}</span>
               </p>
             </div>
           </div>
@@ -151,13 +163,28 @@ export function ProductDeliveryInfoBox({
               </span>
               {originalDeliveryCharge > 0 && (
                 <span className="text-muted-foreground line-through text-xs">
-                  {originalDeliveryCharge}
+                  ₹{originalDeliveryCharge}
                 </span>
               )}
               <span className="text-primary cursor-pointer hover:underline text-xs ml-1 font-bold">T&C</span>
             </div>
+
+            {cutoffInfo.isAfterCutoff ? (
+              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs leading-relaxed">
+                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">7:00 P.M. Cutoff Passed:</span> Same-day delivery and installation slots close at 7:00 PM. Orders placed now will be prioritized for first-slot delivery tomorrow morning.
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/40 p-2.5 rounded-lg">
+                <Clock className="w-4 h-4 text-primary shrink-0" />
+                <span>Same-day installation is available for orders placed before <strong>7:00 P.M.</strong> today.</span>
+              </div>
+            )}
+
             <p className="leading-relaxed text-muted-foreground">
-              Free Quick Delivery & Install at Your Doorstep, For More info Contact Us At- 9200920051, Info@Batterymantra.com
+              Free Quick Delivery & Installation at Your Doorstep in {cityName}. For more info contact us at 9200920051 or Info@Batterymantra.com.
             </p>
           </div>
         </DialogContent>

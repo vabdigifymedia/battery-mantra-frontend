@@ -5,6 +5,37 @@
  * - days: "0", "1", "2-3", "Same Day", "Tomorrow"
  */
 
+export type DeliveryCutoffState = {
+  hour: number;
+  minute: number;
+  isAfterCutoff: boolean;     // hour >= 19 (7:00 PM onwards)
+  isBeforeMorning: boolean;   // hour < 9 (midnight to 8:59 AM)
+  isOperationalHours: boolean; // 9 <= hour < 19 (9:00 AM to 6:59 PM)
+};
+
+/**
+ * Returns current IST time state to coordinate 7:00 PM same-day cutoffs across PDP, cards, and checkout
+ */
+export function getDeliveryCutoffState(date = new Date()): DeliveryCutoffState {
+  const istFormatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = istFormatter.formatToParts(date);
+  const hour = parseInt(parts.find((p) => p.type === "hour")?.value || "0", 10);
+  const minute = parseInt(parts.find((p) => p.type === "minute")?.value || "0", 10);
+
+  return {
+    hour,
+    minute,
+    isAfterCutoff: hour >= 19,
+    isBeforeMorning: hour < 9,
+    isOperationalHours: hour >= 9 && hour < 19,
+  };
+}
+
 export function cleanDeliveryString(val?: string | number | null): string {
   if (val === null || val === undefined) return "";
   return String(val).trim();
@@ -49,12 +80,22 @@ export function formatDeliveryTime(hours?: string | number | null, days?: string
  */
 export function formatDeliveryCardSla(hours?: string | number | null, days?: string | number | null): string {
   const duration = formatDeliveryTime(hours, days);
-  if (/^today$/i.test(duration)) {
-    return "Delivery Today";
+  const { isAfterCutoff, isBeforeMorning } = getDeliveryCutoffState();
+
+  if (/^today$/i.test(duration) || /hours?|mins?/i.test(duration)) {
+    if (isAfterCutoff) {
+      return "Delivery Tomorrow";
+    }
+    if (isBeforeMorning) {
+      return "Delivery Today (from 10 AM)";
+    }
+    return `Delivery in ${duration}`;
   }
+
   if (/^tomorrow$/i.test(duration)) {
-    return "Delivery Tomorrow";
+    return isAfterCutoff ? "Delivery in 2 Days" : "Delivery Tomorrow";
   }
+
   if (/^delivery/i.test(duration)) {
     return duration;
   }
@@ -62,55 +103,92 @@ export function formatDeliveryCardSla(hours?: string | number | null, days?: str
 }
 
 /**
- * Product detail page main SLA (e.g. "Delivery by Today in 1-2 Hours", "Delivery by Tomorrow", "Delivery within 2 Days")
+ * Product detail page main SLA (e.g. "Delivery by Today in 1-2 Hours", "Delivery by Tomorrow in 1-2 Hours")
  */
 export function formatDeliveryDetailSla(hours?: string | number | null, days?: string | number | null): string {
   const h = cleanDeliveryString(hours);
   const d = cleanDeliveryString(days);
+  const { isAfterCutoff, isBeforeMorning } = getDeliveryCutoffState();
 
-  if (h && h !== "0") {
-    const formattedHours = formatDeliveryTime(h, null);
-    return `Delivery by Today in ${formattedHours}`;
-  }
-
-  if (d) {
-    if (d === "1" || d.toLowerCase() === "tomorrow") {
-      return "Delivery by Tomorrow";
-    }
-    if (d === "0" || d.toLowerCase() === "today") {
-      return "Delivery by Today";
-    }
+  // If explicit multi-day SLA (e.g. 2 Days, 3 Days)
+  if (d && !["0", "1", "today", "tomorrow"].includes(d.toLowerCase())) {
     const daysStr = /days?/i.test(d) ? d : `${d} Days`;
     return `Delivery within ${daysStr}`;
   }
 
-  return "Delivery by Today in 1-2 Hours";
+  // If days is specifically 1 / Tomorrow
+  if (d && (d === "1" || d.toLowerCase() === "tomorrow")) {
+    return isAfterCutoff ? "Delivery by Day After Tomorrow" : "Delivery by Tomorrow";
+  }
+
+  // Same-day / hours-based delivery SLA
+  const formattedHours = h && h !== "0" ? formatDeliveryTime(h, null) : "1-2 Hours";
+
+  if (isAfterCutoff) {
+    return `Delivery by Tomorrow in ${formattedHours}`;
+  }
+
+  if (isBeforeMorning) {
+    return `Delivery by Today (Starts from 10:00 AM)`;
+  }
+
+  return `Delivery by Today in ${formattedHours}`;
 }
 
 /**
- * Floating mobile pill on product page (e.g. "Get it Today in 1-2 Hours", "Get it Tomorrow")
+ * Returns time-aware helper subtitle for the delivery SLA box on PDP
+ */
+export function getDeliverySubText(): { text: string; isCutoff: boolean } {
+  const { isAfterCutoff, isBeforeMorning } = getDeliveryCutoffState();
+
+  if (isAfterCutoff) {
+    return {
+      text: "Same-day delivery closed (7:00 P.M. cutoff). Order now for delivery tomorrow.",
+      isCutoff: true,
+    };
+  }
+
+  if (isBeforeMorning) {
+    return {
+      text: "Order now for priority dispatch starting at 10:00 A.M. today.",
+      isCutoff: false,
+    };
+  }
+
+  return {
+    text: "if ordered before 7:00 P.M. today (same-day delivery & installation)",
+    isCutoff: false,
+  };
+}
+
+/**
+ * Floating mobile pill on product page (e.g. "Get it Today in 1-2 Hours", "Get it Tomorrow in 1-2 Hours")
  */
 export function formatDeliveryPillText(hours?: string | number | null, days?: string | number | null): string {
   const h = cleanDeliveryString(hours);
   const d = cleanDeliveryString(days);
+  const { isAfterCutoff, isBeforeMorning } = getDeliveryCutoffState();
 
-  if (h && h !== "0") {
-    const formattedHours = formatDeliveryTime(h, null);
-    return `Get it Today in ${formattedHours}`;
-  }
-
-  if (d) {
-    if (d === "1" || d.toLowerCase() === "tomorrow") {
-      return "Get it Tomorrow";
-    }
-    if (d === "0" || d.toLowerCase() === "today") {
-      return "Get it Today";
-    }
+  if (d && !["0", "1", "today", "tomorrow"].includes(d.toLowerCase())) {
     const daysStr = /days?/i.test(d) ? d : `${d} Days`;
     return `Get it in ${daysStr}`;
   }
 
-  return "Get it Today in 1-2 Hours";
+  if (d && (d === "1" || d.toLowerCase() === "tomorrow")) {
+    return isAfterCutoff ? "Get it Day After Tomorrow" : "Get it Tomorrow";
+  }
+
+  const formattedHours = h && h !== "0" ? formatDeliveryTime(h, null) : "1-2 Hours";
+
+  if (isAfterCutoff) {
+    return `Get it Tomorrow in ${formattedHours}`;
+  }
+
+  if (isBeforeMorning) {
+    return `Get it Today (from 10:00 AM)`;
+  }
+
+  return `Get it Today in ${formattedHours}`;
 }
 
 /**
