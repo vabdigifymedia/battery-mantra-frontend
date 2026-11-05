@@ -17,6 +17,7 @@ function addRefreshSubscriber(cb: (token: string) => void) {
   refreshSubscribers.push(cb);
 }
 
+
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
   const base = env.API_BASE_URL.replace(/\/$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;
@@ -166,8 +167,8 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
           credentials: "omit",
         });
         const retryContentType = retryRes.headers.get("content-type") ?? "";
-        const retryData: unknown = retryContentType.includes("application/json") 
-          ? await retryRes.json().catch(() => null) 
+        const retryData: unknown = retryContentType.includes("application/json")
+          ? await retryRes.json().catch(() => null)
           : await retryRes.text().catch(() => null);
 
         if (!retryRes.ok) throw parseApiError(retryRes.status, retryData);
