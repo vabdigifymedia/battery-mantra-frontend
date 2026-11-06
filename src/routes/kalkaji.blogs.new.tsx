@@ -331,7 +331,7 @@ function NewBlogPost() {
                 </div>
                 <Input
                   id="slug"
-                  placeholder="best-car-battery-in-{city_name}"
+                  placeholder="best-car-battery or best-car-battery-in-delhi"
                   value={slug}
                   onChange={(e) => {
                     setSlug(e.target.value);
@@ -342,10 +342,12 @@ function NewBlogPost() {
                 <p className="text-[11px] text-muted-foreground">
                   {slug.includes("{city_name}") ? (
                     <span className="text-emerald-600 font-medium flex items-center gap-1 mt-0.5">
-                      <Sparkles className="h-3 w-3" /> Dynamic city URL active: Accessible across all cities (e.g. /blog/best-car-battery-in-delhi, /blog/best-car-battery-in-noida)
+                      <Sparkles className="h-3 w-3" /> Multi-city resolver active: Automatically matches visitors across all cities (/blog/...-in-delhi, /blog/...-in-noida).
                     </span>
                   ) : (
-                    "Tip: Include {city_name} in the slug (e.g. best-car-battery-in-{city_name}) for automatic multi-city SEO URLs."
+                    <span>
+                      <strong>SEO Best Practice:</strong> Keep slug clean (e.g. <code className="text-foreground font-mono bg-muted px-1 rounded">best-car-battery</code> or <code className="text-foreground font-mono bg-muted px-1 rounded">best-car-battery-in-delhi</code>). System will automatically serve city variations (<code className="text-foreground font-mono bg-muted px-1 rounded">/blog/...-in-noida</code>, <code className="text-foreground font-mono bg-muted px-1 rounded">/blog/...-in-gurgaon</code>) with dynamic variable replacement!
+                    </span>
                   )}
                 </p>
               </div>

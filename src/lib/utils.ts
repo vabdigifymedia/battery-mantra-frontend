@@ -70,6 +70,12 @@ export function generateCandidateSlugs(slug: string): string[] {
     // 3. Strip city altogether
     candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), ""));
     candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), ""));
+  } else if (/\{city(_name)?\}/i.test(decoded)) {
+    // Slug contains {city_name} or {city}
+    candidates.add(decoded.replace(/\{city(_name)?\}/gi, "delhi"));
+    candidates.add(decoded.replace(/-in-\{city(_name)?\}/gi, ""));
+    candidates.add(decoded.replace(/-\{city(_name)?\}/gi, ""));
+    candidates.add(decoded.replace(/\{city(_name)?\}/gi, ""));
   } else {
     // If slug has no city (e.g. best-car-battery), also try {city_name} and delhi versions
     candidates.add(`${decoded}-in-{city_name}`);
