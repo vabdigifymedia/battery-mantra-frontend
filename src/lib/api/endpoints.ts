@@ -187,6 +187,19 @@ export const endpoints = {
       byId: (id: string) => `/api/admin/campaigns/${encodeURIComponent(id)}`,
       toggleStatus: (id: string) => `/api/admin/campaigns/${encodeURIComponent(id)}/toggle-status`,
     },
+    blogs: {
+      list: "/api/admin/blogs",
+      create: "/api/admin/blogs",
+      byId: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}`,
+      updateStatus: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}/status`,
+      delete: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}`,
+    },
+  },
+  blogs: {
+    list: "/api/blogs",
+    bySlug: (slug: string) => `/api/blogs/${encodeURIComponent(slug)}`,
+    categories: "/api/blogs/categories",
+    featured: "/api/blogs/featured",
   },
   locations: {
     cities: "/api/locations/cities",

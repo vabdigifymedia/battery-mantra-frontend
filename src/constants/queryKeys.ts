@@ -72,4 +72,13 @@ export const queryKeys = {
       [...queryKeys.campaigns.all, "slug", slug, params] as const,
     admin: (status?: string) => [...queryKeys.campaigns.all, "admin", status ?? "ALL"] as const,
   },
+  blogs: {
+    all: ["blogs"] as const,
+    list: (params?: Record<string, any>) => [...queryKeys.blogs.all, "list", params] as const,
+    detail: (slug: string) => [...queryKeys.blogs.all, "detail", slug] as const,
+    categories: () => [...queryKeys.blogs.all, "categories"] as const,
+    featured: () => [...queryKeys.blogs.all, "featured"] as const,
+    admin: (params?: Record<string, any>) => [...queryKeys.blogs.all, "admin", params] as const,
+    adminDetail: (id: string) => [...queryKeys.blogs.all, "admin", "detail", id] as const,
+  },
 } as const;

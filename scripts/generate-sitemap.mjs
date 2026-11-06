@@ -80,6 +80,7 @@ async function run() {
     generateUrlXml(`${BASE_URL}/categories`, today, "weekly", "0.9"),
     generateUrlXml(`${BASE_URL}/shop-by-manufacturers`, today, "weekly", "0.9"),
     generateUrlXml(`${BASE_URL}/vehicle-finder`, today, "monthly", "0.8"),
+    generateUrlXml(`${BASE_URL}/blog`, today, "daily", "0.9"),
     generateUrlXml(`${BASE_URL}/about-us`, today, "monthly", "0.6"),
     generateUrlXml(`${BASE_URL}/privacy-policy`, today, "yearly", "0.4"),
     generateUrlXml(`${BASE_URL}/terms-and-conditions`, today, "yearly", "0.4"),
@@ -194,26 +195,44 @@ async function run() {
   fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap-products.xml"), wrapUrlset(uniqueProductUrls), "utf8");
   console.log(`[Sitemap] Created sitemap-products.xml (${uniqueProductUrls.length} URLs)`);
 
-  // 6. Master Sitemap Index
+  // 6. Blogs
+  const blogsData = await fetchJson("/blogs?size=1000");
+  const blogList = Array.isArray(blogsData) ? blogsData : blogsData?.content || [];
+  const blogUrls = [];
+
+  for (const b of blogList) {
+    const slug = b.slug || toSlug(b.title);
+    if (slug) {
+      const lastmod = b.updatedAt ? b.updatedAt.split("T")[0] : today;
+      blogUrls.push(generateUrlXml(`${BASE_URL}/blog/${slug}`, lastmod, "weekly", "0.8"));
+    }
+  }
+  const uniqueBlogUrls = Array.from(new Set(blogUrls));
+  fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap-blogs.xml"), wrapUrlset(uniqueBlogUrls), "utf8");
+  console.log(`[Sitemap] Created sitemap-blogs.xml (${uniqueBlogUrls.length} URLs)`);
+
+  // 7. Master Sitemap Index
   const masterIndexXml = wrapSitemapIndex([
     `${BASE_URL}/sitemap-static.xml`,
     `${BASE_URL}/sitemap-categories.xml`,
     `${BASE_URL}/sitemap-brands.xml`,
     `${BASE_URL}/sitemap-manufacturers.xml`,
     `${BASE_URL}/sitemap-products.xml`,
+    `${BASE_URL}/sitemap-blogs.xml`,
   ]);
   fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap.xml"), masterIndexXml, "utf8");
   fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap_index.xml"), masterIndexXml, "utf8");
-  console.log(`[Sitemap] Created master sitemap.xml & sitemap_index.xml index pointing to 5 sub-sitemaps.`);
+  console.log(`[Sitemap] Created master sitemap.xml & sitemap_index.xml index pointing to 6 sub-sitemaps.`);
 
   const totalUrls =
     staticUrls.length +
     uniqueCategoryUrls.length +
     uniqueBrandUrls.length +
     uniqueManufacturerUrls.length +
-    uniqueProductUrls.length;
+    uniqueProductUrls.length +
+    uniqueBlogUrls.length;
 
-  console.log(`\n✅ [Sitemap] SUCCESS! Generated total ${totalUrls} indexed URLs across 5 sitemaps.`);
+  console.log(`\n✅ [Sitemap] SUCCESS! Generated total ${totalUrls} indexed URLs across 6 sitemaps.`);
 }
 
 run().catch((err) => {

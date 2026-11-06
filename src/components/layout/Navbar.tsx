@@ -27,6 +27,7 @@ const DEFAULT_LINKS: NavLink[] = [
   { label: "Categories", to: "/categories" },
   { label: "Shop", to: "/products" },
   { label: "Vehicle Finder", to: "/vehicle-finder" },
+  { label: "Blog", to: "/blog" },
   { label: "Reels", to: "/reels" },
   { label: "About Us", to: "/about-us" },
   { label: "Contact Us", to: "/contact-us" },

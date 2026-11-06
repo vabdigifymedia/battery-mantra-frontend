@@ -1011,3 +1011,87 @@ export type CartValidationResponse = {
   finalPayable: number;
   message?: string;
 };
+
+/* ---------- Blog System ---------- */
+export type BlogStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
+
+export interface BlogPostListResponse {
+  id: UUID;
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  coverImage?: string | null;
+  category: string;
+  tags?: string[] | null;
+  authorName?: string | null;
+  authorImage?: string | null;
+  readTimeMinutes: number;
+  status: BlogStatus;
+  isFeatured: boolean;
+  viewCount: number;
+  publishedAt?: string | null;
+  createdAt: string;
+}
+
+export interface BlogPostDetailResponse extends BlogPostListResponse {
+  content: string;
+  updatedAt?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaKeywords?: string | null;
+  canonicalUrl?: string | null;
+  ogImage?: string | null;
+  relatedProducts?: ProductListResponse[];
+  relatedProductIds?: UUID[];
+}
+
+export interface CreateBlogPostRequest {
+  title: string;
+  slug?: string;
+  excerpt?: string;
+  content: string;
+  coverImage?: string;
+  category: string;
+  tags?: string[];
+  authorName?: string;
+  authorImage?: string;
+  readTimeMinutes?: number;
+  status?: BlogStatus;
+  isFeatured?: boolean;
+  relatedProductIds?: UUID[];
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+export type UpdateBlogPostRequest = Partial<CreateBlogPostRequest>;
+
+export interface BlogCategoryCountResponse {
+  category: string;
+  postCount: number;
+}
+
+export interface PageBlogPostListResponse {
+  content: BlogPostListResponse[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first?: boolean;
+  last?: boolean;
+  empty?: boolean;
+}
+
+export interface BlogFilterParams {
+  category?: string;
+  search?: string;
+  status?: BlogStatus;
+  isFeatured?: boolean;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+}
+

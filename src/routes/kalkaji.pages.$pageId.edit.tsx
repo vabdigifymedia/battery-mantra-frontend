@@ -24,7 +24,7 @@ const RESERVED_SLUGS = [
   "cart", "checkout", "login", "register", "admin", "products",
   "product", "categories", "manufacturers", "brands", "dealers",
   "reels", "orders", "account", "profile", "search", "shop",
-  "brand-dealer", "contact", "about",
+  "brand-dealer", "contact", "about", "blog",
 ];
 
 export const Route = createFileRoute("/kalkaji/pages/$pageId/edit")({

@@ -17,6 +17,7 @@ import {
   ShoppingCart,
   Heart,
   Settings,
+  BookOpen,
   Facebook,
   Instagram,
   Twitter,
@@ -50,6 +51,8 @@ const getIcon = (label: string) => {
       return <Car className="h-5 w-5" />;
     case "reels":
       return <Instagram className="h-5 w-5" />;
+    case "blog":
+      return <BookOpen className="h-5 w-5" />;
     case "about us":
       return <Info className="h-5 w-5" />;
     default:

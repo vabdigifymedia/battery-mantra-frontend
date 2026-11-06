@@ -12,6 +12,9 @@ import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/$slug")({
   beforeLoad: ({ params: { slug } }) => {
+    if (slug === "blog") {
+      throw redirect({ to: "/blog", replace: true });
+    }
     if (slug === "shipping-and-replacement") {
       throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, replace: true });
     }

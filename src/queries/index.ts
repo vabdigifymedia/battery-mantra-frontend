@@ -13,7 +13,8 @@ import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 import { campaignService } from "@/services/campaign.service";
-import type { ProductFilterParams, BrandContentResponse } from "@/types/dto";
+import { blogsService } from "@/services/blogs.service";
+import type { ProductFilterParams, BrandContentResponse, BlogFilterParams } from "@/types/dto";
 
 import { useLocationStore } from "@/store/useLocationStore";
 
@@ -314,6 +315,49 @@ export const adminCampaignsQuery = (status?: string) =>
   queryOptions({
     queryKey: queryKeys.campaigns.admin(status),
     queryFn: () => campaignService.getAllAdminCampaigns(status),
+    staleTime: 15_000,
+  });
+
+/* ---------- Blogs Queries ---------- */
+export const blogsListQuery = (params?: BlogFilterParams) =>
+  queryOptions({
+    queryKey: queryKeys.blogs.list(params),
+    queryFn: () => blogsService.list(params),
+    staleTime: 60_000,
+  });
+
+export const blogDetailQuery = (slug: string) =>
+  queryOptions({
+    queryKey: queryKeys.blogs.detail(slug),
+    queryFn: () => blogsService.bySlug(slug),
+    staleTime: 60_000,
+  });
+
+export const blogCategoriesQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.blogs.categories(),
+    queryFn: () => blogsService.categories(),
+    staleTime: 300_000,
+  });
+
+export const featuredBlogsQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.blogs.featured(),
+    queryFn: () => blogsService.featured(),
+    staleTime: 60_000,
+  });
+
+export const adminBlogsListQuery = (params?: BlogFilterParams) =>
+  queryOptions({
+    queryKey: queryKeys.blogs.admin(params),
+    queryFn: () => blogsService.adminList(params),
+    staleTime: 15_000,
+  });
+
+export const adminBlogDetailQuery = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.blogs.adminDetail(id),
+    queryFn: () => blogsService.adminGetById(id),
     staleTime: 15_000,
   });
 
