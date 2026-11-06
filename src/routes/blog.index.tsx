@@ -1,12 +1,13 @@
 import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { blogsListQuery, blogCategoriesQuery, featuredBlogsQuery } from "@/queries";
+import { blogsListQuery, blogCategoriesQuery, featuredBlogsQuery, pageSeoQuery } from "@/queries";
 import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
+import { buildPageHead } from "@/lib/seo";
 import { APP } from "@/constants/app";
 import {
   Search,
@@ -25,23 +26,36 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({
-    meta: [
-      { title: `Battery Guides, Buying Tips & Expert Advice — ${APP.name}` },
-      {
-        name: "description",
-        content:
-          "Explore the Battery Mantra blog for battery buying guides, seasonal maintenance tips, inverter comparisons, and expert automotive power advice.",
-      },
-      { property: "og:title", content: `Battery Guides & Advice — ${APP.name}` },
-      {
-        property: "og:description",
-        content:
-          "Explore in-depth car battery buying guides, tubular vs lithium inverter comparisons, and doorstep maintenance advice.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-  }),
+  loader: async ({ context }) => {
+    let pageSeo = null;
+    try {
+      pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/blog"));
+    } catch {
+      pageSeo = null;
+    }
+    if (!pageSeo) {
+      try {
+        pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/blog/"));
+      } catch {
+        pageSeo = null;
+      }
+    }
+    if (!pageSeo) {
+      try {
+        pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("blog"));
+      } catch {
+        pageSeo = null;
+      }
+    }
+    return { pageSeo };
+  },
+  head: ({ loaderData }) =>
+    buildPageHead(loaderData?.pageSeo?.seo, {
+      title: `Battery Guides, Buying Tips & Expert Advice — ${APP.name}`,
+      description:
+        "Explore the Battery Mantra blog for battery buying guides, seasonal maintenance tips, inverter comparisons, and expert automotive power advice.",
+      path: "/blog",
+    }),
   component: BlogIndexPage,
 });
 

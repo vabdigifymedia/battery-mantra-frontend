@@ -47,7 +47,7 @@ function SeoPagesPage() {
       await apiFetch(`/api/seo/pages/${id}`, { method: "DELETE" });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seo", "pages"] });
+      queryClient.invalidateQueries({ queryKey: ["seo"] });
       toast.success("Page SEO deleted successfully");
     }
   });
@@ -167,7 +167,7 @@ function SeoPageForm({ initialData, onClose }: any) {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seo", "pages"] });
+      queryClient.invalidateQueries({ queryKey: ["seo"] });
       toast.success("Page SEO saved successfully");
       onClose();
     },
