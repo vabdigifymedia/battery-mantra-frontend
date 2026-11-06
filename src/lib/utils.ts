@@ -82,21 +82,18 @@ export function generateCandidateSlugs(slug: string): string[] {
 }
 
 /**
- * Sanitizes and generates blog slug, safely preserving {city_name} while slugifying other words.
+ * Sanitizes and generates blog slug, safely allowing letters, numbers, hyphens,
+ * underscores, and curly brackets { } so dynamic variables like {city_name} work.
  */
 export function cleanBlogSlug(input: string): string {
   if (!input) return "";
   return input
     .trim()
     .toLowerCase()
-    .replace(/\{city_name\}/gi, "__CITY_VAR__")
-    .replace(/\{city\}/gi, "__CITY_VAR__")
-    .replace(/\{year\}/gi, new Date().getFullYear().toString())
-    .replace(/\{current_year\}/gi, new Date().getFullYear().toString())
-    .replace(/[^a-z0-9_ -]+/g, "")
     .replace(/\s+/g, "-")
+    // Keep a-z, 0-9, hyphens, underscores, and curly braces { }
+    .replace(/[^a-z0-9_{}-]+/g, "-")
     .replace(/-+/g, "-")
-    .replace(/__CITY_VAR__/g, "{city_name}")
     .replace(/(^-|-$)+/g, "");
 }
 

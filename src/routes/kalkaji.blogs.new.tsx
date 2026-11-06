@@ -273,13 +273,7 @@ function NewBlogPost() {
               <VariableChipsHelper
                 type="BLOGS"
                 compact={true}
-                title="Dynamic Variables (Click to insert into Title):"
-                onInsert={(key) => {
-                  setTitle((prev) => `${prev} ${key}`.trim());
-                  if (!isSlugManual) {
-                    setSlug((prev) => cleanBlogSlug(`${prev} ${key}`));
-                  }
-                }}
+                title="Dynamic Variables (Click any to copy):"
               />
 
               <div className="space-y-1.5">
@@ -340,7 +334,7 @@ function NewBlogPost() {
                   placeholder="best-car-battery-in-{city_name}"
                   value={slug}
                   onChange={(e) => {
-                    setSlug(cleanBlogSlug(e.target.value));
+                    setSlug(e.target.value);
                     setIsSlugManual(true);
                   }}
                   className="font-mono text-xs"
@@ -914,8 +908,7 @@ function NewBlogPost() {
               <VariableChipsHelper
                 type="BLOGS"
                 compact={true}
-                title="SEO Dynamic Variables (Click to insert into Meta Title):"
-                onInsert={(key) => setMetaTitle((prev) => `${prev} ${key}`.trim())}
+                title="SEO Dynamic Variables (Click any to copy):"
               />
 
               <div className="space-y-1.5">

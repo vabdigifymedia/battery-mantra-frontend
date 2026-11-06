@@ -162,7 +162,6 @@ export interface VariableChipsHelperProps {
   showPriceNote?: boolean;
   compact?: boolean;
   className?: string;
-  onInsert?: (key: string) => void;
 }
 
 export function VariableChipsHelper({
@@ -173,7 +172,6 @@ export function VariableChipsHelper({
   showPriceNote,
   compact = false,
   className,
-  onInsert,
 }: VariableChipsHelperProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -182,9 +180,6 @@ export function VariableChipsHelper({
   if (!variables || variables.length === 0) return null;
 
   const handleCopy = (key: string) => {
-    if (onInsert) {
-      onInsert(key);
-    }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(key);
