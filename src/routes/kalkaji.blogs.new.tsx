@@ -3,7 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { blogsService, calculateReadTime } from "@/services/blogs.service";
 import { productsService } from "@/services/products.service";
-import type { CreateBlogPostRequest, BlogStatus, ProductListResponse } from "@/types/dto";
+import { categoriesQuery, brandsQuery, manufacturersListQuery } from "@/queries";
+import type {
+  CreateBlogPostRequest,
+  BlogStatus,
+  BlogRecommendationType,
+  ProductListResponse,
+} from "@/types/dto";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +32,13 @@ import {
   Globe,
   Share2,
   Package,
+  Layers,
+  Tag,
+  Car,
+  Factory,
+  ArrowRight,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const DEFAULT_CATEGORIES = [
@@ -64,8 +76,12 @@ function NewBlogPost() {
   const [status, setStatus] = useState<BlogStatus>("DRAFT");
   const [manualReadTime, setManualReadTime] = useState<number | "">("");
 
-  // Related Products
+  // Recommendations & CTAs
+  const [recommendationType, setRecommendationType] = useState<BlogRecommendationType>("PRODUCTS");
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [selectedBrandId, setSelectedBrandId] = useState<string>("");
+  const [selectedManufacturerId, setSelectedManufacturerId] = useState<string>("");
   const [productSearch, setProductSearch] = useState("");
 
   // SEO Fields
@@ -75,7 +91,10 @@ function NewBlogPost() {
   const [canonicalUrl, setCanonicalUrl] = useState("");
   const [ogImage, setOgImage] = useState("");
 
-  // Fetch all products for selector
+  // Selectors Data
+  const { data: allCategories } = useQuery(categoriesQuery());
+  const { data: allBrands } = useQuery(brandsQuery());
+  const { data: allManufacturers } = useQuery(manufacturersListQuery());
   const { data: allProducts } = useQuery({
     queryKey: ["admin", "products", "selector"],
     queryFn: () => productsService.list(),
@@ -156,6 +175,26 @@ function NewBlogPost() {
 
     const finalCategory = isCustomCategory ? customCategory.trim() || "General" : category;
 
+    const selectedCat = allCategories?.find((c) => (c.categoryId || (c as any).id) === selectedCategoryId);
+    const selectedBrd = allBrands?.find((b) => (b.brandId || (b as any).id) === selectedBrandId);
+    const selectedMfr = allManufacturers?.find((m) => m.id === selectedManufacturerId);
+
+    // Fallback product IDs if category or brand is selected
+    let fallbackProductIds: string[] | undefined = undefined;
+    if (recommendationType === "PRODUCTS" && selectedProductIds.length > 0) {
+      fallbackProductIds = selectedProductIds;
+    } else if (recommendationType === "CATEGORY" && selectedCategoryId && allProducts) {
+      fallbackProductIds = allProducts
+        .filter((p) => p.categoryId === selectedCategoryId)
+        .slice(0, 4)
+        .map((p) => p.productId);
+    } else if (recommendationType === "BRAND" && selectedBrandId && allProducts) {
+      fallbackProductIds = allProducts
+        .filter((p) => p.brandId === selectedBrandId)
+        .slice(0, 4)
+        .map((p) => p.productId);
+    }
+
     const payload: CreateBlogPostRequest = {
       title: title.trim(),
       slug: cleanSlug,
@@ -169,7 +208,16 @@ function NewBlogPost() {
       readTimeMinutes: Math.max(1, Number(effectiveReadTime) || 3),
       status: finalStatus,
       isFeatured,
-      relatedProductIds: selectedProductIds.length > 0 ? selectedProductIds : undefined,
+      relatedProductIds: fallbackProductIds && fallbackProductIds.length > 0 ? fallbackProductIds : undefined,
+      recommendationType,
+      relatedCategoryId: recommendationType === "CATEGORY" ? selectedCategoryId || undefined : undefined,
+      relatedCategoryName: recommendationType === "CATEGORY" ? selectedCat?.categoryName || undefined : undefined,
+      relatedCategorySlug: recommendationType === "CATEGORY" ? selectedCat?.categorySlug || undefined : undefined,
+      relatedBrandId: recommendationType === "BRAND" ? selectedBrandId || undefined : undefined,
+      relatedBrandName: recommendationType === "BRAND" ? selectedBrd?.brandName || undefined : undefined,
+      relatedBrandSlug: recommendationType === "BRAND" ? selectedBrd?.slug || undefined : undefined,
+      relatedManufacturerId: recommendationType === "MANUFACTURER" ? selectedManufacturerId || undefined : undefined,
+      relatedManufacturerName: recommendationType === "MANUFACTURER" ? selectedMfr?.name || undefined : undefined,
       metaTitle: metaTitle.trim() || title.trim(),
       metaDescription: metaDescription.trim() || excerpt.trim() || undefined,
       metaKeywords: metaKeywords.trim() || tagsInput.trim() || undefined,
@@ -307,121 +355,356 @@ function NewBlogPost() {
             </CardContent>
           </Card>
 
-          {/* Related Products Section */}
+          {/* Attached Recommendations & Conversion CTAs Section */}
           <Card className="shadow-none">
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <Package className="h-4 w-4 text-primary" /> Attached Catalog Products
+                    <Sparkles className="h-4 w-4 text-primary" /> Attached Recommendations & CTAs
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Recommend relevant batteries or inverters inside this article with direct "Add to Cart" CTA cards.
+                    Choose what to recommend to readers at the end of this guide (Products, Category, Brand, or Car Maker).
                   </CardDescription>
                 </div>
-                <Badge variant="secondary" className="text-xs">
-                  {selectedProductIds.length} attached
+                <Badge variant="outline" className="text-xs w-fit">
+                  {recommendationType === "PRODUCTS" && `${selectedProductIds.length} Products`}
+                  {recommendationType === "CATEGORY" && "Category CTA"}
+                  {recommendationType === "BRAND" && "Brand CTA"}
+                  {recommendationType === "MANUFACTURER" && "Vehicle Make CTA"}
+                  {recommendationType === "NONE" && "Disabled"}
                 </Badge>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Product Search Box */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search products by name, brand, capacity (e.g. Amaron 35Ah)..."
-                  value={productSearch}
-                  onChange={(e) => setProductSearch(e.target.value)}
-                  className="pl-9 text-sm"
-                />
-              </div>
 
-              {/* Search Results Dropdown */}
-              {filteredProducts.length > 0 && (
-                <div className="rounded-md border bg-popover p-2 shadow-sm space-y-1 max-h-56 overflow-y-auto">
-                  <span className="text-[11px] font-medium text-muted-foreground px-2">
-                    Click to attach product:
-                  </span>
-                  {filteredProducts.map((p) => (
-                    <div
-                      key={p.productId}
-                      onClick={() => {
-                        setSelectedProductIds((prev) => [...prev, p.productId]);
-                        setProductSearch("");
-                      }}
-                      className="flex items-center justify-between p-2 rounded-md hover:bg-muted/70 cursor-pointer text-sm transition-colors"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {p.productImage ? (
-                          <img
-                            src={p.productImage}
-                            alt={p.productName}
-                            className="h-8 w-8 rounded object-contain border bg-white"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded border bg-muted flex items-center justify-center">
-                            <Package className="h-4 w-4 text-muted-foreground" />
+              {/* Type Switcher Pills */}
+              <div className="flex flex-wrap gap-1.5 p-1 bg-muted/60 rounded-lg mt-3">
+                <button
+                  type="button"
+                  onClick={() => setRecommendationType("PRODUCTS")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+                    recommendationType === "PRODUCTS"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Package className="h-3.5 w-3.5" /> Specific Products
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRecommendationType("CATEGORY")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+                    recommendationType === "CATEGORY"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Layers className="h-3.5 w-3.5" /> Product Category
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRecommendationType("BRAND")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+                    recommendationType === "BRAND"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Tag className="h-3.5 w-3.5" /> Brand
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRecommendationType("MANUFACTURER")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+                    recommendationType === "MANUFACTURER"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Car className="h-3.5 w-3.5" /> Car Manufacturer
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRecommendationType("NONE")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                    recommendationType === "NONE"
+                      ? "bg-background text-foreground shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  None
+                </button>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-4 pt-1">
+              {/* MODE 1: SPECIFIC PRODUCTS */}
+              {recommendationType === "PRODUCTS" && (
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="Search products by name, brand, capacity (e.g. Amaron 35Ah)..."
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                      className="pl-9 text-sm"
+                    />
+                  </div>
+
+                  {filteredProducts.length > 0 && (
+                    <div className="rounded-md border bg-popover p-2 shadow-sm space-y-1 max-h-56 overflow-y-auto">
+                      <span className="text-[11px] font-medium text-muted-foreground px-2">
+                        Click to attach product:
+                      </span>
+                      {filteredProducts.map((p) => (
+                        <div
+                          key={p.productId}
+                          onClick={() => {
+                            setSelectedProductIds((prev) => [...prev, p.productId]);
+                            setProductSearch("");
+                          }}
+                          className="flex items-center justify-between p-2 rounded-md hover:bg-muted/70 cursor-pointer text-sm transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {p.productImage ? (
+                              <img
+                                src={p.productImage}
+                                alt={p.productName}
+                                className="h-8 w-8 rounded object-contain border bg-white"
+                              />
+                            ) : (
+                              <div className="h-8 w-8 rounded border bg-muted flex items-center justify-center">
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="truncate">
+                              <p className="font-medium truncate text-xs">{p.productName}</p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {p.brandName} • ₹{p.productPrice?.toLocaleString()}
+                              </p>
+                            </div>
                           </div>
-                        )}
-                        <div className="truncate">
-                          <p className="font-medium truncate text-xs">{p.productName}</p>
-                          <p className="text-[11px] text-muted-foreground">
-                            {p.brandName} • ₹{p.productPrice?.toLocaleString()}
-                          </p>
+                          <Plus className="h-4 w-4 text-primary shrink-0" />
                         </div>
-                      </div>
-                      <Plus className="h-4 w-4 text-primary shrink-0" />
+                      ))}
                     </div>
-                  ))}
+                  )}
+
+                  {selectedProducts.length > 0 ? (
+                    <div className="space-y-2 pt-2">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Currently Selected Products:
+                      </span>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {selectedProducts.map((p) => (
+                          <div
+                            key={p.productId}
+                            className="flex items-center justify-between p-2.5 rounded-lg border bg-card text-xs"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              {p.productImage && (
+                                <img
+                                  src={p.productImage}
+                                  alt={p.productName}
+                                  className="h-9 w-9 rounded object-contain border bg-white shrink-0"
+                                />
+                              )}
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">{p.productName}</p>
+                                <p className="text-muted-foreground">
+                                  ₹{p.productPrice?.toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                              onClick={() =>
+                                setSelectedProductIds((prev) =>
+                                  prev.filter((id) => id !== p.productId)
+                                )
+                              }
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      No products attached yet. Search above to embed individual battery recommendations.
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Selected Attached Products list */}
-              {selectedProducts.length > 0 ? (
-                <div className="space-y-2 pt-2">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Currently Selected Products:
-                  </span>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {selectedProducts.map((p) => (
-                      <div
-                        key={p.productId}
-                        className="flex items-center justify-between p-2.5 rounded-lg border bg-card text-xs"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          {p.productImage && (
-                            <img
-                              src={p.productImage}
-                              alt={p.productName}
-                              className="h-9 w-9 rounded object-contain border bg-white shrink-0"
-                            />
-                          )}
-                          <div className="min-w-0">
-                            <p className="font-medium truncate">{p.productName}</p>
-                            <p className="text-muted-foreground">
-                              ₹{p.productPrice?.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                          onClick={() =>
-                            setSelectedProductIds((prev) => prev.filter((id) => id !== p.productId))
-                          }
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    ))}
+              {/* MODE 2: CATEGORY */}
+              {recommendationType === "CATEGORY" && (
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Select Target Category</Label>
+                    <Select
+                      value={selectedCategoryId}
+                      onValueChange={setSelectedCategoryId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a Category (e.g. Car Batteries, Inverter Batteries)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allCategories?.map((c) => {
+                          const id = (c.categoryId || (c as any).id) as string;
+                          return (
+                            <SelectItem key={id} value={id}>
+                              {c.categoryName}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  {selectedCategoryId && (
+                    <div className="rounded-xl border bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Layers className="h-5 w-5 text-primary" />
+                          <span className="font-bold text-sm">
+                            {allCategories?.find((c) => (c.categoryId || (c as any).id) === selectedCategoryId)?.categoryName}
+                          </span>
+                        </div>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">
+                          Category Banner + Top 4 Products
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        When readers finish this guide, they will see a dedicated showcase banner inviting them to browse all batteries in this category, plus live pricing and top 4 product cards.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <p className="text-xs text-muted-foreground italic">
-                  No products attached yet. Search above to embed relevant battery recommendations.
-                </p>
+              )}
+
+              {/* MODE 3: BRAND */}
+              {recommendationType === "BRAND" && (
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Select Target Brand</Label>
+                    <Select
+                      value={selectedBrandId}
+                      onValueChange={setSelectedBrandId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a Brand (e.g. Exide, Amaron, Luminous)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allBrands?.map((b) => {
+                          const id = (b.brandId || (b as any).id) as string;
+                          return (
+                            <SelectItem key={id} value={id}>
+                              {b.brandName}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {selectedBrandId && (
+                    <div className="rounded-xl border bg-gradient-to-r from-red-500/10 via-amber-500/5 to-transparent p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          {allBrands?.find((b) => (b.brandId || (b as any).id) === selectedBrandId)?.brandLogo ? (
+                            <img
+                              src={allBrands.find((b) => (b.brandId || (b as any).id) === selectedBrandId)!.brandLogo!}
+                              alt="Brand Logo"
+                              className="h-6 w-auto max-w-[80px] object-contain"
+                            />
+                          ) : (
+                            <Tag className="h-5 w-5 text-red-600" />
+                          )}
+                          <span className="font-bold text-sm">
+                            {allBrands?.find((b) => (b.brandId || (b as any).id) === selectedBrandId)?.brandName}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="text-red-600 border-red-300 text-[10px]">
+                          Official Brand Dealer CTA
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Displays an official brand dealer banner highlighting 100% genuine warranty, instant doorstep replacement, and top bestselling batteries for this brand.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* MODE 4: VEHICLE MANUFACTURER */}
+              {recommendationType === "MANUFACTURER" && (
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Select Vehicle Manufacturer (Car Maker)</Label>
+                    <Select
+                      value={selectedManufacturerId}
+                      onValueChange={setSelectedManufacturerId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a Car Maker (e.g. Maruti Suzuki, Hyundai, Tata Motors)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allManufacturers?.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>
+                            {m.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {selectedManufacturerId && (
+                    <div className="rounded-xl border bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          {allManufacturers?.find((m) => m.id === selectedManufacturerId)?.logoUrl ? (
+                            <img
+                              src={allManufacturers.find((m) => m.id === selectedManufacturerId)!.logoUrl!}
+                              alt="Make Logo"
+                              className="h-6 w-auto max-w-[70px] object-contain"
+                            />
+                          ) : (
+                            <Car className="h-5 w-5 text-blue-600" />
+                          )}
+                          <span className="font-bold text-sm">
+                            {allManufacturers?.find((m) => m.id === selectedManufacturerId)?.name}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="text-blue-600 border-blue-300 text-[10px]">
+                          Vehicle Battery Fitment CTA
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Displays a specialized car fitment banner allowing readers to find 100% compatible batteries specifically for this vehicle manufacturer.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* MODE 5: NONE */}
+              {recommendationType === "NONE" && (
+                <div className="rounded-lg border border-dashed p-6 text-center text-xs text-muted-foreground">
+                  No products or recommendations will be attached to this article. The guide will end cleanly without bottom CTA cards.
+                </div>
               )}
             </CardContent>
           </Card>

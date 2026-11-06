@@ -3,7 +3,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { blogsService, normalizeTags } from "@/services/blogs.service";
 import { productsService } from "@/services/products.service";
-import { blogsListQuery } from "@/queries";
+import {
+  blogsListQuery,
+  categoriesQuery,
+  brandsQuery,
+  manufacturersListQuery,
+  productFilterQuery,
+} from "@/queries";
+import type { BlogPostDetailResponse } from "@/types/dto";
 import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,9 +34,12 @@ import {
   Truck,
   Package,
   List,
+  Car,
+  Tag,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, toSlug, getBrandSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params: { slug } }) => {
@@ -363,28 +373,8 @@ function BlogPostPage() {
               </div>
             </div>
 
-            {/* Embedded Catalog Products CTA */}
-            {blog.relatedProducts && blog.relatedProducts.length > 0 && (
-              <section className="space-y-4 pt-6 border-t">
-                <div className="space-y-1">
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                    <Sparkles className="h-3.5 w-3.5" /> Recommended Solutions
-                  </span>
-                  <h3 className="font-display text-2xl font-bold tracking-tight">
-                    Featured Batteries Mentioned in This Guide
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Available with free doorstep delivery and professional technician installation.
-                  </p>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {blog.relatedProducts.map((product) => (
-                    <ProductCard key={product.productId} product={product} />
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* Dynamic Recommendations / Conversion CTA */}
+            <BlogRecommendationSection blog={blog} />
           </main>
 
           {/* Sticky Sidebar (4 Cols) */}
@@ -484,5 +474,348 @@ function BlogPostPage() {
       </Container>
     </div>
   );
+}
+
+function BlogRecommendationSection({ blog }: { blog: BlogPostDetailResponse }) {
+  const recType =
+    blog.recommendationType ||
+    (blog.relatedCategoryId
+      ? "CATEGORY"
+      : blog.relatedBrandId
+      ? "BRAND"
+      : blog.relatedManufacturerId
+      ? "MANUFACTURER"
+      : blog.relatedProducts && blog.relatedProducts.length > 0
+      ? "PRODUCTS"
+      : "NONE");
+
+  // Category queries & data
+  const { data: allCategories } = useQuery({
+    ...categoriesQuery(),
+    enabled: recType === "CATEGORY",
+  });
+
+  const targetCategory = useMemo(() => {
+    if (!allCategories) return null;
+    return allCategories.find(
+      (c) =>
+        (c.categoryId || (c as any).id) === blog.relatedCategoryId ||
+        c.categorySlug === blog.relatedCategorySlug
+    );
+  }, [allCategories, blog.relatedCategoryId, blog.relatedCategorySlug]);
+
+  const categorySlug =
+    blog.relatedCategorySlug ||
+    targetCategory?.categorySlug ||
+    toSlug(targetCategory?.categoryName || blog.relatedCategoryName || "");
+
+  const categoryName =
+    targetCategory?.categoryName || blog.relatedCategoryName || "Batteries";
+
+  const shouldFetchCategoryProducts =
+    recType === "CATEGORY" &&
+    Boolean(blog.relatedCategoryId) &&
+    (!blog.relatedProducts || blog.relatedProducts.length === 0);
+
+  const { data: categoryProductsData } = useQuery({
+    ...productFilterQuery({
+      categoryId: blog.relatedCategoryId ? [blog.relatedCategoryId] : [],
+      size: 4,
+    }),
+    enabled: shouldFetchCategoryProducts,
+  });
+
+  const categoryProducts =
+    blog.relatedProducts && blog.relatedProducts.length > 0
+      ? blog.relatedProducts
+      : categoryProductsData?.content || [];
+
+  // Brand queries & data
+  const { data: allBrands } = useQuery({
+    ...brandsQuery(),
+    enabled: recType === "BRAND",
+  });
+
+  const targetBrand = useMemo(() => {
+    if (!allBrands) return null;
+    return allBrands.find(
+      (b) =>
+        (b.brandId || (b as any).id) === blog.relatedBrandId ||
+        getBrandSlug(b) === blog.relatedBrandSlug
+    );
+  }, [allBrands, blog.relatedBrandId, blog.relatedBrandSlug]);
+
+  const brandSlug =
+    blog.relatedBrandSlug ||
+    (targetBrand ? getBrandSlug(targetBrand) : "") ||
+    toSlug(targetBrand?.brandName || blog.relatedBrandName || "");
+
+  const brandName = targetBrand?.brandName || blog.relatedBrandName || "Brand";
+  const brandLogo = targetBrand?.brandLogo;
+
+  const shouldFetchBrandProducts =
+    recType === "BRAND" &&
+    Boolean(blog.relatedBrandId) &&
+    (!blog.relatedProducts || blog.relatedProducts.length === 0);
+
+  const { data: brandProductsData } = useQuery({
+    ...productFilterQuery({
+      brandId: blog.relatedBrandId ? [blog.relatedBrandId] : [],
+      size: 4,
+    }),
+    enabled: shouldFetchBrandProducts,
+  });
+
+  const brandProducts =
+    blog.relatedProducts && blog.relatedProducts.length > 0
+      ? blog.relatedProducts
+      : brandProductsData?.content || [];
+
+  // Manufacturer queries & data
+  const { data: allManufacturers } = useQuery({
+    ...manufacturersListQuery(),
+    enabled: recType === "MANUFACTURER",
+  });
+
+  const targetManufacturer = useMemo(() => {
+    if (!allManufacturers) return null;
+    return allManufacturers.find(
+      (m) => m.id === blog.relatedManufacturerId
+    );
+  }, [allManufacturers, blog.relatedManufacturerId]);
+
+  const manufacturerName =
+    targetManufacturer?.name || blog.relatedManufacturerName || "Vehicle";
+  const manufacturerLogo = targetManufacturer?.logoUrl;
+  const manufacturerSlug = toSlug(manufacturerName);
+
+  if (recType === "NONE") {
+    return null;
+  }
+
+  if (recType === "CATEGORY") {
+    return (
+      <section className="space-y-6 pt-8 border-t">
+        <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-primary/15 via-primary/5 to-card p-6 sm:p-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <Badge className="bg-primary/20 text-primary border-primary/30 text-xs font-semibold">
+                Featured Category Showcase
+              </Badge>
+              <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Looking for {categoryName}?
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Explore our full collection of 100% genuine {categoryName.toLowerCase()} with official brand warranty, instant old battery scrap rebate, and 1-2 hour doorstep delivery & installation in Delhi NCR.
+              </p>
+            </div>
+            {categorySlug && (
+              <Button asChild size="lg" className="shrink-0 font-semibold shadow-md">
+                <Link to="/shop/c/$categorySlug" params={{ categorySlug }}>
+                  Browse All {categoryName}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {categoryProducts.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold tracking-tight text-foreground">
+                Top Rated {categoryName}
+              </h4>
+              {categorySlug && (
+                <Link
+                  to="/shop/c/$categorySlug"
+                  params={{ categorySlug }}
+                  className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+                >
+                  View all <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {categoryProducts.map((product) => (
+                <ProductCard key={product.productId} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  if (recType === "BRAND") {
+    return (
+      <section className="space-y-6 pt-8 border-t">
+        <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-red-500/10 via-amber-500/5 to-card p-6 sm:p-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-xl">
+              <div className="flex items-center gap-3">
+                {brandLogo ? (
+                  <div className="bg-white p-2 rounded-lg border shadow-xs">
+                    <img
+                      src={brandLogo}
+                      alt={brandName}
+                      className="h-7 w-auto max-w-[100px] object-contain"
+                    />
+                  </div>
+                ) : (
+                  <Badge variant="outline" className="border-red-400 text-red-600 bg-red-50 dark:bg-red-950/30">
+                    <Tag className="mr-1 h-3 w-3" /> Brand Partner
+                  </Badge>
+                )}
+                <Badge className="bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30 text-xs font-semibold">
+                  Official Authorized Dealer
+                </Badge>
+              </div>
+
+              <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Buy 100% Genuine {brandName} Batteries Online
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Authorized dealer for {brandName}. Every battery comes direct from manufacturer stock with paper warranty card, digital bill, and certified installation by trained experts.
+              </p>
+            </div>
+
+            {brandSlug && (
+              <Button asChild size="lg" className="shrink-0 font-semibold shadow-md bg-red-600 hover:bg-red-700 text-white">
+                <Link to="/brand/$brandSlug" params={{ brandSlug }}>
+                  Shop {brandName} Store
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {brandProducts.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold tracking-tight text-foreground">
+                Bestselling {brandName} Batteries
+              </h4>
+              {brandSlug && (
+                <Link
+                  to="/brand/$brandSlug"
+                  params={{ brandSlug }}
+                  className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+                >
+                  View all {brandName} <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {brandProducts.map((product) => (
+                <ProductCard key={product.productId} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  if (recType === "MANUFACTURER") {
+    return (
+      <section className="space-y-6 pt-8 border-t">
+        <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-card p-6 sm:p-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-xl">
+              <div className="flex items-center gap-3">
+                {manufacturerLogo ? (
+                  <div className="bg-white p-2 rounded-lg border shadow-xs">
+                    <img
+                      src={manufacturerLogo}
+                      alt={manufacturerName}
+                      className="h-7 w-auto max-w-[100px] object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-9 w-9 rounded-lg bg-blue-100 dark:bg-blue-950 flex items-center justify-center text-blue-600">
+                    <Car className="h-5 w-5" />
+                  </div>
+                )}
+                <Badge className="bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30 text-xs font-semibold">
+                  Vehicle Fitment Center
+                </Badge>
+              </div>
+
+              <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Find Compatible Batteries for {manufacturerName}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Select your {manufacturerName} car model to view exact battery specifications, Ah capacity ratings, terminal layouts, and guaranteed best prices with old battery exchange rebate.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch gap-2.5 shrink-0">
+              {manufacturerSlug ? (
+                <Button asChild size="lg" className="font-semibold shadow-md bg-blue-600 hover:bg-blue-700 text-white">
+                  <Link
+                    to="/manufacturers/$categorySlug/$slug"
+                    params={{
+                      categorySlug: "car-battery",
+                      slug: manufacturerSlug,
+                    }}
+                  >
+                    Find {manufacturerName} Batteries
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              ) : null}
+              <Button asChild variant="outline" size="lg" className="font-medium">
+                <Link to="/vehicle-finder">
+                  Vehicle Finder
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {blog.relatedProducts && blog.relatedProducts.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold tracking-tight text-foreground">
+              Recommended Batteries for {manufacturerName} Models
+            </h4>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {blog.relatedProducts.map((product) => (
+                <ProductCard key={product.productId} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // DEFAULT / PRODUCTS: Handpicked individual products
+  if (blog.relatedProducts && blog.relatedProducts.length > 0) {
+    return (
+      <section className="space-y-4 pt-6 border-t">
+        <div className="space-y-1">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3.5 w-3.5" /> Recommended Solutions
+          </span>
+          <h3 className="font-display text-2xl font-bold tracking-tight">
+            Featured Batteries Mentioned in This Guide
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Available with free doorstep delivery and professional technician installation.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {blog.relatedProducts.map((product) => (
+            <ProductCard key={product.productId} product={product} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  return null;
 }
 

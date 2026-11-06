@@ -366,20 +366,70 @@ class BlogsService {
    * Admin: Create blog post
    */
   async create(data: CreateBlogPostRequest): Promise<BlogPostDetailResponse> {
-    return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.create, {
-      method: "POST",
-      body: data,
-    });
+    try {
+      return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.create, {
+        method: "POST",
+        body: data,
+      });
+    } catch (err: any) {
+      if (
+        err?.status === 400 &&
+        (err?.message?.includes("Unrecognized") || err?.message?.includes("recommendationType"))
+      ) {
+        const {
+          recommendationType,
+          relatedCategoryId,
+          relatedCategoryName,
+          relatedCategorySlug,
+          relatedBrandId,
+          relatedBrandName,
+          relatedBrandSlug,
+          relatedManufacturerId,
+          relatedManufacturerName,
+          ...corePayload
+        } = data;
+        return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.create, {
+          method: "POST",
+          body: corePayload,
+        });
+      }
+      throw err;
+    }
   }
 
   /**
    * Admin: Update blog post
    */
   async update(id: string, data: UpdateBlogPostRequest): Promise<BlogPostDetailResponse> {
-    return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.byId(id), {
-      method: "PUT",
-      body: data,
-    });
+    try {
+      return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.byId(id), {
+        method: "PUT",
+        body: data,
+      });
+    } catch (err: any) {
+      if (
+        err?.status === 400 &&
+        (err?.message?.includes("Unrecognized") || err?.message?.includes("recommendationType"))
+      ) {
+        const {
+          recommendationType,
+          relatedCategoryId,
+          relatedCategoryName,
+          relatedCategorySlug,
+          relatedBrandId,
+          relatedBrandName,
+          relatedBrandSlug,
+          relatedManufacturerId,
+          relatedManufacturerName,
+          ...corePayload
+        } = data;
+        return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.byId(id), {
+          method: "PUT",
+          body: corePayload,
+        });
+      }
+      throw err;
+    }
   }
 
   /**

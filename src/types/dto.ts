@@ -1033,6 +1033,8 @@ export interface BlogPostListResponse {
   createdAt: string;
 }
 
+export type BlogRecommendationType = "NONE" | "PRODUCTS" | "CATEGORY" | "BRAND" | "MANUFACTURER";
+
 export interface BlogPostDetailResponse extends BlogPostListResponse {
   content: string;
   updatedAt?: string | null;
@@ -1043,6 +1045,17 @@ export interface BlogPostDetailResponse extends BlogPostListResponse {
   ogImage?: string | null;
   relatedProducts?: ProductListResponse[];
   relatedProductIds?: UUID[];
+
+  // Recommendation Attachments
+  recommendationType?: BlogRecommendationType;
+  relatedCategoryId?: UUID | null;
+  relatedCategoryName?: string | null;
+  relatedCategorySlug?: string | null;
+  relatedBrandId?: UUID | null;
+  relatedBrandName?: string | null;
+  relatedBrandSlug?: string | null;
+  relatedManufacturerId?: UUID | null;
+  relatedManufacturerName?: string | null;
 }
 
 export interface CreateBlogPostRequest {
@@ -1064,6 +1077,17 @@ export interface CreateBlogPostRequest {
   metaKeywords?: string;
   canonicalUrl?: string;
   ogImage?: string;
+
+  // Recommendation Attachments
+  recommendationType?: BlogRecommendationType;
+  relatedCategoryId?: UUID;
+  relatedCategoryName?: string;
+  relatedCategorySlug?: string;
+  relatedBrandId?: UUID;
+  relatedBrandName?: string;
+  relatedBrandSlug?: string;
+  relatedManufacturerId?: UUID;
+  relatedManufacturerName?: string;
 }
 
 export type UpdateBlogPostRequest = Partial<CreateBlogPostRequest>;
