@@ -97,7 +97,7 @@ function EditBlogPost() {
       setIsFeatured(Boolean(blog.isFeatured));
       setStatus(blog.status || "DRAFT");
       setManualReadTime(blog.readTimeMinutes || "");
-      setSelectedProductIds(blog.relatedProductIds || blog.relatedProducts?.map((p) => p.id) || []);
+      setSelectedProductIds(blog.relatedProductIds || blog.relatedProducts?.map((p) => p.productId) || []);
       setMetaTitle(blog.metaTitle || "");
       setMetaDescription(blog.metaDescription || "");
       setMetaKeywords(blog.metaKeywords || "");
@@ -122,17 +122,17 @@ function EditBlogPost() {
     return allProducts
       .filter(
         (p) =>
-          !selectedProductIds.includes(p.id) &&
+          !selectedProductIds.includes(p.productId) &&
           (p.productName.toLowerCase().includes(q) ||
             p.brandName?.toLowerCase().includes(q) ||
-            p.sku?.toLowerCase().includes(q))
+            p.capacity?.toLowerCase().includes(q))
       )
       .slice(0, 8);
   }, [allProducts, productSearch, selectedProductIds]);
 
   const selectedProducts = useMemo(() => {
     if (!allProducts) return [];
-    return allProducts.filter((p) => selectedProductIds.includes(p.id));
+    return allProducts.filter((p) => selectedProductIds.includes(p.productId));
   }, [allProducts, selectedProductIds]);
 
   const updateMutation = useMutation({
@@ -398,17 +398,17 @@ function EditBlogPost() {
                   </span>
                   {filteredProducts.map((p) => (
                     <div
-                      key={p.id}
+                      key={p.productId}
                       onClick={() => {
-                        setSelectedProductIds((prev) => [...prev, p.id]);
+                        setSelectedProductIds((prev) => [...prev, p.productId]);
                         setProductSearch("");
                       }}
                       className="flex items-center justify-between p-2 rounded-md hover:bg-muted/70 cursor-pointer text-sm transition-colors"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        {p.thumbnailUrl ? (
+                        {p.productImage ? (
                           <img
-                            src={p.thumbnailUrl}
+                            src={p.productImage}
                             alt={p.productName}
                             className="h-8 w-8 rounded object-contain border bg-white"
                           />
@@ -420,7 +420,7 @@ function EditBlogPost() {
                         <div className="truncate">
                           <p className="font-medium truncate text-xs">{p.productName}</p>
                           <p className="text-[11px] text-muted-foreground">
-                            {p.brandName} • ₹{p.effectivePrice?.toLocaleString() || p.basePrice?.toLocaleString()}
+                            {p.brandName} • ₹{p.productPrice?.toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -439,13 +439,13 @@ function EditBlogPost() {
                   <div className="grid gap-2 sm:grid-cols-2">
                     {selectedProducts.map((p) => (
                       <div
-                        key={p.id}
+                        key={p.productId}
                         className="flex items-center justify-between p-2.5 rounded-lg border bg-card text-xs"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          {p.thumbnailUrl && (
+                          {p.productImage && (
                             <img
-                              src={p.thumbnailUrl}
+                              src={p.productImage}
                               alt={p.productName}
                               className="h-9 w-9 rounded object-contain border bg-white shrink-0"
                             />
@@ -453,7 +453,7 @@ function EditBlogPost() {
                           <div className="min-w-0">
                             <p className="font-medium truncate">{p.productName}</p>
                             <p className="text-muted-foreground">
-                              ₹{p.effectivePrice?.toLocaleString() || p.basePrice?.toLocaleString()}
+                              ₹{p.productPrice?.toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -463,7 +463,7 @@ function EditBlogPost() {
                           size="icon"
                           className="h-6 w-6 text-muted-foreground hover:text-destructive"
                           onClick={() =>
-                            setSelectedProductIds((prev) => prev.filter((id) => id !== p.id))
+                            setSelectedProductIds((prev) => prev.filter((id) => id !== p.productId))
                           }
                         >
                           <X className="h-3.5 w-3.5" />

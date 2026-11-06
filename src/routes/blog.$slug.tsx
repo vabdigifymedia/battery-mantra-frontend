@@ -130,7 +130,7 @@ function BlogPostPage() {
     const parsed: { id: string; text: string; level: number }[] = [];
     let counter = 0;
 
-    const modified = blog.content.replace(/<h([23])(.*?)>(.*?)<\/h\1>/gi, (_match, level, attrs, innerText) => {
+    const modified = blog.content.replace(/<h([23])(.*?)>(.*?)<\/h\1>/gi, (_match: string, level: string, attrs: string, innerText: string) => {
       const cleanText = innerText.replace(/<[^>]*>/g, "").trim();
       const id = `sec-${counter++}-${cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       parsed.push({
@@ -380,7 +380,7 @@ function BlogPostPage() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   {blog.relatedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard key={product.productId} product={product} />
                   ))}
                 </div>
               </section>
