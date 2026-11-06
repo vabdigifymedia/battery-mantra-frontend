@@ -99,6 +99,8 @@ function BlogIndexPage() {
   const featuredSlug = featuredPost
     ? featuredPost.slug?.includes("{city_name}")
       ? featuredPost.slug.replace(/\{city_name\}/g, toSlug(activeCityName))
+      : featuredPost.slug?.includes("city-name")
+      ? featuredPost.slug.replace(/city-name/g, toSlug(activeCityName))
       : featuredPost.slug
     : "";
 
@@ -335,6 +337,8 @@ function BlogIndexPage() {
               });
               const postSlug = post.slug?.includes("{city_name}")
                 ? post.slug.replace(/\{city_name\}/g, toSlug(activeCityName))
+                : post.slug?.includes("city-name")
+                ? post.slug.replace(/city-name/g, toSlug(activeCityName))
                 : post.slug;
 
               return (

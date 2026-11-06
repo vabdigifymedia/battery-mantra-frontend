@@ -58,10 +58,14 @@ export function generateCandidateSlugs(slug: string): string[] {
 
   const detected = detectCityFromSlug(decoded);
   if (detected) {
-    // 1. Replace city slug with {city_name}
+    // 1. Replace city slug with {city_name} or city-name (since backend slugify cleans { } to city-name)
     candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), "-in-{city_name}"));
     candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), "-{city_name}"));
     candidates.add(decoded.replace(new RegExp(`\\b${detected.slug}\\b`, "i"), "{city_name}"));
+
+    candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), "-in-city-name"));
+    candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), "-city-name"));
+    candidates.add(decoded.replace(new RegExp(`\\b${detected.slug}\\b`, "i"), "city-name"));
 
     // 2. Replace city slug with default 'delhi'
     candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), "-in-delhi"));
@@ -70,15 +74,16 @@ export function generateCandidateSlugs(slug: string): string[] {
     // 3. Strip city altogether
     candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), ""));
     candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), ""));
-  } else if (/\{city(_name)?\}/i.test(decoded)) {
-    // Slug contains {city_name} or {city}
-    candidates.add(decoded.replace(/\{city(_name)?\}/gi, "delhi"));
-    candidates.add(decoded.replace(/-in-\{city(_name)?\}/gi, ""));
-    candidates.add(decoded.replace(/-\{city(_name)?\}/gi, ""));
-    candidates.add(decoded.replace(/\{city(_name)?\}/gi, ""));
+  } else if (/\{city(_name)?\}|city-name/i.test(decoded)) {
+    // Slug contains {city_name} or city-name
+    candidates.add(decoded.replace(/\{city(_name)?\}|city-name/gi, "delhi"));
+    candidates.add(decoded.replace(/-in-(\{city(_name)?\}|city-name)/gi, ""));
+    candidates.add(decoded.replace(/-(\{city(_name)?\}|city-name)/gi, ""));
+    candidates.add(decoded.replace(/\{city(_name)?\}|city-name/gi, ""));
   } else {
-    // If slug has no city (e.g. best-car-battery), also try {city_name} and delhi versions
+    // If slug has no city (e.g. best-car-battery), also try {city_name}, city-name and delhi versions
     candidates.add(`${decoded}-in-{city_name}`);
+    candidates.add(`${decoded}-in-city-name`);
     candidates.add(`${decoded}-in-delhi`);
   }
 

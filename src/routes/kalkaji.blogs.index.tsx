@@ -333,7 +333,11 @@ function AdminBlogsList() {
                           asChild
                           title="View on live website"
                         >
-                          <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer">
+                          <a
+                            href={`/blog/${(post.slug || "").replace(/\{city_name\}|\{city\}|city-name/g, "delhi")}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             <ExternalLink className="h-4 w-4 text-muted-foreground" />
                           </a>
                         </Button>

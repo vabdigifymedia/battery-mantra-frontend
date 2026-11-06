@@ -312,7 +312,7 @@ function BlogPostPage() {
           )}
 
           {/* Quick City Switcher Pills if article is city-enabled */}
-          {(blog.slug?.includes("{city_name}") || blog.title?.includes("{city_name}") || detectedCityFromUrl) && (
+          {(blog.slug?.includes("{city_name}") || blog.slug?.includes("city-name") || blog.title?.includes("{city_name}") || detectedCityFromUrl) && (
             <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1 text-xs">
               <span className="inline-flex items-center gap-1 text-muted-foreground mr-1 text-[11px] font-medium">
                 <MapPin className="h-3 w-3 text-primary" /> Guide for your city:
@@ -320,6 +320,8 @@ function BlogPostPage() {
               {KNOWN_BLOG_CITIES.slice(0, 6).map((c) => {
                 const citySlugTarget = blog.slug?.includes("{city_name}")
                   ? blog.slug.replace(/\{city_name\}/g, c.slug)
+                  : blog.slug?.includes("city-name")
+                  ? blog.slug.replace(/city-name/g, c.slug)
                   : detectedCityFromUrl
                   ? blog.slug.replace(new RegExp(`-${detectedCityFromUrl.slug}\\b`), `-${c.slug}`)
                   : `${blog.slug}-in-${c.slug}`;

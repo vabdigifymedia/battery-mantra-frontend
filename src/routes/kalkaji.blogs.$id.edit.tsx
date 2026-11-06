@@ -289,7 +289,7 @@ function EditBlogPost() {
               {blog.status === "PUBLISHED" && (
                 <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
                   <a
-                    href={`/blog/${(blog.slug || "").replace(/\{city_name\}|\{city\}/g, "delhi")}`}
+                    href={`/blog/${(blog.slug || "").replace(/\{city_name\}|\{city\}|city-name/g, "delhi")}`}
                     target="_blank"
                     rel="noreferrer"
                   >
