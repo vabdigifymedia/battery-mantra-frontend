@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { blogsService, normalizeTags } from "@/services/blogs.service";
 import { productsService } from "@/services/products.service";
+import { locationService } from "@/services/location.service";
+import { useLocationStore } from "@/store/useLocationStore";
 import {
   blogsListQuery,
   categoriesQuery,
@@ -37,17 +39,27 @@ import {
   Car,
   Tag,
   Layers,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn, toSlug, getBrandSlug } from "@/lib/utils";
+import {
+  cn,
+  toSlug,
+  getBrandSlug,
+  applyBlogVariables,
+  detectCityFromSlug,
+  KNOWN_BLOG_CITIES,
+} from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params: { slug } }) => {
     try {
-      const blog = await blogsService.bySlug(slug);
-      return { blog };
+      const decodedSlug = decodeURIComponent(slug);
+      const blog = await blogsService.bySlug(decodedSlug);
+      const detectedCity = detectCityFromSlug(decodedSlug);
+      return { blog, requestedSlug: decodedSlug, detectedCity };
     } catch {
-      return { blog: null };
+      return { blog: null, requestedSlug: slug, detectedCity: null };
     }
   },
   head: ({ loaderData, params }) => {
@@ -58,9 +70,30 @@ export const Route = createFileRoute("/blog/$slug")({
       };
     }
 
-    const title = blog.metaTitle || `${blog.title} — ${APP.name}`;
-    const description =
-      blog.metaDescription || blog.excerpt || `Read ${blog.title} on Battery Mantra.`;
+    const detectedCity = loaderData?.detectedCity;
+    const activeCityName = detectedCity?.name || "Delhi NCR";
+    const currentYear = new Date().getFullYear().toString();
+
+    const templateContext = {
+      cityName: activeCityName,
+      categoryName: blog.category,
+      brandName: blog.relatedBrandName,
+      manufacturerName: blog.relatedManufacturerName,
+      year: currentYear,
+    };
+
+    const title = applyBlogVariables(
+      blog.metaTitle || `${blog.title} — ${APP.name}`,
+      templateContext
+    );
+    const description = applyBlogVariables(
+      blog.metaDescription || blog.excerpt || `Read ${blog.title} on Battery Mantra.`,
+      templateContext
+    );
+    const keywords = applyBlogVariables(
+      blog.metaKeywords || (Array.isArray(blog.tags) ? blog.tags.join(", ") : blog.tags) || "",
+      templateContext
+    );
     const image = blog.ogImage || blog.coverImage || "https://batterymantra.com/og-image.jpg";
     const canonical = blog.canonicalUrl || `https://batterymantra.com/blog/${params.slug}`;
 
@@ -69,7 +102,7 @@ export const Route = createFileRoute("/blog/$slug")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "keywords", content: blog.metaKeywords || (Array.isArray(blog.tags) ? blog.tags.join(", ") : blog.tags) || "" },
+        { name: "keywords", content: keywords },
         // OpenGraph
         { property: "og:title", content: title },
         { property: "og:description", content: description },
@@ -90,8 +123,8 @@ export const Route = createFileRoute("/blog/$slug")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            headline: blog.title,
-            description: blog.excerpt,
+            headline: applyBlogVariables(blog.title, templateContext),
+            description: applyBlogVariables(blog.excerpt, templateContext),
             image: image,
             author: {
               "@type": "Person",
@@ -123,8 +156,61 @@ function BlogPostPage() {
   const { slug } = Route.useParams();
   const loaderData = Route.useLoaderData();
   const [copied, setCopied] = useState(false);
+  const { city: userCity, setLocation, pincode } = useLocationStore();
 
   const blog = loaderData?.blog;
+  const detectedCityFromUrl = loaderData?.detectedCity;
+
+  // Active City: URL city takes precedence for page content, otherwise user's selected location, otherwise fallback
+  const activeCityName =
+    detectedCityFromUrl?.name || userCity?.cityName || "Delhi NCR";
+
+  // Auto-sync user's store location if visiting a specific city URL (e.g. /blog/best-battery-in-noida)
+  useEffect(() => {
+    if (
+      detectedCityFromUrl &&
+      userCity?.cityName?.toLowerCase() !== detectedCityFromUrl.name.toLowerCase()
+    ) {
+      locationService
+        .getPublicCities()
+        .then((cities) => {
+          const matched = cities.find(
+            (c) =>
+              c.cityName?.toLowerCase() === detectedCityFromUrl.name.toLowerCase() ||
+              toSlug(c.cityName) === detectedCityFromUrl.slug
+          );
+          if (matched) {
+            setLocation(pincode || "", true, matched);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [detectedCityFromUrl]);
+
+  // Context for template variables
+  const currentYear = new Date().getFullYear().toString();
+  const templateContext = {
+    cityName: activeCityName,
+    categoryName: blog?.category,
+    brandName: blog?.relatedBrandName,
+    manufacturerName: blog?.relatedManufacturerName,
+    year: currentYear,
+  };
+
+  const processedTitle = useMemo(
+    () => applyBlogVariables(blog?.title, templateContext),
+    [blog?.title, activeCityName]
+  );
+
+  const processedExcerpt = useMemo(
+    () => applyBlogVariables(blog?.excerpt, templateContext),
+    [blog?.excerpt, activeCityName]
+  );
+
+  const processedRawContent = useMemo(
+    () => applyBlogVariables(blog?.content, templateContext),
+    [blog?.content, activeCityName]
+  );
 
   // More articles for sidebar
   const { data: moreArticles } = useQuery(
@@ -133,26 +219,29 @@ function BlogPostPage() {
     })
   );
 
-  // Parse Headings for Table of Contents
+  // Parse Headings for Table of Contents from processed content
   const { headings, contentWithIds } = useMemo(() => {
-    if (!blog?.content) return { headings: [], contentWithIds: "" };
+    if (!processedRawContent) return { headings: [], contentWithIds: "" };
 
     const parsed: { id: string; text: string; level: number }[] = [];
     let counter = 0;
 
-    const modified = blog.content.replace(/<h([23])(.*?)>(.*?)<\/h\1>/gi, (_match: string, level: string, attrs: string, innerText: string) => {
-      const cleanText = innerText.replace(/<[^>]*>/g, "").trim();
-      const id = `sec-${counter++}-${cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-      parsed.push({
-        id,
-        text: cleanText,
-        level: parseInt(level, 10),
-      });
-      return `<h${level}${attrs} id="${id}">${innerText}</h${level}>`;
-    });
+    const modified = processedRawContent.replace(
+      /<h([23])(.*?)>(.*?)<\/h\1>/gi,
+      (_match: string, level: string, attrs: string, innerText: string) => {
+        const cleanText = innerText.replace(/<[^>]*>/g, "").trim();
+        const id = `sec-${counter++}-${cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+        parsed.push({
+          id,
+          text: cleanText,
+          level: parseInt(level, 10),
+        });
+        return `<h${level}${attrs} id="${id}">${innerText}</h${level}>`;
+      }
+    );
 
     return { headings: parsed, contentWithIds: modified };
-  }, [blog?.content]);
+  }, [processedRawContent]);
 
   // Copy share link handler
   const handleCopyLink = () => {
@@ -181,7 +270,7 @@ function BlogPostPage() {
   }
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : `https://batterymantra.com/blog/${slug}`;
-  const shareText = encodeURIComponent(`${blog.title} — Battery Mantra`);
+  const shareText = encodeURIComponent(`${processedTitle} — Battery Mantra`);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -198,7 +287,7 @@ function BlogPostPage() {
               Blog
             </Link>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
-            <span className="font-medium text-foreground truncate">{blog.title}</span>
+            <span className="font-medium text-foreground truncate">{processedTitle}</span>
           </nav>
         </Container>
       </div>
@@ -213,13 +302,47 @@ function BlogPostPage() {
           </div>
 
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-            {blog.title}
+            {processedTitle}
           </h1>
 
-          {blog.excerpt && (
+          {processedExcerpt && (
             <p className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
-              {blog.excerpt}
+              {processedExcerpt}
             </p>
+          )}
+
+          {/* Quick City Switcher Pills if article is city-enabled */}
+          {(blog.slug?.includes("{city_name}") || blog.title?.includes("{city_name}") || detectedCityFromUrl) && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1 text-xs">
+              <span className="inline-flex items-center gap-1 text-muted-foreground mr-1 text-[11px] font-medium">
+                <MapPin className="h-3 w-3 text-primary" /> Guide for your city:
+              </span>
+              {KNOWN_BLOG_CITIES.slice(0, 6).map((c) => {
+                const citySlugTarget = blog.slug?.includes("{city_name}")
+                  ? blog.slug.replace(/\{city_name\}/g, c.slug)
+                  : detectedCityFromUrl
+                  ? blog.slug.replace(new RegExp(`-${detectedCityFromUrl.slug}\\b`), `-${c.slug}`)
+                  : `${blog.slug}-in-${c.slug}`;
+
+                const isActive = activeCityName.toLowerCase() === c.name.toLowerCase();
+
+                return (
+                  <Link
+                    key={c.slug}
+                    to="/blog/$slug"
+                    params={{ slug: citySlugTarget }}
+                    className={cn(
+                      "px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-colors border",
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-surface hover:bg-muted text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {c.name}
+                  </Link>
+                );
+              })}
+            </div>
           )}
 
           {/* Meta details bar */}
@@ -374,7 +497,7 @@ function BlogPostPage() {
             </div>
 
             {/* Dynamic Recommendations / Conversion CTA */}
-            <BlogRecommendationSection blog={blog} />
+            <BlogRecommendationSection blog={blog} cityName={activeCityName} />
           </main>
 
           {/* Sticky Sidebar (4 Cols) */}
@@ -476,7 +599,7 @@ function BlogPostPage() {
   );
 }
 
-function BlogRecommendationSection({ blog }: { blog: BlogPostDetailResponse }) {
+function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailResponse; cityName?: string }) {
   const recType =
     blog.recommendationType ||
     (blog.relatedCategoryId
@@ -606,7 +729,7 @@ function BlogRecommendationSection({ blog }: { blog: BlogPostDetailResponse }) {
                 Looking for {categoryName}?
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Explore our full collection of 100% genuine {categoryName.toLowerCase()} with official brand warranty, instant old battery scrap rebate, and 1-2 hour doorstep delivery & installation in Delhi NCR.
+                Explore our full collection of 100% genuine {categoryName.toLowerCase()} with official brand warranty, instant old battery scrap rebate, and 1-2 hour doorstep delivery & installation in {cityName || "Delhi NCR"}.
               </p>
             </div>
             {categorySlug && (

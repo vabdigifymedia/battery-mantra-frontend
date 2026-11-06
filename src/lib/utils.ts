@@ -20,6 +20,143 @@ export function generateSlug(text: string): string {
 
 export const toSlug = (text?: string) => text ? text.toLowerCase().trim().replace(/\s+/g, "-") : "";
 
+export const KNOWN_BLOG_CITIES = [
+  { slug: "delhi", name: "Delhi" },
+  { slug: "noida", name: "Noida" },
+  { slug: "gurgaon", name: "Gurgaon" },
+  { slug: "gurugram", name: "Gurugram" },
+  { slug: "faridabad", name: "Faridabad" },
+  { slug: "ghaziabad", name: "Ghaziabad" },
+  { slug: "greater-noida", name: "Greater Noida" },
+  { slug: "delhi-ncr", name: "Delhi NCR" },
+];
+
+/**
+ * Detects if a blog slug contains a known city name or city slug (e.g. -in-noida, -delhi).
+ */
+export function detectCityFromSlug(slug: string): { slug: string; name: string } | null {
+  if (!slug) return null;
+  const s = slug.toLowerCase();
+  for (const c of KNOWN_BLOG_CITIES) {
+    const pattern = new RegExp(`(?:-in-|-)${c.slug}(?:$|-)`, "i");
+    if (pattern.test(s) || s === c.slug) {
+      return c;
+    }
+  }
+  return null;
+}
+
+/**
+ * Generates candidate slugs to query when looking up a blog post that may be parameterized
+ * with {city_name} or city suffixes (e.g. best-battery-in-noida -> best-battery-in-{city_name}, etc.)
+ */
+export function generateCandidateSlugs(slug: string): string[] {
+  if (!slug) return [];
+  const decoded = decodeURIComponent(slug).trim().toLowerCase();
+  const candidates = new Set<string>();
+  candidates.add(decoded);
+
+  const detected = detectCityFromSlug(decoded);
+  if (detected) {
+    // 1. Replace city slug with {city_name}
+    candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), "-in-{city_name}"));
+    candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), "-{city_name}"));
+    candidates.add(decoded.replace(new RegExp(`\\b${detected.slug}\\b`, "i"), "{city_name}"));
+
+    // 2. Replace city slug with default 'delhi'
+    candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), "-in-delhi"));
+    candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), "-delhi"));
+
+    // 3. Strip city altogether
+    candidates.add(decoded.replace(new RegExp(`-in-${detected.slug}\\b`, "i"), ""));
+    candidates.add(decoded.replace(new RegExp(`-${detected.slug}\\b`, "i"), ""));
+  } else {
+    // If slug has no city (e.g. best-car-battery), also try {city_name} and delhi versions
+    candidates.add(`${decoded}-in-{city_name}`);
+    candidates.add(`${decoded}-in-delhi`);
+  }
+
+  return Array.from(candidates)
+    .map((c) => c.replace(/(^-|-$)+/g, ""))
+    .filter(Boolean);
+}
+
+/**
+ * Sanitizes and generates blog slug, safely preserving {city_name} while slugifying other words.
+ */
+export function cleanBlogSlug(input: string): string {
+  if (!input) return "";
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/\{city_name\}/gi, "__CITY_VAR__")
+    .replace(/\{city\}/gi, "__CITY_VAR__")
+    .replace(/\{year\}/gi, new Date().getFullYear().toString())
+    .replace(/\{current_year\}/gi, new Date().getFullYear().toString())
+    .replace(/[^a-z0-9_ -]+/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/__CITY_VAR__/g, "{city_name}")
+    .replace(/(^-|-$)+/g, "");
+}
+
+/**
+ * Processes blog text, HTML content, or titles by replacing dynamic variables
+ * ({city_name}, {year}, {category_name}, {brand_name}, etc.) with context values.
+ */
+export function applyBlogVariables(
+  text?: string | null,
+  context: {
+    cityName?: string | null;
+    categoryName?: string | null;
+    brandName?: string | null;
+    manufacturerName?: string | null;
+    deliveryTime?: string | null;
+    year?: string | null;
+    phone?: string | null;
+    [key: string]: any;
+  } = {}
+): string {
+  if (!text) return "";
+  const city = context.cityName?.trim() || "Delhi NCR";
+  const year = context.year || new Date().getFullYear().toString();
+  const month = new Date().toLocaleString("en-IN", { month: "long" });
+  const category = context.categoryName || "Car Battery";
+  const brand = context.brandName || "";
+  const make = context.manufacturerName || "";
+  const deliveryTime = context.deliveryTime || "1-2 Hours";
+  const phone = context.phone || "9200920051";
+  const siteName = "Battery Mantra";
+
+  const map: Record<string, string> = {
+    city_name: city,
+    city: city,
+    year: year,
+    current_year: year,
+    month: month,
+    current_month: month,
+    category_name: category,
+    category: category,
+    brand_name: brand,
+    brand: brand,
+    manufacturer_name: make,
+    make: make,
+    delivery_time: deliveryTime,
+    phone: phone,
+    phone_number: phone,
+    site_name: siteName,
+    app_name: siteName,
+  };
+
+  let result = text;
+  for (const [k, v] of Object.entries(map)) {
+    const regex = new RegExp(`\\{{1,2}\\s*${k}\\s*\\}{1,2}`, "gi");
+    result = result.replace(regex, v);
+  }
+
+  return result;
+}
+
 export function applySeoTemplate(template?: string | null, context: Record<string, string> = {}): string {
   if (!template) return "";
   let result = template;

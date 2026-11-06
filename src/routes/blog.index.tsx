@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { blogsListQuery, blogCategoriesQuery, featuredBlogsQuery, pageSeoQuery } from "@/queries";
+import { useLocationStore } from "@/store/useLocationStore";
 import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import {
   X,
   Share2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, applyBlogVariables, toSlug } from "@/lib/utils";
 
 export const Route = createFileRoute("/blog/")({
   loader: async ({ context }) => {
@@ -62,6 +63,9 @@ export const Route = createFileRoute("/blog/")({
 function BlogIndexPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [search, setSearch] = useState("");
+  const { city } = useLocationStore();
+  const activeCityName = city?.cityName || "Delhi NCR";
+  const currentYear = new Date().getFullYear().toString();
 
   const { data: categoriesData } = useQuery(blogCategoriesQuery());
   const { data: featuredData } = useQuery(featuredBlogsQuery());
@@ -75,6 +79,28 @@ function BlogIndexPage() {
 
   const posts = blogsData?.content || [];
   const featuredPost = featuredData?.[0] || posts.find((p) => p.isFeatured);
+
+  const featuredTitle = featuredPost
+    ? applyBlogVariables(featuredPost.title, {
+        cityName: activeCityName,
+        categoryName: featuredPost.category,
+        year: currentYear,
+      })
+    : "";
+
+  const featuredExcerpt = featuredPost
+    ? applyBlogVariables(featuredPost.excerpt, {
+        cityName: activeCityName,
+        categoryName: featuredPost.category,
+        year: currentYear,
+      })
+    : "";
+
+  const featuredSlug = featuredPost
+    ? featuredPost.slug?.includes("{city_name}")
+      ? featuredPost.slug.replace(/\{city_name\}/g, toSlug(activeCityName))
+      : featuredPost.slug
+    : "";
 
   // Remaining posts excluding hero featured post if it's already shown
   const remainingPosts = useMemo(() => {
@@ -185,7 +211,7 @@ function BlogIndexPage() {
         {!search && selectedCategory === "ALL" && featuredPost && (
           <Link
             to="/blog/$slug"
-            params={{ slug: featuredPost.slug }}
+            params={{ slug: featuredSlug }}
             className="group relative block overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:shadow-xl hover:border-primary/40"
           >
             <div className="grid md:grid-cols-2 gap-0">
@@ -193,7 +219,7 @@ function BlogIndexPage() {
                 {featuredPost.coverImage ? (
                   <img
                     src={featuredPost.coverImage}
-                    alt={featuredPost.title}
+                    alt={featuredTitle}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
@@ -221,11 +247,11 @@ function BlogIndexPage() {
                   </div>
 
                   <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
-                    {featuredPost.title}
+                    {featuredTitle}
                   </h2>
 
                   <p className="text-muted-foreground text-sm sm:text-base line-clamp-3">
-                    {featuredPost.excerpt}
+                    {featuredExcerpt}
                   </p>
                 </div>
 
@@ -296,86 +322,102 @@ function BlogIndexPage() {
         ) : (
           /* Articles Grid */
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {remainingPosts.map((post) => (
-              <article
-                key={post.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:shadow-lg hover:border-primary/40"
-              >
-                {/* Thumbnail */}
-                <Link
-                  to="/blog/$slug"
-                  params={{ slug: post.slug }}
-                  className="relative aspect-[16/10] overflow-hidden bg-muted"
+            {remainingPosts.map((post) => {
+              const postTitle = applyBlogVariables(post.title, {
+                cityName: activeCityName,
+                categoryName: post.category,
+                year: currentYear,
+              });
+              const postExcerpt = applyBlogVariables(post.excerpt, {
+                cityName: activeCityName,
+                categoryName: post.category,
+                year: currentYear,
+              });
+              const postSlug = post.slug?.includes("{city_name}")
+                ? post.slug.replace(/\{city_name\}/g, toSlug(activeCityName))
+                : post.slug;
+
+              return (
+                <article
+                  key={post.id}
+                  className="group flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:shadow-lg hover:border-primary/40"
                 >
-                  {post.coverImage ? (
-                    <img
-                      src={post.coverImage}
-                      alt={post.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">
-                      <BookOpen className="h-8 w-8 opacity-30" />
-                    </div>
-                  )}
-                  <div className="absolute top-3 left-3">
-                    <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm text-xs font-medium">
-                      {post.category}
-                    </Badge>
-                  </div>
-                </Link>
-
-                {/* Content */}
-                <div className="flex flex-1 flex-col justify-between p-5 space-y-4">
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {post.publishedAt
-                          ? new Date(post.publishedAt).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : "Published"}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {post.readTimeMinutes} min read
-                      </span>
-                    </div>
-
-                    <h3 className="font-display text-lg font-bold tracking-tight text-foreground line-clamp-2 transition-colors group-hover:text-primary">
-                      <Link to="/blog/$slug" params={{ slug: post.slug }}>
-                        {post.title}
-                      </Link>
-                    </h3>
-
-                    {post.excerpt && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {post.excerpt}
-                      </p>
+                  {/* Thumbnail */}
+                  <Link
+                    to="/blog/$slug"
+                    params={{ slug: postSlug }}
+                    className="relative aspect-[16/10] overflow-hidden bg-muted"
+                  >
+                    {post.coverImage ? (
+                      <img
+                        src={post.coverImage}
+                        alt={postTitle}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">
+                        <BookOpen className="h-8 w-8 opacity-30" />
+                      </div>
                     )}
-                  </div>
+                    <div className="absolute top-3 left-3">
+                      <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm text-xs font-medium">
+                        {post.category}
+                      </Badge>
+                    </div>
+                  </Link>
 
-                  {/* Footer / CTA */}
-                  <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                    <span className="text-xs text-muted-foreground font-medium">
-                      {post.authorName || "Battery Mantra"}
-                    </span>
-                    <Link
-                      to="/blog/$slug"
-                      params={{ slug: post.slug }}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:translate-x-1 transition-transform"
-                    >
-                      Read <ArrowRight className="h-3 w-3" />
-                    </Link>
+                  {/* Content */}
+                  <div className="flex flex-1 flex-col justify-between p-5 space-y-4">
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {post.publishedAt
+                            ? new Date(post.publishedAt).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "Published"}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {post.readTimeMinutes} min read
+                        </span>
+                      </div>
+
+                      <h3 className="font-display text-lg font-bold tracking-tight text-foreground line-clamp-2 transition-colors group-hover:text-primary">
+                        <Link to="/blog/$slug" params={{ slug: postSlug }}>
+                          {postTitle}
+                        </Link>
+                      </h3>
+
+                      {postExcerpt && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          {postExcerpt}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Footer / CTA */}
+                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {post.authorName || "Battery Mantra"}
+                      </span>
+                      <Link
+                        to="/blog/$slug"
+                        params={{ slug: postSlug }}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:translate-x-1 transition-transform"
+                      >
+                        Read <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
 

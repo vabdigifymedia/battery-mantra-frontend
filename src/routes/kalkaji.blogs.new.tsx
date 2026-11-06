@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
+import { VariableChipsHelper } from "@/components/admin/VariableChipsHelper";
 import {
   ArrowLeft,
   Sparkles,
@@ -37,8 +38,9 @@ import {
   Car,
   Factory,
   ArrowRight,
+  MapPin,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, cleanBlogSlug, applyBlogVariables } from "@/lib/utils";
 import { toast } from "sonner";
 
 const DEFAULT_CATEGORIES = [
@@ -103,16 +105,13 @@ function NewBlogPost() {
   // Calculate estimated reading time
   const autoReadTime = useMemo(() => calculateReadTime(content), [content]);
   const effectiveReadTime = manualReadTime !== "" ? Number(manualReadTime) : autoReadTime;
+  const [previewCity, setPreviewCity] = useState("Delhi");
 
   // Auto-generate slug when title changes unless user manually edited slug
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!isSlugManual) {
-      const generated = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
-      setSlug(generated);
+      setSlug(cleanBlogSlug(val));
     }
   };
 
@@ -166,12 +165,7 @@ function NewBlogPost() {
       return;
     }
 
-    const cleanSlug =
-      slug.trim() ||
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
+    const cleanSlug = cleanBlogSlug(slug.trim() || title);
 
     const finalCategory = isCustomCategory ? customCategory.trim() || "General" : category;
 
@@ -276,17 +270,60 @@ function NewBlogPost() {
               <CardTitle className="text-base font-semibold">Title & URL</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <VariableChipsHelper
+                type="BLOGS"
+                compact={true}
+                title="Dynamic Variables (Click to insert into Title):"
+                onInsert={(key) => {
+                  setTitle((prev) => `${prev} ${key}`.trim());
+                  if (!isSlugManual) {
+                    setSlug((prev) => cleanBlogSlug(`${prev} ${key}`));
+                  }
+                }}
+              />
+
               <div className="space-y-1.5">
                 <Label htmlFor="title" className="text-sm font-medium">
                   Article Title <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="title"
-                  placeholder="e.g. 5 Signs Your Car Battery is About to Die"
+                  placeholder="e.g. Best Car Battery in {city_name} ({year})"
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   className="text-base font-medium"
                 />
+
+                {title.includes("{") && (
+                  <div className="rounded-lg border bg-primary/5 p-2.5 space-y-1.5 text-xs mt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-primary flex items-center gap-1">
+                        <Eye className="h-3.5 w-3.5" /> Customer View Live Preview:
+                      </span>
+                      <div className="flex items-center gap-1 text-[11px]">
+                        <span className="text-muted-foreground">Preview City:</span>
+                        {["Delhi", "Noida", "Gurgaon", "Ghaziabad"].map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => setPreviewCity(c)}
+                            className={cn(
+                              "px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors",
+                              previewCity === c
+                                ? "bg-primary text-primary-foreground font-semibold"
+                                : "bg-background hover:bg-muted text-muted-foreground border"
+                            )}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="font-medium text-foreground bg-background px-2.5 py-1.5 rounded border text-sm">
+                      {applyBlogVariables(title, { cityName: previewCity })}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -300,14 +337,23 @@ function NewBlogPost() {
                 </div>
                 <Input
                   id="slug"
-                  placeholder="5-signs-car-battery-about-to-die"
+                  placeholder="best-car-battery-in-{city_name}"
                   value={slug}
                   onChange={(e) => {
-                    setSlug(e.target.value);
+                    setSlug(cleanBlogSlug(e.target.value));
                     setIsSlugManual(true);
                   }}
                   className="font-mono text-xs"
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  {slug.includes("{city_name}") ? (
+                    <span className="text-emerald-600 font-medium flex items-center gap-1 mt-0.5">
+                      <Sparkles className="h-3 w-3" /> Dynamic city URL active: Accessible across all cities (e.g. /blog/best-car-battery-in-delhi, /blog/best-car-battery-in-noida)
+                    </span>
+                  ) : (
+                    "Tip: Include {city_name} in the slug (e.g. best-car-battery-in-{city_name}) for automatic multi-city SEO URLs."
+                  )}
+                </p>
               </div>
 
               <div className="space-y-1.5">
@@ -344,6 +390,13 @@ function NewBlogPost() {
                 {effectiveReadTime} min read
               </Badge>
             </CardHeader>
+            <div className="px-6 pb-2">
+              <VariableChipsHelper
+                type="BLOGS"
+                compact={true}
+                title="Dynamic Variables for Content (Click to copy):"
+              />
+            </div>
             <CardContent>
               <RichTextEditor
                 value={content}
@@ -858,6 +911,13 @@ function NewBlogPost() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <VariableChipsHelper
+                type="BLOGS"
+                compact={true}
+                title="SEO Dynamic Variables (Click to insert into Meta Title):"
+                onInsert={(key) => setMetaTitle((prev) => `${prev} ${key}`.trim())}
+              />
+
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="metaTitle" className="text-xs font-medium">

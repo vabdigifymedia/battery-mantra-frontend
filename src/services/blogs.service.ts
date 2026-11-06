@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
+import { generateCandidateSlugs } from "@/lib/utils";
 import type {
   BlogPostDetailResponse,
   BlogPostListResponse,
@@ -218,23 +219,28 @@ class BlogsService {
   }
 
   /**
-   * Public: Get blog post by slug
+   * Public: Get blog post by slug with smart multi-candidate resolution
+   * (supports city variations like slug-in-noida, slug-noida, slug-in-{city_name}, etc.)
    */
   async bySlug(slug: string): Promise<BlogPostDetailResponse> {
-    try {
-      const data = await apiFetch<BlogPostDetailResponse>(endpoints.blogs.bySlug(slug), {
-        method: "GET",
-        auth: false,
-      });
-      if (data && data.id) {
-        return data;
-      }
-    } catch {
-      // Fallback
-    }
+    const candidates = generateCandidateSlugs(slug);
 
-    const found = localBlogs.find((b) => b.slug === slug);
-    if (found) return found;
+    for (const candidate of candidates) {
+      try {
+        const data = await apiFetch<BlogPostDetailResponse>(endpoints.blogs.bySlug(candidate), {
+          method: "GET",
+          auth: false,
+        });
+        if (data && data.id) {
+          return data;
+        }
+      } catch {
+        // Continue to next candidate
+      }
+
+      const found = localBlogs.find((b) => b.slug === candidate || b.slug === slug);
+      if (found) return found;
+    }
 
     throw new Error(`Blog post not found: ${slug}`);
   }

@@ -22,9 +22,21 @@ export type VariablePresetType =
   | "MANUFACTURERS"
   | "VEHICLES"
   | "CMS_PAGES"
-  | "PRODUCT";
+  | "PRODUCT"
+  | "BLOGS";
 
 const PRESET_VARIABLES: Record<VariablePresetType, VariableDef[]> = {
+  BLOGS: [
+    { key: "{city_name}", label: "Visitor's City (Delhi, Noida, Gurgaon)", highlight: true },
+    { key: "{year}", label: "Current Year (2026)", highlight: true },
+    { key: "{month}", label: "Current Month" },
+    { key: "{category_name}", label: "Article Category" },
+    { key: "{brand_name}", label: "Attached Brand" },
+    { key: "{manufacturer_name}", label: "Car Maker (Make)" },
+    { key: "{delivery_time}", label: "Delivery Time (1-2 Hours)" },
+    { key: "{phone}", label: "Support Phone (9200920051)" },
+    { key: "{site_name}", label: "Site Name (Battery Mantra)" },
+  ],
   SEO_BRANDS: [
     { key: "{brand_name}", label: "Brand Name" },
     { key: "{category_name}", label: "Category Name (e.g. Battery)" },
@@ -150,6 +162,7 @@ export interface VariableChipsHelperProps {
   showPriceNote?: boolean;
   compact?: boolean;
   className?: string;
+  onInsert?: (key: string) => void;
 }
 
 export function VariableChipsHelper({
@@ -160,6 +173,7 @@ export function VariableChipsHelper({
   showPriceNote,
   compact = false,
   className,
+  onInsert,
 }: VariableChipsHelperProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -168,6 +182,9 @@ export function VariableChipsHelper({
   if (!variables || variables.length === 0) return null;
 
   const handleCopy = (key: string) => {
+    if (onInsert) {
+      onInsert(key);
+    }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(key);
