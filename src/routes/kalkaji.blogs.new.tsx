@@ -40,7 +40,7 @@ import {
   ArrowRight,
   MapPin,
 } from "lucide-react";
-import { cn, cleanBlogSlug, applyBlogVariables } from "@/lib/utils";
+import { cn, cleanBlogSlug, sanitizeSlugForDb, applyBlogVariables } from "@/lib/utils";
 import { toast } from "sonner";
 
 const DEFAULT_CATEGORIES = [
@@ -145,9 +145,10 @@ function NewBlogPost() {
     onError: (err: any) => {
       console.error("Create blog failed:", err);
       let errMsg = err?.message;
-      if (err?.fieldErrors && typeof err.fieldErrors === "object") {
-        const details = Object.entries(err.fieldErrors)
-          .map(([f, msgs]) => `${f}: ${(msgs as string[]).join(", ")}`)
+      const fieldErrors = err?.fieldErrors || err?.data?.errors || err?.raw?.errors;
+      if (fieldErrors && typeof fieldErrors === "object") {
+        const details = Object.entries(fieldErrors)
+          .map(([f, msgs]) => `${f}: ${Array.isArray(msgs) ? msgs.join(", ") : String(msgs)}`)
           .join(" | ");
         if (details) errMsg = `${errMsg}: ${details}`;
       }
@@ -165,7 +166,16 @@ function NewBlogPost() {
       return;
     }
 
-    const cleanSlug = cleanBlogSlug(slug.trim() || title);
+    let cleanSlug = slug.trim() ? cleanBlogSlug(slug.trim()) : cleanBlogSlug(title);
+    if (cleanSlug.includes("{") || cleanSlug.includes("}")) {
+      const sanitized = sanitizeSlugForDb(cleanSlug);
+      toast.info(
+        `Database cannot store '{ }' in URL slug. Auto-converted to '${sanitized}'. All multi-city URLs (/blog/...-in-noida) still work automatically!`,
+        { duration: 6000 }
+      );
+      cleanSlug = sanitized;
+      setSlug(cleanSlug);
+    }
 
     const finalCategory = isCustomCategory ? customCategory.trim() || "General" : category;
 

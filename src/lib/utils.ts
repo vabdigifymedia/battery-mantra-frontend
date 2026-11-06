@@ -104,6 +104,21 @@ export function cleanBlogSlug(input: string): string {
 }
 
 /**
+ * Sanitizes blog slug specifically for database storage. Databases and URL RFC standards
+ * strictly forbid curly braces { }. Replaces {city_name} with default 'delhi' and
+ * strips illegal characters so backend DB insert never fails.
+ */
+export function sanitizeSlugForDb(slug: string): string {
+  if (!slug) return "";
+  return cleanBlogSlug(slug)
+    .replace(/\{city(_name)?\}/gi, "delhi")
+    .replace(/\{[^}]*\}/g, "")
+    .replace(/[^a-z0-9-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
+/**
  * Processes blog text, HTML content, or titles by replacing dynamic variables
  * ({city_name}, {year}, {category_name}, {brand_name}, etc.) with context values.
  */
