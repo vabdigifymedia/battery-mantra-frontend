@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { blogsService } from "@/services/blogs.service";
+import { blogsService, normalizeTags } from "@/services/blogs.service";
 import { productsService } from "@/services/products.service";
 import { blogsListQuery } from "@/queries";
 import { Container } from "@/components/layout/Container";
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/blog/$slug")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "keywords", content: blog.metaKeywords || blog.tags?.join(", ") || "" },
+        { name: "keywords", content: blog.metaKeywords || (Array.isArray(blog.tags) ? blog.tags.join(", ") : blog.tags) || "" },
         // OpenGraph
         { property: "og:title", content: title },
         { property: "og:description", content: description },
@@ -307,10 +307,10 @@ function BlogPostPage() {
             />
 
             {/* Tags Row */}
-            {blog.tags && blog.tags.length > 0 && (
+            {normalizeTags(blog.tags).length > 0 && (
               <div className="pt-6 border-t flex flex-wrap items-center gap-2">
                 <span className="text-xs font-semibold text-muted-foreground">Related Topics:</span>
-                {blog.tags.map((tag) => (
+                {normalizeTags(blog.tags).map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs font-normal">
                     #{tag}
                   </Badge>

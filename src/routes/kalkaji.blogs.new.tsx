@@ -125,7 +125,15 @@ function NewBlogPost() {
       navigate({ to: "/kalkaji/blogs" });
     },
     onError: (err: any) => {
-      toast.error(err?.message || "Failed to create blog post");
+      console.error("Create blog failed:", err);
+      let errMsg = err?.message;
+      if (err?.fieldErrors && typeof err.fieldErrors === "object") {
+        const details = Object.entries(err.fieldErrors)
+          .map(([f, msgs]) => `${f}: ${(msgs as string[]).join(", ")}`)
+          .join(" | ");
+        if (details) errMsg = `${errMsg}: ${details}`;
+      }
+      toast.error(errMsg || "Failed to create blog post. Please check fields.");
     },
   });
 
@@ -148,11 +156,6 @@ function NewBlogPost() {
 
     const finalCategory = isCustomCategory ? customCategory.trim() || "General" : category;
 
-    const tags = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const payload: CreateBlogPostRequest = {
       title: title.trim(),
       slug: cleanSlug,
@@ -160,16 +163,16 @@ function NewBlogPost() {
       content,
       coverImage: coverImage.trim() || undefined,
       category: finalCategory,
-      tags,
+      tags: tagsInput.trim() || undefined,
       authorName: authorName.trim() || "Battery Mantra",
       authorImage: authorImage.trim() || undefined,
-      readTimeMinutes: effectiveReadTime,
+      readTimeMinutes: Math.max(1, Number(effectiveReadTime) || 3),
       status: finalStatus,
       isFeatured,
-      relatedProductIds: selectedProductIds,
+      relatedProductIds: selectedProductIds.length > 0 ? selectedProductIds : undefined,
       metaTitle: metaTitle.trim() || title.trim(),
       metaDescription: metaDescription.trim() || excerpt.trim() || undefined,
-      metaKeywords: metaKeywords.trim() || tags.join(", ") || undefined,
+      metaKeywords: metaKeywords.trim() || tagsInput.trim() || undefined,
       canonicalUrl: canonicalUrl.trim() || undefined,
       ogImage: ogImage.trim() || coverImage.trim() || undefined,
     };

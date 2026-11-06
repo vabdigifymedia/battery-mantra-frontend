@@ -1022,7 +1022,7 @@ export interface BlogPostListResponse {
   excerpt?: string | null;
   coverImage?: string | null;
   category: string;
-  tags?: string[] | null;
+  tags?: string | string[] | null;
   authorName?: string | null;
   authorImage?: string | null;
   readTimeMinutes: number;
@@ -1052,7 +1052,7 @@ export interface CreateBlogPostRequest {
   content: string;
   coverImage?: string;
   category: string;
-  tags?: string[];
+  tags?: string | string[];
   authorName?: string;
   authorImage?: string;
   readTimeMinutes?: number;

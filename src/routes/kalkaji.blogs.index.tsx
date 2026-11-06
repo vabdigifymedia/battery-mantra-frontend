@@ -57,7 +57,7 @@ function AdminBlogsList() {
       toast.success("Blog post deleted");
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
-    onError: () => toast.error("Failed to delete blog post"),
+    onError: (err: any) => toast.error(err?.message || "Failed to delete blog post"),
   });
 
   const statusMutation = useMutation({
@@ -67,7 +67,7 @@ function AdminBlogsList() {
       toast.success(`Post status updated to ${updated.status}`);
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
-    onError: () => toast.error("Failed to update status"),
+    onError: (err: any) => toast.error(err?.message || "Failed to update status"),
   });
 
   const handleDelete = (id: string, title: string) => {

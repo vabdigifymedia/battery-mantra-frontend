@@ -32,7 +32,10 @@ export function RichTextEditor({ value, onChange, placeholder, className, maxHei
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        underline: false,
+        link: false,
+      }),
       Underline,
       TextAlign.configure({
         types: ['heading', 'paragraph'],

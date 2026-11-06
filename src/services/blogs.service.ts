@@ -147,6 +147,16 @@ export function calculateReadTime(textOrHtml: string): number {
   return Math.max(1, Math.ceil(wordCount / 200));
 }
 
+// Helper to normalize tags whether returned as comma-separated string or array
+export function normalizeTags(tags?: string | string[] | null): string[] {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags.filter(Boolean);
+  return tags
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
 // In-memory store for fallback/client modifications when backend is offline
 let localBlogs = [...MOCK_BLOGS];
 
@@ -186,7 +196,7 @@ class BlogsService {
         (b) =>
           b.title.toLowerCase().includes(q) ||
           b.excerpt?.toLowerCase().includes(q) ||
-          b.tags?.some((t) => t.toLowerCase().includes(q))
+          normalizeTags(b.tags).some((t) => t.toLowerCase().includes(q))
       );
     }
 
@@ -356,116 +366,39 @@ class BlogsService {
    * Admin: Create blog post
    */
   async create(data: CreateBlogPostRequest): Promise<BlogPostDetailResponse> {
-    try {
-      return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.create, {
-        method: "POST",
-        body: data,
-      });
-    } catch (err) {
-      // If backend fails, save into local in-memory store so admin flow still tests cleanly
-      const slug =
-        data.slug ||
-        data.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)+/g, "");
-
-      const newPost: BlogPostDetailResponse = {
-        id: `blog-${Date.now()}`,
-        title: data.title,
-        slug,
-        excerpt: data.excerpt,
-        content: data.content,
-        coverImage: data.coverImage,
-        category: data.category,
-        tags: data.tags || [],
-        authorName: data.authorName || "Battery Mantra",
-        authorImage: data.authorImage,
-        readTimeMinutes: data.readTimeMinutes || calculateReadTime(data.content),
-        status: data.status || "DRAFT",
-        isFeatured: Boolean(data.isFeatured),
-        viewCount: 0,
-        publishedAt: data.status === "PUBLISHED" ? new Date().toISOString() : null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        metaTitle: data.metaTitle,
-        metaDescription: data.metaDescription,
-        metaKeywords: data.metaKeywords,
-        canonicalUrl: data.canonicalUrl,
-        ogImage: data.ogImage || data.coverImage,
-        relatedProductIds: data.relatedProductIds || [],
-      };
-
-      localBlogs.unshift(newPost);
-      return newPost;
-    }
+    return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.create, {
+      method: "POST",
+      body: data,
+    });
   }
 
   /**
    * Admin: Update blog post
    */
   async update(id: string, data: UpdateBlogPostRequest): Promise<BlogPostDetailResponse> {
-    try {
-      return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.byId(id), {
-        method: "PUT",
-        body: data,
-      });
-    } catch {
-      // Local fallback
-      const idx = localBlogs.findIndex((b) => b.id === id);
-      if (idx !== -1) {
-        const existing = localBlogs[idx];
-        const updated: BlogPostDetailResponse = {
-          ...existing,
-          ...data,
-          readTimeMinutes: data.content ? calculateReadTime(data.content) : existing.readTimeMinutes,
-          updatedAt: new Date().toISOString(),
-          publishedAt:
-            data.status === "PUBLISHED" && !existing.publishedAt
-              ? new Date().toISOString()
-              : existing.publishedAt,
-        };
-        localBlogs[idx] = updated;
-        return updated;
-      }
-      throw new Error(`Blog post with ID ${id} not found.`);
-    }
+    return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.byId(id), {
+      method: "PUT",
+      body: data,
+    });
   }
 
   /**
    * Admin: Toggle or change status (PUBLISHED, DRAFT, ARCHIVED)
    */
   async updateStatus(id: string, status: BlogStatus): Promise<BlogPostDetailResponse> {
-    try {
-      return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.updateStatus(id), {
-        method: "PATCH",
-        body: { status },
-      });
-    } catch {
-      const found = localBlogs.find((b) => b.id === id);
-      if (found) {
-        found.status = status;
-        if (status === "PUBLISHED" && !found.publishedAt) {
-          found.publishedAt = new Date().toISOString();
-        }
-        found.updatedAt = new Date().toISOString();
-        return found;
-      }
-      throw new Error(`Blog post with ID ${id} not found.`);
-    }
+    return await apiFetch<BlogPostDetailResponse>(endpoints.admin.blogs.updateStatus(id), {
+      method: "PATCH",
+      body: { status },
+    });
   }
 
   /**
    * Admin: Delete blog post
    */
   async delete(id: string): Promise<void> {
-    try {
-      await apiFetch<void>(endpoints.admin.blogs.delete(id), {
-        method: "DELETE",
-      });
-    } catch {
-      localBlogs = localBlogs.filter((b) => b.id !== id);
-    }
+    await apiFetch<void>(endpoints.admin.blogs.delete(id), {
+      method: "DELETE",
+    });
   }
 }
 
