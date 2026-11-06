@@ -196,16 +196,7 @@ function EditBlogPost() {
       return;
     }
 
-    let cleanSlug = slug.trim() ? cleanBlogSlug(slug.trim()) : cleanBlogSlug(title);
-    if (cleanSlug.includes("{") || cleanSlug.includes("}")) {
-      const sanitized = sanitizeSlugForDb(cleanSlug);
-      toast.info(
-        `Database cannot store '{ }' in URL slug. Auto-converted to '${sanitized}'. All multi-city URLs (/blog/...-in-noida) still work automatically!`,
-        { duration: 6000 }
-      );
-      cleanSlug = sanitized;
-      setSlug(cleanSlug);
-    }
+    const cleanSlug = cleanBlogSlug(slug.trim() || title);
 
     const finalCategory = isCustomCategory ? customCategory.trim() || "General" : category;
 
