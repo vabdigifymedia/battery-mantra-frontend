@@ -341,6 +341,12 @@ export type ProductAggregationsResponse = {
 
 // Coupon Types
 export type DiscountType = "PERCENTAGE" | "FLAT";
+export type CouponTargetType =
+  | "ALL_PRODUCTS"
+  | "CATEGORIES"
+  | "BRANDS"
+  | "CUSTOM_PRODUCTS"
+  | "EXCLUDED_PRODUCTS";
 
 export type CouponRequest = {
   code: string;
@@ -352,6 +358,17 @@ export type CouponRequest = {
   expiryDate?: string;
   usageLimit?: number;
   isActive: boolean;
+
+  // Granular Product/Brand/Category Targeting
+  targetType?: CouponTargetType;
+  targetCategoryIds?: UUID[];
+  targetCategoryNames?: string[];
+  targetBrandIds?: UUID[];
+  targetBrandNames?: string[];
+  targetProductIds?: UUID[];
+  excludedProductIds?: UUID[];
+  displayOnPdp?: boolean;
+  pdpHighlightText?: string;
 };
 
 export type CouponResponse = CouponRequest & {

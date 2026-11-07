@@ -21,6 +21,7 @@ import { cartQuery, addressesQuery, activeCampaignsQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { ordersService } from "@/services/orders.service";
 import { couponsService } from "@/services/coupons.service";
+import { validateCartCouponEligibility, enrichCouponWithTargeting } from "@/lib/coupon-rules";
 import { campaignService } from "@/services/campaign.service";
 import { cartService } from "@/services/cart.service";
 import { isProductEligibleForCampaign, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
@@ -267,6 +268,18 @@ function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
+  // Auto-fill coupon if copied from PDP
+  useEffect(() => {
+    try {
+      const prefill = sessionStorage.getItem("bm_copied_coupon");
+      if (prefill && !couponInput) {
+        setCouponInput(prefill);
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
   const campaignDiscountSummary = useMemo(() => {
     if (!activeCampaigns || activeCampaigns.length === 0 || items.length === 0) {
       return { totalCampaignDiscount: 0, hasDealItems: false, eligibleCouponAmount: baseTotalAmount, campaignNames: [] };
@@ -322,7 +335,8 @@ function CheckoutPage() {
   };
 
   const handleApplyCoupon = async () => {
-    if (!couponInput.trim()) return;
+    const rawCode = couponInput.trim().toUpperCase();
+    if (!rawCode) return;
 
     // Strict Anti-Stacking Check: If all cart items are already on special campaign deal
     if (campaignDiscountSummary.hasDealItems && campaignDiscountSummary.eligibleCouponAmount <= 0) {
@@ -330,14 +344,36 @@ function CheckoutPage() {
       return;
     }
 
+    const evalTotal = campaignDiscountSummary.hasDealItems
+      ? campaignDiscountSummary.eligibleCouponAmount
+      : baseTotalAmount;
+
+    // Target Check: Validate coupon targeting rules (categories, brands, products)
+    const targetedCoupon = enrichCouponWithTargeting({
+      code: rawCode,
+      isActive: true,
+      discountType: "FLAT",
+      discountValue: 0,
+    } as any);
+
+    if (targetedCoupon.targetType && targetedCoupon.targetType !== "ALL_PRODUCTS") {
+      const targetingValidation = validateCartCouponEligibility(targetedCoupon, items, evalTotal);
+      if (!targetingValidation.isValid) {
+        toast.error(targetingValidation.message);
+        return;
+      }
+    }
+
     setIsApplyingCoupon(true);
     try {
-      const evalTotal = campaignDiscountSummary.hasDealItems
-        ? campaignDiscountSummary.eligibleCouponAmount
-        : baseTotalAmount;
-      const res = await couponsService.applyCoupon({ code: couponInput.trim().toUpperCase(), cartTotal: evalTotal });
+      const res = await couponsService.applyCoupon({ code: rawCode, cartTotal: evalTotal });
       if (res.isValid) {
-        setAppliedCoupon({ ...res, code: couponInput.trim().toUpperCase() });
+        setAppliedCoupon({ ...res, code: rawCode });
+        try {
+          sessionStorage.removeItem("bm_copied_coupon");
+        } catch {
+          // Ignore
+        }
         toast.success(res.message || "Coupon applied successfully");
       } else {
         toast.error(res.message || "Invalid coupon code");

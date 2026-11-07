@@ -15,6 +15,7 @@ import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductRecommendationSection } from "@/components/products/ProductRecommendationSection";
+import { AvailableCouponsCard } from "@/components/products/AvailableCouponsCard";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
@@ -1155,6 +1156,11 @@ export function PdpPage() {
                 </div>
               </div>
             )}
+
+            {/* Available Coupons & Offers (Direct PDP Display Without Campaign) */}
+            <div className="order-2 sm:order-2">
+              <AvailableCouponsCard product={data} />
+            </div>
 
             {/* Buy Box & Actions (order-3 - Just below Exchange Offer) */}
             <div className="space-y-6 order-3">
