@@ -12,12 +12,12 @@ import {
   Truck,
   Wrench,
   Zap,
+  LayoutGrid,
 } from "lucide-react";
 import type { CategoryListResponse } from "@/types/dto";
 import { normalizeImageUrl } from "@/lib/image/cdn";
 
-const ALL_CATEGORIES_LOGO =
-  "https://res.cloudinary.com/xtijkslp/image/upload/v1793505701/battery-mantra/categories/fqrfxxqvtqghgnddwzeq.png";
+const ALL_CATEGORIES_LOGO = "/uploads/categories/all-categories.png";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
@@ -128,6 +128,7 @@ function CategoryCardItem({ category }: { category: CategoryListResponse }) {
 }
 
 export function HomeCategoryPills() {
+  const [allCatImgError, setAllCatImgError] = useState(false);
   const { data: categories, isLoading } = useQuery(rootCategoriesQuery());
 
   if (isLoading) {
@@ -182,12 +183,19 @@ export function HomeCategoryPills() {
       <div className="shrink-0 pl-3 pr-2 py-0.5 bg-background relative z-20 flex flex-col items-center">
         <Link to="/categories" className={fixedLinkClass}>
           <div className="relative flex h-[74px] w-[74px] items-center justify-center rounded-2xl border-2 border-primary/25 bg-gradient-to-b from-primary/5 via-white to-slate-50/90 dark:from-card dark:via-card dark:to-muted/20 p-1.5 shadow-[0_2px_8px_-1px_rgba(220,38,38,0.12),0_1px_3px_-1px_rgba(0,0,0,0.04)] group-hover:border-primary/50 group-hover:shadow-md group-active:scale-95 transition-all duration-200 overflow-hidden">
-            <img
-              src={ALL_CATEGORIES_LOGO}
-              alt="All Categories"
-              className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
-            />
+            {allCatImgError ? (
+              <div className="w-full h-full flex items-center justify-center text-primary">
+                <LayoutGrid className="w-7 h-7 stroke-[1.8]" />
+              </div>
+            ) : (
+              <img
+                src={ALL_CATEGORIES_LOGO}
+                alt="All Categories"
+                className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+                onError={() => setAllCatImgError(true)}
+              />
+            )}
           </div>
           <div className="h-[34px] w-full flex items-center justify-center">
             <span className="text-[11px] font-bold text-center leading-[1.2] tracking-tight text-primary transition-colors line-clamp-2 px-0.5">

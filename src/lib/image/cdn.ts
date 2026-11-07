@@ -30,6 +30,11 @@ export function normalizeImageUrl(url?: string | null): string {
   let clean = url.trim();
   if (!clean) return "";
 
+  // Relative VPS uploads and public images are returned directly
+  if (clean.startsWith("/uploads/") || clean.startsWith("/images/")) {
+    return clean;
+  }
+
   // Upgrade http to https to avoid mixed-content blocking on modern mobile devices
   if (clean.startsWith("http://")) {
     clean = clean.replace(/^http:\/\//i, "https://");

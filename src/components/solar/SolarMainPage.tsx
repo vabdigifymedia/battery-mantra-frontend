@@ -51,10 +51,10 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
   // Fallback logos directly matching Cloudinary URLs from DB to avoid any flicker/delay
   const partnerBrands = useMemo(() => {
     const fallbackLogos: Record<string, string> = {
-      Luminous: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901729/1540luminous-logo-600x315_gl1xj9.png",
-      Exide: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901728/898logo_png_jmaikg.png",
-      Microtek: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901740/4392LOGO_m6nnnx.png",
-      Livguard: "https://res.cloudinary.com/xtijkslp/image/upload/v1782901733/2370Logo_axhvin.jpg",
+      Luminous: "/uploads/brands/luminous-logo.png",
+      Exide: "/uploads/brands/exide-logo.png",
+      Microtek: "/uploads/brands/microtek-logo.png",
+      Livguard: "/uploads/brands/livguard-logo.png",
     };
 
     return targetBrandNames.map((name) => {

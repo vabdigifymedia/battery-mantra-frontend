@@ -8,10 +8,13 @@ export function SolarCategoriesWidget() {
       <div className="w-[270px] sm:w-auto shrink-0 snap-start sm:shrink bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden flex flex-col group border border-slate-100 hover:-translate-y-1 transition-all duration-300">
         <div className="w-full bg-white relative flex items-center justify-center p-4 border-b border-slate-100 group-hover:bg-amber-50/20 transition-colors">
           <img 
-            src="https://res.cloudinary.com/xtijkslp/image/upload/v1792237178/battery-mantra/categories/js6smpgl64kgnzxhwdmj.png" 
+            src="/uploads/categories/solar-panels.png" 
             alt="Solar Panels" 
             className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500" 
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
           <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
             Up to 22.8% Eff.
@@ -72,10 +75,13 @@ export function SolarCategoriesWidget() {
       <div className="w-[270px] sm:w-auto shrink-0 snap-start sm:shrink bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden flex flex-col group border border-slate-100 hover:-translate-y-1 transition-all duration-300">
         <div className="w-full bg-white relative flex items-center justify-center p-4 border-b border-slate-100 group-hover:bg-emerald-50/20 transition-colors">
           <img 
-            src="https://res.cloudinary.com/xtijkslp/image/upload/v1792237285/battery-mantra/categories/rj18rorvasbdg0o3ejxv.png" 
+            src="/uploads/categories/solar-inverters.png" 
             alt="Solar Inverters" 
             className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500" 
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
           <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
             Smart MPPT
@@ -136,10 +142,13 @@ export function SolarCategoriesWidget() {
       <div className="w-[270px] sm:w-auto shrink-0 snap-start sm:shrink bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden flex flex-col group border border-slate-100 hover:-translate-y-1 transition-all duration-300">
         <div className="w-full bg-white relative flex items-center justify-center p-4 border-b border-slate-100 group-hover:bg-blue-50/20 transition-colors">
           <img 
-            src="https://res.cloudinary.com/xtijkslp/image/upload/v1792237393/battery-mantra/categories/lyakjyydecgygttdm2gr.png" 
+            src="/uploads/categories/solar-batteries.png" 
             alt="Solar Batteries" 
             className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500" 
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
           <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
             Deep Cycle C10
@@ -200,10 +209,13 @@ export function SolarCategoriesWidget() {
       <div className="w-[270px] sm:w-auto shrink-0 snap-start sm:shrink bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden flex flex-col group border border-slate-100 hover:-translate-y-1 transition-all duration-300">
         <div className="w-full bg-white relative flex items-center justify-center p-4 border-b border-slate-100 group-hover:bg-orange-50/20 transition-colors">
           <img 
-            src="https://res.cloudinary.com/xtijkslp/image/upload/v1792237444/battery-mantra/categories/n9xmybajt9o2gbgiekp6.png" 
+            src="/uploads/categories/solar-accessories.png" 
             alt="Solar Accessories" 
             className="w-28 h-28 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform duration-500" 
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
           <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200/60">
             Complete Kits

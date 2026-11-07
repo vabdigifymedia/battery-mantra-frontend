@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Zap, Wrench, BatteryCharging, Sun, Car, Truck } from "lucide-react";
+import { Zap, Wrench, BatteryCharging, Sun, Car, Truck, LayoutGrid } from "lucide-react";
 import { rootCategoriesQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { normalizeImageUrl } from "@/lib/image/cdn";
@@ -30,8 +30,7 @@ function getCategoryFallbackIcon(name: string) {
   return Zap;
 }
 
-const ALL_CATEGORIES_LOGO =
-  "https://res.cloudinary.com/xtijkslp/image/upload/v1793505701/battery-mantra/categories/fqrfxxqvtqghgnddwzeq.png";
+const ALL_CATEGORIES_LOGO = "/uploads/categories/all-categories.png";
 
 function CategoryItemIcon({ iconUrl, name }: { iconUrl?: string | null; name: string }) {
   const [hasError, setHasError] = useState(false);
@@ -58,6 +57,7 @@ function CategoryItemIcon({ iconUrl, name }: { iconUrl?: string | null; name: st
 }
 
 export function CategoryGrid() {
+  const [allCatImgError, setAllCatImgError] = useState(false);
   const { data, isLoading, isError } = useQuery(rootCategoriesQuery());
 
   if (isLoading) {
@@ -82,12 +82,19 @@ export function CategoryGrid() {
       <Link to="/categories" className="block h-full">
         <div className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand/40 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer overflow-hidden h-full min-h-[130px] sm:min-h-[152px]">
           <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-slate-50/90 border border-slate-100 flex items-center justify-center p-2 sm:p-2.5 group-hover:bg-red-50/60 group-hover:border-red-100 transition-colors shrink-0">
-            <img
-              src={ALL_CATEGORIES_LOGO}
-              alt="All Categories"
-              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
-              loading="lazy"
-            />
+            {allCatImgError ? (
+              <div className="w-full h-full flex items-center justify-center text-brand">
+                <LayoutGrid className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />
+              </div>
+            ) : (
+              <img
+                src={ALL_CATEGORIES_LOGO}
+                alt="All Categories"
+                className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
+                loading="lazy"
+                onError={() => setAllCatImgError(true)}
+              />
+            )}
           </div>
           <span className="text-xs sm:text-[13px] font-semibold text-slate-800 group-hover:text-brand transition-colors line-clamp-2 leading-snug mt-2.5 px-1">
             All Categories

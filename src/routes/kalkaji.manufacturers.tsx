@@ -343,7 +343,7 @@ function AdminManufacturers() {
                   value={field.value || ""}
                   onChange={field.onChange}
                   folder="battery-mantra/manufacturers"
-                  label="Logo URL (Cloudinary)"
+                  label="Manufacturer Logo"
                   error={form.formState.errors.logoUrl?.message}
                 />
               )}
