@@ -25,6 +25,7 @@ import {
   X,
   Eye,
   Sliders,
+  Battery,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
@@ -211,14 +212,31 @@ function AdminCoupons() {
     },
   });
 
-  // Filter products for custom / exclude selector
+  // Filter products for custom / exclude selector (pins selected products to the top)
   const filteredProductsList = useMemo(() => {
-    if (!productSearch.trim()) return allProducts.slice(0, 8);
-    const q = productSearch.toLowerCase();
-    return allProducts
-      .filter((p) => p.productName.toLowerCase().includes(q) || p.brandName?.toLowerCase().includes(q))
-      .slice(0, 10);
-  }, [allProducts, productSearch]);
+    const activeList = targetType === "CUSTOM_PRODUCTS" ? selectedProductIds : excludedProductIds;
+    const selectedSet = new Set(activeList);
+
+    let list = allProducts;
+    if (productSearch.trim()) {
+      const q = productSearch.toLowerCase().trim();
+      list = allProducts.filter((p) => {
+        const nameMatch = p.productName?.toLowerCase().includes(q);
+        const brandMatch = p.brandName?.toLowerCase().includes(q);
+        const catMatch = ((p as any).categoryName || (p as any).productCategory || "").toLowerCase().includes(q);
+        const capMatch = ((p as any).capacity || (p as any).capacityAh || "").toLowerCase().includes(q);
+        return Boolean(nameMatch || brandMatch || catMatch || capMatch);
+      });
+    }
+
+    // Sort: selected products appear first, then alphabetically
+    return [...list].sort((a, b) => {
+      const aSel = selectedSet.has(a.productId) ? 1 : 0;
+      const bSel = selectedSet.has(b.productId) ? 1 : 0;
+      if (aSel !== bSel) return bSel - aSel;
+      return a.productName.localeCompare(b.productName);
+    });
+  }, [allProducts, productSearch, targetType, selectedProductIds, excludedProductIds]);
 
   const onSubmit = form.handleSubmit((values) => {
     // Resolve display names for categories and brands
@@ -430,7 +448,7 @@ function AdminCoupons() {
 
       {/* Modal Dialog */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[680px] max-h-[92vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Ticket className="h-5 w-5 text-primary" />
@@ -563,65 +581,181 @@ function AdminCoupons() {
 
               {/* Specific Products / Excluded Products Selector */}
               {(targetType === "CUSTOM_PRODUCTS" || targetType === "EXCLUDED_PRODUCTS") && (
-                <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">
-                      {targetType === "CUSTOM_PRODUCTS" ? "Select Whitelisted Products:" : "Select Excluded Products:"}
-                    </Label>
-                    <span className="text-[11px] text-muted-foreground">
-                      {(targetType === "CUSTOM_PRODUCTS" ? selectedProductIds.length : excludedProductIds.length)} selected
-                    </span>
+                <div className="space-y-2.5 pt-2 border-t border-border/50">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <Label className="text-xs font-bold text-foreground">
+                        {targetType === "CUSTOM_PRODUCTS" ? "Select Whitelisted Products:" : "Select Excluded Products:"}
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        {targetType === "CUSTOM_PRODUCTS"
+                          ? "Coupon will ONLY work for the selected batteries below."
+                          : "Coupon will work for ALL batteries EXCEPT the selected ones below."}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5">
+                        {(targetType === "CUSTOM_PRODUCTS" ? selectedProductIds.length : excludedProductIds.length)} Selected
+                      </Badge>
+
+                      {(targetType === "CUSTOM_PRODUCTS" ? selectedProductIds.length : excludedProductIds.length) > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            form.setValue(
+                              targetType === "CUSTOM_PRODUCTS" ? "targetProductIds" : "excludedProductIds",
+                              []
+                            );
+                          }}
+                          className="text-[11px] text-destructive hover:underline font-medium px-1 cursor-pointer"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
                   </div>
 
+                  {/* Search and Quick Selection bar */}
                   <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     <Input
-                      placeholder="Search batteries by name..."
+                      placeholder="Search by battery name, brand (Exide, Amaron), capacity (35Ah)..."
                       value={productSearch}
                       onChange={(e) => setProductSearch(e.target.value)}
-                      className="pl-8 h-8 text-xs"
+                      className="pl-8 pr-8 h-9 text-xs"
                     />
+                    {productSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setProductSearch("")}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
 
-                  <div className="max-h-40 overflow-y-auto border rounded-md bg-background p-1 divide-y text-xs">
-                    {filteredProductsList.map((p) => {
-                      const activeList = targetType === "CUSTOM_PRODUCTS" ? selectedProductIds : excludedProductIds;
-                      const isSelected = activeList.includes(p.productId);
+                  {/* Showing info and Select All Filtered */}
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
+                    <span>Showing {filteredProductsList.length} batteries</span>
+                    {filteredProductsList.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const activeList = targetType === "CUSTOM_PRODUCTS" ? selectedProductIds : excludedProductIds;
+                          const filteredIds = filteredProductsList.map((p) => p.productId);
+                          const allFilteredSelected = filteredIds.every((id) => activeList.includes(id));
 
-                      return (
-                        <div
-                          key={p.productId}
-                          onClick={() => {
-                            const updated = isSelected
-                              ? activeList.filter((id) => id !== p.productId)
-                              : [...activeList, p.productId];
-                            form.setValue(
-                              targetType === "CUSTOM_PRODUCTS" ? "targetProductIds" : "excludedProductIds",
-                              updated
-                            );
-                          }}
-                          className={cn(
-                            "flex items-center justify-between p-1.5 rounded cursor-pointer hover:bg-muted/60 transition-colors",
-                            isSelected && "bg-primary/10 text-primary font-medium"
-                          )}
-                        >
-                          <div className="min-w-0 pr-2">
-                            <span className="block truncate font-medium">{p.productName}</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">
-                              ₹{p.productPrice} • {p.brandName} • {p.capacity || p.capacityAh || ""}
-                            </span>
-                          </div>
+                          let updated: string[];
+                          if (allFilteredSelected) {
+                            updated = activeList.filter((id) => !filteredIds.includes(id));
+                          } else {
+                            updated = Array.from(new Set([...activeList, ...filteredIds]));
+                          }
+                          form.setValue(
+                            targetType === "CUSTOM_PRODUCTS" ? "targetProductIds" : "excludedProductIds",
+                            updated
+                          );
+                        }}
+                        className="text-primary hover:underline font-semibold cursor-pointer"
+                      >
+                        {filteredProductsList.every((p) =>
+                          (targetType === "CUSTOM_PRODUCTS" ? selectedProductIds : excludedProductIds).includes(p.productId)
+                        )
+                          ? "Deselect All Filtered"
+                          : "Select All Filtered"}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Scrollable Products List with images and badges */}
+                  <div className="max-h-64 sm:max-h-72 overflow-y-auto border border-border/80 rounded-xl bg-background divide-y divide-border/60 shadow-inner">
+                    {filteredProductsList.length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-2">
+                        <Battery className="h-8 w-8 opacity-30 stroke-[1.5]" />
+                        <span>No batteries found matching "{productSearch}"</span>
+                      </div>
+                    ) : (
+                      filteredProductsList.map((p) => {
+                        const activeList = targetType === "CUSTOM_PRODUCTS" ? selectedProductIds : excludedProductIds;
+                        const isSelected = activeList.includes(p.productId);
+
+                        return (
                           <div
+                            key={p.productId}
+                            onClick={() => {
+                              const updated = isSelected
+                                ? activeList.filter((id) => id !== p.productId)
+                                : [...activeList, p.productId];
+                              form.setValue(
+                                targetType === "CUSTOM_PRODUCTS" ? "targetProductIds" : "excludedProductIds",
+                                updated
+                              );
+                            }}
                             className={cn(
-                              "h-4 w-4 rounded border flex items-center justify-center shrink-0",
-                              isSelected ? "bg-primary border-primary text-primary-foreground" : "border-input"
+                              "flex items-center justify-between p-2.5 cursor-pointer transition-all gap-3 hover:bg-muted/60 select-none",
+                              isSelected && "bg-primary/5 hover:bg-primary/8 border-l-4 border-l-primary"
                             )}
                           >
-                            {isSelected && <Check className="h-3 w-3" />}
+                            {/* Product Thumbnail Image */}
+                            <div className="h-12 w-12 rounded-lg border border-border/70 bg-white dark:bg-muted/30 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                              {p.productImage ? (
+                                <img
+                                  src={p.productImage}
+                                  alt={p.productName}
+                                  className="h-full w-full object-contain"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <Battery className="h-6 w-6 text-muted-foreground/40 stroke-[1.5]" />
+                              )}
+                            </div>
+
+                            {/* Product Info */}
+                            <div className="min-w-0 flex-1">
+                              <p className={cn("text-xs font-bold leading-tight truncate", isSelected ? "text-primary" : "text-foreground")}>
+                                {p.productName}
+                              </p>
+                              <div className="flex items-center gap-1.5 flex-wrap mt-1 text-[11px] text-muted-foreground">
+                                <span className="font-extrabold text-foreground">₹{p.productPrice?.toLocaleString("en-IN")}</span>
+                                {p.brandName && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="font-semibold text-brand">{p.brandName}</span>
+                                  </>
+                                )}
+                                {(p.capacity || (p as any).capacityAh) && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="font-mono bg-muted/60 px-1.5 py-0.2 rounded text-[10px]">
+                                      {p.capacity || (p as any).capacityAh}
+                                    </span>
+                                  </>
+                                )}
+                                {((p as any).categoryName || (p as any).productCategory) && (
+                                  <span className="hidden sm:inline text-muted-foreground/70 text-[10px]">
+                                    ({(p as any).categoryName || (p as any).productCategory})
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Checkbox indicator */}
+                            <div
+                              className={cn(
+                                "h-5 w-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
+                                isSelected
+                                  ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                                  : "border-muted-foreground/40 bg-background"
+                              )}
+                            >
+                              {isSelected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               )}
