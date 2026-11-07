@@ -518,8 +518,8 @@ export function PdpPage() {
   const strikePrice = activeCampaignCalc.hasCampaignDiscount
     ? regularCityModePrice
     : (productMrp && productMrp > currentPrice
-      ? productMrp
-      : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
+        ? productMrp
+        : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
 
   const hasDiscount = Boolean((strikePrice && strikePrice > currentPrice) || (productMrp && productMrp > currentPrice));
 
@@ -527,8 +527,8 @@ export function PdpPage() {
   const referencePriceForDiscount = (productMrp && productMrp > currentPrice)
     ? productMrp
     : (basePriceForSavings && basePriceForSavings > currentPrice
-      ? basePriceForSavings
-      : (strikePrice && strikePrice > currentPrice ? strikePrice : null));
+        ? basePriceForSavings
+        : (strikePrice && strikePrice > currentPrice ? strikePrice : null));
 
   const discountPercent = referencePriceForDiscount && referencePriceForDiscount > currentPrice
     ? Math.round(((referencePriceForDiscount - currentPrice) / referencePriceForDiscount) * 100)
@@ -706,8 +706,8 @@ export function PdpPage() {
                         });
                       }}
                       className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${activeImage === img
-                        ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white"
-                        : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
+                          ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white"
+                          : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
                         }`}
                     >
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-2 mix-blend-multiply" />
@@ -945,8 +945,8 @@ export function PdpPage() {
                           });
                         }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "no"
-                          ? "border-brand bg-brand/5 ring-1 ring-brand/30"
-                          : "border-border bg-background hover:bg-muted/40"
+                            ? "border-brand bg-brand/5 ring-1 ring-brand/30"
+                            : "border-border bg-background hover:bg-muted/40"
                           }`}
                       >
                         <div className="min-w-0 flex-1">
@@ -978,8 +978,8 @@ export function PdpPage() {
                           });
                         }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "yes"
-                          ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
-                          : "border-border bg-background hover:bg-muted/40"
+                            ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
+                            : "border-border bg-background hover:bg-muted/40"
                           }`}
                       >
                         <div className="min-w-0 flex-1">

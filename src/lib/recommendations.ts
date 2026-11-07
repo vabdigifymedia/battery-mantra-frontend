@@ -33,10 +33,10 @@ export function parseBatteryCapacity(
   productName?: string | null
 ): ParsedCapacity {
   const combined = `${capacityStr || ""} ${capacityAhStr || ""} ${productName || ""}`.toLowerCase();
-
+  
   // 1. Try extracting numeric Ah (e.g. 35ah, 35 ah, 45ah, 150ah, 200 ah)
   let ah: number | undefined = undefined;
-
+  
   if (capacityAhStr) {
     const directAhMatch = capacityAhStr.match(/(\d+(?:\.\d+)?)/);
     if (directAhMatch) {
