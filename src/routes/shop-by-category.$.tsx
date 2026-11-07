@@ -17,6 +17,7 @@ import { LithiumSubCategoryPage } from "@/components/lithium/LithiumSubCategoryP
 import { SolarMainPage } from "@/components/solar/SolarMainPage";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 const toSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -304,7 +305,15 @@ function SubcategoriesPage() {
                 <>
                   <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                     {c.iconUrl ? (
-                      <img src={c.iconUrl} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+                      <img
+                        src={normalizeImageUrl(c.iconUrl)}
+                        alt={c.categoryName}
+                        className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
                     ) : (
                       <Layers className="h-8 w-8" />
                     )}
@@ -477,9 +486,13 @@ function CategoryBrandsView({
                       <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                         {b.brandLogo ? (
                           <img
-                            src={b.brandLogo}
+                            src={normalizeImageUrl(b.brandLogo)}
                             alt={b.brandName}
-                            className="h-full w-full object-contain mix-blend-multiply"
+                            className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
                           />
                         ) : (
                           <Tag className="h-8 w-8 text-muted-foreground" />
@@ -501,9 +514,13 @@ function CategoryBrandsView({
                       <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                         {b.brandLogo ? (
                           <img
-                            src={b.brandLogo}
+                            src={normalizeImageUrl(b.brandLogo)}
                             alt={b.brandName}
-                            className="h-full w-full object-contain mix-blend-multiply"
+                            className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
                           />
                         ) : (
                           <Tag className="h-8 w-8 text-muted-foreground" />

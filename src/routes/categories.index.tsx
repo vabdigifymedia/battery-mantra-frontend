@@ -26,6 +26,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 import type { CategoryListResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/categories/")({
@@ -484,10 +485,13 @@ function CategoriesPage() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100/70 dark:from-slate-800 dark:to-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-2.5 group-hover:scale-108 group-hover:border-red-100 transition-all duration-300 overflow-hidden">
                       {c.iconUrl ? (
                         <img
-                          src={c.iconUrl}
+                          src={normalizeImageUrl(c.iconUrl)}
                           alt={c.categoryName}
                           className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
                           loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
                         />
                       ) : (
                         <FallbackIcon className="h-8 w-8 sm:h-10 sm:w-10 text-primary stroke-[1.8] group-hover:scale-110 transition-transform duration-200" />

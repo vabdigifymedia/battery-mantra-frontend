@@ -11,6 +11,7 @@ import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
@@ -129,9 +130,13 @@ function ShopByManufacturersPage() {
                     <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                       {m.logoUrl ? (
                         <img
-                          src={m.logoUrl}
+                          src={normalizeImageUrl(m.logoUrl)}
                           alt={m.name}
-                          className="h-full w-full object-contain mix-blend-multiply"
+                          className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
                         />
                       ) : (
                         <FallbackIcon className="h-8 w-8 text-muted-foreground" />
@@ -173,9 +178,13 @@ function ShopByManufacturersPage() {
                       <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
                         {b.brandLogo ? (
                           <img
-                            src={b.brandLogo}
+                            src={normalizeImageUrl(b.brandLogo)}
                             alt={b.brandName}
-                            className="h-full w-full object-contain mix-blend-multiply"
+                            className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
                           />
                         ) : (
                           <Tag className="h-8 w-8 text-muted-foreground" />

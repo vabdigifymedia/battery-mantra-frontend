@@ -28,6 +28,7 @@ import { isProductEligibleForCampaign, calculateProductCampaignDiscount, compare
 import { useLocationStore } from "@/store/useLocationStore";
 import type { ApplyCouponResponse, CityDto } from "@/types/dto";
 import { paymentsService } from "@/services/payments.service";
+import { normalizeImageUrl, FALLBACK_IMAGE } from "@/lib/image/cdn";
 import { loadRazorpayScript } from "@/lib/razorpay";
 import { env } from "@/lib/utils/env";
 import { ApiError } from "@/lib/api/errors";
@@ -834,9 +835,12 @@ function CheckoutPage() {
                       <div className="h-14 w-14 sm:h-16 sm:w-16 bg-muted rounded-lg border flex items-center justify-center shrink-0 overflow-hidden">
                         {it.product.productImage ? (
                           <img
-                            src={it.product.productImage}
+                            src={normalizeImageUrl(it.product.productImage) || FALLBACK_IMAGE}
                             alt={it.product.productName || "Product"}
                             className="h-full w-full object-contain p-1"
+                            onError={(e) => {
+                              e.currentTarget.src = FALLBACK_IMAGE;
+                            }}
                           />
                         ) : (
                           <span className="text-xs text-muted-foreground">No img</span>

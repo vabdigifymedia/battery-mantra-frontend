@@ -22,7 +22,8 @@ export function appendQuery(src: string, params: Record<string, string | number>
 /**
  * Normalizes image URLs:
  * 1. Upgrades insecure 'http://' to 'https://' to prevent browser mixed-content blocking.
- * 2. Injects 'f_auto,q_auto' into Cloudinary URLs so every device receives its optimal supported format (WebP, AVIF, or JPEG/PNG fallback).
+ * 2. URL-encodes literal spaces to prevent mobile WebKit fetch failures.
+ * 3. Never mutates Cloudinary or CDN paths to avoid breaking signed or strict-delivery URLs.
  */
 export function normalizeImageUrl(url?: string | null): string {
   if (!url || typeof url !== "string") return "";
@@ -34,14 +35,9 @@ export function normalizeImageUrl(url?: string | null): string {
     clean = clean.replace(/^http:\/\//i, "https://");
   }
 
-  // Cloudinary auto-optimization for cross-device support (WebP/AVIF/fallback)
-  if (
-    clean.includes("res.cloudinary.com") &&
-    clean.includes("/image/upload/") &&
-    !clean.includes("/f_auto") &&
-    !clean.includes("/q_auto")
-  ) {
-    clean = clean.replace("/image/upload/", "/image/upload/f_auto,q_auto/");
+  // URL-encode literal spaces if not already encoded or data URI
+  if (clean.includes(" ") && !clean.startsWith("data:")) {
+    clean = clean.replace(/ /g, "%20");
   }
 
   return clean;
@@ -49,9 +45,9 @@ export function normalizeImageUrl(url?: string | null): string {
 
 /**
  * High-quality SVG Battery illustration fallback.
- * Renders instantly with 0 external network requests if image fails or is missing.
+ * 100% standards-compliant data URI compatible across Safari, Chrome, Firefox, and mobile WebKit.
  */
 export const FALLBACK_IMAGE =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none'><rect width='240' height='240' fill='%23f8fafc' rx='16'/><rect x='55' y='75' width='130' height='105' rx='10' fill='%23e2e8f0' stroke='%23cbd5e1' stroke-width='4'/><rect x='76' y='60' width='26' height='15' rx='3' fill='%2394a3b8'/><rect x='138' y='60' width='26' height='15' rx='3' fill='%2394a3b8'/><path d='M123 96L105 128H121L116 154L137 122H123L128 96Z' fill='%23dc2626'/><text x='120' y='208' font-family='system-ui,-apple-system,sans-serif' font-size='12' font-weight='700' fill='%2394a3b8' text-anchor='middle'>BATTERY MANTRA</text></svg>";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none'%3E%3Crect width='240' height='240' fill='%23f8fafc' rx='16'/%3E%3Crect x='55' y='75' width='130' height='105' rx='10' fill='%23e2e8f0' stroke='%23cbd5e1' stroke-width='4'/%3E%3Crect x='76' y='60' width='26' height='15' rx='3' fill='%2394a3b8'/%3E%3Crect x='138' y='60' width='26' height='15' rx='3' fill='%2394a3b8'/%3E%3Cpath d='M123 96L105 128H121L116 154L137 122H123L128 96Z' fill='%23dc2626'/%3E%3Ctext x='120' y='208' font-family='system-ui,-apple-system,sans-serif' font-size='12' font-weight='700' fill='%2394a3b8' text-anchor='middle'%3EBATTERY MANTRA%3C/text%3E%3C/svg%3E";
 
 export const FALLBACK_BATTERY_IMAGE = FALLBACK_IMAGE;

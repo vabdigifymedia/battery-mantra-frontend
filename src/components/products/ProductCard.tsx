@@ -371,7 +371,8 @@ export function ProductCard({
             alt={product.productName}
             aspect="auto"
             rounded={false}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 mix-blend-multiply dark:mix-blend-normal"
+            containerClassName="w-full h-full bg-transparent"
+            imgClassName="group-hover:scale-105 transition-transform duration-300 mix-blend-multiply dark:mix-blend-normal"
           />
           {displayCapacity && (
             <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 bg-red-50/95 text-red-600 border border-red-100 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-xs backdrop-blur-xs">
