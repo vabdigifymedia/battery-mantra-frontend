@@ -14,6 +14,7 @@ import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
 import { ProductCard } from "@/components/products/ProductCard";
+import { ProductRecommendationSection } from "@/components/products/ProductRecommendationSection";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
@@ -517,8 +518,8 @@ export function PdpPage() {
   const strikePrice = activeCampaignCalc.hasCampaignDiscount
     ? regularCityModePrice
     : (productMrp && productMrp > currentPrice
-        ? productMrp
-        : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
+      ? productMrp
+      : (isExchangeSelected && data.productPrice > currentPrice ? data.productPrice : null));
 
   const hasDiscount = Boolean((strikePrice && strikePrice > currentPrice) || (productMrp && productMrp > currentPrice));
 
@@ -526,8 +527,8 @@ export function PdpPage() {
   const referencePriceForDiscount = (productMrp && productMrp > currentPrice)
     ? productMrp
     : (basePriceForSavings && basePriceForSavings > currentPrice
-        ? basePriceForSavings
-        : (strikePrice && strikePrice > currentPrice ? strikePrice : null));
+      ? basePriceForSavings
+      : (strikePrice && strikePrice > currentPrice ? strikePrice : null));
 
   const discountPercent = referencePriceForDiscount && referencePriceForDiscount > currentPrice
     ? Math.round(((referencePriceForDiscount - currentPrice) / referencePriceForDiscount) * 100)
@@ -705,8 +706,8 @@ export function PdpPage() {
                         });
                       }}
                       className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 border-2 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm transition-all duration-300 ${activeImage === img
-                          ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white"
-                          : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
+                        ? "border-brand shadow-md shadow-brand/20 scale-105 bg-white"
+                        : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
                         }`}
                     >
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-2 mix-blend-multiply" />
@@ -944,8 +945,8 @@ export function PdpPage() {
                           });
                         }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "no"
-                            ? "border-brand bg-brand/5 ring-1 ring-brand/30"
-                            : "border-border bg-background hover:bg-muted/40"
+                          ? "border-brand bg-brand/5 ring-1 ring-brand/30"
+                          : "border-border bg-background hover:bg-muted/40"
                           }`}
                       >
                         <div className="min-w-0 flex-1">
@@ -977,8 +978,8 @@ export function PdpPage() {
                           });
                         }}
                         className={`flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all ${exchange === "yes"
-                            ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
-                            : "border-border bg-background hover:bg-muted/40"
+                          ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30 ring-1 ring-emerald-600/30"
+                          : "border-border bg-background hover:bg-muted/40"
                           }`}
                       >
                         <div className="min-w-0 flex-1">
@@ -1474,7 +1475,7 @@ export function PdpPage() {
         context={seoContext}
       />
 
-      <RelatedProducts currentProductId={data.productId} currentProduct={data} />
+      <ProductRecommendationSection currentProduct={data} />
       <Container size="xl" className="pb-8">
         <SeoCityLinks productName={data.productName} baseUrl={`/product/${slug}`} />
       </Container>
@@ -1550,55 +1551,5 @@ export function PdpPage() {
         }}
       />
     </div>
-  );
-}
-
-function RelatedProducts({ currentProductId, currentProduct }: { currentProductId: string; currentProduct?: any }) {
-  const { data: allProducts } = useQuery(productListQuery());
-  const [related, setRelated] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (allProducts && allProducts.length > 0) {
-      const filtered = allProducts.filter((p: any) => p.productId !== currentProductId);
-
-      let matched = [...filtered];
-
-      if (currentProduct) {
-        const strictMatch = filtered.filter((p: any) =>
-          p.productCategory === currentProduct.categoryName &&
-          p.brandName === currentProduct.brandName
-        );
-
-        const categoryMatch = filtered.filter((p: any) =>
-          p.productCategory === currentProduct.categoryName &&
-          p.brandName !== currentProduct.brandName
-        );
-
-        const others = filtered.filter((p: any) => p.productCategory !== currentProduct.categoryName);
-
-        matched = [...strictMatch, ...categoryMatch, ...others];
-      } else {
-        matched.sort(() => 0.5 - Math.random());
-      }
-
-      setRelated(matched.slice(0, 8));
-    }
-  }, [allProducts, currentProductId, currentProduct]);
-
-  if (!related.length) return null;
-
-  return (
-    <Container size="xl" className="mt-12 sm:mt-16 border-t pt-8 sm:pt-12">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">More Products You Might Like</h2>
-      </div>
-      <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory no-scrollbar scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-        {related.map((p) => (
-          <div key={p.productId} className="min-w-[210px] w-[210px] sm:min-w-[240px] sm:w-[240px] shrink-0 snap-start">
-            <ProductCard product={p} />
-          </div>
-        ))}
-      </div>
-    </Container>
   );
 }
