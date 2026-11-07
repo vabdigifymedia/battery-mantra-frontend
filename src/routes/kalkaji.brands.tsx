@@ -408,7 +408,7 @@ function AdminBrands() {
                 <CloudinaryUpload
                   value={field.value || ""}
                   onChange={field.onChange}
-                  folder="battery-mantra/brands"
+                  folder="brands"
                   label="Logo URL (Optional)"
                   error={form.formState.errors.brandLogo?.message}
                 />

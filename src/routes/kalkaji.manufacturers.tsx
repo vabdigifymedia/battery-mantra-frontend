@@ -342,7 +342,7 @@ function AdminManufacturers() {
                 <CloudinaryUpload
                   value={field.value || ""}
                   onChange={field.onChange}
-                  folder="battery-mantra/manufacturers"
+                  folder="manufacturers"
                   label="Manufacturer Logo"
                   error={form.formState.errors.logoUrl?.message}
                 />

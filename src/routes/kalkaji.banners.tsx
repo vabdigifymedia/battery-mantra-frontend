@@ -805,7 +805,7 @@ function AdminBanners() {
                   <CloudinaryUpload
                     value={field.value}
                     onChange={field.onChange}
-                    folder="battery-mantra/banners"
+                    folder="banners"
                     label={
                       devType === "DESKTOP"
                         ? "Desktop Banner Image *"

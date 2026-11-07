@@ -452,7 +452,7 @@ function AdminCategories() {
                 <CloudinaryUpload
                   value={field.value || ""}
                   onChange={field.onChange}
-                  folder="battery-mantra/categories"
+                  folder="categories"
                   label="Icon URL (Optional)"
                   error={form.formState.errors.iconUrl?.message}
                 />
@@ -466,7 +466,7 @@ function AdminCategories() {
                 <CloudinaryUpload
                   value={field.value || ""}
                   onChange={field.onChange}
-                  folder="battery-mantra/categories/banners"
+                  folder="categories/banners"
                   label="Upload Banner Image (Optional, for category hero banners)"
                   error={form.formState.errors.bannerUrl?.message}
                 />

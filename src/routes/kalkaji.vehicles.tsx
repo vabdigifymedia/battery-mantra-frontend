@@ -925,7 +925,7 @@ function AdminVehicles() {
                 <CloudinaryUpload
                   value={field.value || ""}
                   onChange={field.onChange}
-                  folder="battery-mantra/vehicles"
+                  folder="vehicles"
                   label="Vehicle Image URL (Optional)"
                   error={form.formState.errors.imageUrl?.message}
                 />

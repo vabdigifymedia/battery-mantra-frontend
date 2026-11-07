@@ -358,7 +358,7 @@ function AddProductPage() {
                       <CloudinaryUpload
                         value={field.value}
                         onChange={field.onChange}
-                        folder="battery-mantra/products"
+                        folder="products"
                         label="Primary Image *"
                         error={form.formState.errors.productImage?.message}
                       />
@@ -382,7 +382,7 @@ function AddProductPage() {
                               <CloudinaryUpload
                                 value={field.value}
                                 onChange={field.onChange}
-                                folder="battery-mantra/products"
+                                folder="products"
                                 label={`Additional Image ${idx + 1}`}
                                 error={form.formState.errors.additionalImages?.[idx]?.url?.message}
                               />
