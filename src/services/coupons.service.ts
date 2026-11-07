@@ -43,8 +43,8 @@ export const couponsService = {
   // Public: Get active coupons for PDP display (without campaign)
   getActivePublicCoupons: async (): Promise<CouponResponse[]> => {
     try {
-      // 1. Try fetching from public/admin endpoint
-      const list = await apiFetch<CouponResponse[]>(endpoints.admin.coupons.list, {
+      // 1. First try public endpoint: /api/coupons/active
+      const list = await apiFetch<CouponResponse[]>(endpoints.coupons.active, {
         method: "GET",
       });
       if (Array.isArray(list)) {
@@ -53,7 +53,19 @@ export const couponsService = {
         return enriched;
       }
     } catch {
-      // Fallback to cached active coupons
+      // 2. Fallback to admin endpoint (if user happens to be logged-in admin)
+      try {
+        const adminList = await apiFetch<CouponResponse[]>(endpoints.admin.coupons.list, {
+          method: "GET",
+        });
+        if (Array.isArray(adminList)) {
+          const enriched = adminList.map(enrichCouponWithTargeting).filter((c) => c.isActive);
+          cachePublicCoupons(enriched);
+          return enriched;
+        }
+      } catch {
+        // Fallback to cached active coupons
+      }
     }
 
     const cached = getCachedPublicCoupons();

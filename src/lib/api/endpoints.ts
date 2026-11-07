@@ -207,6 +207,7 @@ export const endpoints = {
   },
   coupons: {
     apply: "/api/coupons/apply",
+    active: "/api/coupons/active",
   },
   campaigns: {
     active: "/api/campaigns/active",
