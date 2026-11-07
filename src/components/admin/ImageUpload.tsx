@@ -30,7 +30,13 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showManual, setShowManual] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset preview error if value changes
+  React.useEffect(() => {
+    setPreviewError(false);
+  }, [value]);
 
   const handleUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -46,9 +52,29 @@ export function ImageUpload({
     setIsUploading(true);
     try {
       const response = await adminService.uploadImage(file, folder);
-      onChange(response.url);
+      console.log("[ImageUpload] server response:", response);
+
+      // Support all common server response formats
+      const uploadedUrl =
+        (typeof response === "string" ? response : null) ||
+        (response as any)?.url ||
+        (response as any)?.data?.url ||
+        (typeof (response as any)?.data === "string" ? (response as any).data : null) ||
+        (response as any)?.secure_url ||
+        (response as any)?.imageUrl ||
+        "";
+
+      if (!uploadedUrl || typeof uploadedUrl !== "string") {
+        console.error("[ImageUpload] No URL found in response:", response);
+        toast.error("Upload succeeded but server returned no image URL. Check console.");
+        return;
+      }
+
+      setPreviewError(false);
+      onChange(uploadedUrl);
       toast.success("Image uploaded successfully");
     } catch (err: any) {
+      console.error("[ImageUpload] Upload error:", err);
       toast.error(err?.message || "Failed to upload image");
     } finally {
       setIsUploading(false);
@@ -149,15 +175,26 @@ export function ImageUpload({
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <div className="h-48 w-full flex items-center justify-center p-4">
-            <img
-              src={normalizeImageUrl(value)}
-              alt="Uploaded preview"
-              className="max-h-full max-w-full object-contain drop-shadow-sm"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
+          <div className="h-48 w-full flex flex-col items-center justify-center p-4">
+            {previewError ? (
+              <div className="text-center space-y-1.5 p-2">
+                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  Image uploaded, but preview URL failed to load in browser
+                </p>
+                <p className="text-[11px] text-muted-foreground break-all max-w-sm px-2 font-mono bg-muted/50 p-1.5 rounded">
+                  {value}
+                </p>
+              </div>
+            ) : (
+              <img
+                src={normalizeImageUrl(value)}
+                alt="Uploaded preview"
+                className="max-h-full max-w-full object-contain drop-shadow-sm"
+                onError={() => {
+                  setPreviewError(true);
+                }}
+              />
+            )}
           </div>
           <input
             type="file"
