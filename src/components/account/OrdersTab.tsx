@@ -11,6 +11,7 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/utils";
 import type { OrderResponse } from "@/types/dto";
+import { normalizeImageUrl, FALLBACK_IMAGE } from "@/lib/image/cdn";
 
 function OrderStatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; icon: any; className: string }> = {
@@ -133,9 +134,12 @@ export function OrdersTab() {
                     <div key={item.orderItemId || item.productId} className="flex gap-4 items-start">
                       <div className="w-16 h-16 rounded-lg border bg-card flex-shrink-0 flex items-center justify-center p-2 overflow-hidden">
                         <img 
-                          src={item.productImage || "https://placehold.co/400x400/png?text=Battery"} 
+                          src={normalizeImageUrl(item.productImage) || FALLBACK_IMAGE} 
                           alt={item.productName} 
                           className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_IMAGE;
+                          }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">

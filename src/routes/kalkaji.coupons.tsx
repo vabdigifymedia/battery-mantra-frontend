@@ -28,6 +28,7 @@ import {
   Battery,
 } from "lucide-react";
 import { toast } from "sonner";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 import { FormField } from "@/components/forms/FormField";
 import {
   Dialog,
@@ -702,10 +703,13 @@ function AdminCoupons() {
                             <div className="h-12 w-12 rounded-lg border border-border/70 bg-white dark:bg-muted/30 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                               {p.productImage ? (
                                 <img
-                                  src={p.productImage}
+                                  src={normalizeImageUrl(p.productImage)}
                                   alt={p.productName}
                                   className="h-full w-full object-contain"
                                   loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                  }}
                                 />
                               ) : (
                                 <Battery className="h-6 w-6 text-muted-foreground/40 stroke-[1.5]" />

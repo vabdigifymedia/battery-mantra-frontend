@@ -364,14 +364,14 @@ export function ProductCard({
         <RouterLink 
           to="/product/$" 
           params={{ _splat: product.seo?.slug || product.productId }}
-          className="relative pt-8 sm:pt-10 pb-2 sm:pb-4 px-2 sm:px-4 flex items-center justify-center bg-slate-50/50 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 transition-colors"
+          className="relative pt-8 sm:pt-10 pb-2 sm:pb-4 px-2 sm:px-4 flex items-center justify-center bg-slate-50/50 dark:bg-muted/10 aspect-[4/3] overflow-hidden group-hover:bg-slate-50 dark:group-hover:bg-muted/20 transition-colors"
         >
           <Image
             src={product.productImage}
             alt={product.productName}
-            aspect="square"
+            aspect="auto"
             rounded={false}
-            className="rounded-none object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 mix-blend-multiply dark:mix-blend-normal"
           />
           {displayCapacity && (
             <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 bg-red-50/95 text-red-600 border border-red-100 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-xs backdrop-blur-xs">

@@ -16,6 +16,7 @@ import { SpecificationsTable, flattenSpecs } from "@/components/products/Specifi
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductRecommendationSection } from "@/components/products/ProductRecommendationSection";
 import { AvailableCouponsCard } from "@/components/products/AvailableCouponsCard";
+import { normalizeImageUrl, FALLBACK_IMAGE } from "@/lib/image/cdn";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 import { Price } from "@/components/common/Price";
@@ -711,7 +712,15 @@ export function PdpPage() {
                           : "border-transparent hover:border-brand/40 hover:scale-105 hover:bg-white"
                         }`}
                     >
-                      <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-contain p-2 mix-blend-multiply" />
+                      <img
+                        src={normalizeImageUrl(img) || FALLBACK_IMAGE}
+                        alt={`Gallery ${idx + 1}`}
+                        className="w-full h-full object-contain p-2 mix-blend-multiply dark:mix-blend-normal"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_IMAGE;
+                        }}
+                      />
                     </button>
                   ))}
                 </div>
@@ -781,11 +790,14 @@ export function PdpPage() {
                     className="w-full h-full cursor-zoom-in outline-none relative group flex items-center justify-center"
                   >
                     <img
-                      src={activeImage}
+                      src={normalizeImageUrl(activeImage) || FALLBACK_IMAGE}
                       alt={data.productName}
-                      className="max-w-full max-h-full object-contain mix-blend-multiply"
+                      className="max-w-full max-h-full object-contain mix-blend-multiply dark:mix-blend-normal"
                       fetchPriority="high"
                       loading="eager"
+                      onError={(e) => {
+                        e.currentTarget.src = FALLBACK_IMAGE;
+                      }}
                     />
                   </button>
                 ) : (
@@ -1507,9 +1519,12 @@ export function PdpPage() {
                 <CarouselItem key={idx} className="pl-0 basis-full flex items-center justify-center h-[100dvh]">
                   <div className="w-full h-full p-4 sm:p-12 flex items-center justify-center relative">
                     <img
-                      src={img}
+                      src={normalizeImageUrl(img) || FALLBACK_IMAGE}
                       alt={`Gallery view ${idx + 1}`}
                       className="max-w-full max-h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = FALLBACK_IMAGE;
+                      }}
                     />
                   </div>
                 </CarouselItem>

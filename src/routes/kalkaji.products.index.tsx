@@ -10,6 +10,7 @@ import { Trash2, Plus, Edit, CheckCircle, Clock, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -184,7 +185,14 @@ function AdminProducts() {
                 <TableRow key={product.productId}>
                   <TableCell>
                     {product.productImage ? (
-                      <img src={product.productImage} alt={product.productName} className="h-10 w-10 rounded-md object-cover border" />
+                      <img
+                        src={normalizeImageUrl(product.productImage)}
+                        alt={product.productName}
+                        className="h-10 w-10 rounded-md object-contain border bg-white"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
                     ) : (
                       <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">N/A</div>
                     )}
@@ -274,7 +282,14 @@ function AdminProducts() {
             <div key={product.productId} className="rounded-xl border bg-card p-4 shadow-sm">
               <div className="flex gap-3">
                 {product.productImage ? (
-                  <img src={product.productImage} alt={product.productName} className="h-14 w-14 rounded-lg object-cover border shrink-0" />
+                  <img
+                    src={normalizeImageUrl(product.productImage)}
+                    alt={product.productName}
+                    className="h-14 w-14 rounded-lg object-contain border bg-white shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
                 ) : (
                   <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-xs text-muted-foreground shrink-0">N/A</div>
                 )}

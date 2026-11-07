@@ -41,7 +41,7 @@ export function CallbackBanner() {
           {/* Graphic Side */}
           <div className="hidden lg:flex justify-center relative order-1 lg:order-2">
             <img 
-              src="/images/requestCallback Section image.png" 
+              src="/images/requestCallback%20Section%20image.png" 
               alt="Request Callback"
               className="w-full max-w-lg xl:max-w-xl h-auto object-contain drop-shadow-xl scale-110 hover:scale-115 transition-transform duration-500"
             />
@@ -52,7 +52,7 @@ export function CallbackBanner() {
             <div className="space-y-3">
               <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4">
                 <img 
-                  src="/images/requestCallback Section image.png" 
+                  src="/images/requestCallback%20Section%20image.png" 
                   alt=""
                   className="w-56 h-56 sm:w-64 sm:h-64 object-contain lg:hidden mb-2 lg:mb-0 scale-110"
                 />

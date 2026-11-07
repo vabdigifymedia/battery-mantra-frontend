@@ -6,6 +6,7 @@ import { vehiclesListQuery } from "@/queries";
 import { Spinner } from "@/components/feedback/Spinner";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { cn } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 import type { VehicleResponse } from "@/types/dto";
 
 export type VehicleSelection = {
@@ -226,7 +227,14 @@ function Chips({
                 )}
               >
                 {item.imageUrl && (
-                  <img src={item.imageUrl} alt={item.label} className="w-8 h-8 object-contain bg-white rounded flex-shrink-0" />
+                  <img
+                    src={normalizeImageUrl(item.imageUrl)}
+                    alt={item.label}
+                    className="w-8 h-8 object-contain bg-white rounded flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
                 )}
                 <div className="flex flex-col items-start text-left">
                   <span className="font-medium leading-tight">{item.label}</span>

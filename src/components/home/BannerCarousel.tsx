@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parseBannerTitle } from "@/lib/banner-utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 export function BannerCarousel() {
   const { data, isLoading } = useQuery(bannersListQuery());
@@ -99,7 +100,7 @@ export function BannerCarousel() {
                     className="block w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[1.82/1] max-h-[580px] overflow-hidden bg-neutral-900/5"
                   >
                     <img
-                      src={banner.imageUrl}
+                      src={normalizeImageUrl(banner.imageUrl)}
                       alt={cleanTitle || "Promotional Banner"}
                       className="w-full h-full object-cover"
                       fetchPriority={index === 0 ? "high" : "auto"}
@@ -109,7 +110,7 @@ export function BannerCarousel() {
                 ) : (
                   <div className="w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[1.82/1] max-h-[580px] overflow-hidden bg-neutral-900/5">
                     <img
-                      src={banner.imageUrl}
+                      src={normalizeImageUrl(banner.imageUrl)}
                       alt={cleanTitle || "Promotional Banner"}
                       className="w-full h-full object-cover"
                       fetchPriority={index === 0 ? "high" : "auto"}

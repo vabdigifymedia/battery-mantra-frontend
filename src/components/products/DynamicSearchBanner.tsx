@@ -3,6 +3,7 @@ import { brandsQuery, categoriesQuery, vehiclesListQuery } from "@/queries";
 import { useLocationStore } from "@/store/useLocationStore";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee } from "lucide-react";
 import { toSingularCategory } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 export function DynamicSearchBanner({ search, isDealerPage }: { search: any, isDealerPage?: boolean }) {
   const { city } = useLocationStore();
@@ -191,9 +192,9 @@ export function BannerLayout({
         {imageUrl && (
           <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-64 md:h-40 shrink-0 flex items-center justify-center p-1 md:p-2">
             <img
-              src={imageUrl}
+              src={normalizeImageUrl(imageUrl)}
               alt={title}
-              className="w-full h-full object-contain mix-blend-multiply"
+              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal"
             />
           </div>
         )}
@@ -203,7 +204,11 @@ export function BannerLayout({
           {brandNameHeader && (
             <div className="flex items-center justify-start gap-1.5 md:gap-2 mb-1.5 md:mb-2 w-full">
               {brandLogoUrl && (
-                <img src={brandLogoUrl} alt={brandNameHeader} className="h-4 sm:h-5 md:h-6 w-auto object-contain mix-blend-multiply" />
+                <img
+                  src={normalizeImageUrl(brandLogoUrl)}
+                  alt={brandNameHeader}
+                  className="h-4 sm:h-5 md:h-6 w-auto object-contain mix-blend-multiply dark:mix-blend-normal"
+                />
               )}
               <span className={`${currentTheme.text} font-extrabold tracking-wider uppercase text-[10px] sm:text-xs md:text-sm`}>
                 {toSingularCategory(brandNameHeader)}

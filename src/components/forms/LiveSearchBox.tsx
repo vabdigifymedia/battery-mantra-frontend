@@ -7,6 +7,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery, vehiclesListQuery } from "@/queries";
 import { Price } from "@/components/common/Price";
 import { cn, toSlug, getVehicleSlug } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 type LiveSearchBoxProps = {
   value: string;
@@ -156,7 +157,18 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >
                       <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
-                        {cat.iconUrl ? <img src={cat.iconUrl} alt={cat.categoryName} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
+                        {cat.iconUrl ? (
+                          <img
+                            src={normalizeImageUrl(cat.iconUrl)}
+                            alt={cat.categoryName}
+                            className="h-full w-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Search className="h-4 w-4 text-muted-foreground/50" />
+                        )}
                       </div>
                       <span className="text-sm font-medium text-foreground">{cat.categoryName}</span>
                     </Link>
@@ -178,7 +190,18 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >
                       <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
-                        {brand.brandLogo ? <img src={brand.brandLogo} alt={brand.brandName} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
+                        {brand.brandLogo ? (
+                          <img
+                            src={normalizeImageUrl(brand.brandLogo)}
+                            alt={brand.brandName}
+                            className="h-full w-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Search className="h-4 w-4 text-muted-foreground/50" />
+                        )}
                       </div>
                       <span className="text-sm font-medium text-foreground">{brand.brandName}</span>
                     </Link>
@@ -202,7 +225,18 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                         className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                       >
                         <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
-                          {man.logoUrl ? <img src={man.logoUrl} alt={man.name} className="h-full w-full object-contain" /> : <Search className="h-4 w-4 text-muted-foreground/50" />}
+                          {man.logoUrl ? (
+                            <img
+                              src={normalizeImageUrl(man.logoUrl)}
+                              alt={man.name}
+                              className="h-full w-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <Search className="h-4 w-4 text-muted-foreground/50" />
+                          )}
                         </div>
                         <span className="text-sm font-medium text-foreground">{man.name}</span>
                       </Link>
@@ -230,7 +264,18 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50 border-b last:border-b-0"
                     >
                       <div className="h-8 w-8 shrink-0 rounded bg-muted/50 p-1 flex items-center justify-center">
-                        {v.imageUrl ? <img src={v.imageUrl} alt={`${v.make} ${v.model}`} className="h-full w-full object-contain" /> : <Car className="h-4 w-4 text-muted-foreground/50" />}
+                        {v.imageUrl ? (
+                          <img
+                            src={normalizeImageUrl(v.imageUrl)}
+                            alt={`${v.make} ${v.model}`}
+                            className="h-full w-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Car className="h-4 w-4 text-muted-foreground/50" />
+                        )}
                       </div>
                       <span className="text-sm font-medium text-foreground">
                         {v.model} {v.fuelName ? <span className="text-muted-foreground text-xs ml-1">({v.fuelName})</span> : null}
@@ -259,9 +304,12 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
                       <div className="h-12 w-12 shrink-0 rounded-md border bg-white p-1 flex items-center justify-center">
                         {product.productImage ? (
                           <img
-                            src={product.productImage}
+                            src={normalizeImageUrl(product.productImage)}
                             alt={product.productName}
                             className="h-full w-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
                           />
                         ) : (
                           <Search className="h-4 w-4 text-muted-foreground/50" />

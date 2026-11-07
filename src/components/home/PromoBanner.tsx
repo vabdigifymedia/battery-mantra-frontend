@@ -5,6 +5,7 @@ import { bannersListQuery } from "@/queries";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parseBannerTitle, type BannerPlacement } from "@/lib/banner-utils";
 import { cn } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 interface PromoBannerProps {
   placement: BannerPlacement;
@@ -75,7 +76,7 @@ export function PromoBanner({ placement, className, imageClassName }: PromoBanne
       )}
     >
       <img
-        src={banner.imageUrl}
+        src={normalizeImageUrl(banner.imageUrl)}
         alt={cleanTitle || "Promotional Banner"}
         className={cn(
           "w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-[1.015]",

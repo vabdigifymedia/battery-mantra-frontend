@@ -24,7 +24,7 @@ export function GlobalFaqSection({ pageType = "UNIVERSAL", context = {} }: Globa
           {/* Image side */}
           <div className="hidden lg:flex justify-center order-1">
             <img
-              src="/images/FAQ Side Image.png"
+              src="/images/FAQ%20Side%20Image.png"
               alt="FAQ"
               className="w-full max-w-md xl:max-w-lg max-h-[350px] lg:max-h-[450px] xl:max-h-[500px] object-contain drop-shadow-2xl"
             />

@@ -14,6 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { CategoryListResponse } from "@/types/dto";
+import { normalizeImageUrl } from "@/lib/image/cdn";
 
 const ALL_CATEGORIES_LOGO =
   "https://res.cloudinary.com/xtijkslp/image/upload/v1793505701/battery-mantra/categories/fqrfxxqvtqghgnddwzeq.png";
@@ -94,14 +95,15 @@ function FallbackCategoryIcon({ categoryName }: { categoryName: string }) {
 
 function CategoryIcon({ iconUrl, name }: { iconUrl?: string | null; name: string }) {
   const [imageError, setImageError] = useState(false);
+  const cleanUrl = normalizeImageUrl(iconUrl);
 
-  if (!iconUrl || imageError) {
+  if (!cleanUrl || imageError) {
     return <FallbackCategoryIcon categoryName={name} />;
   }
 
   return (
     <img
-      src={iconUrl}
+      src={cleanUrl}
       alt={name}
       className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
