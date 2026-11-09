@@ -41,6 +41,20 @@ function PartnerEngineersPage() {
     queryFn: ({ signal }) => partnerDashboardService.listEngineers(signal),
   });
 
+  const { data: orders = [] } = useQuery({
+    queryKey: ["partner", "orders"],
+    queryFn: ({ signal }) => partnerDashboardService.listAssignedOrders(signal),
+  });
+
+  const getActiveOrdersCount = (engineerId: string) => {
+    return orders.filter(
+      (o) =>
+        o.assignedEngineer?.id === engineerId &&
+        o.orderStatus !== "DELIVERED" &&
+        o.orderStatus !== "CANCELLED"
+    ).length;
+  };
+
   const createMutation = useMutation({
     mutationFn: (data: CreateEngineerRequest) => partnerDashboardService.createEngineer(data),
     onSuccess: () => {
@@ -226,6 +240,7 @@ function PartnerEngineersPage() {
               <TableHead>Engineer Name</TableHead>
               <TableHead>Contact Info</TableHead>
               <TableHead>Base City</TableHead>
+              <TableHead>Workload</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Joined Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -234,7 +249,7 @@ function PartnerEngineersPage() {
           <TableBody>
             {filteredEngineers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Users className="h-8 w-8 text-muted-foreground/50" />
                     <p>No engineers found for your branch.</p>
@@ -274,6 +289,37 @@ function PartnerEngineersPage() {
                         <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                         <span>{eng.city || "N/A"}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {(() => {
+                        const activeCount = getActiveOrdersCount(eng.id);
+                        if (!eng.isActive) {
+                          return (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground">
+                              Unavailable
+                            </span>
+                          );
+                        }
+                        if (activeCount === 0) {
+                          return (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                              🟢 Available (0)
+                            </span>
+                          );
+                        }
+                        if (activeCount <= 2) {
+                          return (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                              🔵 {activeCount} Active
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                            🟠 {activeCount} Active (Busy)
+                          </span>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium border ${eng.isActive ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-red-500/10 text-red-600 border-red-500/20'}`}>

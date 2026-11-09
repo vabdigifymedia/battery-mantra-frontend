@@ -167,6 +167,12 @@ export const adminService = {
     apiFetch<ProductListResponse[]>("/api/admin/products/pending-approvals", { method: "GET" }),
   approveProduct: (id: UUID) =>
     apiFetch<ProductDetailResponse>(`/api/admin/products/${id}/approve`, { method: "PATCH" }),
+  getPendingPricingRequests: () =>
+    apiFetch<any[]>("/api/admin/products/pending-pricing-requests", { method: "GET" }),
+  approvePricingRequest: (requestId: string) =>
+    apiFetch<any>(`/api/admin/products/pricing-requests/${requestId}/approve`, { method: "PATCH" }),
+  rejectPricingRequest: (requestId: string, reason?: string) =>
+    apiFetch<any>(`/api/admin/products/pricing-requests/${requestId}/reject${reason ? `?reason=${encodeURIComponent(reason)}` : ""}`, { method: "PATCH" }),
   reorderProducts: (body: ProductReorderRequest[]) =>
     apiFetch<void>("/api/admin/products/reorder", { method: "PUT", body }),
   bulkUpdateProducts: (body: BulkProductUpdateRequest[]) =>

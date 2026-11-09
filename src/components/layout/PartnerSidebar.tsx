@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
@@ -17,6 +17,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/AuthProvider";
+import { useNewOrderAlert } from "@/hooks/useNewOrderAlert";
 
 const partnerNavigation = [
   { name: "Overview", href: "/kalkaji/partner", icon: LayoutDashboard },
@@ -38,9 +39,35 @@ export function PartnerSidebar() {
     refetchInterval: 5000,
   });
 
-  const pendingAssignedOrdersCount = (assignedOrdersQuery.data || []).filter(
+  const orders = assignedOrdersQuery.data || [];
+
+  const pendingAssignedOrdersCount = orders.filter(
     (o) => o.orderStatus === "PENDING" || o.orderStatus === "CONFIRMED" || o.orderStatus === "PROCESSING"
   ).length;
+
+  // ── New-order audio & toast notifications ──────────────────────────
+  useNewOrderAlert(orders);
+
+  // ── Pulsing badge animation when pending count increases ──────────
+  const prevCount = useRef(pendingAssignedOrdersCount);
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  useEffect(() => {
+    if (pendingAssignedOrdersCount > prevCount.current) {
+      setIsPulsing(true);
+      // Stop the pulse after 3 iterations × 0.6 s = 1.8 s
+      const timer = setTimeout(() => setIsPulsing(false), 1800);
+      return () => clearTimeout(timer);
+    }
+    prevCount.current = pendingAssignedOrdersCount;
+  }, [pendingAssignedOrdersCount]);
+
+  // Update prevCount after pulse ends so next increase re-triggers
+  useEffect(() => {
+    if (!isPulsing) {
+      prevCount.current = pendingAssignedOrdersCount;
+    }
+  }, [isPulsing, pendingAssignedOrdersCount]);
 
   const handleSignOut = () => {
     signOut();
@@ -49,6 +76,14 @@ export function PartnerSidebar() {
 
   return (
     <Sidebar variant="inset">
+      {/* Inject keyframes once */}
+      <style>{`
+        @keyframes pulse-badge {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary), 0.4); }
+          50% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(var(--primary), 0); }
+        }
+      `}</style>
+
       <SidebarHeader className="border-b p-4">
         <Link to="/kalkaji/partner" className="flex items-center gap-2 font-bold text-lg text-primary">
           <Package2 className="h-6 w-6" />
@@ -73,7 +108,14 @@ export function PartnerSidebar() {
                         <item.icon className="h-4 w-4" />
                         <span className="flex-1 truncate">{item.name}</span>
                         {badgeCount > 0 && (
-                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-sm">
+                          <span
+                            className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-sm"
+                            style={
+                              isOrders && isPulsing
+                                ? { animation: "pulse-badge 0.6s ease-in-out 3" }
+                                : undefined
+                            }
+                          >
                             {badgeCount > 99 ? "99+" : badgeCount}
                           </span>
                         )}

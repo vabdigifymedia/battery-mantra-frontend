@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Badge } from "@/components/ui/badge";
 import { partnerService } from "@/services/partner.service";
+import { adminService } from "@/services/admin.service";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -36,6 +37,21 @@ function PartnersPage() {
     queryKey: ["admin", "partners"],
     queryFn: partnerService.getAll,
   });
+
+  const { data: allOrders = [] } = useQuery({
+    queryKey: ["admin", "orders"],
+    queryFn: () => adminService.getAllOrders(),
+    staleTime: 5000,
+  });
+
+  const getPartnerActiveWorkload = (partnerId: string) => {
+    return allOrders.filter(
+      (o) =>
+        o.assignedPartner?.id === partnerId &&
+        o.orderStatus !== "DELIVERED" &&
+        o.orderStatus !== "CANCELLED"
+    ).length;
+  };
 
   const filteredPartners = partners.filter((p) => {
     const matchesSearch = p.businessName.toLowerCase().includes(search.toLowerCase()) ||
@@ -110,7 +126,8 @@ function PartnersPage() {
               <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Business</th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Contact</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cities</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Operating Cities</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Active Workload</th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
               </tr>
@@ -118,13 +135,13 @@ function PartnersPage() {
             <tbody className="[&_tr:last-child]:border-0">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center">
+                  <td colSpan={6} className="p-8 text-center">
                     <Spinner className="mx-auto" />
                   </td>
                 </tr>
               ) : filteredPartners.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     No partners found.
                   </td>
                 </tr>
@@ -148,6 +165,15 @@ function PartnersPage() {
                           <Badge key={city.cityId} variant="outline">{city.cityName}</Badge>
                         ))}
                       </div>
+                    </td>
+                    <td className="p-4 align-middle">
+                      {(() => {
+                        const count = getPartnerActiveWorkload(partner.id);
+                        if (!partner.isActive) return <span className="text-xs text-muted-foreground">—</span>;
+                        if (count === 0) return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">🟢 0 Active</Badge>;
+                        if (count <= 3) return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs">🔵 {count} Active</Badge>;
+                        return <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">🟠 {count} Active (Busy)</Badge>;
+                      })()}
                     </td>
                     <td className="p-4 align-middle">
                       {partner.isActive ? (

@@ -108,8 +108,19 @@ export function AdminSidebar() {
     refetchInterval: 5000,
   });
 
+  const pendingPricingQuery = useQuery({
+    queryKey: ["admin", "pricing-requests", "pending"],
+    queryFn: () => adminService.getPendingPricingRequests().catch(() => []),
+    staleTime: 5000,
+    refetchInterval: 5000,
+  });
+
   const newOrdersCount = ordersQuery.data?.filter(
     (o) => o.orderStatus === "PENDING" || o.orderStatus === "CONFIRMED" || o.orderStatus === "PROCESSING"
+  ).length || 0;
+
+  const partnerRejectedOrdersCount = ordersQuery.data?.filter(
+    (o) => o.orderStatus === "CANCELLED" && (o.cancelledBy === "PARTNER" || (!!o.cancellationReason && !!o.assignedPartner))
   ).length || 0;
 
   const pendingCallbacksCount = callbacksQuery.data?.filter(
@@ -120,13 +131,13 @@ export function AdminSidebar() {
     (e) => e.status === "PENDING" || e.status === "IN_PROGRESS"
   ).length || 0;
 
-  const pendingProductsCount = pendingProductsQuery.data?.length || 0;
+  const totalProductApprovalsCount = (pendingProductsQuery.data?.length || 0) + (pendingPricingQuery.data?.length || 0);
 
   const getBadgeCount = (href: string) => {
     if (href === "/kalkaji/orders") return newOrdersCount;
     if (href === "/kalkaji/callbacks") return pendingCallbacksCount;
     if (href === "/kalkaji/enquiries") return pendingEnquiriesCount;
-    if (href === "/kalkaji/products") return pendingProductsCount;
+    if (href === "/kalkaji/products") return totalProductApprovalsCount;
     return 0;
   };
 

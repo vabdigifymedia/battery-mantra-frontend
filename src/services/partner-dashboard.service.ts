@@ -9,10 +9,13 @@ export const partnerDashboardService = {
   listAssignedOrders: (signal?: AbortSignal) =>
     apiFetch<OrderResponse[]>("/api/partner/orders", { signal }),
   
-  updateOrderStatus: (orderId: string, newStatus: string) =>
-    apiFetch<OrderResponse>(`/api/partner/orders/${orderId}/status?newStatus=${newStatus}`, { 
-      method: "PUT" 
-    }),
+  updateOrderStatus: (orderId: string, newStatus: string, cancellationReason?: string) => {
+    let url = `/api/partner/orders/${orderId}/status?newStatus=${newStatus}`;
+    if (cancellationReason) {
+      url += `&cancellationReason=${encodeURIComponent(cancellationReason)}`;
+    }
+    return apiFetch<OrderResponse>(url, { method: "PUT" });
+  },
 
   assignEngineer: (orderId: string, engineerId: string) =>
     apiFetch<OrderResponse>(`/api/partner/orders/${orderId}/assign-engineer?engineerId=${engineerId}`, { 
@@ -50,4 +53,19 @@ export const partnerDashboardService = {
       method: "PUT",
       body: data,
     }),
+
+  addOrderNote: (orderId: string, note: string) =>
+    apiFetch<OrderResponse>(`/api/partner/orders/${orderId}/notes`, {
+      method: "POST",
+      body: { note },
+    }),
+
+  requestCityPricingChange: (productId: string, data: { cityId: string; price: number; exchangeDiscount?: number; stock: number; reason: string }) =>
+    apiFetch<any>(`/api/partner/products/${productId}/city-pricing-request`, {
+      method: "POST",
+      body: data,
+    }),
+
+  getPendingPricingRequests: (signal?: AbortSignal) =>
+    apiFetch<any[]>("/api/partner/products/pending-pricing-requests", { signal }),
 };

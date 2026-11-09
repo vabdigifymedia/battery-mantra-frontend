@@ -33,6 +33,8 @@ import {
   Globe,
   XCircle,
   Pencil,
+  ShieldCheck,
+  FileText,
 } from "lucide-react";
 import { partnerService } from "@/services/partner.service";
 import { engineerService } from "@/services/engineer.service";
@@ -192,6 +194,7 @@ function AdminOrders() {
       case "dispatched": return filteredOrders.filter((o) => STATUS_DISPATCHED.includes(o.orderStatus));
       case "delivered": return filteredOrders.filter((o) => STATUS_DELIVERED.includes(o.orderStatus));
       case "cancelled": return filteredOrders.filter((o) => STATUS_CANCELLED.includes(o.orderStatus));
+      case "partner_rejected": return filteredOrders.filter((o) => o.orderStatus === "CANCELLED" && (o.cancelledBy === "PARTNER" || (!!o.cancellationReason && !!o.assignedPartner)));
       case "admin_direct": return filteredOrders.filter((o) => !o.assignedPartner);
       case "partner_assigned": return filteredOrders.filter((o) => !!o.assignedPartner);
       default: return filteredOrders;
@@ -201,6 +204,7 @@ function AdminOrders() {
   const pendingCount = filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus)).length;
   const adminDirectCount = filteredOrders.filter((o) => !o.assignedPartner).length;
   const partnerAssignedCount = filteredOrders.filter((o) => !!o.assignedPartner).length;
+  const partnerRejectedCount = filteredOrders.filter((o) => o.orderStatus === "CANCELLED" && (o.cancelledBy === "PARTNER" || (!!o.cancellationReason && !!o.assignedPartner))).length;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -379,6 +383,16 @@ function AdminOrders() {
                           <p className="text-[10px] text-muted-foreground italic truncate max-w-[150px]" title={order.cancellationReason}>
                             "{order.cancellationReason}"
                           </p>
+                        )}
+                        {(order.cancelledBy === "PARTNER" || (!!order.cancellationReason && !!order.assignedPartner)) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 px-2 text-[10px] font-bold text-amber-700 bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20"
+                            onClick={() => setSelectedOrder(order)}
+                          >
+                            ⚡ Rescue & Reassign
+                          </Button>
                         )}
                       </div>
                     ) : order.assignedPartner ? (
@@ -611,6 +625,14 @@ function AdminOrders() {
             <TabsTrigger value="partner_assigned" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               Partner Assigned ({partnerAssignedCount})
             </TabsTrigger>
+            <TabsTrigger value="partner_rejected" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm text-amber-700 dark:text-amber-400 font-medium">
+              ⚠️ Partner Rejected
+              {partnerRejectedCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {partnerRejectedCount}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="new" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               New Orders
               {pendingCount > 0 && (
@@ -663,7 +685,7 @@ function AdminOrders() {
             </DialogHeader>
             <div className="grid gap-6 py-4">
               {selectedOrder.orderStatus === "CANCELLED" && (
-                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-2">
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-3">
                   <div className="flex items-center gap-2 font-bold text-red-600">
                     <XCircle className="h-5 w-5 shrink-0" />
                     <span>Order Was Cancelled</span>
@@ -679,6 +701,26 @@ function AdminOrders() {
                       {selectedOrder.cancellationReason || "No specific reason was provided"}
                     </span>
                   </div>
+
+                  {(selectedOrder.cancelledBy === "PARTNER" || (!!selectedOrder.cancellationReason && !!selectedOrder.assignedPartner)) && (
+                    <div className="pt-2 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-xs text-amber-800 dark:text-amber-300 font-medium">
+                        ⚠️ Partner could not fulfill this order. Rescue and reactivate to process delivery:
+                      </p>
+                      <Button
+                        size="sm"
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs gap-1.5 shadow-sm"
+                        onClick={() => {
+                          updateStatusMutation.mutate({ orderId: selectedOrder.orderId, status: "PROCESSING" as OrderStatus });
+                          unassignPartnerMutation.mutate(selectedOrder.orderId);
+                          setSelectedOrder({ ...selectedOrder, orderStatus: "PROCESSING", assignedPartner: null });
+                          toast.success("Order rescued! Status set to Processing. Reassign to another Partner or Direct Engineer.");
+                        }}
+                      >
+                        ⚡ Reactivate & Rescue Order
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
@@ -897,6 +939,63 @@ function AdminOrders() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* ── Fulfillment & Doorstep Verification Audit ──────────── */}
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Fulfillment & Doorstep Verification Audit
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Old Battery Exchange */}
+                  <div className="rounded-xl border bg-card p-3.5 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">Scrap Battery Exchange</p>
+                    {(selectedOrder.exchangeDiscount && selectedOrder.exchangeDiscount > 0) ? (
+                      <div>
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-500/15 border border-emerald-500/30 rounded px-2 py-0.5">
+                          ✓ Scrap Battery Collected
+                        </span>
+                        <p className="text-[11px] text-muted-foreground mt-1">Discount: ₹{selectedOrder.exchangeDiscount.toLocaleString()}</p>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">No exchange selected</span>
+                    )}
+                  </div>
+
+                  {/* Payment & COD Audit */}
+                  <div className="rounded-xl border bg-card p-3.5 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">Payment & Collection</p>
+                    <p className="text-sm font-semibold">{selectedOrder.paymentMethod || "COD"} • ₹{selectedOrder.totalAmount.toLocaleString()}</p>
+                    <p className="text-[11px] text-emerald-600 font-medium">Status: {selectedOrder.paymentStatus || (selectedOrder.orderStatus === "DELIVERED" ? "PAID" : "PENDING")}</p>
+                  </div>
+
+                  {/* Security Code / OTP */}
+                  <div className="rounded-xl border bg-card p-3.5 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">Delivery Security Code (OTP)</p>
+                    {selectedOrder.deliverySecurityCode ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold bg-muted px-2 py-0.5 rounded border tracking-wider">
+                          {selectedOrder.deliverySecurityCode}
+                        </span>
+                        {selectedOrder.orderStatus === "DELIVERED" && (
+                          <span className="text-[10px] text-emerald-600 font-semibold">Verified ✓</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Not generated</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Installation / Technician Remarks */}
+                {selectedOrder.engineerNotes && (
+                  <div className="rounded-xl border bg-muted/40 p-3.5 space-y-1">
+                    <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-primary" /> Technician Installation Remarks / Notes:
+                    </p>
+                    <p className="text-xs text-muted-foreground whitespace-pre-wrap">{selectedOrder.engineerNotes}</p>
+                  </div>
+                )}
               </div>
             </div>
           </DialogContent>

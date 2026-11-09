@@ -507,6 +507,7 @@ export type OrderResponse = {
   selectedCity?: string;
   cancellationReason?: string;
   cancelledBy?: string;
+  engineerNotes?: string;
 };
 
 export type AdminUpdateOrderItemRequest = {
