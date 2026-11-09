@@ -218,6 +218,70 @@ export const adminService = {
     }
   },
 
+  updateCityStock: async (
+    productId: UUID,
+    cityId: string,
+    stockQuantity: number,
+    existingPrice?: number,
+    existingDiscount?: number
+  ) => {
+    try {
+      return await apiFetch<{ productId: UUID; cityId: string; stock: number; message: string }>(
+        `/api/admin/inventory/cities/${cityId}/products/${productId}`,
+        {
+          method: "PATCH",
+          body: { stock: stockQuantity },
+        }
+      );
+    } catch {
+      // Graceful fallback to updating city pricing directly on product
+      return await apiFetch<any>(
+        `/api/partner/products/${productId}/city-pricing`,
+        {
+          method: "PUT",
+          body: {
+            cityId,
+            price: existingPrice ?? 0,
+            exchangeDiscount: existingDiscount ?? 0,
+            stock: stockQuantity,
+          },
+        }
+      );
+    }
+  },
+
+  bulkUpdateCityStock: async (
+    cityId: string,
+    updates: Array<{ productId: UUID; stockQuantity: number; price?: number; exchangeDiscount?: number }>
+  ) => {
+    try {
+      return await apiFetch<{ updatedCount: number; message: string }>(
+        `/api/admin/inventory/cities/${cityId}/bulk-update`,
+        {
+          method: "PUT",
+          body: updates.map((u) => ({ productId: u.productId, stock: u.stockQuantity })),
+        }
+      );
+    } catch {
+      // Fallback: sequential update
+      for (const item of updates) {
+        await apiFetch<any>(
+          `/api/partner/products/${item.productId}/city-pricing`,
+          {
+            method: "PUT",
+            body: {
+              cityId,
+              price: item.price ?? 0,
+              exchangeDiscount: item.exchangeDiscount ?? 0,
+              stock: item.stockQuantity,
+            },
+          }
+        );
+      }
+      return { updatedCount: updates.length, message: "City inventory updated successfully" };
+    }
+  },
+
   // Categories
   createCategory: (body: CreateCategoryRequest) => 
     apiFetch<CategoryDetailResponse>(endpoints.admin.categories.create, { method: "POST", body }),

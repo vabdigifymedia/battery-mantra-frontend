@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
-import { LayoutDashboard, ShoppingCart, Users, Package, LogOut, Package2, KeyRound } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Users, Package, LogOut, Package2, KeyRound, Boxes } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/auth/ChangePasswordDialog";
 import {
   Sidebar,
@@ -24,6 +24,7 @@ const partnerNavigation = [
   { name: "Assigned Orders", href: "/kalkaji/partner/orders", icon: ShoppingCart },
   { name: "My Engineers", href: "/kalkaji/partner/engineers", icon: Users },
   { name: "Products & Pricing", href: "/kalkaji/partner/products", icon: Package },
+  { name: "Branch Inventory", href: "/kalkaji/partner/inventory", icon: Boxes },
 ];
 
 export function PartnerSidebar() {

@@ -83,6 +83,7 @@ import { Route as KalkajiPartnerIndexRouteImport } from './routes/kalkaji_.partn
 import { Route as KalkajiPartnerEngineersRouteImport } from './routes/kalkaji_.partner.engineers'
 import { Route as KalkajiPartnerOrdersRouteImport } from './routes/kalkaji_.partner.orders'
 import { Route as KalkajiPartnerProductsRouteImport } from './routes/kalkaji_.partner.products'
+import { Route as KalkajiPartnerInventoryRouteImport } from './routes/kalkaji_.partner.inventory'
 import { Route as KalkajiPartnerLoginRouteImport } from './routes/kalkaji_.partner_.login'
 import { Route as ManufacturersCategorySlugIndexRouteImport } from './routes/manufacturers.$categorySlug.index'
 import { Route as ManufacturersCategorySlugSlugRouteImport } from './routes/manufacturers.$categorySlug.$slug'
@@ -478,6 +479,11 @@ const KalkajiPartnerProductsRoute = KalkajiPartnerProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => KalkajiPartnerRoute,
 } as any)
+const KalkajiPartnerInventoryRoute = KalkajiPartnerInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => KalkajiPartnerRoute,
+} as any)
 const KalkajiPartnerLoginRoute = KalkajiPartnerLoginRouteImport.update({
   id: '/kalkaji_/partner_/login',
   path: '/kalkaji/partner/login',
@@ -678,6 +684,7 @@ export interface FileRoutesByFullPath {
   '/kalkaji/partner/engineers': typeof KalkajiPartnerEngineersRoute
   '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji/partner/products': typeof KalkajiPartnerProductsRoute
+  '/kalkaji/partner/inventory': typeof KalkajiPartnerInventoryRoute
   '/kalkaji/partner/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug/': typeof BrandsCategorySlugIndexRoute
@@ -775,6 +782,7 @@ export interface FileRoutesByTo {
   '/kalkaji/partner/engineers': typeof KalkajiPartnerEngineersRoute
   '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji/partner/products': typeof KalkajiPartnerProductsRoute
+  '/kalkaji/partner/inventory': typeof KalkajiPartnerInventoryRoute
   '/kalkaji/partner/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug': typeof BrandsCategorySlugIndexRoute
@@ -876,6 +884,7 @@ export interface FileRoutesById {
   '/kalkaji_/partner/engineers': typeof KalkajiPartnerEngineersRoute
   '/kalkaji_/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji_/partner/products': typeof KalkajiPartnerProductsRoute
+  '/kalkaji_/partner/inventory': typeof KalkajiPartnerInventoryRoute
   '/kalkaji_/partner_/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug/': typeof BrandsCategorySlugIndexRoute
@@ -1774,6 +1783,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KalkajiPartnerProductsRouteImport
       parentRoute: typeof KalkajiPartnerRoute
     }
+    '/kalkaji_/partner/inventory': {
+      id: '/kalkaji_/partner/inventory'
+      path: '/inventory'
+      fullPath: '/kalkaji/partner/inventory'
+      preLoaderRoute: typeof KalkajiPartnerInventoryRouteImport
+      parentRoute: typeof KalkajiPartnerRoute
+    }
     '/kalkaji_/partner_/login': {
       id: '/kalkaji_/partner_/login'
       path: '/kalkaji/partner/login'
@@ -2068,6 +2084,7 @@ interface KalkajiPartnerRouteChildren {
   KalkajiPartnerEngineersRoute: typeof KalkajiPartnerEngineersRoute
   KalkajiPartnerOrdersRoute: typeof KalkajiPartnerOrdersRoute
   KalkajiPartnerProductsRoute: typeof KalkajiPartnerProductsRoute
+  KalkajiPartnerInventoryRoute: typeof KalkajiPartnerInventoryRoute
   KalkajiPartnerIndexRoute: typeof KalkajiPartnerIndexRoute
 }
 
@@ -2075,6 +2092,7 @@ const KalkajiPartnerRouteChildren: KalkajiPartnerRouteChildren = {
   KalkajiPartnerEngineersRoute: KalkajiPartnerEngineersRoute,
   KalkajiPartnerOrdersRoute: KalkajiPartnerOrdersRoute,
   KalkajiPartnerProductsRoute: KalkajiPartnerProductsRoute,
+  KalkajiPartnerInventoryRoute: KalkajiPartnerInventoryRoute,
   KalkajiPartnerIndexRoute: KalkajiPartnerIndexRoute,
 }
 

@@ -68,4 +68,62 @@ export const partnerDashboardService = {
 
   getPendingPricingRequests: (signal?: AbortSignal) =>
     apiFetch<any[]>("/api/partner/products/pending-pricing-requests", { signal }),
+
+  getBranchInventory: (cityId: string, signal?: AbortSignal) =>
+    apiFetch<any[]>(`/api/partner/inventory?cityId=${encodeURIComponent(cityId)}`, { signal }),
+
+  updateBranchStock: async (productId: string, cityId: string, stock: number, existingPrice?: number, existingDiscount?: number) => {
+    try {
+      return await apiFetch<any>(
+        `/api/partner/inventory/${productId}/stock?cityId=${encodeURIComponent(cityId)}&stock=${stock}`,
+        { method: "PATCH" }
+      );
+    } catch {
+      // Graceful fallback to updating city pricing with preserved price and new stock
+      return await apiFetch<ProductDetailResponse>(
+        `/api/partner/products/${productId}/city-pricing`,
+        {
+          method: "PUT",
+          body: {
+            cityId,
+            price: existingPrice ?? 0,
+            exchangeDiscount: existingDiscount ?? 0,
+            stock,
+          },
+        }
+      );
+    }
+  },
+
+  bulkUpdateBranchStock: async (
+    cityId: string,
+    updates: Array<{ productId: string; stock: number; price?: number; exchangeDiscount?: number }>
+  ) => {
+    try {
+      return await apiFetch<{ updatedCount: number; message: string }>(
+        "/api/partner/inventory/bulk-update",
+        {
+          method: "POST",
+          body: { cityId, updates: updates.map((u) => ({ productId: u.productId, stock: u.stock })) },
+        }
+      );
+    } catch {
+      // Fallback: sequential update via city pricing
+      for (const item of updates) {
+        await apiFetch<ProductDetailResponse>(
+          `/api/partner/products/${item.productId}/city-pricing`,
+          {
+            method: "PUT",
+            body: {
+              cityId,
+              price: item.price ?? 0,
+              exchangeDiscount: item.exchangeDiscount ?? 0,
+              stock: item.stock,
+            },
+          }
+        );
+      }
+      return { updatedCount: updates.length, message: "Branch inventory updated successfully" };
+    }
+  },
 };
