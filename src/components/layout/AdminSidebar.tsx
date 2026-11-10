@@ -3,7 +3,8 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminService } from "@/services/admin.service";
 import { env } from "@/lib/utils/env";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit, KeyRound, Flame, Sparkles, Boxes, Newspaper } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin, Truck, Fuel, Battery, Factory, Percent, Globe, FileText, HelpCircle, MessageSquare, ClipboardList, Ticket, ArrowUpDown, CalendarRange, IndianRupee, Instagram, FileEdit, KeyRound, Flame, Sparkles, Boxes, Newspaper, ShieldCheck } from "lucide-react";
+import { ROLES } from "@/constants/roles";
 import { ChangePasswordDialog } from "@/components/auth/ChangePasswordDialog";
 import {
   Sidebar,
@@ -75,9 +76,10 @@ const seoQuickNavigation = [
 
 export function AdminSidebar() {
   const { pathname } = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, hasRole } = useAuth();
   const router = useRouter();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const isSuperAdmin = hasRole(ROLES.ADMIN);
 
   // Queries for Notification Badges (Sharing exact queryKeys with pages for instant real-time invalidation)
   const ordersQuery = useQuery({
@@ -293,6 +295,28 @@ export function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {isSuperAdmin && (
+        <SidebarGroup className="pt-0">
+          <SidebarGroupLabel>Security</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/kalkaji/security"}
+                  tooltip="Mobile Gate Security"
+                >
+                  <Link to="/kalkaji/security" className="flex items-center w-full">
+                    <ShieldCheck className="h-4 w-4 text-red-600" />
+                    <span className="flex-1 truncate font-medium">Mobile Gate PINs</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      )}
 
       <SidebarFooter className="p-4 border-t space-y-1">
         <SidebarMenu>

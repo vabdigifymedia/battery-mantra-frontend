@@ -37,6 +37,22 @@ export const authService = {
     });
   },
 
+  async partnerSendOtp(req: SendOtpRequest): Promise<{ message?: string }> {
+    return apiFetch<{ message?: string }>(endpoints.auth.partnerSendOtp, {
+      method: "POST",
+      body: req,
+      auth: false,
+    });
+  },
+
+  async partnerVerifyOtp(req: VerifyOtpRequest): Promise<LoginResponse> {
+    return apiFetch<LoginResponse>(endpoints.auth.partnerVerifyOtp, {
+      method: "POST",
+      body: req,
+      auth: false,
+    });
+  },
+
   async checkUser(phoneNumber: string): Promise<{ exists: boolean; name: string | null }> {
     return apiFetch<{ exists: boolean; name: string | null }>(`${endpoints.auth.checkUser}?phoneNumber=${encodeURIComponent(phoneNumber)}`, {
       method: "GET",

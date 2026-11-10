@@ -33,7 +33,6 @@ function PartnerEngineersPage() {
     alternatePhone: "",
     address: "",
     city: "",
-    password: "",
   });
 
   const { data: engineers = [], isLoading } = useQuery({
@@ -95,7 +94,6 @@ function PartnerEngineersPage() {
       alternatePhone: "",
       address: "",
       city: "",
-      password: "",
       isActive: true,
     });
     setIsDialogOpen(true);
@@ -111,7 +109,6 @@ function PartnerEngineersPage() {
       alternatePhone: eng.alternatePhone || "",
       address: eng.address || "",
       city: eng.city || "",
-      password: "", // Optional during update
       isActive: eng.isActive,
     });
     setIsDialogOpen(true);
@@ -132,10 +129,6 @@ function PartnerEngineersPage() {
     if (editingEngineer) {
       updateMutation.mutate({ id: editingEngineer.id, data: formData });
     } else {
-      if (!formData.password) {
-        toast.error("Password is required when creating a new engineer.");
-        return;
-      }
       createMutation.mutate(formData);
     }
   };
@@ -437,20 +430,9 @@ function PartnerEngineersPage() {
               />
             </FormField>
 
-            <FormField
-              label={editingEngineer ? "New Password (Leave blank to keep current)" : "Password"}
-              htmlFor="password"
-              required={!editingEngineer}
-            >
-              <Input
-                id="password"
-                type="password"
-                value={formData.password || ""}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder={editingEngineer ? "••••••••" : "Set login password"}
-                required={!editingEngineer}
-              />
-            </FormField>
+            <div className="rounded-lg border bg-blue-500/5 border-blue-500/20 p-3 text-xs text-blue-800 dark:text-blue-200">
+              Engineers sign in on the mobile app using <strong>Phone Number + OTP</strong>. Email is collected for contact &amp; notifications only.
+            </div>
 
             {editingEngineer && (
               <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">

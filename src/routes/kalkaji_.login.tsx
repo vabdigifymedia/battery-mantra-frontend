@@ -99,7 +99,7 @@ function LoginPage() {
       });
       toast.success("Welcome back");
 
-      if (role === "ADMIN") {
+      if (role === "ADMIN" || role === "SUB_ADMIN") {
         router.navigate({ to: "/kalkaji" as any });
       } else if (role === "PARTNER") {
         router.navigate({ to: "/kalkaji/partner" as any });

@@ -5,10 +5,9 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms/FormField";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/forms/PasswordInput";
 import { engineerService } from "@/services/engineer.service";
 import { toast } from "sonner";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Smartphone } from "lucide-react";
 
 export const Route = createFileRoute("/kalkaji/engineers/new")({
   component: NewEngineerPage,
@@ -21,7 +20,6 @@ const schema = z.object({
   phoneNumber: z.string().min(10, "Phone number is required"),
   alternatePhone: z.string().optional(),
   address: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -38,13 +36,12 @@ function NewEngineerPage() {
       phoneNumber: "",
       alternatePhone: "",
       address: "",
-      password: "",
     },
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await engineerService.create(values as any);
+      await engineerService.create(values);
       toast.success("Engineer created successfully");
       navigate({ to: "/kalkaji/engineers" });
     } catch (e: any) {
@@ -65,6 +62,14 @@ function NewEngineerPage() {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
+        <div className="rounded-lg border bg-blue-500/5 border-blue-500/20 p-3.5 text-xs text-blue-800 dark:text-blue-200 flex items-start gap-2.5">
+          <Smartphone className="h-4 w-4 shrink-0 mt-0.5 text-blue-600" />
+          <span>
+            <strong>OTP-Only Sign In:</strong> Engineers log in on the Engineer Mobile App using their registered{" "}
+            <strong>Phone Number + OTP</strong>. Email is collected for contact purposes only.
+          </span>
+        </div>
+
         <div className="grid gap-6 sm:grid-cols-2">
           <FormField label="First Name" error={form.formState.errors.firstName?.message}>
             <Input {...form.register("firstName")} placeholder="e.g. John" />
@@ -74,11 +79,11 @@ function NewEngineerPage() {
             <Input {...form.register("lastName")} placeholder="e.g. Doe" />
           </FormField>
 
-          <FormField label="Email Address" error={form.formState.errors.email?.message}>
+          <FormField label="Email Address (Contact Info)" error={form.formState.errors.email?.message}>
             <Input type="email" {...form.register("email")} placeholder="john@example.com" />
           </FormField>
 
-          <FormField label="Phone Number" error={form.formState.errors.phoneNumber?.message}>
+          <FormField label="Phone Number (OTP Login)" error={form.formState.errors.phoneNumber?.message}>
             <Input {...form.register("phoneNumber")} placeholder="1234567890" />
           </FormField>
 
@@ -89,12 +94,6 @@ function NewEngineerPage() {
           <div className="sm:col-span-2">
             <FormField label="Address (Optional)" error={form.formState.errors.address?.message}>
               <Input {...form.register("address")} placeholder="Full address" />
-            </FormField>
-          </div>
-
-          <div className="sm:col-span-2">
-            <FormField label="Password" error={form.formState.errors.password?.message}>
-              <PasswordInput {...form.register("password")} placeholder="Create a password" />
             </FormField>
           </div>
         </div>

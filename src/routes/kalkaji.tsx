@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminRoute } from "@/guards/AdminRoute";
+import { ROLES } from "@/constants/roles";
 
 export const Route = createFileRoute("/kalkaji")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/kalkaji")({
 
 function AdminLayout() {
   return (
-    <AdminRoute>
+    <AdminRoute roles={[ROLES.ADMIN, ROLES.SUB_ADMIN]}>
       <SidebarProvider>
         <AdminSidebar />
         <SidebarInset>

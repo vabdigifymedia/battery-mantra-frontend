@@ -49,6 +49,7 @@ import { Route as KalkajiManufacturersRouteImport } from './routes/kalkaji.manuf
 import { Route as KalkajiOffersRouteImport } from './routes/kalkaji.offers'
 import { Route as KalkajiQuickEditRouteImport } from './routes/kalkaji.quick-edit'
 import { Route as KalkajiReelsRouteImport } from './routes/kalkaji.reels'
+import { Route as KalkajiSecurityRouteImport } from './routes/kalkaji.security'
 import { Route as KalkajiSpecificationsRouteImport } from './routes/kalkaji.specifications'
 import { Route as KalkajiUsersRouteImport } from './routes/kalkaji.users'
 import { Route as KalkajiVehiclesRouteImport } from './routes/kalkaji.vehicles'
@@ -307,6 +308,11 @@ const KalkajiQuickEditRoute = KalkajiQuickEditRouteImport.update({
 const KalkajiReelsRoute = KalkajiReelsRouteImport.update({
   id: '/reels',
   path: '/reels',
+  getParentRoute: () => KalkajiRoute,
+} as any)
+const KalkajiSecurityRoute = KalkajiSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
   getParentRoute: () => KalkajiRoute,
 } as any)
 const KalkajiSpecificationsRoute = KalkajiSpecificationsRouteImport.update({
@@ -664,6 +670,7 @@ export interface FileRoutesByFullPath {
   '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
+  '/kalkaji/security': typeof KalkajiSecurityRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
   '/kalkaji/users': typeof KalkajiUsersRoute
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
@@ -764,6 +771,7 @@ export interface FileRoutesByTo {
   '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
+  '/kalkaji/security': typeof KalkajiSecurityRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
   '/kalkaji/users': typeof KalkajiUsersRoute
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
@@ -866,6 +874,7 @@ export interface FileRoutesById {
   '/kalkaji/offers': typeof KalkajiOffersRoute
   '/kalkaji/quick-edit': typeof KalkajiQuickEditRoute
   '/kalkaji/reels': typeof KalkajiReelsRoute
+  '/kalkaji/security': typeof KalkajiSecurityRoute
   '/kalkaji/specifications': typeof KalkajiSpecificationsRoute
   '/kalkaji/users': typeof KalkajiUsersRoute
   '/kalkaji/vehicles': typeof KalkajiVehiclesRoute
@@ -969,6 +978,7 @@ export interface FileRouteTypes {
     | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
+    | '/kalkaji/security'
     | '/kalkaji/specifications'
     | '/kalkaji/users'
     | '/kalkaji/vehicles'
@@ -1069,6 +1079,7 @@ export interface FileRouteTypes {
     | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
+    | '/kalkaji/security'
     | '/kalkaji/specifications'
     | '/kalkaji/users'
     | '/kalkaji/vehicles'
@@ -1170,6 +1181,7 @@ export interface FileRouteTypes {
     | '/kalkaji/offers'
     | '/kalkaji/quick-edit'
     | '/kalkaji/reels'
+    | '/kalkaji/security'
     | '/kalkaji/specifications'
     | '/kalkaji/users'
     | '/kalkaji/vehicles'
@@ -1560,6 +1572,13 @@ declare module '@tanstack/react-router' {
       path: '/reels'
       fullPath: '/kalkaji/reels'
       preLoaderRoute: typeof KalkajiReelsRouteImport
+      parentRoute: typeof KalkajiRoute
+    }
+    '/kalkaji/security': {
+      id: '/kalkaji/security'
+      path: '/security'
+      fullPath: '/kalkaji/security'
+      preLoaderRoute: typeof KalkajiSecurityRouteImport
       parentRoute: typeof KalkajiRoute
     }
     '/kalkaji/specifications': {
@@ -2016,6 +2035,7 @@ interface KalkajiRouteChildren {
   KalkajiOffersRoute: typeof KalkajiOffersRoute
   KalkajiQuickEditRoute: typeof KalkajiQuickEditRoute
   KalkajiReelsRoute: typeof KalkajiReelsRoute
+  KalkajiSecurityRoute: typeof KalkajiSecurityRoute
   KalkajiSpecificationsRoute: typeof KalkajiSpecificationsRoute
   KalkajiUsersRoute: typeof KalkajiUsersRoute
   KalkajiVehiclesRoute: typeof KalkajiVehiclesRoute
@@ -2068,6 +2088,7 @@ const KalkajiRouteChildren: KalkajiRouteChildren = {
   KalkajiOffersRoute: KalkajiOffersRoute,
   KalkajiQuickEditRoute: KalkajiQuickEditRoute,
   KalkajiReelsRoute: KalkajiReelsRoute,
+  KalkajiSecurityRoute: KalkajiSecurityRoute,
   KalkajiSpecificationsRoute: KalkajiSpecificationsRoute,
   KalkajiUsersRoute: KalkajiUsersRoute,
   KalkajiVehiclesRoute: KalkajiVehiclesRoute,

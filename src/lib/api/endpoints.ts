@@ -13,6 +13,8 @@ export const endpoints = {
     refresh: "/api/auth/refresh",
     sendOtp: "/api/auth/send-otp",
     verifyOtp: "/api/auth/verify-otp",
+    partnerSendOtp: "/api/auth/partner/send-otp",
+    partnerVerifyOtp: "/api/auth/partner/verify-otp",
     checkUser: "/api/auth/check-user",
   },
   user: {
@@ -193,6 +195,10 @@ export const endpoints = {
       byId: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}`,
       updateStatus: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}/status`,
       delete: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}`,
+    },
+    security: {
+      gateConfig: "/api/admin/security/gate-config",
+      gatePin: "/api/admin/security/gate-pin",
     },
   },
   blogs: {

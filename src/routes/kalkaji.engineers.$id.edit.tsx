@@ -5,10 +5,9 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms/FormField";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/forms/PasswordInput";
 import { engineerService } from "@/services/engineer.service";
 import { toast } from "sonner";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Smartphone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Switch } from "@/components/ui/switch";
@@ -25,7 +24,6 @@ const schema = z.object({
   phoneNumber: z.string().min(10, "Phone number is required"),
   alternatePhone: z.string().optional(),
   address: z.string().optional(),
-  password: z.string().optional(), // Optional for edit
   isActive: z.boolean().optional(),
 });
 
@@ -49,7 +47,6 @@ function EditEngineerPage() {
       phoneNumber: "",
       alternatePhone: "",
       address: "",
-      password: "",
       isActive: true,
     },
   });
@@ -63,7 +60,6 @@ function EditEngineerPage() {
         phoneNumber: engineer.phoneNumber,
         alternatePhone: engineer.alternatePhone || "",
         address: engineer.address || "",
-        password: "",
         isActive: engineer.isActive,
       });
     }
@@ -71,7 +67,11 @@ function EditEngineerPage() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await engineerService.update(id, values as any);
+      await engineerService.update(id, {
+        ...values,
+        city: engineer?.city,
+        partnerId: engineer?.partnerId,
+      });
       toast.success("Engineer updated successfully");
       navigate({ to: "/kalkaji/engineers" });
     } catch (e: any) {
@@ -111,6 +111,14 @@ function EditEngineerPage() {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
+        <div className="rounded-lg border bg-blue-500/5 border-blue-500/20 p-3.5 text-xs text-blue-800 dark:text-blue-200 flex items-start gap-2.5">
+          <Smartphone className="h-4 w-4 shrink-0 mt-0.5 text-blue-600" />
+          <span>
+            <strong>OTP-Only Sign In:</strong> Engineers log in on the Engineer Mobile App using their registered{" "}
+            <strong>Phone Number + OTP</strong>. Email is kept for contact purposes only.
+          </span>
+        </div>
+
         <div className="grid gap-6 sm:grid-cols-2">
           <FormField label="First Name" error={form.formState.errors.firstName?.message}>
             <Input {...form.register("firstName")} placeholder="e.g. John" />
@@ -120,11 +128,11 @@ function EditEngineerPage() {
             <Input {...form.register("lastName")} placeholder="e.g. Doe" />
           </FormField>
 
-          <FormField label="Email Address" error={form.formState.errors.email?.message}>
+          <FormField label="Email Address (Contact Info)" error={form.formState.errors.email?.message}>
             <Input type="email" {...form.register("email")} placeholder="john@example.com" />
           </FormField>
 
-          <FormField label="Phone Number" error={form.formState.errors.phoneNumber?.message}>
+          <FormField label="Phone Number (OTP Login)" error={form.formState.errors.phoneNumber?.message}>
             <Input {...form.register("phoneNumber")} placeholder="1234567890" />
           </FormField>
 
@@ -138,12 +146,6 @@ function EditEngineerPage() {
             </FormField>
           </div>
 
-          <div className="sm:col-span-2">
-            <FormField label="New Password (Optional)" error={form.formState.errors.password?.message}>
-              <PasswordInput {...form.register("password")} placeholder="Leave blank to keep current password" />
-            </FormField>
-          </div>
-          
           <div className="sm:col-span-2 flex items-center justify-between rounded-lg border p-4 bg-muted/20">
             <div className="space-y-0.5">
               <h3 className="text-base font-medium">Account Status</h3>
