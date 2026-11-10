@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useCallback } from "react";
-import { productListQuery, categoriesQuery, brandsQuery } from "@/queries";
+import { productListQuery } from "@/queries";
 import { partnerDashboardService } from "@/services/partner-dashboard.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,9 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, Tag, Search, Clock, CheckCircle, Package, MapPin, AlertTriangle } from "lucide-react";
-import type { ProductListResponse, CityPricingDto } from "@/types/dto";
+import type { ProductListResponse, CityPricingDto, CityDto } from "@/types/dto";
 
-export const Route = createFileRoute("/kalkaji_/partner/products")({
+export const Route = createFileRoute("/kalkaji_/partner/products/")({
   component: PartnerProductsPage,
 });
 
@@ -34,13 +34,11 @@ type PendingPriceRequest = {
 function PartnerProductsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "APPROVED" | "PENDING">("ALL");
   const [selectedProductForPricing, setSelectedProductForPricing] = useState<ProductListResponse | null>(null);
-  const [isRequestProductOpen, setIsRequestProductOpen] = useState(false);
 
   // Queries
   const { data: products = [], isLoading } = useQuery(productListQuery());
-  const { data: categories = [] } = useQuery(categoriesQuery());
-  const { data: brands = [] } = useQuery(brandsQuery());
 
   // City Pricing Form State
   const [cityPrice, setCityPrice] = useState("");
@@ -48,16 +46,6 @@ function PartnerProductsPage() {
   const [stock, setStock] = useState("");
   const [selectedCityId, setSelectedCityId] = useState("");
   const [priceChangeReason, setPriceChangeReason] = useState("");
-
-  // New Product Request Form State
-  const [newProductName, setNewProductName] = useState("");
-  const [newCategoryId, setNewCategoryId] = useState("");
-  const [newBrandId, setNewBrandId] = useState("");
-  const [newBasePrice, setNewBasePrice] = useState("");
-  const [newExchangeDiscount, setNewExchangeDiscount] = useState("");
-  const [newCapacity, setNewCapacity] = useState("");
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newDescription, setNewDescription] = useState("");
 
   // Pending price requests (client-side MVP tracking)
   const [pendingRequests, setPendingRequests] = useState<Map<string, PendingPriceRequest>>(new Map());
@@ -71,7 +59,10 @@ function PartnerProductsPage() {
     queryFn: ({ signal }) => partnerDashboardService.getMyProfile(signal),
   });
 
-  const operatingCities = partnerProfile?.operatingCities || [];
+  const operatingCities: CityDto[] = useMemo(
+    () => partnerProfile?.operatingCities || [],
+    [partnerProfile?.operatingCities]
+  );
   const hasOperatingCities = operatingCities.length > 0;
 
   // --- Mutations ---
@@ -97,7 +88,6 @@ function PartnerProductsPage() {
       partnerDashboardService.requestCityPricingChange(productId, data),
     onSuccess: (_data, variables) => {
       toast.success("Price change request submitted for Admin approval");
-      // Track pending request client-side
       setPendingRequests((prev) => {
         const next = new Map(prev);
         next.set(variables.productId, {
@@ -127,7 +117,6 @@ function PartnerProductsPage() {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (err: any, variables) => {
-      // Revert optimistic update
       setLocalStockOverrides((prev) => {
         const next = new Map(prev);
         next.delete(variables.productId);
@@ -137,33 +126,11 @@ function PartnerProductsPage() {
     },
   });
 
-  const requestProductMutation = useMutation({
-    mutationFn: (data: any) => partnerDashboardService.requestNewProduct(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Product proposal submitted! Waiting for Admin approval.");
-      setIsRequestProductOpen(false);
-      resetRequestForm();
-    },
-    onError: (err: any) => toast.error(err?.message || "Failed to submit product request."),
-  });
-
-  const resetRequestForm = () => {
-    setNewProductName("");
-    setNewCategoryId("");
-    setNewBrandId("");
-    setNewBasePrice("");
-    setNewExchangeDiscount("");
-    setNewCapacity("");
-    setNewImageUrl("");
-    setNewDescription("");
-  };
-
   const handleOpenPricingModal = (product: ProductListResponse) => {
     setSelectedProductForPricing(product);
     setCityPrice(product.productPrice.toString());
     setExchangeDiscount((product.exchangeDiscount || 0).toString());
-    setStock("10");
+    setStock((product.productStock ?? 10).toString());
     setPriceChangeReason("");
     if (operatingCities.length > 0) {
       setSelectedCityId(operatingCities[0].cityId);
@@ -232,7 +199,6 @@ function PartnerProductsPage() {
     const exchDisc = exchangeDiscount ? parseFloat(exchangeDiscount) : 0;
     const stockCount = stock ? parseInt(stock, 10) : 0;
 
-    // Route through approval workflow
     requestPricingChangeMutation.mutate({
       productId: selectedProductForPricing.productId,
       data: {
@@ -251,7 +217,6 @@ function PartnerProductsPage() {
 
       const firstCityId = operatingCities[0].cityId;
 
-      // Optimistic UI update
       setLocalStockOverrides((prev) => {
         const next = new Map(prev);
         next.set(product.productId, newInStock);
@@ -272,44 +237,37 @@ function PartnerProductsPage() {
 
   const getProductStockStatus = useCallback(
     (product: ProductListResponse): boolean => {
-      // Check local override first (optimistic)
       if (localStockOverrides.has(product.productId)) {
         return localStockOverrides.get(product.productId)!;
       }
-      // Fall back to product data
       return (product.productStock ?? 0) > 0;
     },
     [localStockOverrides]
   );
 
-  const handleCreateProductRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newProductName || !newCategoryId || !newBasePrice || !newImageUrl) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    requestProductMutation.mutate({
-      productName: newProductName,
-      categoryId: newCategoryId,
-      brandId: newBrandId || undefined,
-      productPrice: parseFloat(newBasePrice),
-      exchangeDiscount: newExchangeDiscount ? parseFloat(newExchangeDiscount) : 0,
-      capacity: newCapacity || undefined,
-      productImage: newImageUrl,
-      productDescription: newDescription || undefined,
-    });
-  };
-
-  const filteredProducts = products.filter(
-    (p) =>
-      p.productName.toLowerCase().includes(search.toLowerCase()) ||
-      (p.brandName && p.brandName.toLowerCase().includes(search.toLowerCase())) ||
-      (p.productCategory && p.productCategory.toLowerCase().includes(search.toLowerCase()))
+  const pendingCount = useMemo(
+    () => products.filter((p) => p.isApproved === false).length,
+    [products]
   );
 
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      if (statusFilter === "APPROVED" && p.isApproved === false) return false;
+      if (statusFilter === "PENDING" && p.isApproved !== false) return false;
+
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return (
+        p.productName.toLowerCase().includes(q) ||
+        (p.brandName && p.brandName.toLowerCase().includes(q)) ||
+        (p.productCategory && p.productCategory.toLowerCase().includes(q)) ||
+        (p.capacity && p.capacity.toLowerCase().includes(q))
+      );
+    });
+  }, [products, statusFilter, search]);
+
   const isSavePricingDisabled =
-    !selectedCityId && operatingCities.length === 0 ||
+    (!selectedCityId && operatingCities.length === 0) ||
     updateCityPricingMutation.isPending ||
     requestPricingChangeMutation.isPending;
 
@@ -320,15 +278,17 @@ function PartnerProductsPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Products & City Pricing</h1>
             <p className="text-muted-foreground">
-              Manage custom battery prices for your operating city or request new products for Admin approval.
+              Manage custom battery prices for your operating city or propose new products for Admin approval.
             </p>
           </div>
-          <Button onClick={() => setIsRequestProductOpen(true)} className="gap-2 shrink-0">
-            <Plus className="h-4 w-4" /> Request New Product
+          <Button asChild className="gap-2 shrink-0">
+            <Link to="/kalkaji/partner/products/request">
+              <Plus className="h-4 w-4" /> Request New Product
+            </Link>
           </Button>
         </div>
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -337,6 +297,24 @@ function PartnerProductsPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 bg-card"
             />
+          </div>
+
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {[
+              { id: "ALL", label: `All (${products.length})` },
+              { id: "APPROVED", label: `Live Catalog (${products.length - pendingCount})` },
+              { id: "PENDING", label: `Pending Approval (${pendingCount})` },
+            ].map((tab) => (
+              <Button
+                key={tab.id}
+                variant={statusFilter === tab.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter(tab.id as any)}
+                className="text-xs h-8"
+              >
+                {tab.label}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -378,7 +356,7 @@ function PartnerProductsPage() {
                             <img
                               src={product.productImage}
                               alt={product.productName}
-                              className="h-10 w-10 rounded object-cover border shrink-0"
+                              className="h-10 w-10 rounded object-cover border shrink-0 bg-white"
                             />
                           ) : (
                             <div className="h-10 w-10 rounded bg-muted border flex items-center justify-center shrink-0">
@@ -388,7 +366,7 @@ function PartnerProductsPage() {
                           <div>
                             <p className="font-semibold text-sm line-clamp-1">{product.productName}</p>
                             {product.capacity && (
-                              <p className="text-xs text-muted-foreground">Cap: {product.capacity}</p>
+                              <p className="text-xs text-muted-foreground">Spec / R/L: {product.capacity}</p>
                             )}
                           </div>
                         </div>
@@ -620,132 +598,6 @@ function PartnerProductsPage() {
                   {requestPricingChangeMutation.isPending ? "Submitting..." : "Submit Price Change Request"}
                 </Button>
               </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {/* Request New Product Modal */}
-        {isRequestProductOpen && (
-          <Dialog open={isRequestProductOpen} onOpenChange={setIsRequestProductOpen}>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-primary" /> Request New Product
-                </DialogTitle>
-                <DialogDescription>
-                  Propose a new battery product to the platform. It will be sent to Admin for approval.
-                </DialogDescription>
-              </DialogHeader>
-
-              <form onSubmit={handleCreateProductRequest} className="space-y-4 py-2">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Product Name *</Label>
-                  <Input
-                    required
-                    placeholder="e.g. Amaron Hi-Way Commercial Battery 150Ah"
-                    value={newProductName}
-                    onChange={(e) => setNewProductName(e.target.value)}
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Category *</Label>
-                    <Select value={newCategoryId} onValueChange={setNewCategoryId}>
-                      <SelectTrigger className="w-full text-xs">
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.categoryId} value={cat.categoryId}>
-                            {cat.categoryName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Brand</Label>
-                    <Select value={newBrandId} onValueChange={setNewBrandId}>
-                      <SelectTrigger className="w-full text-xs">
-                        <SelectValue placeholder="Select Brand" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {brands.map((b) => (
-                          <SelectItem key={b.brandId} value={b.brandId}>
-                            {b.brandName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Base Price (₹) *</Label>
-                    <Input
-                      required
-                      type="number"
-                      placeholder="Price"
-                      value={newBasePrice}
-                      onChange={(e) => setNewBasePrice(e.target.value)}
-                      className="text-xs"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Exchange Disc. (₹)</Label>
-                    <Input
-                      type="number"
-                      placeholder="Discount"
-                      value={newExchangeDiscount}
-                      onChange={(e) => setNewExchangeDiscount(e.target.value)}
-                      className="text-xs"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Capacity (Ah)</Label>
-                    <Input
-                      placeholder="e.g. 150Ah"
-                      value={newCapacity}
-                      onChange={(e) => setNewCapacity(e.target.value)}
-                      className="text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Product Image URL *</Label>
-                  <Input
-                    required
-                    placeholder="https://images.unsplash.com/..."
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Description</Label>
-                  <Textarea
-                    placeholder="Enter details about battery specifications, warranty, etc."
-                    value={newDescription}
-                    onChange={(e) => setNewDescription(e.target.value)}
-                    className="text-xs min-h-[80px]"
-                  />
-                </div>
-
-                <DialogFooter className="pt-2">
-                  <Button variant="outline" type="button" onClick={() => setIsRequestProductOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={requestProductMutation.isPending}>
-                    {requestProductMutation.isPending ? "Submitting..." : "Submit Proposal"}
-                  </Button>
-                </DialogFooter>
-              </form>
             </DialogContent>
           </Dialog>
         )}

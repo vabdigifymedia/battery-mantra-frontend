@@ -81,9 +81,8 @@ import { Route as KalkajiProductsPriorityRouteImport } from './routes/kalkaji.pr
 import { Route as KalkajiSeoPagesRouteImport } from './routes/kalkaji.seo.pages'
 import { Route as KalkajiPartnerIndexRouteImport } from './routes/kalkaji_.partner.index'
 import { Route as KalkajiPartnerEngineersRouteImport } from './routes/kalkaji_.partner.engineers'
-import { Route as KalkajiPartnerOrdersRouteImport } from './routes/kalkaji_.partner.orders'
-import { Route as KalkajiPartnerProductsRouteImport } from './routes/kalkaji_.partner.products'
 import { Route as KalkajiPartnerInventoryRouteImport } from './routes/kalkaji_.partner.inventory'
+import { Route as KalkajiPartnerOrdersRouteImport } from './routes/kalkaji_.partner.orders'
 import { Route as KalkajiPartnerLoginRouteImport } from './routes/kalkaji_.partner_.login'
 import { Route as ManufacturersCategorySlugIndexRouteImport } from './routes/manufacturers.$categorySlug.index'
 import { Route as ManufacturersCategorySlugSlugRouteImport } from './routes/manufacturers.$categorySlug.$slug'
@@ -102,6 +101,8 @@ import { Route as KalkajiSeoQuickCategoriesRouteImport } from './routes/kalkaji.
 import { Route as KalkajiSeoQuickDealersRouteImport } from './routes/kalkaji.seo.quick.dealers'
 import { Route as KalkajiSeoQuickManufacturersRouteImport } from './routes/kalkaji.seo.quick.manufacturers'
 import { Route as KalkajiSeoQuickProductsRouteImport } from './routes/kalkaji.seo.quick.products'
+import { Route as KalkajiPartnerProductsIndexRouteImport } from './routes/kalkaji_.partner.products.index'
+import { Route as KalkajiPartnerProductsRequestRouteImport } from './routes/kalkaji_.partner.products.request'
 import { Route as ManufacturersCategorySlugSlugCitySlugRouteImport } from './routes/manufacturers.$categorySlug.$slug.$citySlug'
 import { Route as ShopCategorySlugBrandSlugIndexRouteImport } from './routes/shop.$categorySlug.$brandSlug.index'
 import { Route as ShopCategorySlugBrandSlugCitySlugRouteImport } from './routes/shop.$categorySlug.$brandSlug.$citySlug'
@@ -469,19 +470,14 @@ const KalkajiPartnerEngineersRoute = KalkajiPartnerEngineersRouteImport.update({
   path: '/engineers',
   getParentRoute: () => KalkajiPartnerRoute,
 } as any)
-const KalkajiPartnerOrdersRoute = KalkajiPartnerOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => KalkajiPartnerRoute,
-} as any)
-const KalkajiPartnerProductsRoute = KalkajiPartnerProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => KalkajiPartnerRoute,
-} as any)
 const KalkajiPartnerInventoryRoute = KalkajiPartnerInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => KalkajiPartnerRoute,
+} as any)
+const KalkajiPartnerOrdersRoute = KalkajiPartnerOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => KalkajiPartnerRoute,
 } as any)
 const KalkajiPartnerLoginRoute = KalkajiPartnerLoginRouteImport.update({
@@ -583,6 +579,18 @@ const KalkajiSeoQuickProductsRoute = KalkajiSeoQuickProductsRouteImport.update({
   path: '/seo/quick/products',
   getParentRoute: () => KalkajiRoute,
 } as any)
+const KalkajiPartnerProductsIndexRoute =
+  KalkajiPartnerProductsIndexRouteImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => KalkajiPartnerRoute,
+  } as any)
+const KalkajiPartnerProductsRequestRoute =
+  KalkajiPartnerProductsRequestRouteImport.update({
+    id: '/products/request',
+    path: '/products/request',
+    getParentRoute: () => KalkajiPartnerRoute,
+  } as any)
 const ManufacturersCategorySlugSlugCitySlugRoute =
   ManufacturersCategorySlugSlugCitySlugRouteImport.update({
     id: '/$citySlug',
@@ -682,9 +690,8 @@ export interface FileRoutesByFullPath {
   '/kalkaji/products/priority': typeof KalkajiProductsPriorityRoute
   '/kalkaji/seo/pages': typeof KalkajiSeoPagesRoute
   '/kalkaji/partner/engineers': typeof KalkajiPartnerEngineersRoute
-  '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
-  '/kalkaji/partner/products': typeof KalkajiPartnerProductsRoute
   '/kalkaji/partner/inventory': typeof KalkajiPartnerInventoryRoute
+  '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji/partner/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug/': typeof BrandsCategorySlugIndexRoute
@@ -710,11 +717,13 @@ export interface FileRoutesByFullPath {
   '/kalkaji/seo/quick/dealers': typeof KalkajiSeoQuickDealersRoute
   '/kalkaji/seo/quick/manufacturers': typeof KalkajiSeoQuickManufacturersRoute
   '/kalkaji/seo/quick/products': typeof KalkajiSeoQuickProductsRoute
+  '/kalkaji/partner/products/request': typeof KalkajiPartnerProductsRequestRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug/': typeof BrandDealerCategorySlugBrandSlugIndexRoute
   '/brand-products/$categorySlug/$brandSlug/': typeof BrandProductsCategorySlugBrandSlugIndexRoute
+  '/kalkaji/partner/products/': typeof KalkajiPartnerProductsIndexRoute
   '/shop/$categorySlug/$brandSlug/': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug/': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -780,9 +789,8 @@ export interface FileRoutesByTo {
   '/kalkaji/products/priority': typeof KalkajiProductsPriorityRoute
   '/kalkaji/seo/pages': typeof KalkajiSeoPagesRoute
   '/kalkaji/partner/engineers': typeof KalkajiPartnerEngineersRoute
-  '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
-  '/kalkaji/partner/products': typeof KalkajiPartnerProductsRoute
   '/kalkaji/partner/inventory': typeof KalkajiPartnerInventoryRoute
+  '/kalkaji/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji/partner/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug': typeof BrandsCategorySlugIndexRoute
@@ -808,11 +816,13 @@ export interface FileRoutesByTo {
   '/kalkaji/seo/quick/dealers': typeof KalkajiSeoQuickDealersRoute
   '/kalkaji/seo/quick/manufacturers': typeof KalkajiSeoQuickManufacturersRoute
   '/kalkaji/seo/quick/products': typeof KalkajiSeoQuickProductsRoute
+  '/kalkaji/partner/products/request': typeof KalkajiPartnerProductsRequestRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug': typeof BrandDealerCategorySlugBrandSlugIndexRoute
   '/brand-products/$categorySlug/$brandSlug': typeof BrandProductsCategorySlugBrandSlugIndexRoute
+  '/kalkaji/partner/products': typeof KalkajiPartnerProductsIndexRoute
   '/shop/$categorySlug/$brandSlug': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -882,9 +892,8 @@ export interface FileRoutesById {
   '/kalkaji/products/priority': typeof KalkajiProductsPriorityRoute
   '/kalkaji/seo/pages': typeof KalkajiSeoPagesRoute
   '/kalkaji_/partner/engineers': typeof KalkajiPartnerEngineersRoute
-  '/kalkaji_/partner/orders': typeof KalkajiPartnerOrdersRoute
-  '/kalkaji_/partner/products': typeof KalkajiPartnerProductsRoute
   '/kalkaji_/partner/inventory': typeof KalkajiPartnerInventoryRoute
+  '/kalkaji_/partner/orders': typeof KalkajiPartnerOrdersRoute
   '/kalkaji_/partner_/login': typeof KalkajiPartnerLoginRoute
   '/manufacturers/$categorySlug/$slug': typeof ManufacturersCategorySlugSlugRouteWithChildren
   '/brands/$categorySlug/': typeof BrandsCategorySlugIndexRoute
@@ -910,11 +919,13 @@ export interface FileRoutesById {
   '/kalkaji/seo/quick/dealers': typeof KalkajiSeoQuickDealersRoute
   '/kalkaji/seo/quick/manufacturers': typeof KalkajiSeoQuickManufacturersRoute
   '/kalkaji/seo/quick/products': typeof KalkajiSeoQuickProductsRoute
+  '/kalkaji_/partner/products/request': typeof KalkajiPartnerProductsRequestRoute
   '/manufacturers/$categorySlug/$slug/$citySlug': typeof ManufacturersCategorySlugSlugCitySlugRoute
   '/shop/$categorySlug/$brandSlug/$citySlug': typeof ShopCategorySlugBrandSlugCitySlugRoute
   '/shop/c/$categorySlug/$citySlug': typeof ShopCCategorySlugCitySlugRoute
   '/brand-dealer/$categorySlug/$brandSlug/': typeof BrandDealerCategorySlugBrandSlugIndexRoute
   '/brand-products/$categorySlug/$brandSlug/': typeof BrandProductsCategorySlugBrandSlugIndexRoute
+  '/kalkaji_/partner/products/': typeof KalkajiPartnerProductsIndexRoute
   '/shop/$categorySlug/$brandSlug/': typeof ShopCategorySlugBrandSlugIndexRoute
   '/shop/c/$categorySlug/': typeof ShopCCategorySlugIndexRoute
   '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$': typeof ManufacturerProductsCategorySlugMakeSlugModelSlugSplatRoute
@@ -984,8 +995,8 @@ export interface FileRouteTypes {
     | '/kalkaji/products/priority'
     | '/kalkaji/seo/pages'
     | '/kalkaji/partner/engineers'
+    | '/kalkaji/partner/inventory'
     | '/kalkaji/partner/orders'
-    | '/kalkaji/partner/products'
     | '/kalkaji/partner/login'
     | '/manufacturers/$categorySlug/$slug'
     | '/brands/$categorySlug/'
@@ -1011,11 +1022,13 @@ export interface FileRouteTypes {
     | '/kalkaji/seo/quick/dealers'
     | '/kalkaji/seo/quick/manufacturers'
     | '/kalkaji/seo/quick/products'
+    | '/kalkaji/partner/products/request'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug/'
     | '/brand-products/$categorySlug/$brandSlug/'
+    | '/kalkaji/partner/products/'
     | '/shop/$categorySlug/$brandSlug/'
     | '/shop/c/$categorySlug/'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -1081,8 +1094,8 @@ export interface FileRouteTypes {
     | '/kalkaji/products/priority'
     | '/kalkaji/seo/pages'
     | '/kalkaji/partner/engineers'
+    | '/kalkaji/partner/inventory'
     | '/kalkaji/partner/orders'
-    | '/kalkaji/partner/products'
     | '/kalkaji/partner/login'
     | '/manufacturers/$categorySlug/$slug'
     | '/brands/$categorySlug'
@@ -1108,11 +1121,13 @@ export interface FileRouteTypes {
     | '/kalkaji/seo/quick/dealers'
     | '/kalkaji/seo/quick/manufacturers'
     | '/kalkaji/seo/quick/products'
+    | '/kalkaji/partner/products/request'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug'
     | '/brand-products/$categorySlug/$brandSlug'
+    | '/kalkaji/partner/products'
     | '/shop/$categorySlug/$brandSlug'
     | '/shop/c/$categorySlug'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -1181,8 +1196,8 @@ export interface FileRouteTypes {
     | '/kalkaji/products/priority'
     | '/kalkaji/seo/pages'
     | '/kalkaji_/partner/engineers'
+    | '/kalkaji_/partner/inventory'
     | '/kalkaji_/partner/orders'
-    | '/kalkaji_/partner/products'
     | '/kalkaji_/partner_/login'
     | '/manufacturers/$categorySlug/$slug'
     | '/brands/$categorySlug/'
@@ -1208,11 +1223,13 @@ export interface FileRouteTypes {
     | '/kalkaji/seo/quick/dealers'
     | '/kalkaji/seo/quick/manufacturers'
     | '/kalkaji/seo/quick/products'
+    | '/kalkaji_/partner/products/request'
     | '/manufacturers/$categorySlug/$slug/$citySlug'
     | '/shop/$categorySlug/$brandSlug/$citySlug'
     | '/shop/c/$categorySlug/$citySlug'
     | '/brand-dealer/$categorySlug/$brandSlug/'
     | '/brand-products/$categorySlug/$brandSlug/'
+    | '/kalkaji_/partner/products/'
     | '/shop/$categorySlug/$brandSlug/'
     | '/shop/c/$categorySlug/'
     | '/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$'
@@ -1769,25 +1786,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KalkajiPartnerEngineersRouteImport
       parentRoute: typeof KalkajiPartnerRoute
     }
-    '/kalkaji_/partner/orders': {
-      id: '/kalkaji_/partner/orders'
-      path: '/orders'
-      fullPath: '/kalkaji/partner/orders'
-      preLoaderRoute: typeof KalkajiPartnerOrdersRouteImport
-      parentRoute: typeof KalkajiPartnerRoute
-    }
-    '/kalkaji_/partner/products': {
-      id: '/kalkaji_/partner/products'
-      path: '/products'
-      fullPath: '/kalkaji/partner/products'
-      preLoaderRoute: typeof KalkajiPartnerProductsRouteImport
-      parentRoute: typeof KalkajiPartnerRoute
-    }
     '/kalkaji_/partner/inventory': {
       id: '/kalkaji_/partner/inventory'
       path: '/inventory'
       fullPath: '/kalkaji/partner/inventory'
       preLoaderRoute: typeof KalkajiPartnerInventoryRouteImport
+      parentRoute: typeof KalkajiPartnerRoute
+    }
+    '/kalkaji_/partner/orders': {
+      id: '/kalkaji_/partner/orders'
+      path: '/orders'
+      fullPath: '/kalkaji/partner/orders'
+      preLoaderRoute: typeof KalkajiPartnerOrdersRouteImport
       parentRoute: typeof KalkajiPartnerRoute
     }
     '/kalkaji_/partner_/login': {
@@ -1915,6 +1925,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/kalkaji/seo/quick/products'
       preLoaderRoute: typeof KalkajiSeoQuickProductsRouteImport
       parentRoute: typeof KalkajiRoute
+    }
+    '/kalkaji_/partner/products/': {
+      id: '/kalkaji_/partner/products/'
+      path: '/products'
+      fullPath: '/kalkaji/partner/products/'
+      preLoaderRoute: typeof KalkajiPartnerProductsIndexRouteImport
+      parentRoute: typeof KalkajiPartnerRoute
+    }
+    '/kalkaji_/partner/products/request': {
+      id: '/kalkaji_/partner/products/request'
+      path: '/products/request'
+      fullPath: '/kalkaji/partner/products/request'
+      preLoaderRoute: typeof KalkajiPartnerProductsRequestRouteImport
+      parentRoute: typeof KalkajiPartnerRoute
     }
     '/manufacturers/$categorySlug/$slug/$citySlug': {
       id: '/manufacturers/$categorySlug/$slug/$citySlug'
@@ -2082,18 +2106,20 @@ const KalkajiRouteWithChildren =
 
 interface KalkajiPartnerRouteChildren {
   KalkajiPartnerEngineersRoute: typeof KalkajiPartnerEngineersRoute
-  KalkajiPartnerOrdersRoute: typeof KalkajiPartnerOrdersRoute
-  KalkajiPartnerProductsRoute: typeof KalkajiPartnerProductsRoute
   KalkajiPartnerInventoryRoute: typeof KalkajiPartnerInventoryRoute
+  KalkajiPartnerOrdersRoute: typeof KalkajiPartnerOrdersRoute
   KalkajiPartnerIndexRoute: typeof KalkajiPartnerIndexRoute
+  KalkajiPartnerProductsRequestRoute: typeof KalkajiPartnerProductsRequestRoute
+  KalkajiPartnerProductsIndexRoute: typeof KalkajiPartnerProductsIndexRoute
 }
 
 const KalkajiPartnerRouteChildren: KalkajiPartnerRouteChildren = {
   KalkajiPartnerEngineersRoute: KalkajiPartnerEngineersRoute,
-  KalkajiPartnerOrdersRoute: KalkajiPartnerOrdersRoute,
-  KalkajiPartnerProductsRoute: KalkajiPartnerProductsRoute,
   KalkajiPartnerInventoryRoute: KalkajiPartnerInventoryRoute,
+  KalkajiPartnerOrdersRoute: KalkajiPartnerOrdersRoute,
   KalkajiPartnerIndexRoute: KalkajiPartnerIndexRoute,
+  KalkajiPartnerProductsRequestRoute: KalkajiPartnerProductsRequestRoute,
+  KalkajiPartnerProductsIndexRoute: KalkajiPartnerProductsIndexRoute,
 }
 
 const KalkajiPartnerRouteWithChildren = KalkajiPartnerRoute._addFileChildren(
@@ -2169,13 +2195,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

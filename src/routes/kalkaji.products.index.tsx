@@ -1,17 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { adminProductListQuery } from "@/queries";
+import { adminProductListQuery, adminProductDetailQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, CheckCircle, Clock, Search, Tag, X, Check, ArrowRight, Building2, MapPin, AlertCircle } from "lucide-react";
+import { Trash2, Plus, Edit, CheckCircle, Clock, Search, Tag, X, Check, ArrowRight, Building2, MapPin, AlertCircle, Eye, Package, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { normalizeImageUrl } from "@/lib/image/cdn";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,12 +81,32 @@ function AdminProducts() {
     onError: () => toast.error("Failed to delete product"),
   });
 
+  const navigate = useNavigate();
+  const [reviewProposalId, setReviewProposalId] = useState<string | null>(null);
+  const { data: reviewProposalDetail, isLoading: isLoadingProposalDetail } = useQuery({
+    ...adminProductDetailQuery(reviewProposalId || ""),
+    enabled: !!reviewProposalId,
+  });
+
   const approveMutation = useMutation({
     mutationFn: (id: string) => adminService.approveProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      setReviewProposalId(null);
       toast.success("Product approved and activated!");
+    },
+    onError: () => toast.error("Failed to approve product"),
+  });
+
+  const approveAndEditMutation = useMutation({
+    mutationFn: (id: string) => adminService.approveProduct(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      setReviewProposalId(null);
+      toast.success("Product approved! Opening full editor...");
+      navigate({ to: "/kalkaji/products/$productId/edit" as any, params: { productId: id } as any });
     },
     onError: () => toast.error("Failed to approve product"),
   });
@@ -329,8 +350,34 @@ function AdminProducts() {
                   pendingProductProposals.map((product) => (
                     <TableRow key={product.productId} className="hover:bg-muted/30">
                       <TableCell>
-                        <div className="font-semibold text-sm">{product.productName}</div>
-                        {product.capacity && <div className="text-xs text-muted-foreground">Capacity: {product.capacity}</div>}
+                        <div className="flex items-center gap-3">
+                          {product.productImage ? (
+                            <img
+                              src={normalizeImageUrl(product.productImage)}
+                              alt={product.productName}
+                              className="h-11 w-11 rounded-md object-contain border bg-white p-0.5 shrink-0"
+                            />
+                          ) : (
+                            <div className="h-11 w-11 rounded-md bg-muted border flex items-center justify-center shrink-0">
+                              <Package className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-semibold text-sm">{product.productName}</div>
+                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                              {product.capacity && (
+                                <Badge variant="secondary" className="text-[10px] py-0 px-1.5">
+                                  {product.capacity}
+                                </Badge>
+                              )}
+                              {product.warranty && (
+                                <span className="text-[11px] text-emerald-700 font-medium">
+                                  {product.warranty}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm font-medium">{product.productCategory || "Uncategorized"}</div>
@@ -341,11 +388,29 @@ function AdminProducts() {
                           {product.partnerBusinessName || "Partner"}
                         </span>
                       </TableCell>
-                      <TableCell className="font-bold text-sm">
-                        ₹{product.productPrice.toLocaleString()}
+                      <TableCell className="text-sm">
+                        <div className="font-bold">₹{product.productPrice.toLocaleString()}</div>
+                        {product.originalPrice && product.originalPrice > product.productPrice ? (
+                          <div className="text-[11px] text-muted-foreground line-through">
+                            MRP ₹{product.originalPrice.toLocaleString()}
+                          </div>
+                        ) : null}
+                        {product.exchangeDiscount ? (
+                          <div className="text-[11px] text-emerald-700 font-medium">
+                            -₹{product.exchangeDiscount} Exch.
+                          </div>
+                        ) : null}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-xs gap-1"
+                            onClick={() => setReviewProposalId(product.productId)}
+                          >
+                            <Eye className="h-3.5 w-3.5" /> Review
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -353,7 +418,7 @@ function AdminProducts() {
                             disabled={approveMutation.isPending}
                             onClick={() => approveMutation.mutate(product.productId)}
                           >
-                            <CheckCircle className="h-3.5 w-3.5" /> Approve & Activate
+                            <CheckCircle className="h-3.5 w-3.5" /> Approve
                           </Button>
                           <Button
                             size="sm"
@@ -638,6 +703,187 @@ function AdminProducts() {
       )}
         </>
       )}
+
+      {/* Partner Proposal Review Dialog */}
+      <Dialog open={!!reviewProposalId} onOpenChange={(open) => !open && setReviewProposalId(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-amber-600" />
+              Partner Product Proposal Review
+            </DialogTitle>
+            <DialogDescription>
+              Inspect submitted details, photos & pricing before publishing to the storefront.
+            </DialogDescription>
+          </DialogHeader>
+
+          {isLoadingProposalDetail ? (
+            <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground text-sm">
+              <Spinner size="md" /> Loading proposal details...
+            </div>
+          ) : reviewProposalDetail ? (
+            <div className="space-y-5 py-2">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="w-full sm:w-40 h-40 rounded-xl border bg-white flex items-center justify-center p-2 shrink-0">
+                  {reviewProposalDetail.productImage ? (
+                    <img
+                      src={normalizeImageUrl(reviewProposalDetail.productImage)}
+                      alt={reviewProposalDetail.productName}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <Package className="h-10 w-10 text-muted-foreground/40" />
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge variant="outline" className="bg-amber-500/10 text-amber-700 border-amber-500/30 text-xs">
+                      Proposed by: {reviewProposalDetail.partnerBusinessName || "Partner"}
+                    </Badge>
+                    {(reviewProposalDetail.categoryName || reviewProposalDetail.categories?.[0]?.categoryName) && (
+                      <Badge variant="secondary" className="text-xs">
+                        {reviewProposalDetail.categoryName || reviewProposalDetail.categories?.[0]?.categoryName}
+                      </Badge>
+                    )}
+                    {reviewProposalDetail.brandName && (
+                      <Badge variant="outline" className="text-xs">
+                        {reviewProposalDetail.brandName}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <h3 className="text-lg font-bold leading-snug">{reviewProposalDetail.productName}</h3>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    <div className="p-2 rounded-lg bg-muted/40 border">
+                      <span className="text-[10px] text-muted-foreground block">Selling Price</span>
+                      <span className="font-bold text-sm">₹{reviewProposalDetail.productPrice.toLocaleString("en-IN")}</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/40 border">
+                      <span className="text-[10px] text-muted-foreground block">MRP</span>
+                      <span className="font-semibold text-sm">
+                        {reviewProposalDetail.originalPrice ? `₹${reviewProposalDetail.originalPrice.toLocaleString("en-IN")}` : "—"}
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/40 border">
+                      <span className="text-[10px] text-muted-foreground block">Scrap Discount</span>
+                      <span className="font-semibold text-sm text-emerald-700">
+                        {reviewProposalDetail.exchangeDiscount ? `₹${reviewProposalDetail.exchangeDiscount}` : "N/A"}
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/40 border">
+                      <span className="text-[10px] text-muted-foreground block">Initial Stock</span>
+                      <span className="font-semibold text-sm">{reviewProposalDetail.productStock ?? 0} units</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3 text-xs pt-1">
+                    {reviewProposalDetail.capacity && (
+                      <span>
+                        <strong className="text-muted-foreground">Capacity / R/L:</strong> {reviewProposalDetail.capacity}
+                      </span>
+                    )}
+                    {((reviewProposalDetail as any).warranty ||
+                      pendingProductProposals.find((p) => p.productId === reviewProposalId)?.warranty) && (
+                      <span className="flex items-center gap-1 text-emerald-700 font-medium">
+                        <ShieldCheck className="h-3.5 w-3.5" />{" "}
+                        {(reviewProposalDetail as any).warranty ||
+                          pendingProductProposals.find((p) => p.productId === reviewProposalId)?.warranty}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {reviewProposalDetail.additionalImages && reviewProposalDetail.additionalImages.length > 0 && (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-semibold text-muted-foreground">Additional Photos</span>
+                  <div className="flex gap-2 flex-wrap">
+                    {reviewProposalDetail.additionalImages.map((imgUrl, idx) => (
+                      <img
+                        key={idx}
+                        src={normalizeImageUrl(imgUrl)}
+                        alt={`Extra ${idx + 1}`}
+                        className="h-16 w-16 rounded-lg border bg-white object-contain p-1"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(reviewProposalDetail as any).proposalReason && (
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-1">
+                  <span className="text-xs font-bold text-amber-800 dark:text-amber-300">Partner&apos;s Note / Reason</span>
+                  <p className="text-xs">{(reviewProposalDetail as any).proposalReason}</p>
+                </div>
+              )}
+
+              {reviewProposalDetail.highlights && (
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-muted-foreground">Highlights</span>
+                  <div className="text-xs bg-muted/30 border rounded-lg p-3 whitespace-pre-line">
+                    {reviewProposalDetail.highlights}
+                  </div>
+                </div>
+              )}
+
+              {reviewProposalDetail.productDescription && (
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-muted-foreground">Description</span>
+                  <div className="text-xs bg-muted/30 border rounded-lg p-3 whitespace-pre-line max-h-36 overflow-y-auto">
+                    {reviewProposalDetail.productDescription.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
+                  </div>
+                </div>
+              )}
+
+              {reviewProposalDetail.searchKeywords && (
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-muted-foreground">Search Keywords</span>
+                  <p className="text-xs font-mono bg-muted/40 p-2 rounded border">{reviewProposalDetail.searchKeywords}</p>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          <DialogFooter className="gap-2 sm:gap-2 flex-wrap">
+            {reviewProposalId && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-destructive hover:bg-destructive/10 mr-auto"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => {
+                    if (confirm("Reject and delete this product proposal?")) {
+                      deleteMutation.mutate(reviewProposalId);
+                      setReviewProposalId(null);
+                    }
+                  }}
+                >
+                  Reject Proposal
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={approveAndEditMutation.isPending || approveMutation.isPending}
+                  onClick={() => approveAndEditMutation.mutate(reviewProposalId)}
+                  className="gap-1.5"
+                >
+                  <Edit className="h-3.5 w-3.5" />
+                  Approve & Open Editor
+                </Button>
+                <Button
+                  disabled={approveMutation.isPending || approveAndEditMutation.isPending}
+                  onClick={() => approveMutation.mutate(reviewProposalId)}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+                >
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Approve & Activate
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

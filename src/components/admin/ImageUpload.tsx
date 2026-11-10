@@ -16,6 +16,8 @@ export interface ImageUploadProps {
   hint?: string;
   className?: string;
   error?: string;
+  /** Optional custom uploader; defaults to adminService.uploadImage. */
+  uploadFn?: (file: File, folder: string) => Promise<any>;
 }
 
 export function ImageUpload({
@@ -26,6 +28,7 @@ export function ImageUpload({
   hint,
   className,
   error,
+  uploadFn,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -51,7 +54,7 @@ export function ImageUpload({
 
     setIsUploading(true);
     try {
-      const response = await adminService.uploadImage(file, folder);
+      const response = await (uploadFn ? uploadFn(file, folder) : adminService.uploadImage(file, folder));
       console.log("[ImageUpload] server response:", response);
 
       // Support all common server response formats

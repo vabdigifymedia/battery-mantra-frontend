@@ -1,5 +1,10 @@
 import { apiFetch } from "@/lib/api/client";
-import type { OrderResponse, ProductDetailResponse, CityPricingDto } from "@/types/dto";
+import type {
+  OrderResponse,
+  ProductDetailResponse,
+  CityPricingDto,
+  CategorySpecTemplateResponse,
+} from "@/types/dto";
 import type { EngineerProfile, CreateEngineerRequest } from "@/services/engineer.service";
 
 export const partnerDashboardService = {
@@ -47,6 +52,45 @@ export const partnerDashboardService = {
       method: "POST",
       body: data,
     }),
+
+  uploadProductImage: async (file: File, folder = "products") => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      return await apiFetch<{ url: string; publicId?: string }>("/api/partner/upload", {
+        method: "POST",
+        query: { folder },
+        body: formData,
+        multipart: true,
+      });
+    } catch {
+      // Fallback to shared upload endpoint if Partner role is granted access
+      return await apiFetch<{ url: string; publicId?: string }>("/api/admin/upload", {
+        method: "POST",
+        query: { folder },
+        body: formData,
+        multipart: true,
+      });
+    }
+  },
+
+  getCategorySpecTemplate: async (categoryId: string, signal?: AbortSignal) => {
+    try {
+      return await apiFetch<CategorySpecTemplateResponse>(
+        `/api/specs/template/category/${encodeURIComponent(categoryId)}`,
+        { signal }
+      );
+    } catch {
+      try {
+        return await apiFetch<CategorySpecTemplateResponse>(
+          `/api/admin/specs/template/category/${encodeURIComponent(categoryId)}`,
+          { signal }
+        );
+      } catch {
+        return null;
+      }
+    }
+  },
 
   updateCityPricing: (productId: string, data: CityPricingDto) =>
     apiFetch<ProductDetailResponse>(`/api/partner/products/${productId}/city-pricing`, {
