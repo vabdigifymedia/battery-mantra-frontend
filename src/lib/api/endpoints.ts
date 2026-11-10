@@ -196,9 +196,11 @@ export const endpoints = {
       updateStatus: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}/status`,
       delete: (id: string) => `/api/admin/blogs/${encodeURIComponent(id)}`,
     },
+    subAdmins: "/api/admin/sub-admins",
     security: {
       gateConfig: "/api/admin/security/gate-config",
       gatePin: "/api/admin/security/gate-pin",
+      userGatePin: (userId: string) => `/api/admin/security/users/${encodeURIComponent(userId)}/gate-pin`,
     },
   },
   blogs: {

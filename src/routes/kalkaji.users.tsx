@@ -7,9 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, UserPlus } from "lucide-react";
 import { AdminEditCustomerModal } from "@/components/admin/AdminEditCustomerModal";
 import { AdminDeleteUserModal } from "@/components/admin/AdminDeleteUserModal";
+import { CreateSubAdminModal } from "@/components/admin/CreateSubAdminModal";
+import { useAuth } from "@/providers/AuthProvider";
+import { ROLES } from "@/constants/roles";
 import type { UserResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/kalkaji/users")({
@@ -17,10 +20,13 @@ export const Route = createFileRoute("/kalkaji/users")({
 });
 
 function AdminUsers() {
+  const { hasRole } = useAuth();
+  const isSuperAdmin = hasRole(ROLES.ADMIN);
   const { data: users, isLoading } = useQuery(adminUsersQuery());
   const [activeTab, setActiveTab] = useState("ALL");
   const [editingCustomer, setEditingCustomer] = useState<UserResponse | null>(null);
   const [deletingCustomer, setDeletingCustomer] = useState<UserResponse | null>(null);
+  const [createSubAdminOpen, setCreateSubAdminOpen] = useState(false);
   
   const filteredUsers = users?.filter((user: any) => activeTab === "ALL" || user.role === activeTab) || [];
 
@@ -32,15 +38,24 @@ function AdminUsers() {
           <p className="text-muted-foreground">Manage your store's users, customer profiles, and roles.</p>
         </div>
         
-        <Tabs defaultValue="ALL" value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-          <TabsList className="flex overflow-x-auto w-full sm:w-auto no-scrollbar">
-            <TabsTrigger value="ALL" className="flex-1 sm:flex-none">All</TabsTrigger>
-            <TabsTrigger value="ADMIN" className="flex-1 sm:flex-none">Admin</TabsTrigger>
-            <TabsTrigger value="PARTNER" className="flex-1 sm:flex-none">Partner</TabsTrigger>
-            <TabsTrigger value="ENGINEER" className="flex-1 sm:flex-none">Engineer</TabsTrigger>
-            <TabsTrigger value="USER" className="flex-1 sm:flex-none">Customer</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          {isSuperAdmin && (
+            <Button size="sm" onClick={() => setCreateSubAdminOpen(true)} className="gap-1.5 shrink-0">
+              <UserPlus className="h-4 w-4" />
+              Create Sub-Admin
+            </Button>
+          )}
+          <Tabs defaultValue="ALL" value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+            <TabsList className="flex overflow-x-auto w-full sm:w-auto no-scrollbar">
+              <TabsTrigger value="ALL" className="flex-1 sm:flex-none">All</TabsTrigger>
+              <TabsTrigger value="ADMIN" className="flex-1 sm:flex-none">Admin</TabsTrigger>
+              <TabsTrigger value="SUB_ADMIN" className="flex-1 sm:flex-none">Sub-Admin</TabsTrigger>
+              <TabsTrigger value="PARTNER" className="flex-1 sm:flex-none">Partner</TabsTrigger>
+              <TabsTrigger value="ENGINEER" className="flex-1 sm:flex-none">Engineer</TabsTrigger>
+              <TabsTrigger value="USER" className="flex-1 sm:flex-none">Customer</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       {/* Desktop Table */}
@@ -175,6 +190,14 @@ function AdminUsers() {
           user={deletingCustomer}
           isOpen={!!deletingCustomer}
           onClose={() => setDeletingCustomer(null)}
+        />
+      )}
+
+      {/* Create Sub-Admin Modal (Super Admin Only) */}
+      {isSuperAdmin && (
+        <CreateSubAdminModal
+          open={createSubAdminOpen}
+          onOpenChange={setCreateSubAdminOpen}
         />
       )}
     </div>

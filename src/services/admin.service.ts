@@ -99,15 +99,21 @@ export interface AdminCreateOrderRequest {
 
 export type GatePinRole = "ADMIN" | "SUB_ADMIN";
 
-export interface GatePinRoleStatus {
-  targetRole: GatePinRole;
-  configured: boolean;
-  updatedAt?: string | null;
+export interface GateConfigUserItem {
+  userId: string;
+  username: string;
+  email: string;
+  role: GatePinRole | string;
+  isActive: boolean;
+  personalPinConfigured: boolean;
+  gatePinUpdatedAt?: string | null;
 }
 
-export interface GateConfigResponse {
-  admin: GatePinRoleStatus;
-  subAdmin: GatePinRoleStatus;
+export interface AdminGateConfigResponse {
+  adminPinConfigured: boolean;
+  subAdminPinConfigured: boolean;
+  updatedAt?: string | null;
+  users: GateConfigUserItem[];
 }
 
 export interface UpdateGatePinRequest {
@@ -116,67 +122,17 @@ export interface UpdateGatePinRequest {
   currentPassword: string;
 }
 
-function normalizeGateRoleEntry(raw: any, targetRole: GatePinRole): GatePinRoleStatus {
-  if (!raw) return { targetRole, configured: false, updatedAt: null };
+export interface UpdateUserGatePinRequest {
+  newPin: string;
+  currentPassword: string;
+}
 
-  // Support array of role entries (top-level or wrapped in configs/roles/items)
-  const list = Array.isArray(raw)
-    ? raw
-    : Array.isArray(raw?.configs)
-    ? raw.configs
-    : Array.isArray(raw?.roles)
-    ? raw.roles
-    : Array.isArray(raw?.items)
-    ? raw.items
-    : null;
-
-  if (list) {
-    const match = list.find((item: any) => {
-      const r = String(item?.targetRole ?? item?.role ?? "").replace(/^ROLE_/, "").toUpperCase();
-      return r === targetRole;
-    });
-    return normalizeGateRoleEntry(match ?? null, targetRole);
-  }
-
-  // Support keyed object shapes: { ADMIN, SUB_ADMIN } or { admin, subAdmin } or nested configs/roles
-  const nested =
-    raw[targetRole] ??
-    raw[targetRole === "ADMIN" ? "admin" : "subAdmin"] ??
-    raw[targetRole === "ADMIN" ? "superAdmin" : "sub_admin"] ??
-    raw?.configs?.[targetRole] ??
-    raw?.roles?.[targetRole];
-
-  if (nested && typeof nested === "object") {
-    return {
-      targetRole,
-      configured: Boolean(
-        nested.configured ?? nested.isConfigured ?? (String(nested.status ?? "").toUpperCase() === "CONFIGURED")
-      ),
-      updatedAt: nested.updatedAt ?? nested.lastUpdatedAt ?? null,
-    };
-  }
-
-  // Support flat entry objects or flat prefix keys (adminConfigured / subAdminConfigured)
-  const isAdmin = targetRole === "ADMIN";
-  const prefixKey = isAdmin ? "admin" : "subAdmin";
-  if (`${prefixKey}Configured` in raw || `${prefixKey}Status` in raw) {
-    return {
-      targetRole,
-      configured: Boolean(
-        raw[`${prefixKey}Configured`] ??
-          (String(raw[`${prefixKey}Status`] ?? "").toUpperCase() === "CONFIGURED")
-      ),
-      updatedAt: raw[`${prefixKey}UpdatedAt`] ?? null,
-    };
-  }
-
-  return {
-    targetRole,
-    configured: Boolean(
-      raw.configured ?? raw.isConfigured ?? (String(raw.status ?? "").toUpperCase() === "CONFIGURED")
-    ),
-    updatedAt: raw.updatedAt ?? raw.lastUpdatedAt ?? null,
-  };
+export interface CreateSubAdminRequest {
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber?: string;
+  gatePin?: string;
 }
 
 export const adminService = {
@@ -434,16 +390,21 @@ export const adminService = {
   getCategorySpecTemplate: (categoryId: string) =>
     apiFetch<CategorySpecTemplateResponse>(`/api/admin/specs/template/category/${categoryId}`, { method: "GET" }),
 
-  // Security / Mobile App Gate PINs (ROLE_ADMIN only)
-  getGateConfig: async (): Promise<GateConfigResponse> => {
-    const raw = await apiFetch<any>(endpoints.admin.security.gateConfig, { method: "GET" });
-    return {
-      admin: normalizeGateRoleEntry(raw, "ADMIN"),
-      subAdmin: normalizeGateRoleEntry(raw, "SUB_ADMIN"),
-    };
-  },
+  // Sub-Admin Creation & Security / Mobile App Gate PINs (ROLE_ADMIN only)
+  createSubAdmin: (body: CreateSubAdminRequest) =>
+    apiFetch<UserResponse>(endpoints.admin.subAdmins, {
+      method: "POST",
+      body,
+    }),
+  getGateConfig: () =>
+    apiFetch<AdminGateConfigResponse>(endpoints.admin.security.gateConfig, { method: "GET" }),
+  updateUserGatePin: (userId: string, body: UpdateUserGatePinRequest) =>
+    apiFetch<AdminGateConfigResponse>(endpoints.admin.security.userGatePin(userId), {
+      method: "PUT",
+      body,
+    }),
   updateGatePin: (body: UpdateGatePinRequest) =>
-    apiFetch<{ message?: string }>(endpoints.admin.security.gatePin, {
+    apiFetch<AdminGateConfigResponse>(endpoints.admin.security.gatePin, {
       method: "PUT",
       body,
     }),
