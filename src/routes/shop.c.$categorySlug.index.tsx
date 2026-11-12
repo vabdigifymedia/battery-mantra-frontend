@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
 import {
@@ -7,28 +7,48 @@ import {
   categoriesQuery,
 } from "@/queries";
 import { useMemo } from "react";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findCategoryBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory } from "@/lib/utils";
 import { FullPageLoader } from "@/components/feedback/FullPageLoader";
 
 export const Route = createFileRoute("/shop/c/$categorySlug/")({
-  loader: async ({ context }) => {
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
-    void context.queryClient.prefetchQuery(brandsQuery());
-    void context.queryClient.prefetchQuery(categoriesQuery());
-    void context.queryClient.prefetchQuery(seoTemplatesQuery());
+  loader: async ({ context, params }) => {
+    assertValidRouteSlugs(params.categorySlug);
 
-    const [categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(categoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+    void context.queryClient.prefetchQuery(brandsQuery());
+
+    const [categories, rootCategories, templates] = await Promise.all([
+      context.queryClient.ensureQueryData(categoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(rootCategoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
-    return { categories, templates };
+
+    const allCategories = [...(categories || []), ...(rootCategories || [])];
+    const category = findCategoryBySlug(allCategories, params.categorySlug);
+    if (allCategories.length > 0 && !category) {
+      throw notFound();
+    }
+
+    return { categories, rootCategories, templates };
   },
   head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.categorySlug) || !loaderData) {
+      return notFoundHead();
+    }
+
     const rawCategoryName = params.categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const category = loaderData?.categories?.find((c: any) => (c.categorySlug || toSlug(c.categoryName)) === params.categorySlug || toSlug(c.categoryName) === params.categorySlug);
+    const category = findCategoryBySlug(
+      [...(loaderData?.categories || []), ...(loaderData?.rootCategories || [])],
+      params.categorySlug
+    );
     const categoryName = toSingularCategory(category?.categoryName || rawCategoryName);
 
     const seo = resolveTemplateSeo(

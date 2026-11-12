@@ -8,18 +8,21 @@ import {
   brandsQuery,
   pageSeoQuery,
 } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import { buildPageHead, assertValidRouteSlugs, hasAnyInvalidRouteSlug, notFoundHead } from "@/lib/seo";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 
 export const Route = createFileRoute("/products/$citySlug")({
   beforeLoad: ({ params, search }) => {
+    assertValidRouteSlugs(params.citySlug);
+
     if (
       search?.category &&
       typeof search.category === "string" &&
       !search.category.includes(",") &&
       search?.brand &&
       typeof search.brand === "string" &&
-      !search.brand.includes(",")
+      !search.brand.includes(",") &&
+      !hasAnyInvalidRouteSlug(search.category.trim(), search.brand.trim())
     ) {
       const { category, brand, ...restSearch } = search;
       throw redirect({

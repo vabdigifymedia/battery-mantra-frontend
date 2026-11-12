@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { rootCategoriesQuery, manufacturersListQuery, brandsQuery } from "@/queries";
@@ -9,30 +9,47 @@ import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { applySeoTemplate, toSingularCategory } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findCategoryBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
 
 export const Route = createFileRoute("/brands/$categorySlug/")({
-  loader: async ({ context }) => {
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+  loader: async ({ context, params }) => {
+    assertValidRouteSlugs(params.categorySlug);
+
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
 
     const [categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(rootCategoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+      context.queryClient.ensureQueryData(rootCategoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
+
+    const category = findCategoryBySlug(categories, params.categorySlug);
+    if (categories.length > 0 && !category) {
+      throw notFound();
+    }
+
     return { categories, templates };
   },
   head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.categorySlug) || !loaderData) {
+      return notFoundHead();
+    }
+
     const rawCategoryName = params.categorySlug
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const category = findCategoryBySlug(loaderData?.categories, params.categorySlug);
     const categoryName = toSingularCategory(category?.categoryName || rawCategoryName) || "Battery";
 
     const seo = resolveTemplateSeo(

@@ -3,6 +3,7 @@ import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocationNavigation } from "@/hooks/useLocationNavigation";
+import { hasAnyInvalidRouteSlug } from "@/lib/seo";
 import { toSlug } from "@/lib/utils";
 import { toast } from "sonner";
 import { Link, useRouter } from "@tanstack/react-router";
@@ -49,6 +50,11 @@ export function SeoCityLinks({ productName, baseUrl }: SeoCityLinksProps) {
   const effectiveBaseUrl = baseUrl || autoBaseUrl;
 
   if (!cities || cities.length === 0) return null;
+
+  const baseSegments = effectiveBaseUrl.split("/").filter(Boolean);
+  if (baseSegments.length > 0 && hasAnyInvalidRouteSlug(...baseSegments)) {
+    return null;
+  }
 
   return (
     <div className="mt-12 bg-white rounded-xl border p-4 shadow-sm">

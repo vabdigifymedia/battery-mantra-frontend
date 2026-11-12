@@ -36,7 +36,11 @@ import {
   vehiclesListQuery,
   brandContentQuery,
 } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import {
+  buildPageHead,
+  formatBrandCategoryPhrase,
+  hasAnyInvalidRouteSlug,
+} from "@/lib/seo";
 import type { ProductFilterParams } from "@/types/dto";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
 import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
@@ -430,11 +434,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
             </>
           )}
 
-          {!isDealerPage && brand && !vehicle && typeof search.brand === 'string' && !search.brand.includes(',') && (
+          {!isDealerPage && brand && !vehicle && typeof search.brand === 'string' && !search.brand.includes(',') && !hasAnyInvalidRouteSlug(search.brand) && (
             <div className="flex justify-center mt-12 mb-6">
               <a
                 href={
-                  typeof search.category === 'string' && !search.category.includes(',')
+                  typeof search.category === 'string' && !search.category.includes(',') && !hasAnyInvalidRouteSlug(search.category)
                     ? (city?.cityName ? `/brand-dealer/${search.category}/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}` : `/brand-dealer/${search.category}/${search.brand}`)
                     : (city?.cityName ? `/brand-dealer/${search.brand}/${city.cityName.toLowerCase().replace(/\s+/g, '-')}${search.productType ? `?productType=${search.productType}` : ''}` : `/brand-dealer/${search.brand}${search.productType ? `?productType=${search.productType}` : ''}`)
                 }
@@ -459,10 +463,10 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
               ) : (
                 <>
                   <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">
-                    Authorized {brand.brandName} {category?.categoryName || "Battery"} Dealer in {city?.cityName || "Delhi / NCR"}
+                    Authorized {formatBrandCategoryPhrase(brand.brandName, category?.categoryName)} Dealer in {city?.cityName || "Delhi / NCR"}
                   </h2>
                   <p className="mb-4">
-                    Looking for a certified and genuine <strong>{brand.brandName} {category?.categoryName || "Battery"}</strong> dealer in {city?.cityName || "Delhi / NCR"}?
+                    Looking for a certified and genuine <strong>{formatBrandCategoryPhrase(brand.brandName, category?.categoryName)}</strong> dealer in {city?.cityName || "Delhi / NCR"}?
                     Battery Mantra is an authorized partner delivering 100% original manufacturer products with official warranty cards, GST invoices, and express doorstep installation.
                   </p>
                   <h3 className="text-lg font-semibold text-foreground mb-2">

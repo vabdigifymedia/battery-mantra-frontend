@@ -1,34 +1,49 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { locationService } from "@/services/location.service";
 import { useLocationStore } from "@/store/useLocationStore";
 import { manufacturersListQuery, rootCategoriesQuery } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findCategoryBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { ManufacturerPage } from "@/components/manufacturers/ManufacturerPage";
 
 const toSlug = (text?: string) => text ? text.toLowerCase().replace(/\s+/g, '-') : '';
 
 export const Route = createFileRoute("/manufacturers/$categorySlug/$slug/$citySlug")({
-  loader: async ({ context }) => {
-    void context.queryClient.prefetchQuery(manufacturersListQuery());
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+  loader: async ({ context, params }) => {
+    assertValidRouteSlugs(params.categorySlug, params.slug, params.citySlug);
+
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
 
     const [manufacturers, categories, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(manufacturersListQuery()),
-      context.queryClient.ensureQueryData(rootCategoriesQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+      context.queryClient.ensureQueryData(manufacturersListQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(rootCategoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
+
+    if (categories.length > 0 && !findCategoryBySlug(categories, params.categorySlug)) {
+      throw notFound();
+    }
+
     return { manufacturers, categories, templates };
   },
   head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.categorySlug, params.slug, params.citySlug) || !loaderData) {
+      return notFoundHead();
+    }
+
     const makeName = params.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const categoryName = params.categorySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const cityName = params.citySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     
     const manufacturer = loaderData?.manufacturers?.find((m: any) => toSlug(m.name) === params.slug);
-    const category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === params.categorySlug);
+    const category = findCategoryBySlug(loaderData?.categories, params.categorySlug);
 
     const displayMfrName = manufacturer?.name || makeName;
     const displayCategoryName = category?.categoryName || categoryName;

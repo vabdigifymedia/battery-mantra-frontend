@@ -11,7 +11,12 @@ import {
   manufacturersListQuery,
   productFilterQuery,
 } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo, extractBatteryCapacity, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory } from "@/lib/utils";
@@ -146,6 +151,13 @@ export function findMatchingVehicle(
 
 export const Route = createFileRoute("/manufacturer-products/$categorySlug/$makeSlug/$modelSlug/$")({
   loader: async ({ context, params }) => {
+    const { makeSlug, modelSlug, categorySlug } = params as any;
+    const splat = ((params as any)._splat || "").replace(/\/+$/, "");
+    assertValidRouteSlugs(categorySlug, makeSlug, modelSlug);
+    if (splat) {
+      assertValidRouteSlugs(...splat.split("/").filter(Boolean));
+    }
+
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(brandsQuery());
 
@@ -155,7 +167,6 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
       context.queryClient.ensureQueryData(manufacturersListQuery()).catch(() => []),
     ]);
 
-    const { makeSlug, modelSlug, categorySlug } = params as any;
     const vehicle = findMatchingVehicle(vehicles, manufacturers, makeSlug, modelSlug, categorySlug);
     const manufacturer = manufacturers?.find((m: any) => toSlug(m.name) === makeSlug);
 
@@ -177,6 +188,14 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
   head: ({ params, loaderData }) => {
     const { templates, vehicle, manufacturer, initialProducts } = (loaderData as any) || {};
     const { categorySlug, makeSlug, modelSlug, _splat } = params as any;
+    const cleanSplat = (_splat || "").replace(/\/+$/, "");
+    if (
+      !loaderData ||
+      hasAnyInvalidRouteSlug(categorySlug, makeSlug, modelSlug) ||
+      (cleanSplat && hasAnyInvalidRouteSlug(...cleanSplat.split("/").filter(Boolean)))
+    ) {
+      return notFoundHead();
+    }
 
     const fallbackMake = makeSlug ? makeSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
     const rawModel = modelSlug && modelSlug.startsWith(makeSlug + '-') 

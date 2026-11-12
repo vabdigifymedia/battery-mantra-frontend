@@ -1,10 +1,16 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Layers, ChevronRight, Tag } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { rootCategoriesQuery, pageSeoQuery, brandsQuery } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findCategoryBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 import { GradientBlobCard } from "@/components/ui/gradient-blob-card";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
@@ -49,13 +55,23 @@ export const Route = createFileRoute("/shop-by-category/$")({
   loader: async ({ context, params }) => {
     const splat = (params as any)._splat || "";
     const [categorySlug, citySlug] = splat.split("/");
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
+    if (categorySlug && hasAnyInvalidRouteSlug(categorySlug)) {
+      throw notFound();
+    }
+    if (citySlug && hasAnyInvalidRouteSlug(citySlug)) {
+      throw notFound();
+    }
+
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
 
     const [categories, templates] = await Promise.all([
       context.queryClient.ensureQueryData(rootCategoriesQuery()).catch(() => []),
       context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
+
+    if (categorySlug && categories.length > 0 && !findCategoryBySlug(categories, categorySlug)) {
+      throw notFound();
+    }
 
     let pageSeo = null;
     try {
@@ -68,6 +84,9 @@ export const Route = createFileRoute("/shop-by-category/$")({
   },
   head: ({ loaderData }) => {
     const { categorySlug = "category", citySlug, categories = [], templates, pageSeo } = loaderData || {};
+    if (!loaderData || (categorySlug && hasAnyInvalidRouteSlug(categorySlug)) || (citySlug && hasAnyInvalidRouteSlug(citySlug))) {
+      return notFoundHead();
+    }
 
     let foundCategory: any = undefined;
     const findInTree = (cats: any[]): boolean => {

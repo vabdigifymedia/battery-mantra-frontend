@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
@@ -10,7 +10,13 @@ import {
   productFilterQuery,
 } from "@/queries";
 import { useActiveCityId } from "@/hooks/useCityProductPricing";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findBrandBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, getBrandSlug } from "@/lib/utils";
@@ -20,18 +26,22 @@ import { ChevronRight, Car, Zap, BatteryCharging, Tag, Sparkles } from "lucide-r
 
 export const Route = createFileRoute("/brand/$brandSlug")({
   loader: async ({ context, params }) => {
+    assertValidRouteSlugs(params.brandSlug);
+
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
-    void context.queryClient.prefetchQuery(brandsQuery());
     void context.queryClient.prefetchQuery(categoriesQuery());
-    void context.queryClient.prefetchQuery(seoTemplatesQuery());
     void context.queryClient.prefetchQuery(productListQuery());
     
     const [brands, templates] = await Promise.all([
-      context.queryClient.ensureQueryData(brandsQuery()),
-      context.queryClient.ensureQueryData(seoTemplatesQuery()),
+      context.queryClient.ensureQueryData(brandsQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
 
-    const brand = brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    const brand = findBrandBySlug(brands, params.brandSlug);
+    if (brands.length > 0 && !brand) {
+      throw notFound();
+    }
+
     let initialProducts: any[] = [];
     if (brand?.brandId) {
       try {
@@ -47,8 +57,12 @@ export const Route = createFileRoute("/brand/$brandSlug")({
     return { brands, templates, initialProducts, brand };
   },
   head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.brandSlug) || !loaderData) {
+      return notFoundHead();
+    }
+
     const brandName = params.brandSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const brand = loaderData?.brand || loaderData?.brands?.find((b: any) => getBrandSlug(b) === params.brandSlug || toSlug(b.brandName) === params.brandSlug);
+    const brand = loaderData?.brand || findBrandBySlug(loaderData?.brands, params.brandSlug);
     const priceStats = extractProductPriceStats(loaderData?.initialProducts);
     const displayBrandName = brand?.brandName || brandName;
     

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { productSearchSchema } from "@/lib/schemas/productSearchSchema";
@@ -8,7 +8,14 @@ import {
   categoriesQuery,
   productFilterQuery,
 } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import {
+  assertValidRouteSlugs,
+  buildPageHead,
+  findBrandBySlug,
+  findCategoryBySlug,
+  hasAnyInvalidRouteSlug,
+  notFoundHead,
+} from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
 import { toSlug, toSingularCategory, getBrandSlug } from "@/lib/utils";
@@ -18,23 +25,31 @@ import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")({
   loader: async ({ context, params }) => {
-    void context.queryClient.prefetchQuery(rootCategoriesQuery());
-    void context.queryClient.prefetchQuery(brandsQuery());
-    void context.queryClient.prefetchQuery(categoriesQuery());
+    assertValidRouteSlugs(params.categorySlug, params.brandSlug);
+
     void context.queryClient.prefetchQuery(seoTemplatesQuery());
 
-    const [brands, categories, templates] = await Promise.all([
+    const [brands, categories, rootCategories, templates] = await Promise.all([
       context.queryClient.ensureQueryData(brandsQuery()).catch(() => []),
       context.queryClient.ensureQueryData(categoriesQuery()).catch(() => []),
+      context.queryClient.ensureQueryData(rootCategoriesQuery()).catch(() => []),
       context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
 
     const firstSlug = params.categorySlug.toLowerCase();
     const secondSlug = params.brandSlug.toLowerCase();
-    const brandMatchesFirst = brands?.find((b: any) => getBrandSlug(b) === firstSlug || toSlug(b.brandName) === firstSlug);
-    const brandMatchesSecond = brands?.find((b: any) => getBrandSlug(b) === secondSlug || toSlug(b.brandName) === secondSlug);
+    const brandMatchesFirst = findBrandBySlug(brands, firstSlug);
+    const brandMatchesSecond = findBrandBySlug(brands, secondSlug);
     const matchedBrand = brandMatchesFirst || brandMatchesSecond;
-    const category = categories?.find((c: any) => toSlug(c.categoryName) === firstSlug);
+    const allCategories = [...(categories || []), ...(rootCategories || [])];
+    const category = findCategoryBySlug(allCategories, firstSlug);
+
+    if (brands.length > 0 && !matchedBrand) {
+      throw notFound();
+    }
+    if (!brandMatchesFirst && brandMatchesSecond && allCategories.length > 0 && !category) {
+      throw notFound();
+    }
 
     let initialProducts: any[] = [];
     if (matchedBrand?.brandId) {
@@ -52,14 +67,18 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       }
     }
 
-    return { brands, categories, templates, initialProducts };
+    return { brands, categories, rootCategories, templates, initialProducts };
   },
   head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.categorySlug, params.brandSlug) || !loaderData) {
+      return notFoundHead();
+    }
+
     const firstSlug = params.categorySlug.toLowerCase();
     const secondSlug = params.brandSlug.toLowerCase();
 
-    const brandMatchesFirst = loaderData?.brands?.find((b: any) => getBrandSlug(b) === firstSlug || toSlug(b.brandName) === firstSlug);
-    const brandMatchesSecond = loaderData?.brands?.find((b: any) => getBrandSlug(b) === secondSlug || toSlug(b.brandName) === secondSlug);
+    const brandMatchesFirst = findBrandBySlug(loaderData?.brands, firstSlug);
+    const brandMatchesSecond = findBrandBySlug(loaderData?.brands, secondSlug);
 
     let brand = null;
     let category = null;
@@ -77,7 +96,10 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       // Pattern: /brand-dealer/:categorySlug/:brandSlug (e.g. /brand-dealer/car-battery/exide)
       brand = brandMatchesSecond;
       brandName = brand.brandName;
-      category = loaderData?.categories?.find((c: any) => toSlug(c.categoryName) === firstSlug);
+      category = findCategoryBySlug(
+        [...(loaderData?.categories || []), ...(loaderData?.rootCategories || [])],
+        firstSlug
+      );
       categoryName = toSingularCategory(category?.categoryName || firstSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     } else {
       brandName = secondSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
