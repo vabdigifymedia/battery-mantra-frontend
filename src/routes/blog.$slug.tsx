@@ -12,6 +12,7 @@ import {
   manufacturersListQuery,
   productFilterQuery,
 } from "@/queries";
+import { useActiveCityId, useCityPricedProducts } from "@/hooks/useCityProductPricing";
 import type { BlogPostDetailResponse } from "@/types/dto";
 import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/badge";
@@ -602,6 +603,8 @@ function BlogPostPage() {
 }
 
 function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailResponse; cityName?: string }) {
+  const cityId = useActiveCityId();
+  const pricedRelatedProducts = useCityPricedProducts(blog.relatedProducts, cityId);
   const recType =
     blog.recommendationType ||
     (blog.relatedCategoryId
@@ -643,16 +646,19 @@ function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailRes
     (!blog.relatedProducts || blog.relatedProducts.length === 0);
 
   const { data: categoryProductsData } = useQuery({
-    ...productFilterQuery({
-      categoryId: blog.relatedCategoryId ? [blog.relatedCategoryId] : [],
-      size: 4,
-    }),
+    ...productFilterQuery(
+      {
+        categoryId: blog.relatedCategoryId ? [blog.relatedCategoryId] : [],
+        size: 4,
+      },
+      cityId
+    ),
     enabled: shouldFetchCategoryProducts,
   });
 
   const categoryProducts =
-    blog.relatedProducts && blog.relatedProducts.length > 0
-      ? blog.relatedProducts
+    pricedRelatedProducts.length > 0
+      ? pricedRelatedProducts
       : categoryProductsData?.content || [];
 
   // Brand queries & data
@@ -684,16 +690,19 @@ function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailRes
     (!blog.relatedProducts || blog.relatedProducts.length === 0);
 
   const { data: brandProductsData } = useQuery({
-    ...productFilterQuery({
-      brandId: blog.relatedBrandId ? [blog.relatedBrandId] : [],
-      size: 4,
-    }),
+    ...productFilterQuery(
+      {
+        brandId: blog.relatedBrandId ? [blog.relatedBrandId] : [],
+        size: 4,
+      },
+      cityId
+    ),
     enabled: shouldFetchBrandProducts,
   });
 
   const brandProducts =
-    blog.relatedProducts && blog.relatedProducts.length > 0
-      ? blog.relatedProducts
+    pricedRelatedProducts.length > 0
+      ? pricedRelatedProducts
       : brandProductsData?.content || [];
 
   // Manufacturer queries & data
@@ -900,13 +909,13 @@ function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailRes
           </div>
         </div>
 
-        {blog.relatedProducts && blog.relatedProducts.length > 0 && (
+        {pricedRelatedProducts.length > 0 && (
           <div className="space-y-3">
             <h4 className="text-sm font-semibold tracking-tight text-foreground">
               Recommended Batteries for {manufacturerName} Models
             </h4>
             <div className="grid gap-4 sm:grid-cols-2">
-              {blog.relatedProducts.map((product) => (
+              {pricedRelatedProducts.map((product) => (
                 <ProductCard key={product.productId} product={product} />
               ))}
             </div>
@@ -917,7 +926,7 @@ function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailRes
   }
 
   // DEFAULT / PRODUCTS: Handpicked individual products
-  if (blog.relatedProducts && blog.relatedProducts.length > 0) {
+  if (pricedRelatedProducts.length > 0) {
     return (
       <section className="space-y-4 pt-6 border-t">
         <div className="space-y-1">
@@ -933,7 +942,7 @@ function BlogRecommendationSection({ blog, cityName }: { blog: BlogPostDetailRes
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {blog.relatedProducts.map((product) => (
+          {pricedRelatedProducts.map((product) => (
             <ProductCard key={product.productId} product={product} />
           ))}
         </div>

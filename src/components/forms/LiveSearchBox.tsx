@@ -5,6 +5,7 @@ import { Loader2, Search, ArrowRight, Layers, Bookmark, Factory, Car } from "luc
 import { SearchBox } from "./SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 import { productFilterQuery, brandsQuery, rootCategoriesQuery, manufacturersListQuery, vehiclesListQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { Price } from "@/components/common/Price";
 import { cn, toSlug, getVehicleSlug } from "@/lib/utils";
 import { normalizeImageUrl } from "@/lib/image/cdn";
@@ -24,9 +25,10 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
   const navigate = useNavigate();
 
   const debouncedQuery = useDebounce(value, 300);
+  const cityId = useActiveCityId();
 
   const { data, isFetching } = useQuery({
-    ...productFilterQuery({ keyword: debouncedQuery, size: 5 }),
+    ...productFilterQuery({ keyword: debouncedQuery, size: 5 }, cityId),
     enabled: debouncedQuery.length > 1 && isOpen,
   });
 

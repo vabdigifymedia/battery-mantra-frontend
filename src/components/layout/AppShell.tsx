@@ -70,10 +70,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <div className={isPdpPage ? "hidden sm:block" : ""}>
-        <CampaignAnnouncementBar />
-        <Navbar />
-      </div>
+      <CampaignAnnouncementBar className={isPdpPage ? "hidden sm:flex" : undefined} />
+      <Navbar className={isPdpPage ? "hidden sm:block" : undefined} />
       <main id="main" className="flex-1 flex flex-col pb-16 sm:pb-0">
         {children}
       </main>

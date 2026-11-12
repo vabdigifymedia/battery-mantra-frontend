@@ -33,7 +33,7 @@ const DEFAULT_LINKS: NavLink[] = [
   { label: "Contact Us", to: "/contact-us" },
 ];
 
-export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
+export function Navbar({ links = DEFAULT_LINKS, className }: { links?: NavLink[]; className?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -71,6 +71,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
       className={cn(
         "sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md transition-shadow",
         scrolled ? "border-b border-border shadow-sm" : "border-b border-border/40",
+        className,
       )}
     >
       <Container

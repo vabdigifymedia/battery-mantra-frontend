@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { couponsService } from "@/services/coupons.service";
-import { categoriesQuery, brandsQuery, productListQuery } from "@/queries";
+import { categoriesQuery, brandsQuery, adminProductListQuery } from "@/queries";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,7 @@ function AdminCoupons() {
 
   const { data: allCategories = [] } = useQuery(categoriesQuery());
   const { data: allBrands = [] } = useQuery(brandsQuery());
-  const { data: allProducts = [] } = useQuery(productListQuery());
+  const { data: allProducts = [] } = useQuery(adminProductListQuery());
 
   const form = useForm<z.infer<typeof couponSchema>>({
     resolver: zodResolver(couponSchema) as any,

@@ -1,6 +1,7 @@
 import { useRouter } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/constants/queryKeys";
 import type { CityDto } from "@/types/dto";
 
 export const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
@@ -153,8 +154,11 @@ export function useLocationNavigation() {
     // 1. Update Zustand store
     setLocation(pincode, isServiceable, city);
 
-    // 2. Invalidate queries so data refreshes
-    qc.invalidateQueries({ queryKey: ["products"] });
+    // 2. Invalidate queries so city-priced data refreshes across the entire site
+    qc.invalidateQueries({ queryKey: queryKeys.products.all });
+    qc.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+    qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+    qc.invalidateQueries({ queryKey: ["delivery-times"] });
 
     // 3. Determine if the URL needs to change
     const matches = router.state.matches;

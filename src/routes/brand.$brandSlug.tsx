@@ -9,6 +9,7 @@ import {
   productListQuery,
   productFilterQuery,
 } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { buildPageHead } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo, extractProductPriceStats } from "@/lib/seo-templates";
 import { ProductsPageLayout } from "@/components/products/ProductsPageLayout";
@@ -94,9 +95,10 @@ function BrandProductsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.id });
 
+  const cityId = useActiveCityId();
   const { data: brands, isLoading: isBrandsLoading } = useQuery(brandsQuery());
   const { data: categories = [] } = useQuery(categoriesQuery());
-  const { data: allProducts = [] } = useQuery(productListQuery());
+  const { data: allProducts = [] } = useQuery(productListQuery(cityId));
 
   const matchingBrand = brands?.find(b => getBrandSlug(b) === brandSlug || toSlug(b.brandName) === brandSlug);
   const brandName = matchingBrand?.brandName || brandSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

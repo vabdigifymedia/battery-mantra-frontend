@@ -18,8 +18,8 @@ import type { ProductFilterParams, BrandContentResponse, BlogFilterParams } from
 
 import { useLocationStore } from "@/store/useLocationStore";
 
-export const productListQuery = () => {
-  const cityId = useLocationStore.getState().city?.cityId;
+export const productListQuery = (cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
   return queryOptions({
     queryKey: queryKeys.products.list(cityId),
     queryFn: ({ signal }) => productsService.list(cityId, signal),
@@ -27,8 +27,8 @@ export const productListQuery = () => {
   });
 };
 
-export const productFilterQuery = (params: ProductFilterParams) => {
-  const cityId = useLocationStore.getState().city?.cityId;
+export const productFilterQuery = (params: ProductFilterParams, cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
   return queryOptions({
     queryKey: queryKeys.products.filter({ ...params, cityId }),
     queryFn: ({ signal }) => productsService.filter({ ...params, cityId }, signal),
@@ -36,8 +36,8 @@ export const productFilterQuery = (params: ProductFilterParams) => {
   });
 };
 
-export const productFilterInfiniteQuery = (params: ProductFilterParams) => {
-  const cityId = useLocationStore.getState().city?.cityId;
+export const productFilterInfiniteQuery = (params: ProductFilterParams, cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
   return infiniteQueryOptions({
     queryKey: [...queryKeys.products.filter({ ...params, cityId }), "infinite"],
     queryFn: ({ pageParam = 0, signal }) => 
@@ -49,8 +49,8 @@ export const productFilterInfiniteQuery = (params: ProductFilterParams) => {
   });
 };
 
-export const productFilterAggregationsQuery = (params: ProductFilterParams) => {
-  const cityId = useLocationStore.getState().city?.cityId;
+export const productFilterAggregationsQuery = (params: ProductFilterParams, cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
   return queryOptions({
     queryKey: [...queryKeys.products.filter({ ...params, cityId }), "aggregations"],
     queryFn: ({ signal }) => productsService.aggregations({ ...params, cityId }, signal),
@@ -58,8 +58,8 @@ export const productFilterAggregationsQuery = (params: ProductFilterParams) => {
   });
 };
 
-export const productDetailQuery = (id: string) => {
-  const cityId = useLocationStore.getState().city?.cityId;
+export const productDetailQuery = (id: string, cityIdParam?: string) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
   return queryOptions({
     queryKey: queryKeys.products.detail(id, cityId),
     queryFn: async ({ signal }) => {
@@ -303,13 +303,17 @@ export const activeCampaignsQuery = () =>
 
 export const campaignBySlugQuery = (
   slug: string,
-  params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string }
-) =>
-  queryOptions({
-    queryKey: queryKeys.campaigns.bySlug(slug, params),
-    queryFn: ({ signal }) => campaignService.getCampaignBySlug(slug, params, signal),
+  params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string },
+  cityIdParam?: string
+) => {
+  const cityId = cityIdParam ?? useLocationStore.getState().city?.cityId;
+  const queryParams = cityId ? { ...params, cityId } : params;
+  return queryOptions({
+    queryKey: queryKeys.campaigns.bySlug(slug, queryParams),
+    queryFn: ({ signal }) => campaignService.getCampaignBySlug(slug, queryParams, signal),
     staleTime: 60_000,
   });
+};
 
 export const adminCampaignsQuery = (status?: string) =>
   queryOptions({

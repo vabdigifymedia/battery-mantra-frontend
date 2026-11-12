@@ -8,7 +8,7 @@ import { CampaignCountdown } from "./CampaignCountdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export function CampaignAnnouncementBar() {
+export function CampaignAnnouncementBar({ className }: { className?: string } = {}) {
   const { data: campaigns } = useQuery(activeCampaignsQuery());
   const [isDismissed, setIsDismissed] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -76,7 +76,8 @@ export function CampaignAnnouncementBar() {
     <div
       className={cn(
         "relative z-50 w-full h-8.5 sm:h-9 text-xs sm:text-sm font-medium border-b shadow-xs transition-colors duration-500 select-none overflow-hidden flex items-center justify-center px-3 sm:px-6",
-        styles.barBg
+        styles.barBg,
+        className
       )}
     >
       {/* MOBILE VIEW (Strictly 1 Line, No Wrapping, Slim) */}

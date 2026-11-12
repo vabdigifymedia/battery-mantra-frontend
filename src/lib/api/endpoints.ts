@@ -219,13 +219,14 @@ export const endpoints = {
   },
   campaigns: {
     active: "/api/campaigns/active",
-    bySlug: (slug: string, params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string }) => {
+    bySlug: (slug: string, params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string; cityId?: string }) => {
       const q = new URLSearchParams();
       if (params?.page !== undefined) q.set("page", String(params.page));
       if (params?.size !== undefined) q.set("size", String(params.size));
       if (params?.category) q.set("category", params.category);
       if (params?.brand) q.set("brand", params.brand);
       if (params?.sort) q.set("sort", params.sort);
+      if (params?.cityId) q.set("cityId", params.cityId);
       const queryStr = q.toString();
       return `/api/campaigns/${encodeURIComponent(slug)}${queryStr ? `?${queryStr}` : ""}`;
     },

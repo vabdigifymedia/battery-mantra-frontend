@@ -1,9 +1,11 @@
 import { useWishlist } from "@/providers/WishlistProvider";
 import { ProductCard } from "@/components/products/ProductCard";
+import { useCityPricedProducts } from "@/hooks/useCityProductPricing";
 import { HeartCrack } from "lucide-react";
 
 export function WishlistTab() {
   const { items, isLoading } = useWishlist();
+  const pricedItems = useCityPricedProducts(items);
 
   if (isLoading) {
     return (
@@ -38,7 +40,7 @@ export function WishlistTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((product) => (
+        {pricedItems.map((product) => (
           <ProductCard key={product.productId} product={product} />
         ))}
       </div>

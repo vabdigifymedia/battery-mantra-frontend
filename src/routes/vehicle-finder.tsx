@@ -14,6 +14,7 @@ import { ProductGrid } from "@/components/products/ProductGrid";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { productFilterQuery, vehiclesListQuery, productListQuery, pageSeoQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { buildPageHead } from "@/lib/seo";
 
 const searchSchema = z.object({
@@ -63,7 +64,8 @@ function VehicleFinderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.vehicleId, vehicles.data]);
 
-  const allProducts = useQuery(productListQuery());
+  const cityId = useActiveCityId();
+  const allProducts = useQuery(productListQuery(cityId));
   
   const selectedVehicle = vehicles.data?.find((v) => v.vehicleId === selection.vehicleId);
   const vehicleCapacities = selectedVehicle?.capacity 
@@ -76,7 +78,7 @@ function VehicleFinderPage() {
   });
 
   const compat = useQuery({
-    ...productFilterQuery({ vehicleId: selection.vehicleId ?? undefined, size: 40 }),
+    ...productFilterQuery({ vehicleId: selection.vehicleId ?? undefined, size: 40 }, cityId),
     enabled: !!selection.vehicleId && vehicleCapacities.length === 0, // Fallback to backend filter if no capacity set
   });
 

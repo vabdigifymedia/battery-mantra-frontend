@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, ArrowRight, Flame, Copy, Check, Tag, ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import { activeCampaignsQuery, campaignBySlugQuery } from "@/queries";
+import { useActiveCityId, useCityPricedProducts } from "@/hooks/useCityProductPricing";
 import { getCampaignThemeStyles, formatCampaignDiscountLabel, compareCampaignPriority } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "./CampaignCountdown";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -40,17 +41,20 @@ export function HomeFestiveSpotlight() {
     return () => clearInterval(interval);
   }, [homeCampaigns.length, isManualMode, isHovered, validIndex]);
 
+  const cityId = useActiveCityId();
+
   // Query participating products for active campaign
   const { data: campaignDetail } = useQuery({
-    ...campaignBySlugQuery(homeCampaign?.slug || "", { page: 0, size: 4 }),
+    ...campaignBySlugQuery(homeCampaign?.slug || "", { page: 0, size: 4 }, cityId),
     enabled: !!homeCampaign?.slug,
   });
+
+  const products = useCityPricedProducts(campaignDetail?.products?.content, cityId);
 
   if (!homeCampaign || homeCampaigns.length === 0) return null;
 
   const styles = getCampaignThemeStyles(homeCampaign.badgeTheme);
   const discountLabel = formatCampaignDiscountLabel(homeCampaign);
-  const products = campaignDetail?.products?.content || [];
 
   const handleCopyCoupon = (e: React.MouseEvent) => {
     e.preventDefault();

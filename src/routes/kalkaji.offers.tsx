@@ -11,7 +11,7 @@ import {
   Sliders, Eye, EyeOff, Package, X
 } from "lucide-react";
 import { campaignService } from "@/services/campaign.service";
-import { adminCampaignsQuery, categoriesQuery, brandsQuery, productListQuery } from "@/queries";
+import { adminCampaignsQuery, categoriesQuery, brandsQuery, adminProductListQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { getCampaignThemeStyles, formatCampaignDiscountLabel } from "@/lib/campaign-utils";
@@ -325,7 +325,7 @@ function AdminOffersPage() {
   // Auxiliary data for entity targeting selection
   const { data: rawCategories = [] } = useQuery(categoriesQuery());
   const { data: rawBrands = [] } = useQuery(brandsQuery());
-  const { data: rawProducts = [] } = useQuery(productListQuery());
+  const { data: rawProducts = [] } = useQuery(adminProductListQuery());
 
   const { data: rawCampaigns = [], isLoading, isError } = useQuery(adminCampaignsQuery(statusFilter));
 

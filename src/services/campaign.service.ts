@@ -29,7 +29,7 @@ export const campaignService = {
 
   getCampaignBySlug: async (
     slug: string,
-    params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string },
+    params?: { page?: number; size?: number; category?: string; brand?: string; sort?: string; cityId?: string },
     signal?: AbortSignal
   ): Promise<CampaignDetailWithProductsResponse> => {
     return apiFetch<CampaignDetailWithProductsResponse>(endpoints.campaigns.bySlug(slug, params), {

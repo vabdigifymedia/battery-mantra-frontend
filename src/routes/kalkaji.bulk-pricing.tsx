@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { queryKeys } from "@/constants/queryKeys";
+import { Badge } from "@/components/ui/badge";
 import { categoriesService, brandsService } from "@/services/catalog.service";
 import { locationService } from "@/services/location.service";
 import { bulkPricingService } from "@/services/bulk-pricing.service";
@@ -21,6 +24,7 @@ function BulkPricingPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [percentages, setPercentages] = useState<Record<string, number>>({});
+  const [savingCityId, setSavingCityId] = useState<string | null>(null);
 
   const { data: categories = [], isLoading: loadingCategories } = useQuery({
     queryKey: ["admin", "categories"],
@@ -48,10 +52,13 @@ function BulkPricingPage() {
   });
 
   useEffect(() => {
-    if (matrixData) {
+    if (Array.isArray(matrixData)) {
       const newPercentages: Record<string, number> = {};
-      matrixData.forEach(item => {
-        newPercentages[item.cityId] = item.percentage;
+      matrixData.forEach((item) => {
+        const parsed = Number(item.percentage);
+        if (!Number.isNaN(parsed)) {
+          newPercentages[item.cityId] = parsed;
+        }
       });
       setPercentages(newPercentages);
     } else {
@@ -63,10 +70,17 @@ function BulkPricingPage() {
     mutationFn: bulkPricingService.updateMatrix,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "bulk-pricing"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
     },
     onError: (error) => {
-      toast.error("Failed to update percentage");
+      toast.error(error instanceof ApiError ? error.message : "Failed to update percentage");
       console.error(error);
+    },
+    onSettled: () => {
+      setSavingCityId(null);
     },
   });
 
@@ -76,11 +90,12 @@ function BulkPricingPage() {
       return;
     }
     const val = percentages[cityId];
-    if (val === undefined || val === null || val <= 0) {
+    if (val === undefined || val === null || !Number.isFinite(val) || val <= 0) {
       toast.error("Please enter a valid percentage greater than 0");
       return;
     }
-    
+
+    setSavingCityId(cityId);
     updateMutation.mutate({
       categoryId: selectedCategory,
       brandId: selectedBrand,
@@ -181,49 +196,76 @@ function BulkPricingPage() {
                 <table className="w-full text-sm text-left border-collapse">
                   <thead className="bg-muted/50 text-muted-foreground uppercase sticky top-0 z-10 text-xs">
                     <tr>
-                      <th className="px-6 py-4 font-medium border-b w-1/2">City</th>
-                      <th className="px-6 py-4 font-medium border-b w-1/4">Without %</th>
-                      <th className="px-6 py-4 font-medium border-b w-1/4 text-right">Action</th>
+                      <th className="px-6 py-4 font-medium border-b w-2/5">City</th>
+                      <th className="px-6 py-4 font-medium border-b w-2/5">Price % (of Base)</th>
+                      <th className="px-6 py-4 font-medium border-b w-1/5 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {locations.map((city) => (
-                      <tr key={city.cityId} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                        <td className="px-6 py-4 font-medium">{city.cityName}</td>
-                        <td className="px-6 py-4">
-                          <div className="relative">
-                            <Input 
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={percentages[city.cityId] || ""}
-                              onChange={(e) => handlePercentageChange(city.cityId, e.target.value)}
-                              className="pr-8 h-9"
-                              placeholder="e.g. 115"
-                            />
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">%</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <Button 
-                            variant="secondary" 
-                            size="sm"
-                            disabled={updateMutation.isPending}
-                            onClick={() => handleSave(city.cityId)}
-                            className="w-24"
-                          >
-                            {updateMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Save className="h-4 w-4 mr-2" />
-                                Save
-                              </>
-                            )}
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {locations.map((city) => {
+                      const pctVal = percentages[city.cityId] || 0;
+                      const diff = Math.round((pctVal - 100) * 100) / 100;
+                      const isSavingThisRow = savingCityId === city.cityId;
+                      return (
+                        <tr key={city.cityId} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                          <td className="px-6 py-4 font-medium">{city.cityName}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="relative w-36 shrink-0">
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={percentages[city.cityId] || ""}
+                                  onChange={(e) => handlePercentageChange(city.cityId, e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      e.preventDefault();
+                                      handleSave(city.cityId);
+                                    }
+                                  }}
+                                  className="pr-8 h-9"
+                                  placeholder="e.g. 115"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">%</span>
+                              </div>
+                              {pctVal > 0 && (
+                                <Badge
+                                  variant={diff === 0 ? "secondary" : diff > 0 ? "default" : "outline"}
+                                  className={
+                                    diff > 0
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/15"
+                                      : diff < 0
+                                        ? "text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                                        : ""
+                                  }
+                                >
+                                  {diff === 0 ? "Base (100%)" : diff > 0 ? `+${diff}%` : `${diff}%`}
+                                </Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              disabled={updateMutation.isPending}
+                              onClick={() => handleSave(city.cityId)}
+                              className="w-24"
+                            >
+                              {isSavingThisRow ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Save className="h-4 w-4 mr-2" />
+                                  Save
+                                </>
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -172,6 +172,8 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     (Boolean(search.brand) && brandsQueryState.isLoading) ||
     (Boolean(search.category) && categoriesQueryState.isLoading);
 
+  const { city } = useLocationStore();
+
   const {
     data,
     isLoading,
@@ -182,11 +184,11 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    ...productFilterInfiniteQuery(params),
+    ...productFilterInfiniteQuery(params, city?.cityId),
     enabled: !isWaitingForFilters,
   });
 
-  const { data: aggregations } = useQuery(productFilterAggregationsQuery(params));
+  const { data: aggregations } = useQuery(productFilterAggregationsQuery(params, city?.cityId));
 
   const { ref, inView } = useInView();
 
@@ -209,8 +211,6 @@ export function ProductsPageLayout({ search, onSearchChange, vehicleIdOverride, 
   const { data: brandContent } = useQuery(
     brandContentQuery(category?.categoryId, brand?.brandId)
   );
-
-  const { city } = useLocationStore();
 
   const products = data?.pages.flatMap((page) => page.content || []) ?? [];
   const total = data?.pages[0]?.totalElements ?? 0;

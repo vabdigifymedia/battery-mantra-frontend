@@ -220,7 +220,7 @@ export function ProductCard({
   // 3. Fallback: If no direct capacity and no specDetails, query product details to read full specifications
   const needsDetail = !directCapacity && !(product as any).specDetails;
   const { data: detailData } = useQuery({
-    ...productDetailQuery(product.seo?.slug || product.productId),
+    ...productDetailQuery(product.seo?.slug || product.productId, city?.cityId),
     enabled: Boolean(needsDetail),
     staleTime: 10 * 60_000,
   });

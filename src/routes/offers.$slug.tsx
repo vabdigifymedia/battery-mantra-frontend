@@ -4,6 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Sparkles, Tag, ArrowLeft, ArrowRight, Copy, Check, Clock, ShieldCheck, Flame, ShoppingBag } from "lucide-react";
 import { campaignBySlugQuery } from "@/queries";
+import { useActiveCityId, useCityPricedProducts } from "@/hooks/useCityProductPricing";
 import { getCampaignThemeStyles, formatCampaignDiscountLabel, safeFormatDate } from "@/lib/campaign-utils";
 import { CampaignCountdown } from "@/components/campaign/CampaignCountdown";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -53,20 +54,25 @@ function CampaignOfferPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const [copied, setCopied] = useState(false);
+  const cityId = useActiveCityId();
 
   const { data, isLoading, isError } = useQuery(
-    campaignBySlugQuery(slug, {
-      page: search.page,
-      size: search.size,
-      category: search.category,
-      brand: search.brand,
-      sort: search.sort,
-    })
+    campaignBySlugQuery(
+      slug,
+      {
+        page: search.page,
+        size: search.size,
+        category: search.category,
+        brand: search.brand,
+        sort: search.sort,
+      },
+      cityId
+    )
   );
 
   const campaign = data?.campaign;
   const productsPage = data?.products;
-  const products = productsPage?.content || [];
+  const products = useCityPricedProducts(productsPage?.content, cityId);
 
   if (isLoading) {
     return (

@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { productListQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { ProductCard } from "@/components/products/ProductCard";
 import type { ProductListResponse } from "@/types/dto";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,7 +16,8 @@ export function FeaturedProducts({
   filterFn?: (p: ProductListResponse) => boolean;
   sortFn?: (a: ProductListResponse, b: ProductListResponse) => number;
 }) {
-  const { data, isLoading, isError } = useQuery(productListQuery());
+  const cityId = useActiveCityId();
+  const { data, isLoading, isError } = useQuery(productListQuery(cityId));
   const scrollRef = useRef<HTMLDivElement>(null);
 
   if (isError) return null;

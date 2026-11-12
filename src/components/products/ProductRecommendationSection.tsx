@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { productListQuery, vehiclesListQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ export function ProductRecommendationSection({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"all" | "alternatives" | "brand" | "vehicles">("all");
 
-  const { data: allProducts, isLoading: isLoadingProducts } = useQuery(productListQuery());
+  const cityId = useActiveCityId();
+  const { data: allProducts, isLoading: isLoadingProducts } = useQuery(productListQuery(cityId));
   const { data: vehicles } = useQuery(vehiclesListQuery());
 
   const buckets = useMemo(() => {

@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { productFilterQuery, brandsQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { ProductCard } from "@/components/products/ProductCard";
 import { CategoryListResponse } from "@/types/dto";
 import { SeoCityLinks } from "@/components/products/SeoCityLinks";
@@ -80,9 +81,11 @@ export function SolarMainPage({ category, subcategories }: SolarMainPageProps) {
     return ids;
   }, [category.categoryId, subcategories]);
 
+  const cityId = useActiveCityId();
+
   // Fetch real products under this solar category & its subcategories
   const { data: productsData, isLoading: isProductsLoading } = useQuery(
-    productFilterQuery({ categoryId: categoryIds, size: 8 })
+    productFilterQuery({ categoryId: categoryIds, size: 8 }, cityId)
   );
   const products = productsData?.content || [];
 

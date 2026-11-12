@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { productFilterQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, ArrowRight, Leaf, Zap, Home, Building2, Store } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
@@ -16,7 +17,8 @@ export function LithiumMainPage({
   category: CategoryListResponse;
   subcategories: CategoryListResponse[];
 }) {
-  const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 4 }));
+  const cityId = useActiveCityId();
+  const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 4 }, cityId));
   const products = data?.content || [];
 
   return (

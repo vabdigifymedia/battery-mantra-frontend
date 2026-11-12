@@ -219,7 +219,8 @@ export const Route = createFileRoute("/product/$")({
 
 export function PdpPage() {
   const { slug, citySlug } = Route.useLoaderData();
-  const { data } = useSuspenseQuery(productDetailQuery(slug));
+  const { isServiceable, pincode, city } = useLocationStore();
+  const { data } = useSuspenseQuery(productDetailQuery(slug, city?.cityId));
   const { status } = useAuth();
   const navigate = useNavigate({ from: Route.fullPath });
   const qc = useQueryClient();
@@ -237,7 +238,6 @@ export function PdpPage() {
   const [isFullscreenGallery, setIsFullscreenGallery] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
 
-  const { isServiceable, pincode, city } = useLocationStore();
   const locationChecked = Boolean(pincode || city);
   const blockPurchase = locationChecked && !isServiceable;
 

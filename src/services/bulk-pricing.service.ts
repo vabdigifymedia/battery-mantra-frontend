@@ -18,7 +18,7 @@ export interface BulkPricingRequest {
 export const bulkPricingService = {
   getMatrix: async (categoryId: string, brandId: string): Promise<BulkPricingMatrix[]> => {
     return apiFetch<BulkPricingMatrix[]>(
-      `/api/admin/bulk-pricing?categoryId=${categoryId}&brandId=${brandId}`,
+      `/api/admin/bulk-pricing?categoryId=${encodeURIComponent(categoryId)}&brandId=${encodeURIComponent(brandId)}`,
       { method: "GET" }
     );
   },

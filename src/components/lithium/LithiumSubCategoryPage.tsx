@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { productFilterQuery } from "@/queries";
+import { useActiveCityId } from "@/hooks/useCityProductPricing";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShieldCheck, Award, Truck, BadgeIndianRupee, Battery, BatteryCharging, Sun, Zap, Leaf, ArrowRight } from "lucide-react";
 import { CategoryListResponse } from "@/types/dto";
@@ -16,7 +17,8 @@ export function LithiumSubCategoryPage({
   category: CategoryListResponse;
   type: string;
 }) {
-  const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 8 }));
+  const cityId = useActiveCityId();
+  const { data } = useQuery(productFilterQuery({ categoryId: [category.categoryId], size: 8 }, cityId));
   const products = data?.content || [];
 
   const isSolar = type === "lithium-inbuilt-solar-inverter-battery";
