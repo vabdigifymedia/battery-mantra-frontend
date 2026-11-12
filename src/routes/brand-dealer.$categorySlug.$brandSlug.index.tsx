@@ -44,11 +44,13 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
     const allCategories = [...(categories || []), ...(rootCategories || [])];
     const category = findCategoryBySlug(allCategories, firstSlug);
 
-    if (brands.length > 0 && !matchedBrand) {
-      throw notFound();
-    }
-    if (!brandMatchesFirst && brandMatchesSecond && allCategories.length > 0 && !category) {
-      throw notFound();
+    if (brands.length > 0 || allCategories.length > 0) {
+      const isBrandCityPattern = Boolean(brandMatchesFirst);
+      const isCategoryBrandPattern = Boolean(brandMatchesSecond && (allCategories.length === 0 || category));
+      const isCategoryCityPattern = Boolean(!brandMatchesFirst && !brandMatchesSecond && category);
+      if (!isBrandCityPattern && !isCategoryBrandPattern && !isCategoryCityPattern) {
+        throw notFound();
+      }
     }
 
     let initialProducts: any[] = [];
@@ -143,7 +145,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/")(
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brand-dealer/${params.categorySlug}/${params.brandSlug}` });
   },
   validateSearch: productSearchSchema,
   component: DealerBrandProductsPage,

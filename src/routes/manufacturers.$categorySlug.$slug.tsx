@@ -54,7 +54,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$slug")({
           description: `Select your ${categoryName} manufacturer or brand to find compatible batteries at best prices with free installation.`,
         }
       );
-      return buildPageHead(seo);
+      return buildPageHead(seo, { path: `/manufacturers/${params.categorySlug}/${params.slug}` });
     } else {
       const makeName = params.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
       const manufacturer = manufacturers?.find((m: any) => toSlug(m.name) === params.slug);
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/$slug")({
           description: `Find 100% compatible batteries for all ${makeName} vehicle models at guaranteed lowest prices. Free doorstep installation & 24/7 service on Battery Mantra.`,
         }
       );
-      return buildPageHead(seo);
+      return buildPageHead(seo, { path: `/manufacturers/${params.categorySlug}/${params.slug}` });
     }
   },
   component: DynamicSlugPage,

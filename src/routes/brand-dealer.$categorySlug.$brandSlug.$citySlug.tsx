@@ -102,7 +102,7 @@ export const Route = createFileRoute("/brand-dealer/$categorySlug/$brandSlug/$ci
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brand-dealer/${params.categorySlug}/${params.brandSlug}/${params.citySlug}` });
   },
   validateSearch: productSearchSchema,
   component: DealerBrandCityProductsPage,

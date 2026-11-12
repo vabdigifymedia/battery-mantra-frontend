@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { blogsService, normalizeTags } from "@/services/blogs.service";
 import { productsService } from "@/services/products.service";
@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
 import { ProductCard } from "@/components/products/ProductCard";
 import { APP } from "@/constants/app";
+import { assertValidRouteSlugs, hasAnyInvalidRouteSlug, notFoundHead } from "@/lib/seo";
 import {
   Calendar,
   Clock,
@@ -54,21 +55,24 @@ import {
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params: { slug } }) => {
+    assertValidRouteSlugs(slug);
+    let blog: BlogPostDetailResponse | null = null;
     try {
       const decodedSlug = decodeURIComponent(slug);
-      const blog = await blogsService.bySlug(decodedSlug);
+      blog = await blogsService.bySlug(decodedSlug);
+      if (!blog) {
+        throw notFound();
+      }
       const detectedCity = detectCityFromSlug(decodedSlug);
       return { blog, requestedSlug: decodedSlug, detectedCity };
-    } catch {
-      return { blog: null, requestedSlug: slug, detectedCity: null };
+    } catch (e) {
+      throw notFound();
     }
   },
   head: ({ loaderData, params }) => {
     const blog = loaderData?.blog;
-    if (!blog) {
-      return {
-        meta: [{ title: `Blog Post Not Found — ${APP.name}` }],
-      };
+    if (!blog || hasAnyInvalidRouteSlug(params.slug)) {
+      return notFoundHead();
     }
 
     const detectedCity = loaderData?.detectedCity;

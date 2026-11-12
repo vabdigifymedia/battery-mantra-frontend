@@ -84,7 +84,7 @@ export const Route = createFileRoute("/brand-dealer/$brandSlug")({
       }
     );
     
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/brand-dealer/${params.brandSlug}` });
   },
   validateSearch: productSearchSchema,
   component: DealerBrandProductsPage,

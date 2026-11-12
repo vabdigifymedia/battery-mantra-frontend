@@ -71,7 +71,7 @@ export const Route = createFileRoute("/shop/c/$categorySlug/$citySlug")({
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/shop/c/${params.categorySlug}/${params.citySlug}` });
   },
   validateSearch: productSearchSchema,
   component: CategoryProductsPage,

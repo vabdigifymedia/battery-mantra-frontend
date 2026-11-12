@@ -63,7 +63,7 @@ export const Route = createFileRoute("/manufacturers/$categorySlug/")({
       }
     );
 
-    return buildPageHead(seo);
+    return buildPageHead(seo, { path: `/manufacturers/${params.categorySlug}` });
   },
   component: CategoryManufacturersPage,
 });

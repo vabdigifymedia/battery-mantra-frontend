@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { cmsService } from "@/services/cms.service";
 import { Container } from "@/components/layout/Container";
@@ -6,20 +6,21 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { APP } from "@/constants/app";
 
 import { pageSeoQuery } from "@/queries";
-import { buildPageHead } from "@/lib/seo";
+import { assertValidRouteSlugs, buildPageHead, notFoundHead } from "@/lib/seo";
 import { applySeoTemplate } from "@/lib/utils";
 import { useLocationStore } from "@/store/useLocationStore";
 
 export const Route = createFileRoute("/$slug")({
   beforeLoad: ({ params: { slug } }) => {
-    if (slug === "blog") {
-      throw redirect({ to: "/blog", replace: true });
+    assertValidRouteSlugs(slug);
+    if (slug === "blog" || slug === "blogs") {
+      throw redirect({ to: "/blog", statusCode: 301 });
     }
     if (slug === "shipping-and-replacement") {
-      throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, replace: true });
+      throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, statusCode: 301 });
     }
     if (slug === "solar-systems" || slug === "solar") {
-      throw redirect({ to: "/shop-by-category/$", params: { _splat: "solar-systems" }, replace: true });
+      throw redirect({ to: "/shop-by-category/$", params: { _splat: "solar-systems" }, statusCode: 301 });
     }
   },
   component: CmsPageRender,
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/$slug")({
     let pageSeo = null;
     try {
       page = await cmsService.getPageBySlug(slug);
-    } catch (e) {
+    } catch {
       page = null;
     }
     if (!page && slug === "shipping-return") {
@@ -40,9 +41,20 @@ export const Route = createFileRoute("/$slug")({
     }
     try {
       pageSeo = await context.queryClient.fetchQuery(pageSeoQuery("/" + slug));
-    } catch (e) {
+    } catch {
       pageSeo = null;
     }
+
+    if (!page && !pageSeo) {
+      if (slug === "terms-and-conditions") {
+        throw redirect({ to: "/$slug", params: { slug: "terms-conditions" }, statusCode: 301 });
+      }
+      if (slug === "refund-policy" || slug === "shipping-policy") {
+        throw redirect({ to: "/$slug", params: { slug: "shipping-return" }, statusCode: 301 });
+      }
+      throw notFound();
+    }
+
     return { page, pageSeo };
   },
   head: ({ loaderData, params }) => {
@@ -50,9 +62,7 @@ export const Route = createFileRoute("/$slug")({
     const pageSeo = loaderData?.pageSeo?.seo;
 
     if (!page && !pageSeo) {
-      return {
-        meta: [{ title: `Page Not Found — ${APP.name}` }],
-      };
+      return notFoundHead();
     }
 
     const mergedSeo = {

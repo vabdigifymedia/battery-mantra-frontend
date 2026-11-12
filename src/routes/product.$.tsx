@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, startTransition, useRef } from "react";
 import { z } from "zod";
@@ -66,6 +66,7 @@ import { deliveryTimeService } from "@/services/delivery-time.service";
 import { formatDeliveryPillText, getDeliveryTimeText } from "@/lib/delivery";
 import { isProductEligibleForCampaign, getCampaignThemeStyles, formatCampaignDiscountLabel, calculateProductCampaignDiscount, compareCampaignPriority } from "@/lib/campaign-utils";
 
+import { assertValidRouteSlugs, hasAnyInvalidRouteSlug } from "@/lib/seo";
 import { seoTemplatesQuery, resolveTemplateSeo } from "@/lib/seo-templates";
 
 const searchSchema = z.object({
@@ -78,13 +79,37 @@ export const Route = createFileRoute("/product/$")({
   loader: async ({ context, params }) => {
     const splat = (params as any)._splat || "";
     const [slug, citySlug] = splat.split("/");
+    assertValidRouteSlugs(slug);
+    if (citySlug && hasAnyInvalidRouteSlug(citySlug)) {
+      throw notFound();
+    }
+
     try {
       void context.queryClient.prefetchQuery(seoTemplatesQuery());
       const product = await context.queryClient.ensureQueryData(productDetailQuery(slug));
       const templates = await context.queryClient.ensureQueryData(seoTemplatesQuery());
       return { product, templates, slug, citySlug };
     } catch (e) {
-      if (e instanceof ApiError && e.status === 404) throw notFound();
+      if (e instanceof ApiError && e.status === 404) {
+        const cleanSlug = slug.replace(/-+$/, "");
+        if (cleanSlug && cleanSlug !== slug) {
+          try {
+            const recovered = await context.queryClient.ensureQueryData(productDetailQuery(cleanSlug));
+            if (recovered) {
+              throw redirect({
+                to: "/product/$",
+                params: { _splat: citySlug ? `${cleanSlug}/${citySlug}` : cleanSlug },
+                statusCode: 301,
+              });
+            }
+          } catch (innerErr: any) {
+            if (innerErr?.statusCode === 301 || innerErr?.options?.statusCode === 301) {
+              throw innerErr;
+            }
+          }
+        }
+        throw notFound();
+      }
       throw e;
     }
   },

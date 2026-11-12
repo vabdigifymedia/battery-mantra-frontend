@@ -83,9 +83,8 @@ async function run() {
     generateUrlXml(`${BASE_URL}/blog`, today, "daily", "0.9"),
     generateUrlXml(`${BASE_URL}/about-us`, today, "monthly", "0.6"),
     generateUrlXml(`${BASE_URL}/privacy-policy`, today, "yearly", "0.4"),
-    generateUrlXml(`${BASE_URL}/terms-and-conditions`, today, "yearly", "0.4"),
-    generateUrlXml(`${BASE_URL}/refund-policy`, today, "yearly", "0.4"),
-    generateUrlXml(`${BASE_URL}/shipping-policy`, today, "yearly", "0.4"),
+    generateUrlXml(`${BASE_URL}/terms-conditions`, today, "yearly", "0.4"),
+    generateUrlXml(`${BASE_URL}/shipping-return`, today, "yearly", "0.4"),
   ];
   fs.writeFileSync(path.join(PUBLIC_DIR, "sitemap-static.xml"), wrapUrlset(staticUrls), "utf8");
   console.log(`[Sitemap] Created sitemap-static.xml (${staticUrls.length} URLs)`);

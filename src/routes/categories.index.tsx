@@ -26,20 +26,18 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buildPageHead } from "@/lib/seo";
 import { normalizeImageUrl } from "@/lib/image/cdn";
 import type { CategoryListResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/categories/")({
-  head: () => ({
-    meta: [
-      { title: "All Battery Categories | BatteryMantra" },
-      {
-        name: "description",
-        content:
-          "Browse complete battery catalogue: Car batteries, Inverter batteries, Solar systems, Lithium power solutions and more with free installation across India.",
-      },
-    ],
-  }),
+  head: () =>
+    buildPageHead(null, {
+      title: "All Battery Categories | BatteryMantra",
+      description:
+        "Browse complete battery catalogue: Car batteries, Inverter batteries, Solar systems, Lithium power solutions and more with free installation across India.",
+      path: "/categories",
+    }),
   component: CategoriesPage,
 });
 

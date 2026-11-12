@@ -69,8 +69,13 @@ export const Route = createFileRoute("/shop-by-category/$")({
       context.queryClient.ensureQueryData(seoTemplatesQuery()).catch(() => undefined),
     ]);
 
-    if (categorySlug && categories.length > 0 && !findCategoryBySlug(categories, categorySlug)) {
+    const matchedCategory = categorySlug ? findCategoryBySlug(categories, categorySlug) : undefined;
+    if (categorySlug && categories.length > 0 && !matchedCategory) {
       throw notFound();
+    }
+
+    if (matchedCategory?.categoryId && (!matchedCategory.subCategories || matchedCategory.subCategories.length === 0)) {
+      void context.queryClient.ensureQueryData(brandsQuery(matchedCategory.categoryId)).catch(() => []);
     }
 
     let pageSeo = null;

@@ -48,11 +48,16 @@ export const Route = createFileRoute("/products/$citySlug")({
       return { pageSeo: null };
     }
   },
-  head: ({ loaderData }) =>
-    buildPageHead(loaderData?.pageSeo?.seo, {
+  head: ({ loaderData, params }) => {
+    if (hasAnyInvalidRouteSlug(params.citySlug)) {
+      return notFoundHead();
+    }
+    return buildPageHead(loaderData?.pageSeo?.seo, {
       title: "Shop batteries — BatteryMantra",
       description: "Browse premium automotive, inverter and industrial batteries from trusted brands.",
-    }),
+      path: `/products/${params.citySlug}`,
+    });
+  },
   validateSearch: productSearchSchema,
   component: ProductsPage,
 });

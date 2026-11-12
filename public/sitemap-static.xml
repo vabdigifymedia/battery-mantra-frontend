@@ -49,19 +49,13 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/terms-and-conditions</loc>
+    <loc>https://batterymantra.com/terms-conditions</loc>
     <lastmod>2026-11-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://batterymantra.com/refund-policy</loc>
-    <lastmod>2026-11-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://batterymantra.com/shipping-policy</loc>
+    <loc>https://batterymantra.com/shipping-return</loc>
     <lastmod>2026-11-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>

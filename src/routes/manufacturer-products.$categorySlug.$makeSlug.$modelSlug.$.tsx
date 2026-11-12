@@ -249,11 +249,16 @@ export const Route = createFileRoute("/manufacturer-products/$categorySlug/$make
       }
     );
 
+    const canonicalPath = cleanSplat
+      ? `/manufacturer-products/${categorySlug}/${makeSlug}/${modelSlug}/${cleanSplat}`
+      : `/manufacturer-products/${categorySlug}/${makeSlug}/${modelSlug}`;
+
     return buildPageHead(seo, {
       title: capacity
         ? `${displayFullName} ${capacity} Battery Online | Buy 100% Genuine Car Battery`
         : `${displayFullName} Battery Online | Buy 100% Genuine Car Battery`,
       description: `Buy 100% Genuine ${displayFullName}${capacity ? ` ${capacity}` : ""} Battery Online at Best Price${priceStats.priceRangeFormatted ? ` (${priceStats.priceRangeFormatted})` : ""} in India. Get Free Express Delivery and Installation in 1-2 hours.`,
+      path: canonicalPath,
     });
   },
   validateSearch: productSearchSchema,

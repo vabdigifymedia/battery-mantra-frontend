@@ -44,6 +44,7 @@ export const Route = createFileRoute("/offers/$slug")({
       title,
       description,
       image: c?.desktopBannerUrl || undefined,
+      path: `/offers/${params.slug}`,
     });
   },
   component: CampaignOfferPage,
