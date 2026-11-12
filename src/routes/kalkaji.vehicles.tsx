@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
@@ -13,9 +13,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, Car, Upload, Search, RotateCcw } from "lucide-react";
+import { Trash2, Plus, Edit, Car, Upload, Search, RotateCcw, Tag } from "lucide-react";
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  UnderlineTabs,
+  FilterCombobox,
+  FilterSummaryBar,
+  type ActiveFilterChip,
+  type FilterOption,
+} from "@/components/admin/AdminFilters";
 import { FormField } from "@/components/forms/FormField";
 import { adminCapacitiesQuery, rootCategoriesQuery, manufacturersListQuery, fuelsQuery } from "@/queries";
 import { Badge } from "@/components/ui/badge";
@@ -163,11 +169,31 @@ function AdminVehicles() {
 
   const PAGE_SIZE = 15;
 
+  const vehicleTypeCounts = useMemo(() => {
+    const counts = { ALL: vehicles?.length || 0, CAR: 0, COMMERCIAL: 0, E_RICKSHAW: 0, INVERTER: 0 };
+    for (const v of vehicles || []) {
+      if (v.vehicleType && v.vehicleType in counts) {
+        counts[v.vehicleType as keyof typeof counts] += 1;
+      }
+    }
+    return counts;
+  }, [vehicles]);
+
   const typeFilteredVehicles = activeTab === "ALL"
     ? vehicles
     : vehicles?.filter(v => v.vehicleType === activeTab);
 
-  const availableMakes = Array.from(new Set(typeFilteredVehicles?.map(v => v.make) ?? [])).sort();
+  const makeOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const v of typeFilteredVehicles || []) {
+      if (v.make) {
+        counts.set(v.make, (counts.get(v.make) || 0) + 1);
+      }
+    }
+    return Array.from(counts.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([make, count]) => ({ value: make, label: make, count }));
+  }, [typeFilteredVehicles]);
 
   const makeFilteredVehicles = activeMake === "ALL"
     ? typeFilteredVehicles
@@ -360,87 +386,111 @@ function AdminVehicles() {
         </div>
       </div>
 
-      {/* Search Input Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search make, model, slug, fuel, capacity..."
-            className="pl-9 pr-9 h-10 w-full bg-background"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => {
+      <UnderlineTabs
+        value={activeTab}
+        onValueChange={(val) => {
+          setActiveTab(val);
+          setActiveMake("ALL");
+          setCurrentPage(1);
+        }}
+        items={[
+          { value: "ALL", label: "All Vehicles", count: vehicleTypeCounts.ALL },
+          { value: "CAR", label: "Cars", count: vehicleTypeCounts.CAR },
+          { value: "COMMERCIAL", label: "Commercial", count: vehicleTypeCounts.COMMERCIAL },
+          { value: "E_RICKSHAW", label: "E-Rickshaws", count: vehicleTypeCounts.E_RICKSHAW },
+          { value: "INVERTER", label: "Inverters", count: vehicleTypeCounts.INVERTER },
+        ]}
+      />
+
+      <div className="space-y-4">
+        {/* Search & Brand Filter Toolbar */}
+        <div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+              <div className="relative flex-1 min-w-[220px] max-w-sm">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search make, model, slug, fuel, capacity..."
+                  className="pl-9 pr-9 h-9 w-full bg-background text-xs sm:text-sm"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setCurrentPage(1);
+                    }}
+                    className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                    title="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {makeOptions.length > 0 && (
+                <FilterCombobox
+                  label="Make / Brand"
+                  value={activeMake}
+                  onValueChange={(val) => {
+                    setActiveMake(val);
+                    setCurrentPage(1);
+                  }}
+                  options={makeOptions}
+                  allLabel="All Brands"
+                  allCount={typeFilteredVehicles?.length || 0}
+                  searchPlaceholder="Search brand..."
+                  icon={<Tag className="h-3.5 w-3.5" />}
+                />
+              )}
+            </div>
+
+            <FilterSummaryBar
+              chips={[
+                ...(activeMake !== "ALL"
+                  ? [
+                      {
+                        key: "make",
+                        label: "Brand",
+                        value: activeMake,
+                        onRemove: () => {
+                          setActiveMake("ALL");
+                          setCurrentPage(1);
+                        },
+                      } satisfies ActiveFilterChip,
+                    ]
+                  : []),
+                ...(searchQuery.trim()
+                  ? [
+                      {
+                        key: "search",
+                        label: "Search",
+                        value: searchQuery.trim(),
+                        onRemove: () => {
+                          setSearchQuery("");
+                          setCurrentPage(1);
+                        },
+                      } satisfies ActiveFilterChip,
+                    ]
+                  : []),
+              ]}
+              onClearAll={() => {
+                setActiveMake("ALL");
                 setSearchQuery("");
                 setCurrentPage(1);
               }}
-              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-              title="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+              showingCount={filteredVehicles?.length || 0}
+              totalCount={typeFilteredVehicles?.length}
+              itemLabel="vehicles"
+            />
+          </div>
         </div>
-        {searchQuery && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>
-              Found <strong>{filteredVehicles?.length || 0}</strong> {filteredVehicles?.length === 1 ? "vehicle" : "vehicles"}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => {
-                setSearchQuery("");
-                setCurrentPage(1);
-              }}
-            >
-              Clear
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveMake("ALL"); setCurrentPage(1); }} className="w-full">
-        <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
-          <TabsTrigger value="ALL" className="rounded-md">All Vehicles</TabsTrigger>
-          <TabsTrigger value="CAR" className="rounded-md">Cars</TabsTrigger>
-
-          <TabsTrigger value="COMMERCIAL" className="rounded-md">Commercial</TabsTrigger>
-          <TabsTrigger value="E_RICKSHAW" className="rounded-md">E-Rickshaws</TabsTrigger>
-          <TabsTrigger value="INVERTER" className="rounded-md">Inverters</TabsTrigger>
-        </TabsList>
-
-        {activeTab !== "ALL" && availableMakes.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Button
-              variant={activeMake === "ALL" ? "default" : "outline"}
-              size="sm"
-              onClick={() => { setActiveMake("ALL"); setCurrentPage(1); }}
-              className="h-7 text-xs rounded-full px-4"
-            >
-              All Brands
-            </Button>
-            {availableMakes.map(make => (
-              <Button
-                key={make}
-                variant={activeMake === make ? "default" : "outline"}
-                size="sm"
-                onClick={() => { setActiveMake(make); setCurrentPage(1); }}
-                className="h-7 text-xs rounded-full px-4"
-              >
-                {make}
-              </Button>
-            ))}
-          </div>
-        )}
 
         {/* Desktop Table */}
         <div className="hidden md:block rounded-md border bg-card">
@@ -696,7 +746,7 @@ function AdminVehicles() {
             </Pagination>
           )}
         </div>
-      </Tabs>
+      </div>
 
       {/* SINGLE ADD / EDIT MODAL */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

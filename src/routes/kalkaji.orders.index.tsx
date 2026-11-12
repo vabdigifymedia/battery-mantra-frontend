@@ -5,8 +5,12 @@ import { adminOrdersQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import {
+  UnderlineTabs,
+  FilterSummaryBar,
+  type ActiveFilterChip,
+} from "@/components/admin/AdminFilters";
 import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
 import {
@@ -94,6 +98,7 @@ function AdminOrders() {
     engineerName: string;
   } | null>(null);
   const [activeTab, setActiveTab] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState<"ALL" | "ADMIN_DIRECT" | "PARTNER_ASSIGNED">("ALL");
   const prevOrdersCountRef = useRef(orders.length);
 
   useEffect(() => {
@@ -181,11 +186,17 @@ function AdminOrders() {
     onError: (err: any) => toast.error(err?.message || "Failed to unassign engineer"),
   });
 
-  const filteredOrders = orders.filter((o) =>
+  const searchMatchedOrders = orders.filter((o) =>
     o.orderId?.toLowerCase().includes(search.toLowerCase()) ||
     (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase())) ||
     (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const filteredOrders = searchMatchedOrders.filter((o) => {
+    if (sourceFilter === "ADMIN_DIRECT") return !o.assignedPartner;
+    if (sourceFilter === "PARTNER_ASSIGNED") return !!o.assignedPartner;
+    return true;
+  });
 
   const getOrdersForTab = (tab: string) => {
     switch (tab) {
@@ -195,16 +206,15 @@ function AdminOrders() {
       case "delivered": return filteredOrders.filter((o) => STATUS_DELIVERED.includes(o.orderStatus));
       case "cancelled": return filteredOrders.filter((o) => STATUS_CANCELLED.includes(o.orderStatus));
       case "partner_rejected": return filteredOrders.filter((o) => o.orderStatus === "CANCELLED" && (o.cancelledBy === "PARTNER" || (!!o.cancellationReason && !!o.assignedPartner)));
-      case "admin_direct": return filteredOrders.filter((o) => !o.assignedPartner);
-      case "partner_assigned": return filteredOrders.filter((o) => !!o.assignedPartner);
       default: return filteredOrders;
     }
   };
 
   const pendingCount = filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus)).length;
-  const adminDirectCount = filteredOrders.filter((o) => !o.assignedPartner).length;
-  const partnerAssignedCount = filteredOrders.filter((o) => !!o.assignedPartner).length;
+  const adminDirectCount = searchMatchedOrders.filter((o) => !o.assignedPartner).length;
+  const partnerAssignedCount = searchMatchedOrders.filter((o) => !!o.assignedPartner).length;
   const partnerRejectedCount = filteredOrders.filter((o) => o.orderStatus === "CANCELLED" && (o.cancelledBy === "PARTNER" || (!!o.cancellationReason && !!o.assignedPartner))).length;
+  const displayedOrders = getOrdersForTab(activeTab);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -613,51 +623,86 @@ function AdminOrders() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <TabsList className="mb-6 inline-flex min-w-max h-auto p-1 bg-muted/60 rounded-xl">
-            <TabsTrigger value="all" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              All Orders ({filteredOrders.length})
-            </TabsTrigger>
-            <TabsTrigger value="admin_direct" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Main Branch (Admin Direct) ({adminDirectCount})
-            </TabsTrigger>
-            <TabsTrigger value="partner_assigned" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Partner Assigned ({partnerAssignedCount})
-            </TabsTrigger>
-            <TabsTrigger value="partner_rejected" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm text-amber-700 dark:text-amber-400 font-medium">
-              ⚠️ Partner Rejected
-              {partnerRejectedCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                  {partnerRejectedCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="new" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              New Orders
-              {pendingCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                  {pendingCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="ready" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Ready For Dispatch
-            </TabsTrigger>
-            <TabsTrigger value="dispatched" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Dispatched
-            </TabsTrigger>
-            <TabsTrigger value="delivered" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Delivered
-            </TabsTrigger>
-            <TabsTrigger value="cancelled" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              Cancelled
-            </TabsTrigger>
-          </TabsList>
+      <div className="space-y-4">
+        <UnderlineTabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          items={[
+            { value: "all", label: "All Orders", count: filteredOrders.length },
+            {
+              value: "new",
+              label: "New Orders",
+              badge: pendingCount,
+              badgeClassName: "bg-red-500",
+            },
+            { value: "ready", label: "Ready For Dispatch" },
+            { value: "dispatched", label: "Dispatched" },
+            { value: "delivered", label: "Delivered" },
+            { value: "cancelled", label: "Cancelled" },
+            {
+              value: "partner_rejected",
+              label: "Partner Rejected",
+              icon: <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />,
+              badge: partnerRejectedCount,
+              badgeClassName: "bg-amber-500",
+              className: "text-amber-700 dark:text-amber-400",
+            },
+          ]}
+        />
+
+        <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-xl border bg-card/60 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Fulfillment:</span>
+            <Select
+              value={sourceFilter}
+              onValueChange={(v) => setSourceFilter(v as "ALL" | "ADMIN_DIRECT" | "PARTNER_ASSIGNED")}
+            >
+              <SelectTrigger className="h-9 w-[230px] text-xs bg-background font-medium">
+                <SelectValue placeholder="All Sources" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Sources ({searchMatchedOrders.length})</SelectItem>
+                <SelectItem value="ADMIN_DIRECT">Main Branch — Admin Direct ({adminDirectCount})</SelectItem>
+                <SelectItem value="PARTNER_ASSIGNED">Partner Assigned ({partnerAssignedCount})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FilterSummaryBar
+            chips={[
+              ...(sourceFilter !== "ALL"
+                ? [
+                    {
+                      key: "source",
+                      label: "Fulfillment",
+                      value: sourceFilter === "ADMIN_DIRECT" ? "Admin Direct" : "Partner Assigned",
+                      onRemove: () => setSourceFilter("ALL"),
+                    } satisfies ActiveFilterChip,
+                  ]
+                : []),
+              ...(search.trim()
+                ? [
+                    {
+                      key: "search",
+                      label: "Search",
+                      value: search.trim(),
+                      onRemove: () => setSearch(""),
+                    } satisfies ActiveFilterChip,
+                  ]
+                : []),
+            ]}
+            onClearAll={() => {
+              setSourceFilter("ALL");
+              setSearch("");
+            }}
+            showingCount={displayedOrders.length}
+            totalCount={filteredOrders.length}
+            itemLabel="orders"
+          />
         </div>
 
-        <OrderTable data={getOrdersForTab(activeTab)} />
-      </Tabs>
+        <OrderTable data={displayedOrders} />
+      </div>
 
       {selectedOrder && (
         <Dialog open={!!selectedOrder} onOpenChange={(open) => { if (!open) { setSelectedOrder(null); setPendingEngineerSwitch(null); } }}>

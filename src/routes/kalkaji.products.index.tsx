@@ -1,16 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { adminProductListQuery, adminProductDetailQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit, CheckCircle, Clock, Search, Tag, X, Check, ArrowRight, Building2, MapPin, AlertCircle, Eye, Package, ShieldCheck } from "lucide-react";
+import { Trash2, Plus, Edit, CheckCircle, Clock, Search, Tag, X, Check, ArrowRight, Building2, MapPin, AlertCircle, Eye, Package, ShieldCheck, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import {
+  UnderlineTabs,
+  FilterCombobox,
+  FilterSummaryBar,
+  type ActiveFilterChip,
+  type FilterOption,
+} from "@/components/admin/AdminFilters";
 import { normalizeImageUrl } from "@/lib/image/cdn";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -50,11 +56,33 @@ function AdminProducts() {
   const [searchQuery, setSearchQuery] = useState("");
   const PAGE_SIZE = 15;
 
+  const categoryOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const p of products || []) {
+      if (p.productCategory) {
+        counts.set(p.productCategory, (counts.get(p.productCategory) || 0) + 1);
+      }
+    }
+    return Array.from(counts.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([cat, count]) => ({ value: cat, label: cat, count }));
+  }, [products]);
+
   const categoryFilteredProducts = activeCategory === "ALL"
     ? products
     : products?.filter(p => p.productCategory === activeCategory);
 
-  const availableBrands = Array.from(new Set(categoryFilteredProducts?.map(p => p.brandName).filter(Boolean) as string[])).sort();
+  const brandOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const p of categoryFilteredProducts || []) {
+      if (p.brandName) {
+        counts.set(p.brandName, (counts.get(p.brandName) || 0) + 1);
+      }
+    }
+    return Array.from(counts.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([brand, count]) => ({ value: brand, label: brand, count }));
+  }, [categoryFilteredProducts]);
 
   const brandFilteredProducts = activeBrand === "ALL"
     ? categoryFilteredProducts
@@ -171,33 +199,32 @@ function AdminProducts() {
       </div>
 
       {/* Top View Selector: Catalog vs Partner Proposals vs Price Requests */}
-      <div className="border-b pb-4">
-        <Tabs value={catalogViewTab} onValueChange={(v: any) => setCatalogViewTab(v)} className="w-full">
-          <TabsList className="bg-muted/70 p-1 rounded-xl h-auto flex-wrap">
-            <TabsTrigger value="ALL_PRODUCTS" className="rounded-lg text-xs font-semibold py-2 px-4">
-              All Products ({products?.length || 0})
-            </TabsTrigger>
-            <TabsTrigger value="PENDING_PRODUCTS" className="rounded-lg text-xs font-semibold py-2 px-4 flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              Product Proposals
-              {pendingProductProposals.length > 0 && (
-                <span className="ml-1 inline-flex items-center justify-center rounded-full bg-amber-500 text-white text-[10px] px-1.5 py-0.2 font-bold">
-                  {pendingProductProposals.length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="PRICE_REQUESTS" className="rounded-lg text-xs font-semibold py-2 px-4 flex items-center gap-1.5">
-              <Tag className="h-3.5 w-3.5" />
-              City Price Requests
-              {pendingPricingRequests.length > 0 && (
-                <span className="ml-1 inline-flex items-center justify-center rounded-full bg-blue-600 text-white text-[10px] px-1.5 py-0.2 font-bold">
-                  {pendingPricingRequests.length}
-                </span>
-              )}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      <UnderlineTabs
+        value={catalogViewTab}
+        onValueChange={setCatalogViewTab}
+        items={[
+          {
+            value: "ALL_PRODUCTS",
+            label: "All Products",
+            count: products?.length || 0,
+            icon: <Package className="h-3.5 w-3.5" />,
+          },
+          {
+            value: "PENDING_PRODUCTS",
+            label: "Product Proposals",
+            icon: <Clock className="h-3.5 w-3.5" />,
+            badge: pendingProductProposals.length,
+            badgeClassName: "bg-amber-500",
+          },
+          {
+            value: "PRICE_REQUESTS",
+            label: "City Price Requests",
+            icon: <Tag className="h-3.5 w-3.5" />,
+            badge: pendingPricingRequests.length,
+            badgeClassName: "bg-blue-600",
+          },
+        ]}
+      />
 
       {/* ── VIEW 1: PARTNER PRICE REQUESTS ───────────────────────────────── */}
       {catalogViewTab === "PRICE_REQUESTS" && (
@@ -448,38 +475,95 @@ function AdminProducts() {
       {catalogViewTab === "ALL_PRODUCTS" && (
         <>
           {products && products.length > 0 && (
-            <Tabs value={activeCategory} onValueChange={(val) => { setActiveCategory(val); setActiveBrand("ALL"); setCurrentPage(1); }} className="w-full">
-              <TabsList className="mb-4 flex-wrap justify-start h-auto gap-1 bg-muted/50 p-1">
-                <TabsTrigger value="ALL" className="rounded-md">All Categories</TabsTrigger>
-                {Array.from(new Set(products.map(p => p.productCategory).filter(Boolean) as string[])).sort().map(cat => (
-                  <TabsTrigger key={cat} value={cat} className="rounded-md">{cat}</TabsTrigger>
-                ))}
-              </TabsList>
-              
-              {activeCategory !== "ALL" && availableBrands.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Button 
-                    variant={activeBrand === "ALL" ? "default" : "outline"} 
-                    size="sm" 
-                    onClick={() => { setActiveBrand("ALL"); setCurrentPage(1); }}
-                    className="h-7 text-xs rounded-full px-4"
-                  >
-                    All Brands
-                  </Button>
-                  {availableBrands.map(brand => (
-                    <Button 
-                      key={brand}
-                      variant={activeBrand === brand ? "default" : "outline"} 
-                      size="sm" 
-                      onClick={() => { setActiveBrand(brand); setCurrentPage(1); }}
-                      className="h-7 text-xs rounded-full px-4"
-                    >
-                      {brand}
-                    </Button>
-                  ))}
+            <div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <FilterCombobox
+                    label="Category"
+                    value={activeCategory}
+                    onValueChange={(val) => {
+                      setActiveCategory(val);
+                      setActiveBrand("ALL");
+                      setCurrentPage(1);
+                    }}
+                    options={categoryOptions}
+                    allLabel="All Categories"
+                    allCount={products.length}
+                    searchPlaceholder="Search category..."
+                    icon={<Layers className="h-3.5 w-3.5" />}
+                  />
+                  {brandOptions.length > 0 && (
+                    <FilterCombobox
+                      label="Brand"
+                      value={activeBrand}
+                      onValueChange={(val) => {
+                        setActiveBrand(val);
+                        setCurrentPage(1);
+                      }}
+                      options={brandOptions}
+                      allLabel="All Brands"
+                      allCount={categoryFilteredProducts?.length || 0}
+                      searchPlaceholder="Search brand..."
+                      icon={<Tag className="h-3.5 w-3.5" />}
+                    />
+                  )}
                 </div>
-              )}
-            </Tabs>
+
+                <FilterSummaryBar
+                  chips={[
+                    ...(activeCategory !== "ALL"
+                      ? [
+                          {
+                            key: "category",
+                            label: "Category",
+                            value: activeCategory,
+                            onRemove: () => {
+                              setActiveCategory("ALL");
+                              setActiveBrand("ALL");
+                              setCurrentPage(1);
+                            },
+                          } satisfies ActiveFilterChip,
+                        ]
+                      : []),
+                    ...(activeBrand !== "ALL"
+                      ? [
+                          {
+                            key: "brand",
+                            label: "Brand",
+                            value: activeBrand,
+                            onRemove: () => {
+                              setActiveBrand("ALL");
+                              setCurrentPage(1);
+                            },
+                          } satisfies ActiveFilterChip,
+                        ]
+                      : []),
+                    ...(searchQuery.trim()
+                      ? [
+                          {
+                            key: "search",
+                            label: "Search",
+                            value: searchQuery.trim(),
+                            onRemove: () => {
+                              setSearchQuery("");
+                              setCurrentPage(1);
+                            },
+                          } satisfies ActiveFilterChip,
+                        ]
+                      : []),
+                  ]}
+                  onClearAll={() => {
+                    setActiveCategory("ALL");
+                    setActiveBrand("ALL");
+                    setSearchQuery("");
+                    setCurrentPage(1);
+                  }}
+                  showingCount={filteredProducts?.length || 0}
+                  totalCount={products.length}
+                  itemLabel="products"
+                />
+              </div>
+            </div>
           )}
 
       {/* Desktop Table */}

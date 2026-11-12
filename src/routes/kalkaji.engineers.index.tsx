@@ -7,9 +7,14 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { Badge } from "@/components/ui/badge";
 import { engineerService, type EngineerProfile } from "@/services/engineer.service";
 import { partnerService } from "@/services/partner.service";
-import { useState } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  FilterCombobox,
+  FilterSummaryBar,
+  type ActiveFilterChip,
+  type FilterOption,
+} from "@/components/admin/AdminFilters";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -90,6 +95,29 @@ function EngineersPage() {
 
   const adminEngineersCount = engineers.filter((e) => !e.partnerId).length;
 
+  const branchOptions = useMemo<FilterOption[]>(
+    () => [
+      {
+        value: "admin",
+        label: "Direct Admin",
+        count: adminEngineersCount,
+        icon: <Shield className="h-3.5 w-3.5 text-blue-500" />,
+      },
+      ...partners.map((partner) => ({
+        value: partner.id,
+        label: partner.businessName,
+        count: engineers.filter((e) => e.partnerId === partner.id).length,
+        icon: <Building2 className="h-3.5 w-3.5 text-emerald-500" />,
+      })),
+    ],
+    [partners, engineers, adminEngineersCount],
+  );
+
+  const selectedBranchLabel =
+    selectedTab === "admin"
+      ? "Direct Admin"
+      : partners.find((p) => p.id === selectedTab)?.businessName || selectedTab;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -104,60 +132,87 @@ function EngineersPage() {
         </Button>
       </div>
 
-      {/* Tabs for Filtering by Partner / Admin */}
-      <div className="space-y-4">
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <div className="overflow-x-auto pb-1">
-            <TabsList className="h-auto p-1 bg-muted/60 inline-flex flex-nowrap min-w-full sm:min-w-0">
-              <TabsTrigger value="all" className="px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap">
-                All Engineers ({engineers.length})
-              </TabsTrigger>
-              <TabsTrigger value="admin" className="px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap gap-1.5">
-                <Shield className="h-3.5 w-3.5 text-blue-500" />
-                Direct Admin ({adminEngineersCount})
-              </TabsTrigger>
-              {partners.map((partner) => {
-                const partnerEngCount = engineers.filter((e) => e.partnerId === partner.id).length;
-                return (
-                  <TabsTrigger
-                    key={partner.id}
-                    value={partner.id}
-                    className="px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap gap-1.5"
-                  >
-                    <Building2 className="h-3.5 w-3.5 text-emerald-500" />
-                    {partner.businessName} ({partnerEngCount})
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </div>
-        </Tabs>
+      {/* Unified Search & Branch/Status Filter Toolbar */}
+      <div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+            <div className="relative flex-1 min-w-[200px] sm:max-w-xs">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by name, phone, city..."
+                className="pl-8 h-9 bg-background text-xs sm:text-sm"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
-        {/* Search & Actions Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search by name, phone, city..."
-              className="pl-8"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+            <FilterCombobox
+              label="Branch"
+              value={selectedTab}
+              onValueChange={setSelectedTab}
+              options={branchOptions}
+              allValue="all"
+              allLabel="All Engineers"
+              allCount={engineers.length}
+              searchPlaceholder="Search branch or partner..."
+              icon={<Building2 className="h-3.5 w-3.5" />}
             />
+
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[150px] h-9 text-xs bg-background font-medium">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Suspended</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-xs text-muted-foreground ml-auto">
-            Showing <strong className="text-foreground">{filteredEngineers.length}</strong> engineers
-          </span>
+
+          <FilterSummaryBar
+            chips={[
+              ...(selectedTab !== "all"
+                ? [
+                    {
+                      key: "branch",
+                      label: "Branch",
+                      value: selectedBranchLabel,
+                      onRemove: () => setSelectedTab("all"),
+                    } satisfies ActiveFilterChip,
+                  ]
+                : []),
+              ...(statusFilter !== "all"
+                ? [
+                    {
+                      key: "status",
+                      label: "Status",
+                      value: statusFilter === "active" ? "Active" : "Suspended",
+                      onRemove: () => setStatusFilter("all"),
+                    } satisfies ActiveFilterChip,
+                  ]
+                : []),
+              ...(search.trim()
+                ? [
+                    {
+                      key: "search",
+                      label: "Search",
+                      value: search.trim(),
+                      onRemove: () => setSearch(""),
+                    } satisfies ActiveFilterChip,
+                  ]
+                : []),
+            ]}
+            onClearAll={() => {
+              setSelectedTab("all");
+              setStatusFilter("all");
+              setSearch("");
+            }}
+            showingCount={filteredEngineers.length}
+            totalCount={engineers.length}
+            itemLabel="engineers"
+          />
         </div>
       </div>
 
