@@ -12,7 +12,6 @@ import {
   type GateConfigUserItem,
   type GatePinRole,
 } from "@/services/admin.service";
-import { CreateSubAdminModal } from "@/components/admin/CreateSubAdminModal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -42,7 +41,6 @@ import {
   RefreshCw,
   Search,
   Users,
-  UserPlus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/kalkaji/security")({
@@ -389,7 +387,6 @@ function AdminSecurityContent() {
   const [roleFilter, setRoleFilter] = useState<"ALL" | "ADMIN" | "SUB_ADMIN">("ALL");
   const [userSearch, setUserSearch] = useState("");
   const [selectedUserForPin, setSelectedUserForPin] = useState<GateConfigUserItem | null>(null);
-  const [createSubAdminOpen, setCreateSubAdminOpen] = useState(false);
   const [tierTab, setTierTab] = useState<GatePinRole>("ADMIN");
 
   const {
@@ -463,10 +460,6 @@ function AdminSecurityContent() {
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             Refresh
-          </Button>
-          <Button size="sm" onClick={() => setCreateSubAdminOpen(true)} className="gap-1.5">
-            <UserPlus className="h-4 w-4" />
-            Create Sub-Admin
           </Button>
         </div>
       </div>
@@ -675,12 +668,6 @@ function AdminSecurityContent() {
       <SetUserGatePinDialog
         user={selectedUserForPin}
         onClose={() => setSelectedUserForPin(null)}
-      />
-
-      {/* Create Sub-Admin Modal (with Optional Gate PIN) */}
-      <CreateSubAdminModal
-        open={createSubAdminOpen}
-        onOpenChange={setCreateSubAdminOpen}
       />
     </div>
   );
