@@ -73,6 +73,34 @@ function formatTimestamp(timestamp?: string | null, fallbackLabel = "Using syste
   });
 }
 
+function formatSecurityApiError(err: any, fallback: string): string {
+  const baseMessage = err?.message || fallback;
+  const rawErrors =
+    err?.fieldErrors ||
+    err?.raw?.errors ||
+    err?.raw?.fieldErrors ||
+    err?.data?.errors;
+
+  if (rawErrors && typeof rawErrors === "object" && !Array.isArray(rawErrors)) {
+    const entries = Object.entries(rawErrors)
+      .map(([field, val]) => {
+        const text = Array.isArray(val) ? val.join(", ") : String(val ?? "");
+        return text ? `${field}: ${text}` : field;
+      })
+      .filter(Boolean);
+    if (entries.length > 0) {
+      return `${baseMessage} (${entries.join("; ")})`;
+    }
+  }
+
+  const rawDetails = err?.raw?.details;
+  if (typeof rawDetails === "string" && rawDetails.trim()) {
+    return `${baseMessage} (${rawDetails.trim()})`;
+  }
+
+  return baseMessage;
+}
+
 function TierFallbackCard({
   role,
   configured,
@@ -243,9 +271,10 @@ function SetUserGatePinDialog({
       onClose();
     },
     onError: (err: any) => {
-      const msg =
-        err?.message ||
-        "Failed to set personal Gate PIN. Check your current password and ensure the PIN is unique across all Admin & Sub-Admin accounts.";
+      const msg = formatSecurityApiError(
+        err,
+        "Failed to set personal Gate PIN. Check your current password and ensure the PIN is unique across all Admin & Sub-Admin accounts."
+      );
       setServerError(msg);
       toast.error(msg);
     },
@@ -344,9 +373,10 @@ function TierFallbackPinForm({ targetRole }: { targetRole: GatePinRole }) {
       toast.success(`${label} updated securely`);
     },
     onError: (err: any) => {
-      const msg =
-        err?.message ||
-        "Failed to update fallback tier PIN. Verify your current password and ensure it is distinct from other PINs.";
+      const msg = formatSecurityApiError(
+        err,
+        "Failed to update fallback tier PIN. Verify your current password and ensure it is distinct from other PINs."
+      );
       setServerError(msg);
       toast.error(msg);
     },
